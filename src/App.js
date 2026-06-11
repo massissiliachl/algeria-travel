@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import Gallery from './pages/Gallery';
 import Destinations from './pages/Destinations';
 import Contact from './pages/Contact';
+import WhatsAppButton from './components/WhatsAppButton'; // Ajoutez cette ligne
+
 import './App.css';
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
+        <WhatsAppButton />
       </BrowserRouter>
     </LangProvider>
   );

@@ -73,9 +73,7 @@ const Navbar = () => {
         <Link to="/destinations" className={`nav-link-btn ${isActive('/destinations') ? 'active' : ''}`}>
           {t('nav_destinations')}
         </Link>
-        <Link to="/gallery" className={`nav-link-btn ${isActive('/gallery') ? 'active' : ''}`}>
-          {t('nav_gallery')}
-        </Link>
+        
         <Link to="/contact" className={`nav-link-btn ${isActive('/contact') ? 'active' : ''}`}>
           {t('nav_contact')}
         </Link>
