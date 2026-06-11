@@ -23,7 +23,7 @@ const FEATURED_TOURS = [
     oldPrice: 55000,
     rating: 4.9,
     reviews: 234,
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9ofb0IQyWwdN7RdPnQ7wFi1unr80uZcHMzA&s",
+    image: "image.png",
     badge: "POPULAIRE",
     badge_en: "POPULAR"
   },
