@@ -447,7 +447,7 @@ const Destinations = () => {
           left: 0;
           width: 100%;
           height: 100%;
-          background-image: url('/design1.png');
+          background-image: url('https://voyage-en-algerie.com/wp-content/uploads/2026/04/culture-touareg-1.jpg');
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
