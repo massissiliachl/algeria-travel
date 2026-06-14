@@ -264,8 +264,22 @@ const DestinationModal = ({ tour, onClose, language }) => {
   );
 };
 
-// Composant AboutSection
+// Composant AboutSection avec VIDÉO QUI MARCHE
 const AboutSection = ({ language }) => {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlayVideo = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
     <section className="about-section">
       <div className="about-container">
@@ -307,9 +321,30 @@ const AboutSection = ({ language }) => {
           </div>
           
           <div className="about-video" data-aos="fade-left">
-            <div className="video-placeholder">
-              <div className="video-icon">🎥</div>
-              <p>{language === 'fr' ? 'Découvrez notre aventure' : 'Discover our adventure'}</p>
+            <div className="video-wrapper">
+              <video 
+                ref={videoRef}
+                poster="logo.png"
+                className="about-video-element"
+                playsInline
+              >
+<source src="/videos/v.mp4" type="video/mp4" />                {language === 'fr' ? 'Votre navigateur ne supporte pas la vidéo.' : 'Your browser does not support the video tag.'}
+              </video>
+              
+              {!isPlaying && (
+                <div className="video-overlay">
+                  <button className="video-play-btn" onClick={handlePlayVideo}>
+                    <div className="play-icon"></div>
+                  </button>
+                </div>
+              )}
+              
+              {!isPlaying && (
+                <div className="video-badge">
+                  <span>▶</span>
+                  <span>{language === 'fr' ? 'Découvrez notre aventure' : 'Discover our adventure'}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1052,20 +1087,96 @@ const Home = () => {
           color: var(--accent);
         }
 
-        .video-placeholder {
-          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        /* VIDEO STYLES - CORRIGÉS */
+        .video-wrapper {
+          position: relative;
           border-radius: 24px;
-          height: 350px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          color: white;
+          overflow: hidden;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          aspect-ratio: 16/9;
+          background: #000;
+          cursor: pointer;
         }
 
-        .video-icon {
-          font-size: 64px;
-          margin-bottom: 16px;
+        .about-video-element {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .video-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+
+        .video-overlay:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+
+        .video-play-btn {
+          width: 90px;
+          height: 90px;
+          background: rgba(0, 0, 0, 0.6);
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          backdrop-filter: blur(4px);
+        }
+
+        .video-play-btn:hover {
+          transform: scale(1.1);
+          background: rgba(0, 0, 0, 0.8);
+        }
+
+        .play-icon {
+          width: 0;
+          height: 0;
+          border-style: solid;
+          border-width: 18px 0 18px 32px;
+          border-color: transparent transparent transparent white;
+          margin-left: 8px;
+        }
+
+        .video-badge {
+          position: absolute;
+          bottom: 20px;
+          left: 20px;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(10px);
+          padding: 8px 16px;
+          border-radius: 40px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          color: white;
+          font-size: 14px;
+          font-weight: 500;
+          pointer-events: none;
+        }
+
+        .video-badge span:first-child {
+          background: var(--accent);
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
         }
 
         /* Testimonials */
@@ -1308,6 +1419,8 @@ const Home = () => {
           .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
           .about-grid { gap: 40px; }
           .about-stats { gap: 25px; }
+          .video-play-btn { width: 70px; height: 70px; }
+          .play-icon { border-width: 14px 0 14px 24px; }
         }
 
         @media (max-width: 768px) {
@@ -1333,6 +1446,9 @@ const Home = () => {
           .modal-actions { flex-direction: column; }
           .btn-reserver, .btn-contact { text-align: center; width: 100%; }
           .modal-price .current { font-size: 1.5rem; }
+          .video-play-btn { width: 60px; height: 60px; }
+          .play-icon { border-width: 12px 0 12px 20px; }
+          .video-badge { font-size: 11px; padding: 5px 12px; bottom: 12px; left: 12px; }
         }
 
         @media (max-width: 576px) {
@@ -1348,10 +1464,12 @@ const Home = () => {
           .panel-price { font-size: 18px; }
           .feature { flex-direction: column; align-items: center; text-align: center; }
           .about-stats .stat span { font-size: 1.3rem; }
-          .video-placeholder { height: 220px; }
           .testimonial-text { font-size: 0.9rem; }
           .modal-content { padding: 16px; }
           .modal-info { gap: 12px; font-size: 12px; }
+          .video-play-btn { width: 50px; height: 50px; }
+          .play-icon { border-width: 10px 0 10px 16px; }
+          .video-badge { font-size: 10px; padding: 4px 10px; }
         }
 
         @media (max-width: 480px) {
