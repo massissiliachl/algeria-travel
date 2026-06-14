@@ -41,7 +41,7 @@ iframe {
 .language-selector-wrapper button {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  color: var(--text-dark);
   padding: 6px 12px;
   margin: 0 4px;
   border-radius: 6px;
@@ -60,7 +60,7 @@ iframe {
 .language-selector-wrapper button[data-active="true"] {
   background: var(--accent, #c6a43b);
   border-color: var(--accent, #c6a43b);
-  color: white;
+  color: var(--text-dark);
 }
 
 /* Version mobile */
@@ -77,8 +77,30 @@ iframe {
     width: calc(50% - 8px);
   }
 }
+
+/* Variables de thème par défaut (utilisées via body[data-theme]) */
+body[data-theme="light"] {
+  --bg-body: linear-gradient(135deg, #FFFCF8 0%, #F5EDE3 50%, #E8D9C5 100%);
+  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,239,230,0.9));
+  --text-dark: #111111;
+  --text-light: #6B6B6B;
+  --border-color: rgba(17,17,17,0.08);
+  --accent: #c6a43b;
+}
+
+body[data-theme="dark"] {
+  --bg-body: linear-gradient(135deg, #041019 0%, #07121a 50%, #0f2c3a 100%);
+  --card-bg: linear-gradient(180deg, rgba(7,18,26,0.8), rgba(7,24,32,0.8));
+  --text-dark: #e6eef2;
+  --text-light: #9aa6ad;
+  --border-color: rgba(255,255,255,0.06);
+  --accent: #d4844a;
+}
+
 body {
-  background-color: var(--blanc-casse);
+  background: var(--bg-body) fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
   font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--text-dark);
   line-height: 1.5;
@@ -108,7 +130,7 @@ h1, h2, h3, .serif {
 
 ::selection {
   background: var(--terre-cuite);
-  color: white;
+  color: var(--text-dark);
 }
 
 .btn-primary {
@@ -116,7 +138,7 @@ h1, h2, h3, .serif {
   border: none;
   padding: 14px 32px;
   font-weight: 700;
-  color: white;
+  color: var(--text-dark);
   border-radius: 50px;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -139,7 +161,7 @@ h1, h2, h3, .serif {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-dark);
   text-decoration: none;
   letter-spacing: -0.02em;
   transition: transform 0.3s ease;
@@ -153,7 +175,7 @@ h1, h2, h3, .serif {
   background: var(--terre-cuite);
   padding: 10px 24px;
   border-radius: 50px;
-  color: white !important;
+  color: var(--text-dark) !important;
 }
 .btn-reserve::after { display: none; }
 .btn-reserve:hover { background: var(--ocre); transform: translateY(-2px); }
@@ -183,7 +205,7 @@ h1, h2, h3, .serif {
 .hero-content {
   max-width: 750px;
   margin-left: 8%;
-  color: white;
+  color: var(--text-dark);
   position: relative;
   z-index: 2;
   animation: fadeInUp 1s ease;
@@ -262,7 +284,7 @@ h1, h2, h3, .serif {
 
 .search-btn {
   background: linear-gradient(135deg, var(--terre-cuite), var(--ocre));
-  color: white;
+  color: var(--text-dark);
   border: none;
   padding: 14px 36px;
   border-radius: 50px;
@@ -392,7 +414,7 @@ h1, h2, h3, .serif {
 .itinerary {
   margin: 60px 40px;
   padding: 50px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 56px;
   box-shadow: 0 15px 35px rgba(0,0,0,0.05);
 }
@@ -464,7 +486,7 @@ h1, h2, h3, .serif {
 
 .reviews-section {
   margin: 60px 40px;
-  background: linear-gradient(135deg, #fff, #fef9f5);
+  background: var(--card-bg);
   border-radius: 56px;
   padding: 55px;
   box-shadow: 0 15px 35px rgba(0,0,0,0.05);
@@ -478,7 +500,7 @@ h1, h2, h3, .serif {
 
 .review-form-card {
   flex: 1;
-  background: white;
+  background: var(--card-bg);
   border-radius: 40px;
   padding: 35px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -504,7 +526,7 @@ h1, h2, h3, .serif {
 
 .star-rating label {
   font-size: 2rem;
-  color: #ddd;
+  color: var(--text-light);
   cursor: pointer;
   transition: color 0.2s;
 }
@@ -561,7 +583,7 @@ h1, h2, h3, .serif {
 }
 
 .review-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 28px;
   padding: 20px;
   margin-bottom: 20px;
@@ -661,9 +683,9 @@ h1, h2, h3, .serif {
 }
 .rating i { color: #FFB800; margin-right: 3px; }
 
-.visa-section {
+visa-section {
   margin: 60px 40px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 56px;
   padding: 55px;
   display: flex;
@@ -728,11 +750,11 @@ h1, h2, h3, .serif {
 
 .footer {
   background: var(--bleu-mediterranee);
-  color: #ccc;
+  color: var(--text-light);
   padding: 70px 50px 40px;
   margin-top: 80px;
 }
-.footer a { color: #ccc; text-decoration: none; transition: color 0.3s; }
+.footer a { color: var(--text-light); text-decoration: none; transition: color 0.3s; }
 .footer a:hover { color: var(--ocre); }
 
 .newsletter-input {
@@ -747,7 +769,7 @@ h1, h2, h3, .serif {
   border-radius: 50px;
   border: none;
   background: rgba(255,255,255,0.12);
-  color: white;
+  color: var(--text-dark);
 }
 .newsletter-input button {
   background: var(--terre-cuite);
@@ -796,17 +818,457 @@ h1, h2, h3, .serif {
     word-break: break-word;
   }
 
-  .hero-content p {
-    max-width: 100%;
+  .hero-content {
+    max-width: 750px;
+    margin-left: 8%;
+    color: var(--text-dark);
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 1s ease;
   }
-
-  .footer {
-    padding: 50px 20px 30px;
-  }
-
   .search-section {
     padding: 0 16px;
   }
 }
 
+  /* src/theme.css - Styles supplémentaires pour le thème */
+
+/* Cartes */
+.tour-card,
+.testimonial-card,
+.card {
+  background: var(--card-bg);
+  color: var(--text-dark);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* Sections */
+.section-dest,
+.section,
+.testimonials-section,
+.about-section,
+.section-newsletter {
+  background-color: var(--bg-body);
+  transition: background 0.3s ease;
+}
+
+/* Bordures */
+.tour-footer,
+.testimonial-author,
+.modal-info,
+.modal-info-grid,
+.modal-inclusions,
+.about-stats {
+  border-color: var(--border-color);
+}
+
+/* Inputs */
+input, textarea, select {
+  background-color: var(--card-bg);
+  color: var(--text-dark);
+  border-color: var(--border-color);
+}
+
+/* Texte secondaire */
+.tour-description,
+.testimonial-text,
+.panel-desc,
+.card-subtitle {
+  color: var(--text-light);
+}
+
+/* Mode clair - ajustements spécifiques */
+[data-theme="light"] .hero-content h1,
+[data-theme="light"] .hero-content p {
+  color: white;
+}
+
+[data-theme="light"] .logo {
+  color: white;
+}
+
+[data-theme="light"] .logo span {
+  color: var(--ocre);
+}
+
+[data-theme="light"] .section-title {
+  color: var(--bleu-mediterranee);
+}
+
+[data-theme="dark"] .section-title {
+  color: var(--text-dark);
+}
+/* src/App.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* ============================================
+   VARIABLES PAR DÉFAUT
+   ============================================ */
+:root {
+  --sable: #E8D9C5;
+  --terre-cuite: #C25D3A;
+  --ocre: #D4844A;
+  --bleu-mediterranee: #1B3A4B;
+  --bleu-profondeur: #0F2C3A;
+  --sable-clair: #F5EDE3;
+  --blanc-casse: #FFFCF8;
+  --text-dark: #2C2C2C;
+  --text-light: #6B6B6B;
+  --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ============================================
+   THÈME CLAIR - DÉGRADÉS CHALEUREUX
+   ============================================ */
+body[data-theme="light"] {
+  /* Dégradé principal - lumière du désert */
+  --bg-gradient: linear-gradient(145deg, #FFFCF8 0%, #FEF7E9 25%, #F5EDE3 50%, #EDE3D5 75%, #FFFCF8 100%);
   
+  /* Dégradé secondaire - sable et terre */
+  --bg-secondary: linear-gradient(135deg, #FFFFFF 0%, #F8F2EA 100%);
+  
+  /* Dégradé pour cartes - effet verre clair */
+  --card-gradient: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,242,234,0.9) 100%);
+  
+  /* Dégradé pour hero overlay */
+  --hero-overlay: linear-gradient(135deg, rgba(27,58,75,0.65), rgba(15,44,58,0.4));
+  
+  /* Couleurs */
+  --text-dark: #2C2C2C;
+  --text-light: #6B6B6B;
+  --border-color: rgba(44,44,44,0.08);
+  --accent: #c6a43b;
+  --accent-glow: 0 0 20px rgba(198,164,59,0.3);
+}
+
+/* ============================================
+   THÈME SOMBRE - DÉGRADÉS PROFONDS
+   ============================================ */
+body[data-theme="dark"] {
+  /* Dégradé principal - nuit étoilée sur le Sahara */
+  --bg-gradient: linear-gradient(145deg, #041019 0%, #06121c 15%, #0a1a28 50%, #06121c 85%, #041019 100%);
+  
+  /* Dégradé secondaire - bleu profond */
+  --bg-secondary: linear-gradient(135deg, #07121a 0%, #0a1a25 100%);
+  
+  /* Dégradé pour cartes - effet verre sombre */
+  --card-gradient: linear-gradient(135deg, rgba(7,18,26,0.9) 0%, rgba(10,26,37,0.85) 100%);
+  
+  /* Dégradé pour hero overlay */
+  --hero-overlay: linear-gradient(135deg, rgba(27,58,75,0.75), rgba(15,44,58,0.5));
+  
+  /* Couleurs */
+  --text-dark: #E6EEF2;
+  --text-light: #9AA6AD;
+  --border-color: rgba(230,238,242,0.06);
+  --accent: #D4844A;
+  --accent-glow: 0 0 25px rgba(212,132,74,0.3);
+}
+
+/* ============================================
+   STYLES DE BASE
+   ============================================ */
+body {
+  background: var(--bg-gradient) fixed;
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.5;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
+/* ============================================
+   STYLES DES SECTIONS AVEC DÉGRADÉS
+   ============================================ */
+.section-dest,
+.section,
+.testimonials-section,
+.about-section,
+.section-newsletter {
+  background: var(--bg-secondary);
+  transition: background 0.4s ease;
+  border-radius: 0;
+}
+
+/* ============================================
+   STYLES DES CARTES
+   ============================================ */
+.tour-card,
+.testimonial-card,
+.card,
+.search-card,
+.review-card,
+.review-form-card,
+.itinerary,
+.visa-section {
+  background: var(--card-gradient);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  transition: all 0.4s ease;
+}
+
+.tour-card:hover,
+.testimonial-card:hover,
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+/* ============================================
+   STYLES DES SECTIONS SPÉCIALES
+   ============================================ */
+.hero {
+  background: var(--hero-overlay), 
+              url('https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-560126657.jpg?c=original') center/cover no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to top, var(--bg-gradient), transparent);
+  pointer-events: none;
+}
+
+/* ============================================
+   STYLES DES TITRES
+   ============================================ */
+.section-title {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--bleu-mediterranee), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+}
+
+[data-theme="dark"] .section-title {
+  background: linear-gradient(135deg, #E6EEF2, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  margin: 20px auto 0;
+  border-radius: 3px;
+}
+
+/* ============================================
+   STYLES DES FORMULAIRES
+   ============================================ */
+input, textarea, select {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(198,164,59,0.2);
+}
+
+/* ============================================
+   STYLES DES BOUTONS
+   ============================================ */
+.btn-primary,
+.search-btn,
+.submit-review {
+  background: linear-gradient(135deg, var(--accent), var(--terre-cuite));
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-primary:hover,
+.search-btn:hover,
+.submit-review:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  filter: brightness(1.05);
+}
+
+/* ============================================
+   STYLES DU FOOTER
+   ============================================ */
+.footer {
+  background: linear-gradient(135deg, var(--bleu-mediterranee), var(--bleu-profondeur));
+  color: var(--text-light);
+  padding: 70px 50px 40px;
+  margin-top: 80px;
+}
+
+[data-theme="dark"] .footer {
+  background: linear-gradient(135deg, #041019, #07121a);
+}
+
+/* ============================================
+   STYLES DES MODALS
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(5px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-container {
+  background: var(--card-gradient);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  overflow-y: auto;
+  max-width: 900px;
+  width: 90%;
+  max-height: 90vh;
+}
+
+/* ============================================
+   STYLES DES TÉMOIGNAGES
+   ============================================ */
+.testimonial {
+  background: linear-gradient(135deg, var(--card-gradient), var(--bg-secondary));
+  border-radius: 56px;
+  padding: 70px 60px;
+  text-align: center;
+  margin: 60px 40px;
+}
+
+/* ============================================
+   STYLES DES ÉTAPES
+   ============================================ */
+.step-number {
+  background: linear-gradient(135deg, var(--accent), var(--terre-cuite));
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--accent), var(--terre-cuite));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.1);
+}
+
+/* ============================================
+   SÉLECTION DE TEXTE
+   ============================================ */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--accent);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .hero-content h1 { font-size: 3.2rem; }
+  .search-card { flex-direction: column; border-radius: 40px; }
+  .testimonial { margin: 30px 20px; padding: 35px; }
+  .hero { background-attachment: scroll; }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .hero { min-height: 100svh; background-attachment: scroll; }
+  .hero-content { margin-left: 0; padding: 0 20px; text-align: center; }
+  .hero-content h1 { font-size: 2.25rem; }
+  .hero-content p { max-width: 100%; }
+  .footer { padding: 50px 20px 30px; }
+  .search-section { padding: 0 16px; }
+  .section-title { font-size: 2rem; }
+  .testimonial { margin: 30px 16px; padding: 25px; }
+  .testimonial p { font-size: 1.2rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 { font-size: 1.8rem; }
+  .section-title { font-size: 1.6rem; }
+}

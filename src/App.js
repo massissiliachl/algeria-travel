@@ -1,16 +1,27 @@
 // src/App.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LangProvider } from './hooks/useLangHook';
 import Home from './pages/Home';
 import Gallery from './pages/Gallery';
 import Destinations from './pages/Destinations';
 import Contact from './pages/Contact';
-import WhatsAppButton from './components/WhatsAppButton'; // Ajoutez cette ligne
+import WhatsAppButton from './components/WhatsAppButton';
 
 import './App.css';
 
 function App() {
+  // Charger le thème sauvegardé au démarrage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.body.setAttribute('data-theme', savedTheme);
+    } else {
+      // Par défaut, thème sombre
+      document.body.setAttribute('data-theme', 'dark');
+    }
+  }, []);
+
   return (
     <LangProvider>
       <BrowserRouter>

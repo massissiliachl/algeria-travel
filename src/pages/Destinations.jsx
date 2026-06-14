@@ -1,914 +1,1026 @@
-// src/pages/Destinations.jsx
-import React, { useState, useEffect, useRef } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import { useState, useEffect, useRef } from "react";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { useLang } from '../hooks/useLangHook';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
-const getLocalizedDest = (dest, pick) => ({
-  ...dest,
-  subtitle: pick(dest.subtitle, dest.subtitle_en),
-  description: pick(dest.description, dest.description_en),
-  bestTime: pick(dest.bestTime, dest.bestTime_en),
-  duration: pick(dest.duration, dest.duration_en),
-  itinerary: dest.itinerary.map((item) => ({
-    ...item,
-    title: pick(item.title, item.title_en),
-    desc: pick(item.desc, item.desc_en),
-  })),
-});
+const destinations = [
+  {
+    id: 1,
+    name: "Timgad",
+    name_fr: "Timgad",
+    name_en: "Timgad",
+    subtitle: "The Pompeii of Africa",
+    subtitle_fr: "La Pompéi de l'Afrique",
+    subtitle_en: "The Pompeii of Africa",
+    description: "UNESCO-listed Roman ruins among the best preserved in North Africa.",
+    description_fr: "Ruines romaines classées à l'UNESCO parmi les mieux préservées d'Afrique du Nord.",
+    description_en: "UNESCO-listed Roman ruins among the best preserved in North Africa.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHaUG1Z_ZV2gwi8RAX55XRmHI3fqbAziuyrg&s",
+    location: "Batna, Aurès",
+    bestTime: "Mar – May / Sep – Nov",
+    bestTime_fr: "Mars – Mai / Sep – Nov",
+    bestTime_en: "Mar – May / Sep – Nov",
+    duration: "4 days",
+    duration_fr: "4 jours",
+    duration_en: "4 days",
+    price: "45,000",
+    rating: 4.8,
+    category: "culture",
+    activities: ["🏛️ Antique site", "📜 Mosaics", "🚶 Hiking"],
+    activities_fr: ["🏛️ Site antique", "📜 Mosai͏̈ques", "🚶 Randonnée"],
+    itinerary: [
+      { day: 1, title: "Arrival in Batna", title_fr: "Arrivée à Batna", desc: "Welcome and check-in", desc_fr: "Accueil et installation" },
+      { day: 2, title: "Timgad", title_fr: "Timgad", desc: "Full tour of the Roman site", desc_fr: "Visite complète du site romain" },
+      { day: 3, title: "Exploration", title_fr: "Exploration", desc: "Baths and forum", desc_fr: "Thermes et forum" },
+      { day: 4, title: "Departure", title_fr: "Départ", desc: "Airport transfer", desc_fr: "Transfert aéroport" },
+    ],
+  },
+  {
+    id: 2,
+    name: "Timimoun",
+    name_fr: "Timimoun",
+    name_en: "Timimoun",
+    subtitle: "The Red Oasis",
+    subtitle_fr: "L'Oasis Rouge",
+    subtitle_en: "The Red Oasis",
+    description: "Red-earth ksour perched on Sahara dunes. A truly unique spectacle.",
+    description_fr: "Ksour en terre rouge perchés sur les dunes du Sahara. Un spectacle unique.",
+    description_en: "Red-earth ksour perched on Sahara dunes. A truly unique spectacle.",
+    image: "https://elwatan.dz/wp-content/uploads/storage/43970/TIMIMOUN.jpg",
+    location: "Gourara, Grand Sud",
+    bestTime: "October – April",
+    bestTime_fr: "Octobre – Avril",
+    bestTime_en: "October – April",
+    duration: "5 days",
+    duration_fr: "5 jours",
+    duration_en: "5 days",
+    price: "35,000",
+    rating: 4.9,
+    category: "desert",
+    activities: ["🏜️ Dunes", "🕌 Ksour", "🌅 Sunset"],
+    activities_fr: ["🏜️ Dunes", "🕌 Ksour", "🌅 Coucher de soleil"],
+    itinerary: [
+      { day: 1, title: "Arrival", title_fr: "Arrivée", desc: "Welcome and mint tea", desc_fr: "Accueil et thé à la menthe" },
+      { day: 2, title: "Ksour", title_fr: "Ksour", desc: "Discover the red villages", desc_fr: "Découverte des villages rouges" },
+      { day: 3, title: "Dunes", title_fr: "Dunes", desc: "Trek and sunset", desc_fr: "Trek et coucher de soleil" },
+      { day: 4, title: "Crafts", title_fr: "Artisanat", desc: "Pottery workshop", desc_fr: "Atelier poterie" },
+      { day: 5, title: "Departure", title_fr: "Départ", desc: "Airport transfer", desc_fr: "Transfert aéroport" },
+    ],
+  },
+  {
+    id: 3,
+    name: "Tassili n'Ajjer",
+    name_fr: "Tassili n'Ajjer",
+    name_en: "Tassili n'Ajjer",
+    subtitle: "The Open-Air Museum",
+    subtitle_fr: "Le Musée à Ciel Ouvert",
+    subtitle_en: "The Open-Air Museum",
+    description: "Prehistoric rock art and UNESCO-listed lunar landscapes in the deep Sahara.",
+    description_fr: "Art rupestre préhistorique et paysages lunaires classés à l'UNESCO dans le Grand Sud.",
+    description_en: "Prehistoric rock art and UNESCO-listed lunar landscapes in the deep Sahara.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx0zN9XuJEhMuuosMwDbWxfkCyikBakJBMIQ&s",
+    location: "Djanet, Sahara",
+    bestTime: "November – February",
+    bestTime_fr: "Novembre – Février",
+    bestTime_en: "November – February",
+    duration: "7 days",
+    duration_fr: "7 jours",
+    duration_en: "7 days",
+    price: "12,500",
+    rating: 4.9,
+    category: "nature",
+    activities: ["🎨 Rock art", "🥾 Trek", "⛺ Bivouac"],
+    activities_fr: ["🎨 Art rupestre", "🥾 Trek", "⛺ Bivouac"],
+    itinerary: [
+      { day: 1, title: "Arrival", title_fr: "Arrivée", desc: "Trek preparation", desc_fr: "Préparation du trek" },
+      { day: 2, title: "Departure", title_fr: "Départ", desc: "4x4 route", desc_fr: "Route en 4x4" },
+      { day: 3, title: "Engravings", title_fr: "Gravures", desc: "Prehistoric art", desc_fr: "Art préhistorique" },
+      { day: 4, title: "Canyons", title_fr: "Canyons", desc: "Gorge trek", desc_fr: "Trek dans les gorges" },
+      { day: 5, title: "Bivouac", title_fr: "Bivouac", desc: "Night under the stars", desc_fr: "Nuit sous les étoiles" },
+      { day: 6, title: "Return", title_fr: "Retour", desc: "Return route", desc_fr: "Route retour" },
+      { day: 7, title: "Departure", title_fr: "Départ", desc: "Airport transfer", desc_fr: "Transfert aéroport" },
+    ],
+  },
+  {
+    id: 4,
+    name: "Ghardaïa",
+    name_fr: "Ghardaïa",
+    name_en: "Ghardaïa",
+    subtitle: "M'Zab Valley",
+    subtitle_fr: "Vallée du M'Zab",
+    subtitle_en: "M'Zab Valley",
+    description: "Unique Berber architecture, fortified cities and lush oases of the valley.",
+    description_fr: "Architecture berbère unique, cités fortifiées et oasis verdoyantes de la vallée.",
+    description_en: "Unique Berber architecture, fortified cities and lush oases of the valley.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgbwTu5UUydTv5_SwzjDeb9f75Fj4J_L9OyA&s",
+    location: "Vallée du M'Zab",
+    bestTime: "October – March",
+    bestTime_fr: "Octobre – Mars",
+    bestTime_en: "October – March",
+    duration: "4 days",
+    duration_fr: "4 jours",
+    duration_en: "4 days",
+    price: "48,000",
+    rating: 4.8,
+    category: "culture",
+    activities: ["🏛️ Architecture", "🎨 Crafts", "🕌 Mosques"],
+    activities_fr: ["🏛️ Architecture", "🎨 Artisanat", "🕌 Mosquées"],
+    itinerary: [
+      { day: 1, title: "Arrival", title_fr: "Arrivée", desc: "Valley panorama", desc_fr: "Panorama sur la vallée" },
+      { day: 2, title: "Ksour", title_fr: "Ksour", desc: "Architecture tour", desc_fr: "Tour architectural" },
+      { day: 3, title: "Palm grove", title_fr: "Palmeraie", desc: "Local workshop", desc_fr: "Atelier local" },
+      { day: 4, title: "Departure", title_fr: "Départ", desc: "Transfer", desc_fr: "Transfert" },
+    ],
+  },
+  {
+    id: 5,
+    name: "Djemila",
+    name_fr: "Djemila",
+    name_en: "Djemila",
+    subtitle: "The Roman Pearl",
+    subtitle_fr: "La Perle Romaine",
+    subtitle_en: "The Roman Pearl",
+    description: "Among the best-preserved archaeological sites in the world, UNESCO-listed.",
+    description_fr: "Parmi les sites archéologiques les mieux préservés au monde, classé UNESCO.",
+    description_en: "Among the best-preserved archaeological sites in the world, UNESCO-listed.",
+    image: "https://visitalgeria.org/wp-content/uploads/2024/04/Djemila-the-archaeological-zone-of-the-well-preserved-Berber-Roman-ruins-in-North-Africa-Algeria.-UNESCO-World-Heritage-Site-15-1024x536.jpg",
+    location: "Sétif",
+    bestTime: "May – October",
+    bestTime_fr: "Mai – Octobre",
+    bestTime_en: "May – October",
+    duration: "3 days",
+    duration_fr: "3 jours",
+    duration_en: "3 days",
+    price: "20,000",
+    rating: 4.7,
+    category: "culture",
+    activities: ["🏛️ Ruins", "📜 Mosaics", "🎭 Theatre"],
+    activities_fr: ["🏛️ Ruines", "📜 Mosai͏̈ques", "🎭 Théâtre"],
+    itinerary: [
+      { day: 1, title: "Arrival", title_fr: "Arrivée", desc: "Check-in", desc_fr: "Installation" },
+      { day: 2, title: "Djemila", title_fr: "Djemila", desc: "Site visit", desc_fr: "Visite du site" },
+      { day: 3, title: "Departure", title_fr: "Départ", desc: "Transfer", desc_fr: "Transfert" },
+    ],
+  },
+  {
+    id: 6,
+    name: "Taghit",
+    name_fr: "Taghit",
+    name_en: "Taghit",
+    subtitle: "The Secret Oasis",
+    subtitle_fr: "L'Oasis Secrète",
+    subtitle_en: "The Secret Oasis",
+    description: "Majestic dunes and a preserved oasis in the heart of the Algerian Sahara.",
+    description_fr: "Dunes majestueuses et oasis préservée au cœur du Sahara algérien.",
+    description_en: "Majestic dunes and a preserved oasis in the heart of the Algerian Sahara.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxC8ziUGgisBwriU1vhBnxClvWqqsfs8c2kA&s",
+    location: "Béchar, Sahara",
+    bestTime: "October – March",
+    bestTime_fr: "Octobre – Mars",
+    bestTime_en: "October – March",
+    duration: "4 days",
+    duration_fr: "4 jours",
+    duration_en: "4 days",
+    price: "720",
+    rating: 4.8,
+    category: "desert",
+    activities: ["🏜️ Dunes", "🌴 Palm grove", "🌅 Sunset"],
+    activities_fr: ["🏜️ Dunes", "🌴 Palmeraie", "🌅 Coucher de soleil"],
+    itinerary: [
+      { day: 1, title: "Arrival", title_fr: "Arrivée", desc: "Welcome", desc_fr: "Accueil" },
+      { day: 2, title: "Dunes", title_fr: "Dunes", desc: "Camel trek", desc_fr: "Trek à dos de chameau" },
+      { day: 3, title: "Oasis", title_fr: "Oasis", desc: "Palm grove visit", desc_fr: "Visite de la palmeraie" },
+      { day: 4, title: "Departure", title_fr: "Départ", desc: "Transfer", desc_fr: "Transfert" },
+    ],
+  },
+];
 
-const Destinations = () => {
-  const { t, pick } = useLang();
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [selectedItinerary, setSelectedItinerary] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const FILTERS = [
+  { key: "all", label: "All", label_fr: "Tous", icon: "✦" },
+  { key: "culture", label: "Culture", label_fr: "Culture", icon: "🏛️" },
+  { key: "desert", label: "Desert", label_fr: "Désert", icon: "🏜️" },
+  { key: "nature", label: "Nature", label_fr: "Nature", icon: "🌿" },
+];
+
+export default function Destinations() {
+  const { language, t, pick } = useLang();
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [flippedCard, setFlippedCard] = useState(null);
   const [visibleCount, setVisibleCount] = useState(6);
+  const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef(null);
 
   useEffect(() => {
-    AOS.init({ duration: 800, once: true, offset: 50 });
-    setTimeout(() => setIsLoading(false), 500);
-    
-    const handleScroll = () => {
-      if (heroRef.current) {
-        heroRef.current.style.opacity = `${Math.max(0, 1 - window.scrollY / 600)}`;
-        if (window.innerWidth > 768) {
-          heroRef.current.style.transform = `scale(${1 - window.scrollY / 2000})`;
-        } else {
-          heroRef.current.style.transform = 'none';
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const destinations = [
-    {
-      id: 1,
-      name: "Timgad",
-      subtitle: "La Pompéi de l'Afrique",
-      subtitle_en: "The Pompeii of Africa",
-      description: "Vestiges romains classés UNESCO parmi les mieux préservés d'Afrique du Nord.",
-      description_en: "UNESCO-listed Roman ruins among the best preserved in North Africa.",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHaUG1Z_ZV2gwi8RAX55XRmHI3fqbAziuyrg&s",
-      location: "Batna, Aurès",
-      bestTime: "Mars - Mai / Sept - Nov",
-      bestTime_en: "Mar - May / Sep - Nov",
-      duration: "4 jours",
-      duration_en: "4 days",
-      price: "45000",
-      rating: 4.8,
-      category: "culture",
-      activities: ["🏛️ Site antique", "📜 Mosaïques", "🚶 Randonnée"],
-      itinerary: [
-        { day: 1, title: "Arrivée à Batna", title_en: "Arrival in Batna", desc: "Accueil et installation", desc_en: "Welcome and check-in" },
-        { day: 2, title: "Timgad", title_en: "Timgad", desc: "Visite complète du site romain", desc_en: "Full tour of the Roman site" },
-        { day: 3, title: "Exploration", title_en: "Exploration", desc: "Thermes et forum", desc_en: "Baths and forum" },
-        { day: 4, title: "Départ", title_en: "Departure", desc: "Transfert aéroport", desc_en: "Airport transfer" }
-      ]
-    },
-    {
-      id: 2,
-      name: "Timimoun",
-      subtitle: "L'Oasis Rouge",
-      subtitle_en: "The Red Oasis",
-      description: "Ksour en terre rouge perchés sur les dunes du Sahara. Un spectacle unique.",
-      description_en: "Red-earth ksour perched on Sahara dunes. A unique spectacle.",
-      image: "https://elwatan.dz/wp-content/uploads/storage/43970/TIMIMOUN.jpg",
-      location: "Gourara, Grand Sud",
-      bestTime: "Octobre - Avril",
-      bestTime_en: "October - April",
-      duration: "5 jours",
-      duration_en: "5 days",
-      price: "35000",
-      rating: 4.9,
-      category: "desert",
-      activities: ["🏜️ Dunes", "🕌 Ksour", "🌅 Coucher soleil"],
-      itinerary: [
-        { day: 1, title: "Arrivée", title_en: "Arrival", desc: "Accueil et thé à la menthe", desc_en: "Welcome and mint tea" },
-        { day: 2, title: "Ksour", title_en: "Ksour", desc: "Découverte des villages rouges", desc_en: "Discover the red villages" },
-        { day: 3, title: "Dunes", title_en: "Dunes", desc: "Trek et coucher de soleil", desc_en: "Trek and sunset" },
-        { day: 4, title: "Artisanat", title_en: "Crafts", desc: "Atelier poterie", desc_en: "Pottery workshop" },
-        { day: 5, title: "Départ", title_en: "Departure", desc: "Transfert aéroport", desc_en: "Airport transfer" }
-      ]
-    },
-    
-    {
-      id: 8,
-      name: "Taghit",
-      subtitle: "L'Oasis Secrète",
-      subtitle_en: "The Secret Oasis",
-      description: "Dunes majestueuses et oasis préservée au cœur du Sahara.",
-      description_en: "Majestic dunes and a preserved oasis in the heart of the Sahara.",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxC8ziUGgisBwriU1vhBnxClvWqqsfs8c2kA&s",
-      location: "Béchar, Sahara",
-      bestTime: "Octobre - Mars",
-      bestTime_en: "October - March",
-      duration: "4 jours",
-      duration_en: "4 days",
-      price: "720",
-      rating: 4.8,
-      category: "desert",
-      activities: ["🏜️ Dunes", "🌴 Palmeraie", "🌅 Coucher soleil"],
-      itinerary: [
-        { day: 1, title: "Arrivée", title_en: "Arrival", desc: "Accueil", desc_en: "Welcome" },
-        { day: 2, title: "Dunes", title_en: "Dunes", desc: "Trek chamelier", desc_en: "Camel trek" },
-        { day: 3, title: "Oasis", title_en: "Oasis", desc: "Visite palmeraie", desc_en: "Palm grove visit" },
-        { day: 4, title: "Départ", title_en: "Departure", desc: "Transfert", desc_en: "Transfer" }
-      ]
-    },
-    {
-      id: 3,
-      name: "Tassili n'Ajjer",
-      subtitle: "Le Musée à Ciel Ouvert",
-      subtitle_en: "The Open-Air Museum",
-      description: "Art rupestre préhistorique et paysages lunaires classés UNESCO.",
-      description_en: "Prehistoric rock art and UNESCO-listed lunar landscapes.",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx0zN9XuJEhMuuosMwDbWxfkCyikBakJBMIQ&s",
-      location: "Djanet, Sahara",
-      bestTime: "Novembre - Février",
-      bestTime_en: "November - February",
-      duration: "7 jours",
-      duration_en: "7 days",
-      price: "12500",
-      rating: 4.9,
-      category: "nature",
-      activities: ["🎨 Art rupestre", "🥾 Trek", "⛺ Bivouac"],
-      itinerary: [
-        { day: 1, title: "Arrivée", title_en: "Arrival", desc: "Préparation du trek", desc_en: "Trek preparation" },
-        { day: 2, title: "Départ", title_en: "Departure", desc: "Route en 4x4", desc_en: "4x4 route" },
-        { day: 3, title: "Gravures", title_en: "Engravings", desc: "Art préhistorique", desc_en: "Prehistoric art" },
-        { day: 4, title: "Canyons", title_en: "Canyons", desc: "Trek dans les gorges", desc_en: "Gorge trek" },
-        { day: 5, title: "Bivouac", title_en: "Bivouac", desc: "Nuit sous les étoiles", desc_en: "Night under the stars" },
-        { day: 6, title: "Retour", title_en: "Return", desc: "Route retour", desc_en: "Return route" },
-        { day: 7, title: "Départ", title_en: "Departure", desc: "Transfert aéroport", desc_en: "Airport transfer" }
-      ]
-    },
- 
-    {
-      id: 5,
-      name: "Ghardaïa",
-      subtitle: "Vallée du M'Zab",
-      subtitle_en: "M'Zab Valley",
-      description: "Architecture berbère unique, cités fortifiées et oasis verdoyantes.",
-      description_en: "Unique Berber architecture, fortified cities and lush oases.",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgbwTu5UUydTv5_SwzjDeb9f75Fj4J_L9OyA&s",
-      location: "Vallée du M'Zab",
-      bestTime: "Octobre - Mars",
-      bestTime_en: "October - March",
-      duration: "4 jours",
-      duration_en: "4 days",
-      price: "48000",
-      rating: 4.8,
-      category: "culture",
-      activities: ["🏛️ Architecture", "🎨 Artisanat", "🕌 Mosquées"],
-      itinerary: [
-        { day: 1, title: "Arrivée", title_en: "Arrival", desc: "Panorama vallée", desc_en: "Valley panorama" },
-        { day: 2, title: "Ksour", title_en: "Ksour", desc: "Visite architecture", desc_en: "Architecture tour" },
-        { day: 3, title: "Palmeraie", title_en: "Palm grove", desc: "Atelier local", desc_en: "Local workshop" },
-        { day: 4, title: "Départ", title_en: "Departure", desc: "Transfert", desc_en: "Transfer" }
-      ]
-    },
-    
-    {
-      id: 7,
-      name: "Djemila",
-      subtitle: "La Perle Romaine",
-      subtitle_en: "The Roman Pearl",
-      description: "Site archéologique parmi les mieux conservés, classé UNESCO.",
-      description_en: "Among the best-preserved archaeological sites, UNESCO-listed.",
-      image: "https://visitalgeria.org/wp-content/uploads/2024/04/Djemila-the-archaeological-zone-of-the-well-preserved-Berber-Roman-ruins-in-North-Africa-Algeria.-UNESCO-World-Heritage-Site-15-1024x536.jpg",
-      location: "Sétif",
-      bestTime: "Mai - Octobre",
-      bestTime_en: "May - October",
-      duration: "3 jours",
-      duration_en: "3 days",
-      price: "20000",
-      rating: 4.7,
-      category: "culture",
-      activities: ["🏛️ Ruines", "📜 Mosaïques", "🎭 Théâtre"],
-      itinerary: [
-        { day: 1, title: "Arrivée", title_en: "Arrival", desc: "Installation", desc_en: "Check-in" },
-        { day: 2, title: "Djemila", title_en: "Djemila", desc: "Visite du site", desc_en: "Site visit" },
-        { day: 3, title: "Départ", title_en: "Departure", desc: "Transfert", desc_en: "Transfer" }
-      ]
-    }
-  ];
+  const heroOpacity = Math.max(0, 1 - scrollY / 500);
+  const heroScale = Math.max(0.95, 1 - scrollY / 4000);
 
-  const filteredDestinations = activeFilter === 'all' 
-    ? destinations 
-    : destinations.filter(d => d.category === activeFilter);
-  
-  const displayedDestinations = filteredDestinations.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredDestinations.length;
+  const filtered =
+    activeFilter === "all"
+      ? destinations
+      : destinations.filter((d) => d.category === activeFilter);
+  const displayed = filtered.slice(0, visibleCount);
 
-  const loadMore = () => setVisibleCount(prev => prev + 4);
-  
-  const handleBooking = (dest) => {
-    alert(`✨ ${t('booking_alert')} ${dest.name} ${t('booking_from')} ${dest.price} DA`);
+  // Helper pour obtenir la valeur traduite
+  const getText = (item, field, frField, enField) => {
+    if (language === 'fr' && item[frField]) return item[frField];
+    return item[enField] || item[field];
   };
 
-  const categoryIcons = {
-    all: '🌍', culture: '🏛️', desert: '🏜️', nature: '🌿', city: '🏙️', history: '📜'
+  const getItineraryText = (item, field, frField) => {
+    if (language === 'fr' && item[frField]) return item[frField];
+    return item[field];
   };
-
-  const categoryLabels = {
-    all: t('filter_all'),
-    culture: t('filter_culture'),
-    desert: t('filter_desert'),
-    nature: t('filter_nature'),
-    city: t('filter_culture'),
-    history: t('filter_culture'),
-  };
-
-  if (isLoading) {
-    return (
-      <div className="loader-wrapper">
-        <div className="loader-spinner"></div>
-        <p>{t('dest_loader')}</p>
-      </div>
-    );
-  }
 
   return (
     <>
       <Navbar />
-      
-      {/* Hero Section avec image locale */}
-      <section className="hero" ref={heroRef}>
-        <div className="hero-image"></div>
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <span className="hero-tag" data-aos="fade-up">{t('dest_hero_tag')}</span>
-          <h1 className="hero-title" data-aos="fade-up" data-aos-delay="100">
-            {t('dest_hero_title_1')}<br />
-            <span>{t('dest_hero_title_2')}</span>
-          </h1>
-          <p className="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
-            {t('dest_hero_subtitle')}
-          </p>
-          <div className="hero-stats" data-aos="fade-up" data-aos-delay="300">
-            <div className="stat"><strong>12+</strong><span>{t('dest_stat_destinations')}</span></div>
-            <div className="stat"><strong>50+</strong><span>{t('dest_stat_tours')}</span></div>
-            <div className="stat"><strong>4.8★</strong><span>{t('dest_stat_travelers')}</span></div>
-          </div>
-        </div>
-        <div className="hero-scroll">↓</div>
-      </section>
+      <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: "#0f0d0a", color: "#f5f0e8", overflowX: "hidden" }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
-      {/* Destinations Section */}
-      <section className="destinations">
-        <div className="container">
-          <div className="section-header" data-aos="fade-up">
-            <span className="section-subtitle">{t('dest_section_subtitle')}</span>
-            <h2 className="section-title">{t('dest_section_title')} <span>{t('dest_section_title_span')}</span></h2>
-            <div className="section-line"></div>
-          </div>
+          *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+          body { overflow-x: hidden; }
 
-          {/* Filters */}
-          <div className="filters" data-aos="fade-up">
-            {Object.entries(categoryIcons).map(([key, icon]) => (
-              <button
-                key={key}
-                className={`filter ${activeFilter === key ? 'active' : ''}`}
-                onClick={() => { setActiveFilter(key); setVisibleCount(6); }}
-              >
-                {icon} {categoryLabels[key] || key}
-              </button>
-            ))}
-          </div>
-
-          {/* Grid */}
-          <div className="grid">
-            {displayedDestinations.map((dest, idx) => {
-              const d = getLocalizedDest(dest, pick);
-              return (
-              <div key={dest.id} className="card" data-aos="fade-up" data-aos-delay={idx * 50}>
-                <div className="card-image">
-                  <img src={dest.image} alt={dest.name} />
-                  <div className="card-overlay"></div>
-                  <div className="card-price">{dest.price}DA<span>{t('per_person')}</span></div>
-                  <div className="card-rating">★ {dest.rating}</div>
-                </div>
-                <div className="card-content">
-                  <div className="card-location">{dest.location}</div>
-                  <h3>{dest.name}</h3>
-                  <p className="card-subtitle">{d.subtitle}</p>
-                  <p className="card-desc">{d.description}</p>
-                  
-                  <div className="card-activities">
-                    {dest.activities.map((act, i) => (
-                      <span key={i} className="activity">{act}</span>
-                    ))}
-                  </div>
-                  
-                  <div className="card-info">
-                    <span>📅 {d.bestTime}</span>
-                    <span>⏱️ {d.duration}</span>
-                  </div>
-                  
-                  <div className="card-buttons">
-                    <button 
-                      className="btn-outline" 
-                      onClick={() => setSelectedItinerary(selectedItinerary === dest.id ? null : dest.id)}
-                    >
-                      {selectedItinerary === dest.id ? t('btn_hide') : t('btn_itinerary')}
-                    </button>
-                    <button className="btn-primary" onClick={() => handleBooking(dest)}>{t('btn_book')}</button>
-                  </div>
-                  
-                  {selectedItinerary === dest.id && (
-                    <div className="itinerary">
-                      <h4>{t('itinerary_title')}</h4>
-                      {d.itinerary.map((item, i) => (
-                        <div key={i} className="itinerary-item">
-                          <span className="day">{t('day_label')}{i+1}</span>
-                          <div>
-                            <strong>{item.title}</strong>
-                            <p>{item.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );})}
-          </div>
-
-          {hasMore && (
-            <div className="load-more" data-aos="fade-up">
-              <button onClick={loadMore}>{t('load_more')} <span>↓</span></button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="features">
-        <div className="container">
-          <div className="features-grid">
-            <div className="feature" data-aos="fade-up">
-              <div className="feature-icon">🏆</div>
-              <h3>{t('feature_experts_title')}</h3>
-              <p>{t('feature_experts_desc')}</p>
-            </div>
-            <div className="feature" data-aos="fade-up" data-aos-delay="100">
-              <div className="feature-icon">✧</div>
-              <h3>{t('feature_custom_title')}</h3>
-              <p>{t('feature_custom_desc')}</p>
-            </div>
-            <div className="feature" data-aos="fade-up" data-aos-delay="200">
-              <div className="feature-icon">♡</div>
-              <h3>{t('feature_authentic_title')}</h3>
-              <p>{t('feature_authentic_desc')}</p>
-            </div>
-            <div className="feature" data-aos="fade-up" data-aos-delay="300">
-              <div className="feature-icon">🕊️</div>
-              <h3>{t('feature_support_title')}</h3>
-              <p>{t('feature_support_desc')}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="cta">
-        <div className="cta-content">
-          <span className="cta-tag">{t('cta_tag')}</span>
-          <h2>{t('cta_title')}</h2>
-          <p>{t('cta_subtitle')}</p>
-          <button className="cta-button" onClick={() => alert(t('cta_alert'))}>
-            {t('cta_button')}
-          </button>
-        </div>
-      </section>
-
-      <Footer />
-
-      <style>{`
-        /* RESET & BASE */
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        body {
-          overflow-x: hidden;
-          max-width: 100%;
-          overscroll-behavior-x: none;
-        }
-
-        /* LOADER */
-        .loader-wrapper {
-          position: fixed;
-          inset: 0;
-          background: #0a0a0a;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          z-index: 9999;
-          gap: 20px;
-          color: #c8a87c;
-          font-family: system-ui, sans-serif;
-        }
-        .loader-spinner {
-          width: 40px;
-          height: 40px;
-          border: 2px solid rgba(200,168,124,0.2);
-          border-top-color: #c8a87c;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* HERO - avec image locale */
-        .hero {
-          position: relative;
-          min-height: 90vh;
-          min-height: 90svh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          overflow: hidden;
-          color: white;
-          width: 100%;
-          max-width: 100%;
-        }
-        .hero-image {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-image: url('https://voyage-en-algerie.com/wp-content/uploads/2026/04/culture-touareg-1.jpg');
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
-          z-index: 0;
-        } 
-        .hero-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.4) 100%);
-          z-index: 1;
-        }
-        .hero-content {
-          position: relative;
-          z-index: 2;
-          padding: 60px 20px;
-          max-width: 800px;
-        }
-        .hero-tag {
-          font-size: 12px;
-          letter-spacing: 4px;
-          text-transform: uppercase;
-          color: #c8a87c;
-          display: inline-block;
-          margin-bottom: 24px;
-        }
-        .hero-title {
-          font-size: clamp(42px, 10vw, 82px);
-          font-weight: 500;
-          line-height: 1.1;
-          margin-bottom: 24px;
-        }
-        .hero-title span {
-          font-style: italic;
-          font-weight: 300;
-          color: #c8a87c;
-        }
-        .hero-subtitle {
-          font-size: 16px;
-          opacity: 0.85;
-          margin-bottom: 40px;
-          line-height: 1.6;
-        }
-        .hero-stats {
-          display: flex;
-          justify-content: center;
-          gap: 48px;
-        }
-        .stat strong {
-          font-size: 28px;
-          font-weight: 400;
-          color: #c8a87c;
-          display: block;
-        }
-        .stat span {
-          font-size: 12px;
-          opacity: 0.7;
-        }
-        .hero-scroll {
-          position: absolute;
-          bottom: 30px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: 20px;
-          animation: bounce 2s infinite;
-          cursor: pointer;
-          z-index: 2;
-          color: white;
-        }
-        @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
-
-        /* DESTINATIONS */
-        .destinations {
-          padding: 80px 0;
-          background: #faf8f5;
-        }
-        .container {
-          max-width: 1300px;
-          margin: 0 auto;
-          padding: 0 24px;
-        }
-        .section-header {
-          text-align: center;
-          margin-bottom: 60px;
-        }
-        .section-subtitle {
-          font-size: 12px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: #c8a87c;
-        }
-        .section-title {
-          font-size: clamp(28px, 6vw, 44px);
-          font-weight: 400;
-          margin-top: 12px;
-        }
-        .section-title span {
-          font-weight: 600;
-          color: #c8a87c;
-        }
-        .section-line {
-          width: 50px;
-          height: 2px;
-          background: #c8a87c;
-          margin: 20px auto 0;
-        }
-
-        /* FILTERS */
-        .filters {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          margin-bottom: 50px;
-          flex-wrap: wrap;
-        }
-        .filter {
-          background: transparent;
-          border: 1px solid #e0d8d0;
-          padding: 8px 24px;
-          border-radius: 40px;
-          font-size: 13px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          color: #5a4a3a;
-        }
-        .filter:hover, .filter.active {
-          background: #c8a87c;
-          border-color: #c8a87c;
-          color: white;
-        }
-
-        /* GRID */
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-          gap: 32px;
-        }
-        .card {
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          transition: all 0.3s ease;
-          box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-        }
-        .card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .card-image {
-          position: relative;
-          height: 250px;
-          overflow: hidden;
-        }
-        .card-image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.4s ease;
-        }
-        .card:hover .card-image img {
-          transform: scale(1.03);
-        }
-        .card-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-        }
-        .card-price {
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
-          background: rgba(0,0,0,0.7);
-          backdrop-filter: blur(8px);
-          padding: 6px 14px;
-          border-radius: 30px;
-          color: #c8a87c;
-          font-weight: 600;
-          font-size: 18px;
-        }
-        .card-price span {
-          font-size: 11px;
-          color: rgba(255,255,255,0.7);
-          font-weight: normal;
-        }
-        .card-rating {
-          position: absolute;
-          top: 16px;
-          left: 16px;
-          background: rgba(0,0,0,0.6);
-          backdrop-filter: blur(4px);
-          padding: 4px 10px;
-          border-radius: 20px;
-          font-size: 12px;
-          color: #ffc107;
-        }
-        .card-content {
-          padding: 24px;
-        }
-        .card-location {
-          font-size: 11px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #c8a87c;
-          margin-bottom: 8px;
-        }
-        .card-content h3 {
-          font-size: 24px;
-          font-weight: 500;
-          margin-bottom: 4px;
-        }
-        .card-subtitle {
-          font-size: 13px;
-          color: #c8a87c;
-          margin-bottom: 12px;
-        }
-        .card-desc {
-          font-size: 13px;
-          color: #6b5b4e;
-          line-height: 1.5;
-          margin-bottom: 16px;
-        }
-        .card-activities {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 16px;
-        }
-        .activity {
-          background: #f0ebe5;
-          padding: 4px 10px;
-          border-radius: 20px;
-          font-size: 11px;
-          color: #5a4a3a;
-        }
-        .card-info {
-          display: flex;
-          gap: 16px;
-          font-size: 12px;
-          color: #8a7a6a;
-          padding: 12px 0;
-          border-top: 1px solid #eee;
-          border-bottom: 1px solid #eee;
-          margin-bottom: 16px;
-        }
-        .card-buttons {
-          display: flex;
-          gap: 12px;
-        }
-        .btn-outline {
-          flex: 1;
-          background: transparent;
-          border: 1px solid #c8a87c;
-          padding: 10px;
-          border-radius: 30px;
-          font-size: 13px;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: #c8a87c;
-        }
-        .btn-outline:hover {
-          background: #c8a87c10;
-        }
-        .btn-primary {
-          flex: 1;
-          background: #c8a87c;
-          border: none;
-          padding: 10px;
-          border-radius: 30px;
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: white;
-        }
-        .btn-primary:hover {
-          background: #b8956a;
-        }
-
-        /* ITINERARY */
-        .itinerary {
-          margin-top: 20px;
-          padding-top: 16px;
-          border-top: 1px solid #eee;
-        }
-        .itinerary h4 {
-          font-size: 14px;
-          margin-bottom: 12px;
-          color: #c8a87c;
-        }
-        .itinerary-item {
-          display: flex;
-          gap: 12px;
-          margin-bottom: 12px;
-        }
-        .itinerary-item .day {
-          min-width: 32px;
-          height: 32px;
-          background: #f0ebe5;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 600;
-          color: #c8a87c;
-        }
-        .itinerary-item strong {
-          font-size: 13px;
-          display: block;
-          margin-bottom: 2px;
-        }
-        .itinerary-item p {
-          font-size: 11px;
-          color: #8a7a6a;
-        }
-
-        /* LOAD MORE */
-        .load-more {
-          text-align: center;
-          margin-top: 50px;
-        }
-        .load-more button {
-          background: transparent;
-          border: 1px solid #c8a87c;
-          padding: 12px 36px;
-          border-radius: 40px;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: #c8a87c;
-        }
-        .load-more button:hover {
-          background: #c8a87c;
-          color: white;
-        }
-
-        /* FEATURES */
-        .features {
-          padding: 70px 0;
-          background: #1a1a1a;
-          color: white;
-        }
-        .features-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 30px;
-        }
-        .feature {
-          text-align: center;
-          padding: 24px;
-        }
-        .feature-icon {
-          font-size: 40px;
-          margin-bottom: 16px;
-          opacity: 0.8;
-        }
-        .feature h3 {
-          font-size: 18px;
-          font-weight: 500;
-          margin-bottom: 8px;
-          color: #c8a87c;
-        }
-        .feature p {
-          font-size: 13px;
-          opacity: 0.6;
-          line-height: 1.5;
-        }
-
-        /* CTA */
-        .cta {
-          padding: 80px 20px;
-          text-align: center;
-          background: #faf8f5;
-        }
-        .cta-content {
-          max-width: 600px;
-          margin: 0 auto;
-        }
-        .cta-tag {
-          font-size: 11px;
-          letter-spacing: 3px;
-          color: #c8a87c;
-          text-transform: uppercase;
-        }
-        .cta-content h2 {
-          font-size: clamp(28px, 6vw, 42px);
-          font-weight: 400;
-          margin: 16px 0 8px;
-        }
-        .cta-content p {
-          font-size: 16px;
-          color: #8a7a6a;
-          margin-bottom: 32px;
-        }
-        .cta-button {
-          background: #c8a87c;
-          border: none;
-          padding: 14px 48px;
-          border-radius: 40px;
-          font-size: 15px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: white;
-        }
-        .cta-button:hover {
-          background: #b8956a;
-          transform: translateY(-2px);
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
-          .features-grid {
-            grid-template-columns: repeat(2, 1fr);
+          /* ── HERO ── */
+          .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
           }
-        }
-        @media (max-width: 700px) {
-          .hero-stats {
-            gap: 24px;
-            flex-wrap: wrap;
-            justify-content: center;
+          .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://voyage-en-algerie.com/wp-content/uploads/2026/04/culture-touareg-1.jpg');
+            background-size: cover;
+            background-position: center 30%;
+            will-change: transform;
           }
-          .features-grid {
-            grid-template-columns: 1fr;
+          .hero-vignette {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+              to bottom,
+              rgba(15,13,10,0.1) 0%,
+              rgba(15,13,10,0.0) 30%,
+              rgba(15,13,10,0.6) 65%,
+              rgba(15,13,10,0.98) 100%
+            );
           }
-          .grid {
-            grid-template-columns: 1fr;
+          .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 clamp(24px, 6vw, 100px) 80px;
+            max-width: 900px;
+            width: 100%;
+          }
+          .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #d4a853;
+            margin-bottom: 20px;
+          }
+          .hero-eyebrow::before {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 1px;
+            background: #d4a853;
           }
           .hero-title {
-            font-size: 36px;
-            word-break: break-word;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(48px, 9vw, 96px);
+            font-weight: 400;
+            line-height: 1.0;
+            color: #f5f0e8;
+            margin-bottom: 28px;
           }
+          .hero-title em {
+            font-style: italic;
+            color: #d4a853;
+          }
+          .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+          }
+          .hero-stat {
+            text-align: left;
+          }
+          .hero-stat strong {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 400;
+            color: #d4a853;
+            display: block;
+            line-height: 1;
+          }
+          .hero-stat span {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.5);
+          }
+          .hero-divider {
+            width: 1px;
+            height: 40px;
+            background: rgba(245,240,232,0.15);
+          }
+          .hero-scroll-line {
+            position: absolute;
+            bottom: 32px;
+            right: clamp(24px, 6vw, 100px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(245,240,232,0.4);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            z-index: 2;
+          }
+          .hero-scroll-line::after {
+            content: '';
+            display: block;
+            width: 1px;
+            height: 48px;
+            background: linear-gradient(to bottom, rgba(245,240,232,0.4), transparent);
+            animation: scrollLine 2s ease-in-out infinite;
+          }
+          @keyframes scrollLine {
+            0%, 100% { transform: scaleY(1); opacity: 0.4; }
+            50% { transform: scaleY(0.6); opacity: 0.8; }
+          }
+
+          /* ── SECTION DESTINATIONS ── */
+          .section-dest {
+            background: #f5f0e8;
+            color: #0f0d0a;
+            padding: clamp(60px, 8vw, 120px) clamp(24px, 6vw, 80px);
+          }
+          .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 52px;
+            gap: 20px;
+            flex-wrap: wrap;
+          }
+          .section-label {
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #d4a853;
+            margin-bottom: 10px;
+          }
+          .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 400;
+            line-height: 1.1;
+            color: #0f0d0a;
+          }
+          .section-title em {
+            font-style: italic;
+            color: #d4a853;
+          }
+
+          /* FILTERS */
           .filters {
-            justify-content: flex-start;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            padding-bottom: 8px;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-x: contain;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
           }
-          .container {
-            padding: 0 16px;
-          }
-        }
-        @media (max-width: 480px) {
-          .hero-stats {
-            gap: 16px;
-          }
-          .stat strong {
-            font-size: 20px;
-          }
-          .filter {
-            padding: 6px 16px;
+          .filter-btn {
+            background: transparent;
+            border: 1px solid rgba(15,13,10,0.2);
+            padding: 8px 20px;
+            border-radius: 2px;
             font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            color: #5a4a3a;
+            transition: all 0.2s;
+            font-family: inherit;
           }
-        }
-      `}</style>
+          .filter-btn:hover {
+            border-color: #d4a853;
+            color: #d4a853;
+          }
+          .filter-btn.active {
+            background: #d4a853;
+            border-color: #d4a853;
+            color: #fff;
+          }
+
+          /* ── GRID ── */
+          .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            margin-bottom: 2px;
+          }
+          @media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+          @media (max-width: 640px)  { .grid { grid-template-columns: 1fr; } }
+
+          /* ── CARD ── */
+          .card {
+            position: relative;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            cursor: pointer;
+            background: #1c1a17;
+          }
+          @media (max-width: 640px) { .card { aspect-ratio: 4/3; } }
+
+          .card-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+          }
+          .card:hover .card-img {
+            transform: scale(1.06);
+          }
+          .card-base-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+              to top,
+              rgba(15,13,10,0.92) 0%,
+              rgba(15,13,10,0.4) 50%,
+              rgba(15,13,10,0.05) 100%
+            );
+            transition: opacity 0.4s;
+          }
+          .card:hover .card-base-overlay {
+            opacity: 0.5;
+          }
+
+          /* Card base content (always visible) */
+          .card-base {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 28px;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2;
+          }
+          .card:hover .card-base {
+            transform: translateY(-8px);
+          }
+          .card-location-tag {
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #d4a853;
+            margin-bottom: 6px;
+            display: block;
+          }
+          .card-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(22px, 3vw, 30px);
+            font-weight: 400;
+            color: #f5f0e8;
+            line-height: 1.1;
+            margin-bottom: 4px;
+          }
+          .card-subtitle {
+            font-size: 12px;
+            color: rgba(245,240,232,0.5);
+            font-style: italic;
+            margin-bottom: 12px;
+          }
+          .card-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+          }
+          .card-pill {
+            font-size: 10px;
+            padding: 3px 10px;
+            border: 1px solid rgba(245,240,232,0.25);
+            border-radius: 20px;
+            color: rgba(245,240,232,0.7);
+          }
+
+          /* Card hover panel */
+          .card-hover-panel {
+            position: absolute;
+            inset: 0;
+            background: rgba(15,13,10,0.92);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 32px;
+            z-index: 3;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none;
+          }
+          .card.flipped .card-hover-panel,
+          .card:hover .card-hover-panel {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+          }
+          .panel-eyebrow {
+            font-size: 9px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #d4a853;
+            margin-bottom: 6px;
+          }
+          .panel-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 400;
+            color: #f5f0e8;
+            margin-bottom: 4px;
+          }
+          .panel-subtitle {
+            font-size: 12px;
+            color: rgba(245,240,232,0.5);
+            font-style: italic;
+            margin-bottom: 18px;
+          }
+          .panel-desc {
+            font-size: 13px;
+            color: rgba(245,240,232,0.75);
+            line-height: 1.6;
+            margin-bottom: 20px;
+          }
+          .panel-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+          }
+          .panel-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+          }
+          .panel-info-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.4);
+          }
+          .panel-info-value {
+            font-size: 13px;
+            color: #f5f0e8;
+            font-weight: 500;
+          }
+          .panel-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #d4a853;
+            font-weight: 400;
+            margin-bottom: 4px;
+          }
+          .panel-price-label {
+            font-size: 10px;
+            color: rgba(245,240,232,0.4);
+            letter-spacing: 1px;
+          }
+          .panel-divider {
+            height: 1px;
+            background: rgba(245,240,232,0.1);
+            margin-bottom: 20px;
+          }
+          .panel-itinerary {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 22px;
+            max-height: 120px;
+            overflow-y: auto;
+          }
+          .panel-itinerary::-webkit-scrollbar { width: 2px; }
+          .panel-itinerary::-webkit-scrollbar-thumb { background: #d4a853; border-radius: 1px; }
+          .panel-itin-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+          }
+          .panel-day-dot {
+            min-width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(212,168,83,0.15);
+            border: 1px solid #d4a853;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #d4a853;
+            font-weight: 600;
+            margin-top: 1px;
+            flex-shrink: 0;
+          }
+          .panel-itin-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f5f0e8;
+            margin-bottom: 1px;
+          }
+          .panel-itin-desc {
+            font-size: 10px;
+            color: rgba(245,240,232,0.45);
+          }
+          .panel-actions {
+            display: flex;
+            gap: 10px;
+          }
+          .btn-gold {
+            flex: 1;
+            background: #d4a853;
+            border: none;
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #0f0d0a;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+          }
+          .btn-gold:hover { background: #c49642; }
+          .btn-outline-white {
+            flex: 1;
+            background: transparent;
+            border: 1px solid rgba(245,240,232,0.3);
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.7);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+          }
+          .btn-outline-white:hover { border-color: #d4a853; color: #d4a853; }
+
+          /* Card rating badge */
+          .card-rating {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15,13,10,0.7);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(212,168,83,0.3);
+            padding: 5px 10px;
+            font-size: 11px;
+            color: #d4a853;
+            z-index: 4;
+          }
+
+          /* ── LOAD MORE ── */
+          .load-more-wrap {
+            background: #f5f0e8;
+            padding: 0 clamp(24px, 6vw, 80px) 80px;
+            text-align: center;
+          }
+          .btn-load-more {
+            background: transparent;
+            border: 1px solid rgba(15,13,10,0.3);
+            padding: 14px 48px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #0f0d0a;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+          }
+          .btn-load-more:hover {
+            background: #0f0d0a;
+            color: #f5f0e8;
+            border-color: #0f0d0a;
+          }
+
+          /* ── WHY US ── */
+          .why-section {
+            background: #1c1a17;
+            padding: clamp(60px, 8vw, 120px) clamp(24px, 6vw, 80px);
+          }
+          .why-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+          }
+          @media (max-width: 900px) { .why-grid { grid-template-columns: repeat(2, 1fr); } }
+          @media (max-width: 520px)  { .why-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+          .why-item {
+            border-top: 1px solid rgba(245,240,232,0.1);
+            padding-top: 28px;
+          }
+          .why-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            color: rgba(212,168,83,0.15);
+            line-height: 1;
+            margin-bottom: 16px;
+            font-weight: 400;
+          }
+          .why-icon { font-size: 24px; margin-bottom: 12px; }
+          .why-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f5f0e8;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+          }
+          .why-desc {
+            font-size: 13px;
+            color: rgba(245,240,232,0.45);
+            line-height: 1.6;
+          }
+
+          /* ── CTA ── */
+          .cta-section {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(80px, 12vw, 160px) clamp(24px, 6vw, 80px);
+            background: #0f0d0a;
+            text-align: center;
+          }
+          .cta-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 70%);
+            pointer-events: none;
+          }
+          .cta-label {
+            font-size: 10px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #d4a853;
+            margin-bottom: 20px;
+          }
+          .cta-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 400;
+            color: #f5f0e8;
+            line-height: 1.1;
+            margin-bottom: 20px;
+          }
+          .cta-title em {
+            font-style: italic;
+            color: #d4a853;
+          }
+          .cta-sub {
+            font-size: 15px;
+            color: rgba(245,240,232,0.5);
+            margin-bottom: 44px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+          }
+          .btn-cta {
+            background: #d4a853;
+            border: none;
+            padding: 16px 56px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #0f0d0a;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+          }
+          .btn-cta:hover {
+            background: #c49642;
+            transform: translateY(-2px);
+          }
+
+          /* ── MOBILE FILTER SCROLL ── */
+          @media (max-width: 640px) {
+            .filters {
+              overflow-x: auto;
+              flex-wrap: nowrap;
+              padding-bottom: 4px;
+              -webkit-overflow-scrolling: touch;
+            }
+            .filter-btn { white-space: nowrap; }
+            .section-header {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+          }
+
+          /* touch-friendly: on mobile, tap to flip card */
+          @media (hover: none) {
+            .card:hover .card-hover-panel { opacity: 0; transform: translateY(16px); }
+            .card:hover .card-img { transform: none; }
+            .card:hover .card-base { transform: none; }
+            .card.flipped .card-hover-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+          }
+        `}</style>
+
+        {/* ── HERO ── */}
+        <section className="hero" ref={heroRef}>
+          <div
+            className="hero-bg"
+            style={{
+              opacity: heroOpacity,
+              transform: `scale(${heroScale})`,
+              transformOrigin: "center bottom",
+            }}
+          />
+          <div className="hero-vignette" />
+          <div className="hero-content">
+            <div className="hero-eyebrow">{language === 'fr' ? 'Explorez l\'Algérie' : 'Explore Algeria'}</div>
+            <h1 className="hero-title">
+              {language === 'fr' ? 'Découvrez' : 'Discover'}<br /><em>{language === 'fr' ? 'Destinations' : 'Destinations'}</em>
+            </h1>
+            <div className="hero-meta">
+              <div className="hero-stat">
+                <strong>12+</strong>
+                <span>{language === 'fr' ? 'Destinations' : 'Destinations'}</span>
+              </div>
+              <div className="hero-divider" />
+              <div className="hero-stat">
+                <strong>50+</strong>
+                <span>{language === 'fr' ? 'Circuits' : 'Tours'}</span>
+              </div>
+              <div className="hero-divider" />
+              <div className="hero-stat">
+                <strong>4.8★</strong>
+                <span>{language === 'fr' ? 'Note moyenne' : 'Avg Rating'}</span>
+              </div>
+            </div>
+          </div>
+          <div className="hero-scroll-line">{language === 'fr' ? 'Défiler' : 'Scroll'}</div>
+        </section>
+
+        {/* ── DESTINATIONS ── */}
+        <section className="section-dest">
+          <div className="section-header">
+            <div>
+              <p className="section-label">{language === 'fr' ? 'Notre Collection' : 'Our Collection'}</p>
+              <h2 className="section-title">
+                {language === 'fr' ? 'Voyages' : 'Curated'}<br /><em>{language === 'fr' ? 'sur mesure' : 'Journeys'}</em>
+              </h2>
+            </div>
+            <div className="filters">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  className={`filter-btn${activeFilter === f.key ? " active" : ""}`}
+                  onClick={() => { setActiveFilter(f.key); setVisibleCount(6); }}
+                >
+                  {f.icon} {language === 'fr' ? f.label_fr : f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid">
+            {displayed.map((dest) => (
+              <div
+                key={dest.id}
+                className={`card${flippedCard === dest.id ? " flipped" : ""}`}
+                onClick={() => setFlippedCard(flippedCard === dest.id ? null : dest.id)}
+              >
+                <img src={dest.image} alt={dest.name} className="card-img" loading="lazy" />
+                <div className="card-base-overlay" />
+                <div className="card-rating">★ {dest.rating}</div>
+
+                {/* Base content */}
+                <div className="card-base">
+                  <span className="card-location-tag">{dest.location}</span>
+                  <h3 className="card-name">{language === 'fr' ? dest.name_fr : dest.name_en}</h3>
+                  <p className="card-subtitle">{language === 'fr' ? dest.subtitle_fr : dest.subtitle_en}</p>
+                  <div className="card-pills">
+                    {(language === 'fr' ? dest.activities_fr : dest.activities).slice(0, 2).map((a, i) => (
+                      <span key={i} className="card-pill">{a}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Hover / tap panel */}
+                <div className="card-hover-panel">
+                  <p className="panel-eyebrow">{dest.location}</p>
+                  <h3 className="panel-name">{language === 'fr' ? dest.name_fr : dest.name_en}</h3>
+                  <p className="panel-subtitle">{language === 'fr' ? dest.subtitle_fr : dest.subtitle_en}</p>
+                  <p className="panel-desc">{language === 'fr' ? dest.description_fr : dest.description_en}</p>
+
+                  <div className="panel-info" style={{ marginBottom: 16 }}>
+                    <div className="panel-info-item">
+                      <span className="panel-info-label">{language === 'fr' ? 'Durée' : 'Duration'}</span>
+                      <span className="panel-info-value">{language === 'fr' ? dest.duration_fr : dest.duration}</span>
+                    </div>
+                    <div className="panel-info-item">
+                      <span className="panel-info-label">{language === 'fr' ? 'Meilleure période' : 'Best time'}</span>
+                      <span className="panel-info-value" style={{ fontSize: 11 }}>{language === 'fr' ? dest.bestTime_fr : dest.bestTime}</span>
+                    </div>
+                    <div className="panel-info-item" style={{ marginLeft: "auto", textAlign: "right" }}>
+                      <div className="panel-price">{dest.price}<span style={{ fontSize: 14 }}>DA</span></div>
+                      <div className="panel-price-label">{language === 'fr' ? 'par personne' : 'per person'}</div>
+                    </div>
+                  </div>
+
+                  <div className="panel-divider" />
+                  <div className="panel-itinerary">
+                    {dest.itinerary.map((item, i) => (
+                      <div key={i} className="panel-itin-row">
+                        <div className="panel-day-dot">{i + 1}</div>
+                        <div>
+                          <div className="panel-itin-title">{language === 'fr' ? item.title_fr : item.title}</div>
+                          <div className="panel-itin-desc">{language === 'fr' ? item.desc_fr : item.desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="panel-actions">
+                    <button className="btn-gold" onClick={(e) => { e.stopPropagation(); alert(`${language === 'fr' ? 'Réservation' : 'Booking'} ${dest.name} — ${language === 'fr' ? 'à partir de' : 'from'} ${dest.price} DA`); }}>
+                      {language === 'fr' ? 'Réserver' : 'Book Now'}
+                    </button>
+                    <button className="btn-outline-white" onClick={(e) => { e.stopPropagation(); setFlippedCard(null); }}>
+                      {language === 'fr' ? 'Fermer' : 'Close'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Load more */}
+        {visibleCount < filtered.length && (
+          <div className="load-more-wrap">
+            <button className="btn-load-more" onClick={() => setVisibleCount((v) => v + 4)}>
+              {language === 'fr' ? 'Charger plus de destinations' : 'Load More Destinations'}
+            </button>
+          </div>
+        )}
+
+        {/* ── WHY US ── */}
+        <section className="why-section">
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            <p className="section-label" style={{ marginBottom: 48 }}>{language === 'fr' ? 'Pourquoi voyager avec nous' : 'Why travel with us'}</p>
+            <div className="why-grid">
+              {[
+                { icon: "🏆", title: language === 'fr' ? "Guides experts" : "Expert Guides", desc: language === 'fr' ? "Des spécialistes locaux avec des décennies d'expérience." : "Local specialists with decades of experience in every region." },
+                { icon: "✦", title: language === 'fr' ? "Sur mesure" : "Tailor-Made", desc: language === 'fr' ? "Chaque itinéraire adapté à votre rythme." : "Every itinerary crafted to fit your rhythm and interests." },
+                { icon: "♡", title: language === 'fr' ? "Authentique" : "Authentic", desc: language === 'fr' ? "Des expériences hors des sentiers battus." : "Off-the-beaten-path experiences you won't find in any brochure." },
+                { icon: "🕊️", title: language === 'fr' ? "Assistance 24/7" : "Full Support", desc: language === 'fr' ? "Une aide de la planification au transfert final." : "24/7 assistance from planning through the final transfer." },
+              ].map((w, i) => (
+                <div key={i} className="why-item">
+                  <div className="why-num">0{i + 1}</div>
+                  <div className="why-icon">{w.icon}</div>
+                  <div className="why-title">{w.title}</div>
+                  <p className="why-desc">{w.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA ── */}
+        <section className="cta-section">
+          <div className="cta-glow" />
+          <p className="cta-label">{language === 'fr' ? 'Prêt à explorer ?' : 'Ready to explore?'}</p>
+          <h2 className="cta-title">{language === 'fr' ? 'Votre prochaine' : 'Your next'}<br /><em>{language === 'fr' ? 'aventure vous attend' : 'adventure awaits'}</em></h2>
+          <p className="cta-sub">{language === 'fr' ? 'Laissez-nous créer un voyage qui restera avec vous longtemps après votre retour.' : 'Let us craft a journey that stays with you long after you return home.'}</p>
+          <button className="btn-cta" onClick={() => alert(language === 'fr' ? "Redirection vers la page contact..." : "Redirecting to contact...")}>
+            {language === 'fr' ? 'Planifier mon voyage' : 'Plan My Trip'}
+          </button>
+        </section>
+      </div>
+      <Footer />
     </>
   );
-};
-
-export default Destinations;
+}

@@ -7,9 +7,22 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) return savedTheme;
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  });
+  
   const location = useLocation();
   const { language, changeLanguage, t } = useLang();
   const dropdownRef = useRef(null);
+
+  // Appliquer le thème au body
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,6 +67,10 @@ const Navbar = () => {
     setLangDropdownOpen(false);
   };
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <Link to="/" className="logo" onClick={(e) => {
@@ -73,14 +90,39 @@ const Navbar = () => {
         <Link to="/destinations" className={`nav-link-btn ${isActive('/destinations') ? 'active' : ''}`}>
           {t('nav_destinations')}
         </Link>
-        
         <Link to="/contact" className={`nav-link-btn ${isActive('/contact') ? 'active' : ''}`}>
           {t('nav_contact')}
         </Link>
       </div>
       
       <div className="nav-right">
-        {/* Sélecteur de langue en forme de globe */}
+        {/* Bouton thème clair/sombre */}
+        <button 
+          className="theme-toggle-btn" 
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
+        >
+          {theme === 'dark' ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" strokeWidth="1.5"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3C10.6868 3 9.38642 3.25866 8.17317 3.7612C6.95991 4.26375 5.85752 5.00035 4.92893 5.92893C3.05357 7.8043 2 10.3478 2 13C2 15.6522 3.05357 18.1957 4.92893 20.0711C5.85752 20.9997 6.95991 21.7362 8.17317 22.2388C9.38642 22.7413 10.6868 23 12 23C14.6522 23 17.1957 21.9464 19.0711 20.0711C20.9464 18.1957 22 15.6522 22 13C22 11.6868 21.7413 10.3864 21.2388 9.17317C20.7362 7.95991 19.9997 6.85752 19.0711 5.92893C18.1425 5.00035 17.0401 4.26375 15.8268 3.7612C14.6136 3.25866 13.3132 3 12 3Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              <path d="M12 7C11.2043 7 10.4154 7.14897 9.68257 7.43884C8.94973 7.72871 8.28577 8.15304 7.72434 8.68423C7.1629 9.21543 6.71404 9.84357 6.4029 10.5405C6.09175 11.2374 5.92415 11.9884 5.90996 12.7495C5.89576 13.5106 6.0355 14.2678 6.32073 14.9763C6.60596 15.6848 7.03096 16.3305 7.57317 16.8667C8.11538 17.4029 8.76216 17.8194 9.47852 18.1028C10.1949 18.3862 10.9653 18.5309 11.742 18.5288" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
+
+        {/* Sélecteur de langue */}
         <div className="language-dropdown" ref={dropdownRef}>
           <button 
             className="globe-btn"
@@ -117,7 +159,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Menu hamburger - LES 3 TRAITS EN BLANC SANS BORDURE */}
+        {/* Menu hamburger */}
         <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <div className="hamburger-icon">
             <span></span>
@@ -134,9 +176,6 @@ const Navbar = () => {
         </Link>
         <Link to="/destinations" className={`nav-link-btn ${isActive('/destinations') ? 'active' : ''}`}>
           {t('nav_destinations')}
-        </Link>
-        <Link to="/gallery" className={`nav-link-btn ${isActive('/gallery') ? 'active' : ''}`}>
-          {t('nav_gallery')}
         </Link>
         <Link to="/contact" className={`nav-link-btn ${isActive('/contact') ? 'active' : ''}`}>
           {t('nav_contact')}
@@ -166,21 +205,32 @@ const Navbar = () => {
           padding: 1rem 2rem;
         }
 
+        /* Mode clair - navbar scrolled */
+        [data-theme="light"] .navbar.scrolled {
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(8px);
+        }
+
         .logo {
           font-size: 1.5rem;
           font-weight: bold;
-          color: white;
+          color: var(--text-dark);
           text-decoration: none;
           letter-spacing: 2px;
           transition: all 0.3s ease;
           text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
+        /* Mode clair - logo */
+        [data-theme="light"] .logo {
+          color: #111;
+          text-shadow: none;
+        }
+
         .logo span {
           color: var(--accent, #c6a43b);
         }
 
-        /* Liens desktop - À DROITE */
         .nav-links-desktop {
           display: flex;
           gap: 32px;
@@ -189,14 +239,43 @@ const Navbar = () => {
           margin-right: 16px;
         }
 
-        /* Zone droite (globe + menu burger) */
         .nav-right {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
         }
 
-        /* Menu hamburger - 3 TRAITS BLANC SANS BORDURE */
+        /* Bouton thème */
+        .theme-toggle-btn {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.35);
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-dark);
+        }
+
+        [data-theme="light"] .theme-toggle-btn {
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          color: #111;
+        }
+
+        .theme-toggle-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
+          border-color: var(--accent, #c6a43b);
+          transform: scale(1.05);
+          color: var(--accent, #c6a43b);
+        }
+
+        [data-theme="light"] .theme-toggle-btn:hover {
+          background: rgba(0, 0, 0, 0.1);
+        }
+
         .mobile-menu-btn {
           background: transparent;
           border: none;
@@ -207,7 +286,6 @@ const Navbar = () => {
           align-items: center;
           justify-content: center;
           padding: 0;
-          transition: all 0.3s ease;
         }
 
         .hamburger-icon {
@@ -222,36 +300,31 @@ const Navbar = () => {
           display: block;
           width: 100%;
           height: 2px;
-          background-color: white;
+          background-color: var(--text-dark);
           transition: all 0.3s ease;
           border-radius: 2px;
+        }
+
+        [data-theme="light"] .hamburger-icon span {
+          background-color: #111;
         }
 
         .mobile-menu-btn:hover .hamburger-icon span {
           background-color: var(--accent, #c6a43b);
         }
 
-        /* Animation pour l'ouverture du menu */
         .nav-links-mobile.active ~ .nav-right .mobile-menu-btn .hamburger-icon span:nth-child(1) {
           transform: rotate(45deg) translate(5px, 5px);
         }
-
         .nav-links-mobile.active ~ .nav-right .mobile-menu-btn .hamburger-icon span:nth-child(2) {
           opacity: 0;
         }
-
         .nav-links-mobile.active ~ .nav-right .mobile-menu-btn .hamburger-icon span:nth-child(3) {
           transform: rotate(-45deg) translate(7px, -7px);
         }
 
-        /* Correction pour l'animation du burger */
-        .nav-links-mobile.active ~ .nav-right .mobile-menu-btn .hamburger-icon span {
-          background-color: white;
-        }
-
-        /* Liens desktop */
         .nav-link-btn {
-          color: white;
+          color: var(--text-dark);
           text-decoration: none;
           font-size: 1rem;
           transition: all 0.3s ease;
@@ -260,14 +333,17 @@ const Navbar = () => {
           text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
+        [data-theme="light"] .nav-link-btn {
+          color: #111;
+          text-shadow: none;
+        }
+
         .nav-link-btn:hover {
           color: var(--accent, #c6a43b);
         }
-
         .nav-link-btn.active {
           color: var(--accent, #c6a43b);
         }
-
         .nav-link-btn.active::after {
           content: '';
           position: absolute;
@@ -278,7 +354,6 @@ const Navbar = () => {
           background: var(--accent, #c6a43b);
         }
 
-        /* Language Dropdown */
         .language-dropdown {
           position: relative;
         }
@@ -297,9 +372,9 @@ const Navbar = () => {
           color: white;
         }
 
-        .navbar.scrolled .globe-btn {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.2);
+        [data-theme="light"] .globe-btn {
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          color: #111;
         }
 
         .globe-btn:hover {
@@ -323,15 +398,15 @@ const Navbar = () => {
           animation: fadeInDown 0.2s ease;
         }
 
+        [data-theme="light"] .dropdown-menu {
+          background: #fff;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
         @keyframes fadeInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         .dropdown-item {
@@ -349,29 +424,22 @@ const Navbar = () => {
           text-align: left;
         }
 
+        [data-theme="light"] .dropdown-item {
+          color: #111;
+        }
+
         .dropdown-item:hover {
           background: rgba(198, 164, 59, 0.2);
         }
-
         .dropdown-item.active {
           background: rgba(198, 164, 59, 0.3);
           color: #c6a43b;
         }
 
-        .flag {
-          font-size: 1.2rem;
-        }
+        .flag { font-size: 1.2rem; }
+        .lang-name { flex: 1; }
+        .check { color: #c6a43b; font-weight: bold; }
 
-        .lang-name {
-          flex: 1;
-        }
-
-        .check {
-          color: #c6a43b;
-          font-weight: bold;
-        }
-
-        /* Menu mobile */
         .nav-links-mobile {
           position: fixed;
           top: 70px;
@@ -389,77 +457,32 @@ const Navbar = () => {
           display: flex;
         }
 
-        .nav-links-mobile.active {
-          left: 0;
+        [data-theme="light"] .nav-links-mobile {
+          background: rgba(255, 255, 255, 0.95);
         }
 
-        .nav-links-mobile .nav-link-btn {
-          font-size: 1.2rem;
-        }
+        .nav-links-mobile.active { left: 0; }
+        .nav-links-mobile .nav-link-btn { font-size: 1.2rem; }
 
-        /* Desktop */
         @media (min-width: 769px) {
-          .mobile-menu-btn {
-            display: none !important;
-          }
-          
-          .nav-links-mobile {
-            display: none;
-          }
+          .mobile-menu-btn { display: none !important; }
+          .nav-links-mobile { display: none; }
         }
 
-        /* Mobile */
         @media (max-width: 768px) {
-          .navbar {
-            padding: 1rem;
-            background: transparent;
-            backdrop-filter: none;
-          }
-          
-          .navbar.scrolled {
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(8px);
-            padding: 0.8rem 1rem;
-          }
-
-          .logo {
-            font-size: 1.2rem;
-          }
-
-          .nav-links-desktop {
-            display: none;
-          }
-
-          .mobile-menu-btn {
-            display: flex !important;
-          }
-
-          .globe-btn {
-            width: 40px;
-            height: 40px;
-          }
+          .navbar { padding: 1rem; }
+          .navbar.scrolled { padding: 0.8rem 1rem; }
+          .logo { font-size: 1.2rem; }
+          .nav-links-desktop { display: none; }
+          .mobile-menu-btn { display: flex !important; }
+          .globe-btn, .theme-toggle-btn { width: 40px; height: 40px; }
         }
 
-        /* Petit mobile */
         @media (max-width: 480px) {
-          .logo {
-            font-size: 1rem;
-          }
-          
-          .globe-btn {
-            width: 36px;
-            height: 36px;
-          }
-          
-          .globe-btn svg {
-            width: 16px;
-            height: 16px;
-          }
-
-          .hamburger-icon {
-            width: 20px;
-            height: 15px;
-          }
+          .logo { font-size: 1rem; }
+          .globe-btn, .theme-toggle-btn { width: 36px; height: 36px; }
+          .globe-btn svg, .theme-toggle-btn svg { width: 16px; height: 16px; }
+          .hamburger-icon { width: 20px; height: 15px; }
         }
       `}</style>
     </nav>
