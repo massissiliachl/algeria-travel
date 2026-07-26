@@ -1,0 +1,216 @@
+/* Destinations — responsive overrides */
+
+.dest-page .acts-hero {
+  min-height: min(68vh, 640px);
+}
+
+.dest-page .acts-hero__title {
+  max-width: 16ch;
+  word-wrap: break-word;
+}
+
+.dest-page .acts-card__meta {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.dest-page .acts-card__meta span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .dest-page .acts-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .dest-page .acts-hero {
+    min-height: auto;
+    padding: calc(var(--nav-h, 72px) + 28px) 0 96px;
+  }
+
+  .dest-page .acts-hero__title {
+    font-size: clamp(1.85rem, 7vw, 2.6rem);
+    max-width: none;
+    line-height: 1.15;
+  }
+
+  .dest-page .acts-hero__subtitle {
+    margin-bottom: 28px;
+    font-size: 0.92rem;
+  }
+
+  .dest-page .acts-hero__features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    max-width: none;
+  }
+
+  .dest-page .acts-hero__feat strong {
+    font-size: 0.82rem;
+  }
+
+  .dest-page .acts-hero__feat span {
+    font-size: 0.7rem;
+  }
+
+  .dest-page .acts-filters-wrap {
+    margin-top: -36px;
+    padding: 0 14px;
+  }
+
+  .dest-page .acts-filters {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 14px;
+  }
+
+  .dest-page .acts-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dest-page .acts-filters__btn {
+    flex-shrink: 0;
+    padding: 10px 12px;
+    font-size: 0.78rem;
+  }
+
+  .dest-page .acts-grid-section {
+    padding: 36px 0 24px;
+  }
+
+  .dest-page .acts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    max-width: none;
+    margin: 0;
+  }
+
+  .dest-page .acts-card {
+    aspect-ratio: 3 / 4;
+    border-radius: 14px;
+  }
+
+  .dest-page .acts-card__body {
+    padding: 12px;
+  }
+
+  .dest-page .acts-card__body h3 {
+    font-size: 1rem;
+  }
+
+  .dest-page .acts-card__tags {
+    font-size: 0.72rem;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dest-page .acts-promo {
+    padding: 28px 0 48px;
+  }
+
+  .dest-page .acts-promo__inner {
+    gap: 20px;
+  }
+
+  .dest-page .acts-promo__text h2 {
+    font-size: clamp(1.4rem, 5vw, 1.85rem);
+  }
+
+  .dest-page .acts-promo__visual img {
+    min-height: 220px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .dest-page .acts-hero {
+    padding: calc(var(--nav-h, 64px) + 20px) 0 88px;
+  }
+
+  .dest-page .acts-hero__title {
+    font-size: clamp(1.65rem, 8vw, 2.1rem);
+  }
+
+  .dest-page .acts-hero__features {
+    gap: 12px 10px;
+  }
+
+  .dest-page .acts-hero__feat svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* 2 colonnes plus lisibles que 1 carte étroite centrée */
+  .dest-page .acts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .dest-page .acts-card {
+    aspect-ratio: 3 / 4.2;
+    border-radius: 12px;
+  }
+
+  .dest-page .acts-card__body h3 {
+    font-size: 0.92rem;
+    margin-bottom: 4px;
+  }
+
+  .dest-page .acts-card__meta {
+    gap: 4px;
+  }
+
+  .dest-page .acts-card__meta span {
+    font-size: 0.65rem;
+  }
+
+  .dest-page .acts-promo__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dest-page .acts-promo__btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 380px) {
+  .dest-page .acts-hero__features {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dest-page .acts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dest-page .acts-card {
+    aspect-ratio: 16 / 11;
+    max-height: none;
+  }
+
+  .dest-page .acts-card__meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dest-page .acts-card:hover,
+  .dest-page .acts-card:focus-visible {
+    transform: none;
+  }
+}

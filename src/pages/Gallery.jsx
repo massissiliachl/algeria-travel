@@ -1,1377 +1,462 @@
-// src/pages/Gallery.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import './Gallery.css';
+
+const INIT_IMAGES = [
+  { id: 1, src: '/images/sahara1.jpeg', likes: 412, dislikes: 8, comments: [] },
+  { id: 2, src: '/images/sahara2.jpeg', likes: 287, dislikes: 5, comments: [] },
+  { id: 3, src: '/images/sahara3.jpeg', likes: 534, dislikes: 11, comments: [] },
+  { id: 4, src: '/images/sahara4.jpeg', likes: 198, dislikes: 4, comments: [] },
+  { id: 5, src: '/images/sahara5.jpeg', likes: 356, dislikes: 7, comments: [] },
+  { id: 6, src: '/images/sahara6.jpeg', likes: 241, dislikes: 6, comments: [] },
+  { id: 7, src: '/images/sahara7.jpeg', likes: 319, dislikes: 9, comments: [] },
+  { id: 8, src: '/images/sahara8.jpeg', likes: 176, dislikes: 3, comments: [] },
+  { id: 9, src: '/images/galery.jpg', likes: 268, dislikes: 4, comments: [] },
+  { id: 10, src: '/images/quad.jpg', likes: 392, dislikes: 6, comments: [] },
+  { id: 11, src: '/images/quad1.jpeg', likes: 221, dislikes: 3, comments: [] },
+  { id: 12, src: '/images/quatre-quatre.jpg', likes: 305, dislikes: 5, comments: [] },
+  { id: 13, src: '/images/chameau.jpg', likes: 448, dislikes: 7, comments: [] },
+  { id: 14, src: '/images/kayak.jpeg', likes: 274, dislikes: 4, comments: [] },
+  { id: 15, src: '/images/visitekseurs.webp', likes: 331, dislikes: 5, comments: [] },
+];
+
+const STORAGE_KEY = 'gallery_reactions_v3';
 
 const Gallery = () => {
-  const { t, pick } = useLang();
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [loadedImages, setLoadedImages] = useState({});
+  const { t } = useLang();
+  const [images, setImages] = useState(INIT_IMAGES);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [ready, setReady] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [galleryImages, setGalleryImages] = useState([]);
+  const [showComments, setShowComments] = useState(false);
+  const [burst, setBurst] = useState([]);
+  const [pulse, setPulse] = useState({ like: false, dislike: false });
+  const gridRef = useRef(null);
+  const heroRef = useRef(null);
+  const burstId = useRef(0);
+  const [parallax, setParallax] = useState(0);
 
-  const initImages = [
-    {
-      id: 1,
-      src: "/quad.jpeg",
-      title: "Randonnée en Quad",
-      title_en: "Quad Adventure",
-      location: "Sahara Algérien",
-      location_en: "Algerian Sahara",
-      description: "Aventure en quad à travers les dunes du Sahara algérien",
-      description_en: "Quad adventure through the dunes of the Algerian Sahara",
-      size: "large",
-      likes: 234,
-      dislikes: 12,
-      comments: []
-    },
-    {
-      id: 2,
-      src: "/parasailinf.jpeg",
-      title: "Parachute Ascensionnel",
-      title_en: "Parasailing",
-      location: "Côte Algérienne",
-      location_en: "Algerian Coast",
-      description: "Vue panoramique exceptionnelle sur la mer Méditerranée",
-      description_en: "Exceptional panoramic view over the Mediterranean Sea",
-      size: "medium",
-      likes: 189,
-      dislikes: 5,
-      comments: []
-    },
-    {
-      id: 3,
-      src: "/i1.jpeg",
-      title: "Excursion en Quad",
-      title_en: "Quad Excursion",
-      location: "Algérie",
-      location_en: "Algeria",
-      description: "Découverte des paysages désertiques lors d'une sortie en quad",
-      description_en: "Discover desert landscapes on a quad outing",
-      size: "small",
-      likes: 312,
-      dislikes: 8,
-      comments: []
-    },
-    {
-      id: 4,
-      src: "/jetski.jpeg",
-      title: "Jet Ski",
-      title_en: "Jet Ski",
-      location: "Béjaïa",
-      location_en: "Béjaïa",
-      description: "Sensations fortes sur les eaux cristallines de la Méditerranée",
-      description_en: "Thrills on the crystal-clear waters of the Mediterranean",
-      size: "large",
-      likes: 456,
-      dislikes: 15,
-      comments: []
-    },
-    {
-      id: 5,
-      src: "/quad.jpeg",
-      title: "Aventure dans les Dunes",
-      title_en: "Dune Adventure",
-      location: "Algérie",
-      location_en: "Algeria",
-      description: "Parcours en quad à travers les magnifiques dunes dorées",
-      description_en: "Quad ride through magnificent golden dunes",
-      size: "medium",
-      likes: 278,
-      dislikes: 9,
-      comments: []
-    },
-    {
-      id: 6,
-      src: "/image.png",
-      title: "Balade à Cheval",
-      title_en: "Horseback Riding",
-      location: "Béjaïa",
-      location_en: "Béjaïa",
-      description: "Promenade à cheval au cœur des paysages naturels de Béjaïa",
-      description_en: "Horseback ride through the natural landscapes of Béjaïa",
-      size: "small",
-      likes: 167,
-      dislikes: 6,
-      comments: []
-    },
-    {
-      id: 7,
-      src: "/i.jpg",
-      title: "Sortie en Bateau",
-      title_en: "Boat Trip",
-      location: "Béjaïa",
-      location_en: "Béjaïa",
-      description: "Excursion en bateau pour découvrir la côte et les criques de Béjaïa",
-      description_en: "Boat excursion to discover the coast and coves of Béjaïa",
-      size: "large",
-      likes: 523,
-      dislikes: 11,
-      comments: []
-    },
-    {
-      id: 8,
-      src: "/quad1.jpeg",
-      title: "Circuit en Quad",
-      title_en: "Quad Tour",
-      location: "Algérie",
-      location_en: "Algeria",
-      description: "Expérience unique au cœur des paysages sahariens",
-      description_en: "Unique experience in the heart of Saharan landscapes",
-      size: "medium",
-      likes: 198,
-      dislikes: 4,
-      comments: []
-    },
-    {
-      id: 9,
-      src: "/vol parapente.jpg",
-      title: "Vol en Parapente",
-      title_en: "Paragliding Flight",
-      location: "Béjaïa",
-      location_en: "Béjaïa",
-      description: "Admirez les paysages de Béjaïa depuis les airs",
-      description_en: "Admire the landscapes of Béjaïa from the sky",
-      size: "small",
-      likes: 145,
-      dislikes: 3,
-      comments: []
-    },
-    {
-      id: 10,
-      src: "/grotte.jpg",
-      title: "Grottes de Béjaïa",
-      title_en: "Béjaïa Caves",
-      location: "Béjaïa",
-      location_en: "Béjaïa",
-      description: "Découverte des magnifiques grottes naturelles de Béjaïa",
-      description_en: "Discover the magnificent natural caves of Béjaïa",
-      size: "large",
-      likes: 345,
-      dislikes: 7,
-      comments: []
-    },
-    {
-      id: 11,
-      src: "/dj.jpeg",
-      title: "Ferme de Djerba",
-      title_en: "Djerba Farm",
-      location: "Tazeboujt - Béjaïa",
-      location_en: "Tazeboujt - Béjaïa",
-      description: "Ferme touristique offrant un cadre naturel paisible et authentique",
-      description_en: "Tourist farm offering a peaceful and authentic natural setting",
-      size: "medium",
-      likes: 156,
-      dislikes: 2,
-      comments: []
-    },
-    {
-      id: 12,
-      src: "/paddle.jpeg",
-      title: "Paddle en Mer",
-      title_en: "Sea Paddleboarding",
-      location: "Béjaïa",
-      location_en: "Béjaïa",
-      description: "Activité paddle sur les eaux turquoise de la côte béjaouie",
-      description_en: "Paddleboarding on the turquoise waters of the Béjaïa coast",
-      size: "small",
-      likes: 234,
-      dislikes: 5,
-      comments: [
-        { id: 1, user: "Lilia Ben.", text: "Magnifique !!! 😍", date: "2024-01-15", avatar: "[randomuser.me](https://randomuser.me/api/portraits/women/1.jpg)" },
-        { id: 2, user: "Yanis L.", text: "Un paysage a couper le souffle", date: "2024-01-10", avatar: "[randomuser.me](https://randomuser.me/api/portraits/men/1.jpg)" }
-      ]    }
-  ];
   useEffect(() => {
-    const savedGallery = localStorage.getItem('gallery_interactions');
-    if (savedGallery) {
-      setGalleryImages(JSON.parse(savedGallery));
-    } else {
-      setGalleryImages(initImages);
-      localStorage.setItem('gallery_interactions', JSON.stringify(initImages));
+    window.scrollTo(0, 0);
+    const id = requestAnimationFrame(() => setReady(true));
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length) setImages(parsed);
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(INIT_IMAGES));
+      }
+    } catch {
+      setImages(INIT_IMAGES);
     }
-
-    AOS.init({
-      duration: 800,
-      once: true,
-      offset: 40,
-      easing: 'ease-out-cubic'
-    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
-  const saveInteractions = useCallback((updatedImages) => {
-    setGalleryImages(updatedImages);
-    localStorage.setItem('gallery_interactions', JSON.stringify(updatedImages));
-  }, []);
-
-  const handleLike = useCallback((imageId) => {
-    const updatedImages = galleryImages.map((img) =>
-      img.id === imageId ? { ...img, likes: img.likes + 1 } : img
-    );
-    saveInteractions(updatedImages);
-  }, [galleryImages, saveInteractions]);
-
-  const handleDislike = useCallback((imageId) => {
-    const updatedImages = galleryImages.map((img) =>
-      img.id === imageId ? { ...img, dislikes: img.dislikes + 1 } : img
-    );
-    saveInteractions(updatedImages);
-  }, [galleryImages, saveInteractions]);
-
-  const handleAddComment = useCallback((imageId) => {
-    if (!commentText.trim()) return;
-    const newComment = {
-      id: Date.now(),
-      user: "Voyageur",
-      text: commentText.trim(),
-      date: new Date().toISOString().split('T')[0],
-      avatar: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 10)}.jpg`
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return undefined;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setParallax(Math.min(y * 0.35, 120));
+        ticking = false;
+      });
     };
-    const updatedImages = galleryImages.map((img) =>
-      img.id === imageId ? { ...img, comments: [newComment, ...img.comments] } : img
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const root = gridRef.current;
+    if (!root) return undefined;
+    const nodes = root.querySelectorAll('[data-gal-in]');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      nodes.forEach((el) => el.classList.add('is-in'));
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -5% 0px' }
     );
+    nodes.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [images]);
 
-    saveInteractions(updatedImages);
-    setCommentText('');
-  }, [commentText, galleryImages, saveInteractions]);
+  const save = useCallback((next) => {
+    setImages(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
-  const handleImageLoad = (id) => {
-    setLoadedImages((prev) => ({ ...prev, [id]: true }));
+  const spawnBurst = (kind) => {
+    const particles = Array.from({ length: kind === 'like' ? 10 : 6 }, (_, i) => ({
+      id: burstId.current + i,
+      kind,
+      x: (Math.random() - 0.5) * 140,
+      y: -40 - Math.random() * 100,
+      z: (Math.random() - 0.5) * 80,
+      rot: (Math.random() - 0.5) * 60,
+      delay: Math.random() * 0.12,
+    }));
+    burstId.current += particles.length;
+    setBurst(particles);
+    window.setTimeout(() => setBurst([]), 900);
   };
 
-  const currentImage = selectedImage
-    ? galleryImages.find((img) => img.id === selectedImage.id)
-    : null;
+  const triggerPulse = (key) => {
+    setPulse((p) => ({ ...p, [key]: true }));
+    window.setTimeout(() => setPulse((p) => ({ ...p, [key]: false })), 650);
+  };
 
-  const currentIndex = selectedImage
-    ? galleryImages.findIndex((img) => img.id === selectedImage.id)
-    : -1;
+  const handleLike = (id) => {
+    spawnBurst('like');
+    triggerPulse('like');
+    save(
+      images.map((img) =>
+        img.id === id ? { ...img, likes: (img.likes || 0) + 1 } : img
+      )
+    );
+  };
+
+  const handleDislike = (id) => {
+    spawnBurst('dislike');
+    triggerPulse('dislike');
+    save(
+      images.map((img) =>
+        img.id === id ? { ...img, dislikes: (img.dislikes || 0) + 1 } : img
+      )
+    );
+  };
+
+  const handleAddComment = (id) => {
+    if (!commentText.trim()) return;
+    const comment = {
+      id: Date.now(),
+      user: 'Voyageur',
+      text: commentText.trim(),
+      date: new Date().toLocaleDateString(),
+    };
+    save(
+      images.map((img) =>
+        img.id === id
+          ? { ...img, comments: [comment, ...(img.comments || [])] }
+          : img
+      )
+    );
+    setCommentText('');
+  };
+
+  const currentImage =
+    selectedIndex !== null ? images[selectedIndex] : null;
+
+  const goPrev = () => {
+    if (selectedIndex === null) return;
+    setShowComments(false);
+    setSelectedIndex(
+      selectedIndex > 0 ? selectedIndex - 1 : images.length - 1
+    );
+  };
+
+  const goNext = () => {
+    if (selectedIndex === null) return;
+    setShowComments(false);
+    setSelectedIndex(
+      selectedIndex < images.length - 1 ? selectedIndex + 1 : 0
+    );
+  };
+
+  useEffect(() => {
+    if (selectedIndex === null) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedIndex(null);
+        setShowComments(false);
+      }
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndex, images]);
 
   return (
-    <>
+    <div className={`gal ${ready ? 'is-ready' : ''}`}>
       <Navbar />
 
-      <section className="gallery-hero">
-        <div className="gallery-hero-bg"></div>
-        <div className="gallery-hero-overlay"></div>
-        <div className="gallery-hero-glow glow-1"></div>
-        <div className="gallery-hero-glow glow-2"></div>
+      <header className="gal-hero" ref={heroRef}>
+        <div
+          className="gal-hero__media"
+          style={{ transform: `translate3d(0, ${parallax}px, 0)` }}
+        >
+          <img src="/images/sahara4.jpeg" alt="" />
+        </div>
+        <div className="gal-hero__veil" />
+        <div className="gal-hero__fluid" aria-hidden>
+          <span className="gal-hero__blob gal-hero__blob--1" />
+          <span className="gal-hero__blob gal-hero__blob--2" />
+          <span className="gal-hero__blob gal-hero__blob--3" />
+        </div>
 
-        <div className="container">
-          <div className="gallery-hero-content" data-aos="fade-up">
-            <span className="hero-badge">{t('gallery_hero_badge')}</span>
-            <h1>
-              {t('gallery_hero_title')} <span className="text-gold">{t('gallery_hero_title_span')}</span>
-            </h1>
-            <p>{t('gallery_hero_desc')}</p>
+        <div className="gal-hero__inner">
+          <p className="gal-a gal-a--1 gal-hero__brand">
+            Algeria <em>Travel</em>
+          </p>
+          <h1 className="gal-a gal-a--2">
+            <span className="gal-hero__line">{t('gallery_hero_title')}</span>
+            <em className="gal-hero__line gal-hero__line--em">
+              {t('gallery_hero_title_span')}
+            </em>
+          </h1>
+          <button
+            type="button"
+            className="gal-a gal-a--3 gal-hero__scroll"
+            onClick={() =>
+              gridRef.current?.scrollIntoView({ behavior: 'smooth' })
+            }
+            aria-label={t('gallery_scroll_hint')}
+          >
+            <span className="gal-hero__scroll-orb">
+              <span />
+            </span>
+            <span className="gal-hero__scroll-label">
+              {t('gallery_scroll_hint')}
+            </span>
+          </button>
+        </div>
 
-            <div className="gallery-hero-stats">
-              <span>
-                <i className="fas fa-image"></i>
-                {galleryImages.length}+ {t('gallery_photos')}
+        <svg
+          className="gal-hero__wave"
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          aria-hidden
+        >
+          <path
+            className="gal-hero__wave-fill"
+            d="M0,64 C240,120 480,20 720,64 C960,108 1200,40 1440,72 L1440,120 L0,120 Z"
+          />
+        </svg>
+      </header>
+
+      <main className="gal-body" ref={gridRef}>
+        <div className="gal-bento">
+          {images.map((image, i) => (
+            <button
+              key={image.id}
+              type="button"
+              className={`gal-cell gal-cell--${(i % 8) + 1}`}
+              data-gal-in
+              style={{ transitionDelay: `${(i % 6) * 60}ms` }}
+              onClick={() => {
+                setSelectedIndex(i);
+                setShowComments(false);
+              }}
+              aria-label={`${t('nav_gallery')} ${i + 1}`}
+            >
+              <img src={image.src} alt="" loading="lazy" />
+              <span className="gal-cell__likes" aria-hidden>
+                <Icon name="Heart" size={12} />
+                <span>{image.likes}</span>
               </span>
-              <span>
-                <i className="fas fa-heart"></i>
-                {galleryImages.reduce((sum, img) => sum + img.likes, 0)} {t('gallery_likes')}
-              </span>
-              <span>
-                <i className="fas fa-comment"></i>
-                {galleryImages.reduce((sum, img) => sum + img.comments.length, 0)} {t('gallery_comments')}
-              </span>
+            </button>
+          ))}
+        </div>
+      </main>
+
+      {currentImage && (
+        <div
+          className="gal-lb"
+          onClick={() => {
+            setSelectedIndex(null);
+            setShowComments(false);
+          }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            className="gal-lb__x"
+            aria-label="Close"
+            onClick={() => {
+              setSelectedIndex(null);
+              setShowComments(false);
+            }}
+          >
+            <Icon name="X" size={20} />
+          </button>
+          <button
+            type="button"
+            className="gal-lb__btn gal-lb__btn--prev"
+            aria-label="Previous"
+            onClick={(e) => {
+              e.stopPropagation();
+              goPrev();
+            }}
+          >
+            <Icon name="ChevronLeft" size={22} />
+          </button>
+
+          <div
+            className="gal-lb__stage"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="gal-lb__visual">
+              <img
+                className="gal-lb__pic"
+                key={currentImage.id}
+                src={currentImage.src}
+                alt=""
+              />
+              <div className="gal-burst" aria-hidden>
+                {burst.map((p) => (
+                  <span
+                    key={p.id}
+                    className={`gal-burst__p gal-burst__p--${p.kind}`}
+                    style={{
+                      '--bx': `${p.x}px`,
+                      '--by': `${p.y}px`,
+                      '--bz': `${p.z}px`,
+                      '--br': `${p.rot}deg`,
+                      animationDelay: `${p.delay}s`,
+                    }}
+                  >
+                    {p.kind === 'like' ? '♥' : '−'}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="hero-scroll-hint">
-          <span>{t('gallery_scroll_hint')}</span>
-          <i className="fas fa-chevron-down"></i>
-        </div>
-      </section>
-
-      <section className="gallery-section">
-        <div className="container">
-          <div className="section-heading" data-aos="fade-up">
-            <span className="section-kicker">{t('gallery_section_kicker')}</span>
-            <h2>{t('gallery_section_title')}</h2>
-            <p>{t('gallery_section_desc')}</p>
-          </div>
-
-          <div className="masonry-grid">
-            {galleryImages.map((image, index) => (
-              <div
-                key={image.id}
-                className={`masonry-item ${image.size} ${!loadedImages[image.id] ? 'loading' : ''}`}
-                data-aos="fade-up"
-                data-aos-delay={60 * (index % 6)}
-                onClick={() => setSelectedImage(image)}
+            <div className="gal-react">
+              <button
+                type="button"
+                className={`gal-react__btn gal-react__btn--like ${
+                  pulse.like ? 'is-pop' : ''
+                }`}
+                onClick={() => handleLike(currentImage.id)}
               >
-                {!loadedImages[image.id] && (
-                  <div className="masonry-item-loader">
-                    <div className="loader-ring"></div>
-                  </div>
-                )}
+                <span className="gal-react__3d">
+                  <Icon name="Heart" size={20} />
+                </span>
+                <span className={`gal-react__count ${pulse.like ? 'is-flip' : ''}`}>
+                  {currentImage.likes}
+                </span>
+              </button>
 
-                <img
-                  src={image.src}
-                  alt={image.title}
-                  loading="lazy"
-                  onLoad={() => handleImageLoad(image.id)}
-                  style={{ opacity: loadedImages[image.id] ? 1 : 0 }}
+              <button
+                type="button"
+                className={`gal-react__btn gal-react__btn--dislike ${
+                  pulse.dislike ? 'is-pop' : ''
+                }`}
+                onClick={() => handleDislike(currentImage.id)}
+              >
+                <span className="gal-react__3d">
+                  <Icon name="ThumbsDown" size={18} />
+                </span>
+                <span
+                  className={`gal-react__count ${
+                    pulse.dislike ? 'is-flip' : ''
+                  }`}
+                >
+                  {currentImage.dislikes}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`gal-react__btn gal-react__btn--comment ${
+                  showComments ? 'is-on' : ''
+                }`}
+                onClick={() => setShowComments((v) => !v)}
+              >
+                <span className="gal-react__3d">
+                  <Icon name="MessageCircle" size={18} />
+                </span>
+                <span className="gal-react__count">
+                  {currentImage.comments?.length || 0}
+                </span>
+              </button>
+            </div>
+
+            <div
+              className={`gal-comments ${showComments ? 'is-open' : ''}`}
+            >
+              <h3>{t('gallery_comments_title')}</h3>
+              <div className="gal-comments__form">
+                <textarea
+                  rows={2}
+                  placeholder={t('gallery_comment_placeholder')}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
                 />
-
-                <div className="masonry-item-overlay">
-                  <div className="masonry-top-tag">{pick(image.location, image.location_en)}</div>
-
-                  <div className="masonry-item-info">
-                    <div>
-                      <h3>{pick(image.title, image.title_en)}</h3>
-                      <p>{pick(image.description, image.description_en)}</p>
-                    </div>
-
-                    <div className="masonry-item-stats">
-                      <span>
-                        <i className="fas fa-heart"></i> {image.likes}
-                      </span>
-                      <span>
-                        <i className="fas fa-comment"></i> {image.comments.length}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  disabled={!commentText.trim()}
+                  onClick={() => handleAddComment(currentImage.id)}
+                >
+                  {t('gallery_send')}
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {selectedImage && currentImage && (
-        <div className="lightbox" onClick={() => setSelectedImage(null)}>
-          <button
-            className="lightbox-close"
-            onClick={() => setSelectedImage(null)}
-          >
-            <i className="fas fa-times"></i>
-          </button>
-
-          <button
-            className="lightbox-nav lightbox-prev"
-            onClick={(e) => {
-              e.stopPropagation();
-              const prevIndex = currentIndex > 0 ? currentIndex - 1 : galleryImages.length - 1;
-              setSelectedImage(galleryImages[prevIndex]);
-            }}
-          >
-            <i className="fas fa-chevron-left"></i>
-          </button>
-
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <div className="lightbox-image">
-              <img src={currentImage.src} alt={currentImage.title} />
-            </div>
-
-            <div className="lightbox-details">
-              <div className="lightbox-header">
-                <div>
-                  <span className="lightbox-chip">{pick(currentImage.location, currentImage.location_en)}</span>
-                  <h2>{pick(currentImage.title, currentImage.title_en)}</h2>
-                  <p className="lightbox-description">{pick(currentImage.description, currentImage.description_en)}</p>
-                </div>
-
-                <div className="lightbox-actions">
-                  <button
-                    className="action-btn like-btn"
-                    onClick={() => handleLike(currentImage.id)}
-                  >
-                    <i className="fas fa-heart"></i> {currentImage.likes}
-                  </button>
-
-                  <button
-                    className="action-btn dislike-btn"
-                    onClick={() => handleDislike(currentImage.id)}
-                  >
-                    <i className="fas fa-thumbs-down"></i> {currentImage.dislikes}
-                  </button>
-                </div>
-              </div>
-
-              <div className="comments-card">
-                <h3>
-                  <i className="fas fa-comments"></i>
-                  {t('gallery_comments_title')} ({currentImage.comments.length})
-                </h3>
-
-                <div className="add-comment">
-                  <textarea
-                    placeholder={t('gallery_comment_placeholder')}
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    rows="3"
-                  />
-                  <button
-                    className="send-comment"
-                    onClick={() => handleAddComment(currentImage.id)}
-                    disabled={!commentText.trim()}
-                  >
-                    {t('gallery_send')} <i className="fas fa-paper-plane"></i>
-                  </button>
-                </div>
-
-                <div className="comments-list">
-                  {currentImage.comments.length === 0 ? (
-                    <div className="no-comments">
-                      <i className="fas fa-comment-dots"></i>
-                      <p>Soyez le premier a commenter !</p>
-                    </div>
-                  ) : (
-                    currentImage.comments.map((comment) => (
-                      <div key={comment.id} className="comment-item">
-                        <img
-                          src={comment.avatar}
-                          alt={comment.user}
-                          className="comment-avatar"
-                        />
-
-                        <div className="comment-content">
-                          <div className="comment-header">
-                            <strong>{comment.user}</strong>
-                            <span className="comment-date">{comment.date}</span>
-                          </div>
-                          <p>{comment.text}</p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+              {(currentImage.comments?.length || 0) === 0 ? (
+                <p className="gal-comments__empty">{t('gallery_no_comments')}</p>
+              ) : (
+                currentImage.comments.map((c) => (
+                  <article key={c.id} className="gal-comments__item">
+                    <strong>{c.user}</strong>
+                    <time>{c.date}</time>
+                    <p>{c.text}</p>
+                  </article>
+                ))
+              )}
             </div>
           </div>
 
           <button
-            className="lightbox-nav lightbox-next"
+            type="button"
+            className="gal-lb__btn gal-lb__btn--next"
+            aria-label="Next"
             onClick={(e) => {
               e.stopPropagation();
-              const nextIndex = currentIndex < galleryImages.length - 1 ? currentIndex + 1 : 0;
-              setSelectedImage(galleryImages[nextIndex]);
+              goNext();
             }}
           >
-            <i className="fas fa-chevron-right"></i>
+            <Icon name="ChevronRight" size={22} />
           </button>
-
-          <div className="lightbox-counter">
-            {currentIndex + 1} / {galleryImages.length}
-          </div>
+          <p className="gal-lb__n">
+            {selectedIndex + 1} / {images.length}
+          </p>
         </div>
       )}
 
+      <nav className="gal-navlinks">
+        <Link to="/">{t('nav_home')}</Link>
+        <Link to="/destinations">{t('nav_destinations')}</Link>
+        <Link to="/contact">{t('nav_contact')}</Link>
+      </nav>
+
       <Footer />
-
-      <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        :root {
-          --gold: #d4af37;
-          --gold-dark: #a67c1f;
-          --gold-soft: rgba(212, 175, 55, 0.16);
-          --dark: #0b0b0f;
-          --dark-2: #12131a;
-          --dark-3: #191b24;
-          --gray: #8c8f99;
-          --gray-soft: #c7cad1;
-          --light: #f7f7f9;
-          --white: #ffffff;
-          --red: #ff5b6e;
-          --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.28);
-          --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.18);
-          --border: rgba(255, 255, 255, 0.08);
-        }
-
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          color: var(--white);
-          background:
-            radial-gradient(circle at top left, rgba(212,175,55,0.06), transparent 25%),
-            linear-gradient(180deg, #0b0b0f 0%, #101118 100%);
-          overflow-x: hidden;
-          max-width: 100%;
-          overscroll-behavior-x: none;
-        }
-
-        .container {
-          width: min(100%, 1440px);
-          max-width: 100%;
-          margin: 0 auto;
-          padding: 0 24px;
-        }
-
-        .text-gold {
-          color: var(--gold);
-        }
-
-        .gallery-hero {
-          position: relative;
-          min-height: 78vh;
-          min-height: 78svh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          isolation: isolate;
-          width: 100%;
-          max-width: 100%;
-        }
-
-        .gallery-hero-bg {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7)),
-            url('https://images.pexels.com/photos/2567327/pexels-photo-2567327.jpeg') center/cover no-repeat;
-          transform: scale(1.04);
-          animation: heroZoom 24s ease-in-out infinite;
-        }
-
-        .gallery-hero-overlay {
-          position: absolute;
-          inset: 0;
-          background:
-            radial-gradient(circle at 20% 30%, rgba(212,175,55,0.16), transparent 28%),
-            linear-gradient(135deg, rgba(11,11,15,0.55), rgba(11,11,15,0.88));
-          z-index: 1;
-        }
-
-        .gallery-hero-glow {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          z-index: 1;
-        }
-
-        .glow-1 {
-          width: 220px;
-          height: 220px;
-          background: rgba(212,175,55,0.16);
-          top: 12%;
-          left: 10%;
-        }
-
-        .glow-2 {
-          width: 260px;
-          height: 260px;
-          background: rgba(255,255,255,0.06);
-          right: 8%;
-          bottom: 12%;
-        }
-
-        @keyframes heroZoom {
-          0%, 100% { transform: scale(1.02); }
-          50% { transform: scale(1.06); }
-        }
-
-        .gallery-hero-content {
-          position: relative;
-          z-index: 2;
-          max-width: 860px;
-          text-align: center;
-          margin: 0 auto;
-          padding-top: 40px;
-        }
-
-        .hero-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 18px;
-          border: 1px solid rgba(255,255,255,0.16);
-          background: rgba(255,255,255,0.08);
-          backdrop-filter: blur(14px);
-          color: var(--gray-soft);
-          border-radius: 999px;
-          font-size: 0.85rem;
-          margin-bottom: 22px;
-          box-shadow: var(--shadow-md);
-        }
-
-        .gallery-hero-content h1 {
-          font-size: clamp(2.6rem, 6vw, 5.4rem);
-          line-height: 1.02;
-          letter-spacing: -0.03em;
-          font-weight: 800;
-          margin-bottom: 18px;
-        }
-
-        .gallery-hero-content p {
-          font-size: clamp(1rem, 2vw, 1.15rem);
-          line-height: 1.75;
-          color: rgba(255,255,255,0.78);
-          max-width: 700px;
-          margin: 0 auto 34px;
-        }
-
-        .gallery-hero-stats {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 14px;
-        }
-
-        .gallery-hero-stats span {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 12px 18px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.08);
-          border: 1px solid rgba(255,255,255,0.12);
-          backdrop-filter: blur(12px);
-          color: var(--white);
-          font-size: 0.92rem;
-          box-shadow: var(--shadow-md);
-        }
-
-        .gallery-hero-stats i {
-          color: var(--gold);
-        }
-
-        .hero-scroll-hint {
-          position: absolute;
-          bottom: 28px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 2;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-          color: rgba(255,255,255,0.72);
-          font-size: 0.78rem;
-          animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-          0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(8px); }
-        }
-
-        .gallery-section {
-          position: relative;
-          padding: 90px 0 100px;
-          background:
-            radial-gradient(circle at top center, rgba(212,175,55,0.06), transparent 30%),
-            linear-gradient(180deg, #11131a 0%, #0d0f15 100%);
-        }
-
-        .section-heading {
-          text-align: center;
-          max-width: 760px;
-          margin: 0 auto 46px;
-        }
-
-        .section-kicker {
-          display: inline-block;
-          color: var(--gold);
-          font-size: 0.82rem;
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          margin-bottom: 12px;
-          font-weight: 700;
-        }
-
-        .section-heading h2 {
-          font-size: clamp(1.9rem, 4vw, 3rem);
-          margin-bottom: 14px;
-          color: var(--white);
-        }
-
-        .section-heading p {
-          color: rgba(255,255,255,0.66);
-          line-height: 1.8;
-          font-size: 1rem;
-        }
-
-        .masonry-grid {
-          column-count: 4;
-          column-gap: 22px;
-          width: 100%;
-          max-width: 100%;
-        }
-
-        .masonry-item {
-          position: relative;
-          break-inside: avoid;
-          margin-bottom: 22px;
-          border-radius: 24px;
-          overflow: hidden;
-          cursor: pointer;
-          background: #1d1f28;
-          border: 1px solid rgba(255,255,255,0.06);
-          box-shadow: var(--shadow-lg);
-          transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-        }
-
-        .masonry-item:hover {
-          transform: translateY(-8px);
-          border-color: rgba(212,175,55,0.28);
-          box-shadow: 0 26px 60px rgba(0,0,0,0.35);
-        }
-
-        .masonry-item.loading {
-          min-height: 220px;
-        }
-
-        .masonry-item-loader {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background:
-            linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-          z-index: 2;
-        }
-
-        .loader-ring {
-          width: 42px;
-          height: 42px;
-          border: 3px solid rgba(255,255,255,0.15);
-          border-top-color: var(--gold);
-          border-radius: 50%;
-          animation: spin 0.9s linear infinite;
-        }
-
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-
-        .masonry-item img {
-          width: 100%;
-          height: auto;
-          display: block;
-          transition: transform 0.55s ease, filter 0.4s ease, opacity 0.4s ease;
-        }
-
-        .masonry-item:hover img {
-          transform: scale(1.05);
-          filter: brightness(0.92);
-        }
-
-        .masonry-item.small img {
-          min-height: 220px;
-          object-fit: cover;
-        }
-
-        .masonry-item.medium img {
-          min-height: 310px;
-          object-fit: cover;
-        }
-
-        .masonry-item.large img {
-          min-height: 430px;
-          object-fit: cover;
-        }
-
-        .masonry-item-overlay {
-          position: absolute;
-          inset: 0;
-          padding: 18px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          background:
-            linear-gradient(to top, rgba(8,8,10,0.92) 8%, rgba(8,8,10,0.15) 52%, rgba(8,8,10,0.06) 100%);
-          opacity: 0;
-          transition: opacity 0.35s ease;
-        }
-
-        .masonry-item:hover .masonry-item-overlay {
-          opacity: 1;
-        }
-
-        .masonry-top-tag {
-          align-self: flex-start;
-          padding: 8px 14px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,0.14);
-          color: var(--white);
-          font-size: 0.78rem;
-        }
-
-        .masonry-item-info h3 {
-          font-size: 1.15rem;
-          color: var(--white);
-          margin-bottom: 8px;
-        }
-
-        .masonry-item-info p {
-          color: rgba(255,255,255,0.72);
-          font-size: 0.9rem;
-          line-height: 1.5;
-          margin-bottom: 14px;
-        }
-
-        .masonry-item-stats {
-          display: flex;
-          gap: 16px;
-          align-items: center;
-        }
-
-        .masonry-item-stats span {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          color: var(--white);
-          font-size: 0.85rem;
-          padding: 8px 12px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.08);
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .masonry-item-stats .fa-heart {
-          color: var(--red);
-        }
-
-        .lightbox {
-          position: fixed;
-          inset: 0;
-          z-index: 2000;
-          background: rgba(3, 4, 8, 0.78);
-          backdrop-filter: blur(16px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 24px;
-          overflow-y: auto;
-          overscroll-behavior: contain;
-        }
-
-        .lightbox-content {
-          display: grid;
-          grid-template-columns: 1.3fr 0.9fr;
-          width: min(1320px, 100%);
-          max-height: 92vh;
-          border-radius: 28px;
-          overflow: hidden;
-          background: rgba(17, 19, 26, 0.92);
-          border: 1px solid rgba(255,255,255,0.08);
-          box-shadow: 0 30px 80px rgba(0,0,0,0.45);
-          margin: auto;
-        }
-
-        .lightbox-image {
-          background:
-            radial-gradient(circle at center, rgba(212,175,55,0.08), transparent 45%),
-            #090a0f;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 24px;
-        }
-
-        .lightbox-image img {
-          width: 100%;
-          max-height: 85vh;
-          object-fit: contain;
-          border-radius: 20px;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.35);
-        }
-
-        .lightbox-details {
-          padding: 28px;
-          color: var(--white);
-          overflow-y: auto;
-          background:
-            linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-        }
-
-        .lightbox-details::-webkit-scrollbar,
-        .comments-list::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .lightbox-details::-webkit-scrollbar-thumb,
-        .comments-list::-webkit-scrollbar-thumb {
-          background: rgba(212,175,55,0.55);
-          border-radius: 999px;
-        }
-
-        .lightbox-header {
-          display: flex;
-          flex-direction: column;
-          gap: 18px;
-          margin-bottom: 24px;
-        }
-
-        .lightbox-chip {
-          display: inline-block;
-          padding: 8px 14px;
-          margin-bottom: 14px;
-          border-radius: 999px;
-          background: var(--gold-soft);
-          border: 1px solid rgba(212,175,55,0.24);
-          color: var(--gold);
-          font-size: 0.82rem;
-          font-weight: 700;
-        }
-
-        .lightbox-header h2 {
-          font-size: 2rem;
-          line-height: 1.15;
-          margin-bottom: 10px;
-        }
-
-        .lightbox-description {
-          color: rgba(255,255,255,0.7);
-          line-height: 1.8;
-          font-size: 0.98rem;
-        }
-
-        .lightbox-actions {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-        }
-
-        .action-btn {
-          border: none;
-          border-radius: 999px;
-          padding: 12px 18px;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 0.92rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
-        }
-
-        .action-btn:hover {
-          transform: translateY(-2px);
-        }
-
-        .like-btn {
-          background: rgba(255, 91, 110, 0.14);
-          color: #ff8a98;
-          border: 1px solid rgba(255, 91, 110, 0.2);
-        }
-
-        .like-btn:hover {
-          background: rgba(255, 91, 110, 0.22);
-        }
-
-        .dislike-btn {
-          background: rgba(255,255,255,0.08);
-          color: var(--white);
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .dislike-btn:hover {
-          background: rgba(255,255,255,0.15);
-        }
-
-        .comments-card {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 22px;
-          padding: 20px;
-        }
-
-        .comments-card h3 {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 1rem;
-          margin-bottom: 18px;
-        }
-
-        .comments-card h3 i {
-          color: var(--gold);
-        }
-
-        .add-comment {
-          margin-bottom: 18px;
-        }
-
-        .add-comment textarea {
-          width: 100%;
-          padding: 14px 16px;
-          border-radius: 16px;
-          border: 1px solid rgba(255,255,255,0.1);
-          background: rgba(255,255,255,0.06);
-          color: var(--white);
-          font-size: 0.95rem;
-          font-family: inherit;
-          resize: vertical;
-          min-height: 96px;
-          transition: border-color 0.25s ease, background 0.25s ease;
-        }
-
-        .add-comment textarea:focus {
-          outline: none;
-          border-color: rgba(212,175,55,0.5);
-          background: rgba(255,255,255,0.08);
-        }
-
-        .add-comment textarea::placeholder {
-          color: rgba(255,255,255,0.42);
-        }
-
-        .send-comment {
-          margin-top: 10px;
-          border: none;
-          border-radius: 999px;
-          padding: 11px 18px;
-          background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-          color: #fff;
-          font-weight: 700;
-          cursor: pointer;
-          transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
-          box-shadow: 0 10px 24px rgba(212,175,55,0.22);
-        }
-
-        .send-comment:hover:not(:disabled) {
-          transform: translateY(-2px);
-        }
-
-        .send-comment:disabled {
-          opacity: 0.55;
-          cursor: not-allowed;
-          box-shadow: none;
-        }
-
-        .comments-list {
-          max-height: 320px;
-          overflow-y: auto;
-          padding-right: 4px;
-        }
-
-        .no-comments {
-          text-align: center;
-          padding: 28px 14px;
-          color: rgba(255,255,255,0.5);
-        }
-
-        .no-comments i {
-          font-size: 2rem;
-          margin-bottom: 10px;
-          color: rgba(212,175,55,0.7);
-        }
-
-        .comment-item {
-          display: flex;
-          gap: 12px;
-          padding: 14px;
-          border-radius: 16px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.05);
-          margin-bottom: 12px;
-        }
-
-        .comment-avatar {
-          width: 42px;
-          height: 42px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid rgba(255,255,255,0.12);
-        }
-
-        .comment-content {
-          flex: 1;
-        }
-
-        .comment-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 10px;
-          flex-wrap: wrap;
-          margin-bottom: 6px;
-        }
-
-        .comment-header strong {
-          font-size: 0.95rem;
-          color: var(--white);
-        }
-
-        .comment-date {
-          font-size: 0.78rem;
-          color: rgba(255,255,255,0.48);
-        }
-
-        .comment-content p {
-          color: rgba(255,255,255,0.74);
-          line-height: 1.6;
-          font-size: 0.92rem;
-        }
-
-        .lightbox-close,
-        .lightbox-nav {
-          position: absolute;
-          z-index: 2001;
-          border: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: var(--white);
-          background: rgba(255,255,255,0.08);
-          border: 1px solid rgba(255,255,255,0.12);
-          backdrop-filter: blur(12px);
-          transition: transform 0.25s ease, background 0.25s ease;
-        }
-
-        .lightbox-close:hover,
-        .lightbox-nav:hover {
-          transform: scale(1.06);
-          background: rgba(212,175,55,0.22);
-        }
-
-        .lightbox-close {
-          top: 22px;
-          right: 22px;
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          font-size: 1rem;
-        }
-
-        .lightbox-nav {
-          top: 50%;
-          transform: translateY(-50%);
-          width: 52px;
-          height: 52px;
-          border-radius: 50%;
-          font-size: 1rem;
-        }
-
-        .lightbox-prev {
-          left: 26px;
-        }
-
-        .lightbox-next {
-          right: 26px;
-        }
-
-        .lightbox-counter {
-          position: absolute;
-          bottom: 22px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 2001;
-          padding: 10px 16px;
-          border-radius: 999px;
-          background: rgba(0,0,0,0.4);
-          border: 1px solid rgba(255,255,255,0.08);
-          color: var(--white);
-          font-size: 0.86rem;
-          backdrop-filter: blur(12px);
-        }
-
-        @media (max-width: 1200px) {
-          .masonry-grid {
-            column-count: 3;
-          }
-
-          .lightbox-content {
-            grid-template-columns: 1fr;
-          }
-
-          .lightbox-image img {
-            max-height: 48vh;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .gallery-hero {
-            min-height: 70svh;
-          }
-
-          .gallery-hero-bg {
-            transform: none;
-            animation: none;
-          }
-
-          .gallery-hero-content {
-            padding: 80px 16px 40px;
-          }
-
-          .gallery-hero-content h1 {
-            font-size: clamp(2rem, 9vw, 2.8rem);
-            word-break: break-word;
-          }
-
-          .gallery-hero-stats {
-            flex-direction: column;
-            align-items: stretch;
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto;
-          }
-
-          .gallery-hero-stats span {
-            justify-content: center;
-            width: 100%;
-          }
-
-          .hero-scroll-hint {
-            display: none;
-          }
-
-          .gallery-section {
-            padding: 60px 0 72px;
-          }
-
-          .masonry-grid {
-            column-count: 1;
-            column-gap: 0;
-          }
-
-          .masonry-item {
-            margin-bottom: 16px;
-            border-radius: 20px;
-          }
-
-          .masonry-item.small img,
-          .masonry-item.medium img,
-          .masonry-item.large img {
-            min-height: 220px;
-            max-height: 420px;
-            object-fit: cover;
-          }
-
-          .masonry-item-overlay {
-            opacity: 1;
-          }
-
-          .masonry-item:hover {
-            transform: none;
-          }
-
-          .lightbox {
-            padding: 10px;
-            align-items: flex-start;
-          }
-
-          .lightbox-content {
-            border-radius: 20px;
-            max-height: none;
-            margin-top: 48px;
-            margin-bottom: 16px;
-          }
-
-          .lightbox-image img {
-            max-height: 42vh;
-            border-radius: 0;
-          }
-
-          .lightbox-details {
-            padding: 20px;
-            max-height: none;
-            overflow-y: visible;
-          }
-
-          .lightbox-header h2 {
-            font-size: 1.35rem;
-            word-break: break-word;
-          }
-
-          .lightbox-close {
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
-          }
-
-          .lightbox-nav {
-            width: 40px;
-            height: 40px;
-            top: auto;
-            bottom: 18px;
-            transform: none;
-          }
-
-          .lightbox-prev {
-            left: 16px;
-          }
-
-          .lightbox-next {
-            right: 16px;
-          }
-
-          .lightbox-counter {
-            bottom: 24px;
-          }
-
-          .comments-list {
-            max-height: 220px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .container {
-            padding: 0 14px;
-          }
-
-          .hero-badge {
-            font-size: 0.75rem;
-            padding: 8px 12px;
-          }
-
-          .gallery-hero-stats span {
-            font-size: 0.8rem;
-            padding: 10px 12px;
-          }
-
-          .masonry-item-info p {
-            font-size: 0.84rem;
-          }
-
-          .lightbox-details {
-            padding: 14px;
-          }
-
-          .comments-card {
-            padding: 14px;
-          }
-
-          .lightbox-actions {
-            flex-direction: column;
-          }
-
-          .action-btn {
-            width: 100%;
-            justify-content: center;
-          }
-
-          .lightbox-prev {
-            left: 10px;
-          }
-
-          .lightbox-next {
-            right: 10px;
-          }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-          .masonry-grid {
-            column-count: 2;
-            column-gap: 18px;
-          }
-        }
-
-        [data-aos] {
-          pointer-events: auto !important;
-        }
-      `}</style>
-    </>
+    </div>
   );
 };
 

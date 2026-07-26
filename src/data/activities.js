@@ -1,0 +1,320 @@
+export const ACTIVITY_CATEGORIES = {
+  adventure: { fr: 'Aventure', en: 'Adventure', ar: 'مغامرة' },
+  desert: { fr: 'Désert', en: 'Desert', ar: 'صحراء' },
+  heritage: { fr: 'Patrimoine', en: 'Heritage', ar: 'تراث' },
+  nature: { fr: 'Nature', en: 'Nature', ar: 'طبيعة' },
+};
+
+/** Filtres page Activités (style mockup) */
+export const ACTIVITY_FILTERS = [
+  { key: 'all', icon: 'Compass', fr: 'Tout', en: 'All', ar: 'الكل' },
+  { key: 'adventure', icon: 'Mountain', fr: 'Aventure', en: 'Adventure', ar: 'مغامرة' },
+  { key: 'nature', icon: 'Trees', fr: 'Nature', en: 'Nature', ar: 'طبيعة' },
+  { key: 'culture', icon: 'Landmark', fr: 'Culture', en: 'Culture', ar: 'ثقافة' },
+  { key: 'nautical', icon: 'Waves', fr: 'Nautique', en: 'Nautical', ar: 'مائي' },
+  { key: 'discovery', icon: 'Sparkles', fr: 'Découverte', en: 'Discovery', ar: 'اكتشاف' },
+  { key: 'extreme', icon: 'Zap', fr: 'Extrême', en: 'Extreme', ar: 'قاسي' },
+];
+
+export const ACTIVITIES = [
+  {
+    id: 'quad',
+    name: 'Quad',
+    name_en: 'Quad',
+    name_ar: 'دراجة رباعية',
+    desc: 'Sensation et liberté sur les dunes en quad.',
+    desc_en: 'Thrills and freedom on the dunes by quad.',
+    desc_ar: 'إثارة وحرية على الكثبان بالدراجة الرباعية.',
+    fullDesc:
+      'Enfilez le casque et suivez votre guide sur un parcours de dunes et de pistes. Le quad offre une liberté unique pour ressentir le Sahara de près, en toute sécurité.',
+    fullDesc_en:
+      'Put on your helmet and follow your guide across dunes and tracks. The quad offers unique freedom to feel the Sahara up close, safely.',
+    fullDesc_ar:
+      'ارتدِ الخوذة واتبع مرشدك عبر الكثبان والمسارات. الدراجة الرباعية تمنحك حرية فريدة لاكتشاف الصحراء عن قرب وبأمان.',
+    history:
+      'Apparu comme loisir dans le Sud, le quad s’est imposé auprès des voyageurs pour découvrir les ergs sans quitter le rythme du désert. Encadré par des guides locaux, il reste respectueux des dunes et des villages.',
+    history_en:
+      'Introduced as leisure in the South, the quad became popular with travelers exploring the ergs without losing the desert’s pace. Led by local guides, it stays respectful of dunes and villages.',
+    history_ar:
+      'انتشرت الدراجة الرباعية كهواية في الجنوب ليكتشف المسافرون العروق بإيقاع الصحراء، بإشراف مرشدين محليين يحترمون الكثبان والقرى.',
+    visit:
+      'Briefing, essai sur piste plate, puis boucle dans les dunes. Pause thé et photos au sommet d’une dune.',
+    visit_en:
+      'Briefing, practice on flat ground, then a dune loop. Tea break and photos from a dune crest.',
+    visit_ar:
+      'شرح وتجربة على أرض مستوية ثم حلقة في الكثبان. استراحة شاي وصور من قمة كثيب.',
+    icon: 'CarFront',
+    color: '#B45309',
+    category: 'adventure',
+    filters: ['adventure', 'extreme', 'discovery'],
+    places: ['djanet', 'hoggar', 'ghardaia'],
+    tags: { fr: 'Aventure • Désert', en: 'Adventure • Desert', ar: 'مغامرة • صحراء' },
+    durationShort: '2h – 3h',
+    durationShort_en: '2h – 3h',
+    durationShort_ar: '2س – 3س',
+    image: '/images/quad.jpg',
+    gallery: [
+      '/images/quad.jpg',
+      '/images/quad1.jpeg',
+      '/images/sahara1.jpeg',
+    ],
+    price: 12000,
+    duration: '2 heures',
+    duration_en: '2 hours',
+    duration_ar: 'ساعتان',
+    location: 'Djanet · Hoggar · Ghardaïa',
+    location_en: 'Djanet · Hoggar · Ghardaïa',
+    location_ar: 'جانت · الهقار · غرداية',
+    dates: 'Octobre – Avril',
+    dates_en: 'October – April',
+    dates_ar: 'أكتوبر – أبريل',
+    group: '2 – 6 pers.',
+    group_en: '2 – 6 people',
+    group_ar: '2 – 6 أشخاص',
+    rating: 4.8,
+    included: ['Quad', 'Casque', 'Guide', 'Thé'],
+    included_en: ['Quad', 'Helmet', 'Guide', 'Tea'],
+    included_ar: ['دراجة', 'خوذة', 'مرشد', 'شاي'],
+  },
+  {
+    id: '4x4',
+    name: '4x4',
+    name_en: '4x4 Safari',
+    name_ar: 'سيارات الدفع الرباعي',
+    desc: 'Exploration des pistes sahariennes en véhicule tout-terrain.',
+    desc_en: 'Explore Saharan tracks in an all-terrain vehicle.',
+    desc_ar: 'استكشاف مسارات الصحراء بمركبة رباعية الدفع.',
+    fullDesc:
+      'Partez à l’aventure au cœur du Grand Sud en 4x4. Traversée de dunes, plateaux rocheux et oasis avec un chauffeur-guide local. Une immersion totale dans les paysages du Sahara algérien.',
+    fullDesc_en:
+      'Set off into the Deep South by 4x4. Cross dunes, rocky plateaus and oases with a local driver-guide. Total immersion in Algerian Sahara landscapes.',
+    fullDesc_ar:
+      'انطلق في مغامرة الجنوب العميق بسيارة دفع رباعي. عبور الكثبان والهضاب والواحات مع سائق مرشد محلي.',
+    history:
+      'Le 4x4 est le moyen moderne de parcourir les anciennes routes caravanières du Sahara. Autrefois, les caravanes reliaient Timimoun, Ghardaïa et Djanet ; aujourd’hui, les pistes permettent de découvrir ces mêmes horizons en sécurité.',
+    history_en:
+      'The 4x4 is the modern way to follow ancient Saharan caravan routes. Once linking Timimoun, Ghardaïa and Djanet, these tracks now let travelers explore the same horizons safely.',
+    history_ar:
+      'السيارة الرباعية هي الوسيلة الحديثة لتتبع طرق القوافل الصحراوية القديمة بين تيميمون وغرداية وجانت.',
+    visit:
+      'Départ tôt le matin, briefing sécurité, puis parcours adapté à votre niveau. Haltes photo, thé à la menthe et retour avant le coucher du soleil.',
+    visit_en:
+      'Early departure, safety briefing, then a route adapted to your level. Photo stops, mint tea and return before sunset.',
+    visit_ar:
+      'انطلاق صباحي مبكر وشرح للسلامة ثم مسار يناسب مستواك. توقفات للصور وشاي بالنعناع وعودة قبل الغروب.',
+    icon: 'Car',
+    color: '#8B5E34',
+    category: 'adventure',
+    filters: ['adventure', 'extreme', 'discovery'],
+    places: ['djanet', 'hoggar', 'ghardaia'],
+    tags: { fr: 'Aventure • Tout-terrain', en: 'Adventure • Off-road', ar: 'مغامرة • طرق وعرة' },
+    durationShort: 'Demi-journée',
+    durationShort_en: 'Half day',
+    durationShort_ar: 'نصف يوم',
+    image: '/images/quatre-quatre.jpg',
+    gallery: [
+      '/images/quatre-quatre.jpg',
+      '/images/quad.jpg',
+      '/images/sahara2.jpeg',
+      '/images/sahara3.jpeg',
+    ],
+    price: 15000,
+    duration: 'Demi-journée / journée',
+    duration_en: 'Half day / full day',
+    duration_ar: 'نصف يوم / يوم كامل',
+    location: 'Djanet · Ghardaïa · Hoggar',
+    location_en: 'Djanet · Ghardaïa · Hoggar',
+    location_ar: 'جانت · غرداية · الهقار',
+    dates: 'Octobre – Avril',
+    dates_en: 'October – April',
+    dates_ar: 'أكتوبر – أبريل',
+    group: '2 – 6 pers.',
+    group_en: '2 – 6 people',
+    group_ar: '2 – 6 أشخاص',
+    rating: 4.9,
+    included: ['Véhicule 4x4', 'Chauffeur-guide', 'Eau & thé', 'Assurance'],
+    included_en: ['4x4 vehicle', 'Driver-guide', 'Water & tea', 'Insurance'],
+    included_ar: ['مركبة 4x4', 'سائق مرشد', 'ماء وشاي', 'تأمين'],
+  },
+  {
+    id: 'camel',
+    name: 'Balade à dos de chameau',
+    name_en: 'Camel Ride',
+    name_ar: 'ركوب الجمال',
+    desc: 'Traversée des dunes au rythme millénaire du désert.',
+    desc_en: 'Cross the dunes at the desert’s ancient pace.',
+    desc_ar: 'عبور الكثبان على إيقاع الصحراء العريق.',
+    fullDesc:
+      'Montez à dos de chameau pour une balade au coucher du soleil. Silence, lumière dorée et thé autour du feu : l’essence du voyage saharien.',
+    fullDesc_en:
+      'Ride a camel at sunset. Silence, golden light and tea by the fire: the essence of Saharan travel.',
+    fullDesc_ar:
+      'اركب الجمل عند الغروب. صمت وضوء ذهبي وشاي حول النار: جوهر السفر الصحراوي.',
+    history:
+      'Le dromadaire a façonné l’histoire du Sahara : commerce, migration et survie. Aujourd’hui, la balade perpétue ce lien entre l’homme, l’animal et le désert.',
+    history_en:
+      'The dromedary shaped Sahara history: trade, migration and survival. Today’s ride keeps alive the bond between people, animals and the desert.',
+    history_ar:
+      'شكّل الجمل تاريخ الصحراء: تجارة وهجرة وبقاء. والنزهة اليوم تحافظ على الرابط بين الإنسان والحيوان والصحراء.',
+    visit:
+      'Accueil au camp, départ avant le soleil couchant, retour au bivouac pour le thé et le dîner.',
+    visit_en:
+      'Welcome at camp, departure before sunset, return to the bivouac for tea and dinner.',
+    visit_ar:
+      'ترحيب في المخيم وانطلاق قبل الغروب ثم عودة للمبيت للشاي والعشاء.',
+    icon: 'Sunrise',
+    color: '#CA8A04',
+    category: 'desert',
+    filters: ['nature', 'discovery'],
+    places: ['djanet', 'ghardaia', 'hoggar'],
+    tags: { fr: 'Nature • Tradition', en: 'Nature • Tradition', ar: 'طبيعة • تقاليد' },
+    durationShort: '2h – 3h',
+    durationShort_en: '2h – 3h',
+    durationShort_ar: '2س – 3س',
+    image: '/images/chameau.jpg',
+    gallery: [
+      '/images/chameau.jpg',
+      '/images/sahara4.jpeg',
+      '/images/sahara5.jpeg',
+    ],
+    price: 5000,
+    duration: '2 heures',
+    duration_en: '2 hours',
+    duration_ar: 'ساعتان',
+    location: 'Djanet · Ghardaïa · Hoggar',
+    location_en: 'Djanet · Ghardaïa · Hoggar',
+    location_ar: 'جانت · غرداية · الهقار',
+    dates: 'Octobre – Mars',
+    dates_en: 'October – March',
+    dates_ar: 'أكتوبر – مارس',
+    group: '2 – 10 pers.',
+    group_en: '2 – 10 people',
+    group_ar: '2 – 10 أشخاص',
+    rating: 5.0,
+    included: ['Chameau', 'Guide', 'Thé', 'Photos'],
+    included_en: ['Camel', 'Guide', 'Tea', 'Photos'],
+    included_ar: ['جمل', 'مرشد', 'شاي', 'صور'],
+  },
+  {
+    id: 'kayak',
+    name: 'Kayak en mer',
+    name_en: 'Sea Kayaking',
+    name_ar: 'التجديف في البحر',
+    desc: 'Pagaie le long des criques et eaux turquoise de la côte kabyle.',
+    desc_en: 'Paddle along coves and turquoise waters of the Kabyle coast.',
+    desc_ar: 'جدّف على طول الخلجان والمياه الفيروزية لساحل القبائل.',
+    fullDesc:
+      'Enfilez le gilet et glissez en kayak le long de la côte de Béjaïa. Criques, falaises et eaux claires : une sortie douce pour découvrir la Méditerranée autrement.',
+    fullDesc_en:
+      'Put on a life jacket and glide by kayak along the Béjaïa coast. Coves, cliffs and clear water — a gentle way to discover the Mediterranean differently.',
+    fullDesc_ar:
+      'ارتدِ سترة النجاة وانزلق بالكاياك على ساحل بجاية. خلجان ومنحدرات ومياه صافية: خروج لطيف لاكتشاف المتوسط بشكل مختلف.',
+    history:
+      'La baie de Béjaïa et ses criques ont toujours vécu au rythme de la mer. Le kayak permet d’approcher Cap Carbon et les falaises en silence, sans moteur.',
+    history_en:
+      'Béjaïa bay and its coves have always lived by the sea. Kayaking lets you approach Cap Carbon and the cliffs quietly, without an engine.',
+    history_ar:
+      'خليج بجاية وخلجانها عاشت دائماً على إيقاع البحر. الكاياك يقربك من كاب كاربون والمنحدرات بهدوء دون محرك.',
+    visit:
+      'Équipement fourni, initiation rapide, puis sortie le long de la côte selon la mer et votre niveau.',
+    visit_en:
+      'Gear provided, short intro, then a coastal outing according to sea conditions and your level.',
+    visit_ar:
+      'معدات مشمولة وتعريف قصير ثم خروج ساحلي حسب البحر ومستواك.',
+    icon: 'Kayak',
+    color: '#0E7490',
+    category: 'nature',
+    filters: ['nature', 'nautical'],
+    places: ['bejaia'],
+    tags: { fr: 'Nautique • Côte', en: 'Nautical • Coast', ar: 'مائي • ساحل' },
+    durationShort: '1h 30',
+    durationShort_en: '1.5 hours',
+    durationShort_ar: 'ساعة ونصف',
+    image: '/images/kayak.jpeg',
+    gallery: [
+      '/images/kayak.jpeg',
+      '/images/bejaia.jpeg',
+      '/images/home/news-coast.jpg',
+    ],
+    price: 4500,
+    duration: '1 h 30',
+    duration_en: '1.5 hours',
+    duration_ar: 'ساعة ونصف',
+    location: 'Béjaïa · Cap Carbon',
+    location_en: 'Bejaia · Cap Carbon',
+    location_ar: 'بجاية · كاب كاربون',
+    dates: 'Mai – Octobre',
+    dates_en: 'May – October',
+    dates_ar: 'ماي – أكتوبر',
+    group: '2 – 8 pers.',
+    group_en: '2 – 8 people',
+    group_ar: '2 – 8 أشخاص',
+    rating: 4.7,
+    included: ['Kayak', 'Gilet', 'Pagaie', 'Guide'],
+    included_en: ['Kayak', 'Life jacket', 'Paddle', 'Guide'],
+    included_ar: ['كاياك', 'سترة', 'مجداف', 'مرشد'],
+  },
+  {
+    id: 'ksars',
+    name: 'Visite des ksour',
+    name_en: 'Ksar Visit',
+    name_ar: 'زيارة القصور',
+    desc: 'Histoire et architecture des cités fortifiées du Sahara.',
+    desc_en: 'History and architecture of Saharan fortified towns.',
+    desc_ar: 'تاريخ وعمارة المدن المحصّنة في الصحراء.',
+    fullDesc:
+      'Pénétrez dans les ksars : ruelles d’argile, portes monumentales, mosquées et palmeraies. Une immersion dans l’âme du Sahara bâti, guidée par des habitants passionnés.',
+    fullDesc_en:
+      'Step into the ksars: clay alleyways, monumental gates, mosques and palm groves. Immersion in the built Sahara, guided by passionate locals.',
+    fullDesc_ar:
+      'ادخل إلى القصور: أزقة طينية وأبواب ضخمة ومساجد وبساتين نخيل. انغماس في روح الصحراء المبنية مع مرشدين محليين.',
+    history:
+      'Les ksars (ou ksour) sont des villages fortifiés en terre crue, nés pour protéger habitants, récoltes et caravanes. Au M’Zab, à Timimoun ou dans le Gourara, chaque ksar raconte un art de vivre adapté au climat extrême : ombre des ruelles, systèmes d’irrigation (foggaras), architecture communautaire. Classés ou protégés, ils restent vivants — marchés, fêtes et hospitalité — et incarnent l’histoire profonde du Sahara algérien.',
+    history_en:
+      'Ksars (or ksour) are fortified earthen villages built to protect people, harvests and caravans. In the M’Zab, Timimoun or Gourara, each ksar embodies a way of life adapted to extreme climate: shaded lanes, foggaras irrigation, communal architecture. Protected or listed, they remain alive — markets, festivals, hospitality — and carry the deep history of the Algerian Sahara.',
+    history_ar:
+      'القصور قرى محصّنة من الطين بُنيت لحماية السكان والمحاصيل والقوافل. في مزاب وتيميمون والجرارة، يجسّد كل قصر أسلوب حياة يلائم المناخ القاسي: أزقة مظللة وأنظمة سقي (الفقارات) وعمارة جماعية. ما زالت حية بأسواقها واحتفالاتها وضيافتها، وتحمل تاريخ الصحراء الجزائرية العميق.',
+    visit:
+      'Visite à pied avec guide local : porte principale, place, mosquée, ateliers d’artisanat, vue sur la palmeraie. Temps libre pour photographier et rencontrer les habitants.',
+    visit_en:
+      'Walking tour with a local guide: main gate, square, mosque, craft workshops, palm grove viewpoint. Free time to photograph and meet residents.',
+    visit_ar:
+      'جولة سيراً مع مرشد محلي: الباب الرئيسي والساحة والمسجد وورش الحرف وإطلالة على البستان. وقت حر للتصوير ولقاء السكان.',
+    icon: 'Landmark',
+    color: '#A45C42',
+    category: 'heritage',
+    filters: ['culture', 'discovery'],
+    places: ['ghardaia'],
+    tags: { fr: 'Culture • Patrimoine', en: 'Culture • Heritage', ar: 'ثقافة • تراث' },
+    durationShort: '2h – 3h',
+    durationShort_en: '2h – 3h',
+    durationShort_ar: '2س – 3س',
+    image: '/images/visitekseurs.webp',
+    gallery: [
+      '/images/visitekseurs.webp',
+      '/images/ghardaia.jpeg',
+      '/images/maison-hote-sud-1.png',
+      '/images/sahara5.jpeg',
+    ],
+    price: 3500,
+    duration: '2 – 3 heures',
+    duration_en: '2 – 3 hours',
+    duration_ar: '2 – 3 ساعات',
+    location: 'Ghardaïa · Timimoun · Gourara',
+    location_en: 'Ghardaïa · Timimoun · Gourara',
+    location_ar: 'غرداية · تيميمون · الجرارة',
+    dates: 'Toute l’année (idéal oct. – mars)',
+    dates_en: 'All year (best Oct – Mar)',
+    dates_ar: 'طوال السنة (الأفضل أكتوبر – مارس)',
+    group: '4 – 15 pers.',
+    group_en: '4 – 15 people',
+    group_ar: '4 – 15 أشخاص',
+    rating: 4.9,
+    included: ['Guide local', 'Entrée', 'Thé', 'Explications'],
+    included_en: ['Local guide', 'Entry', 'Tea', 'Commentary'],
+    included_ar: ['مرشد محلي', 'دخول', 'شاي', 'شرح'],
+  },
+];
+
+export const getActivitiesForPlace = (placeId) =>
+  ACTIVITIES.filter((a) => Array.isArray(a.places) && a.places.includes(placeId));
