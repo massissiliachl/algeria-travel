@@ -11,7 +11,6 @@ import './Blog.css';
 const Blog = () => {
   const { t, pick } = useLang();
   const [filter, setFilter] = useState('all');
-  const [selected, setSelected] = useState(null);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return BLOG_POSTS;
@@ -19,7 +18,6 @@ const Blog = () => {
   }, [filter]);
 
   const featured = BLOG_POSTS.find((p) => p.featured) || BLOG_POSTS[0];
-  const active = selected || featured;
 
   return (
     <div className="acts-page blog-page">
@@ -52,10 +50,7 @@ const Blog = () => {
               role="tab"
               aria-selected={filter === f.key}
               className={`acts-filters__btn ${filter === f.key ? 'is-active' : ''}`}
-              onClick={() => {
-                setFilter(f.key);
-                setSelected(null);
-              }}
+              onClick={() => setFilter(f.key)}
             >
               <Icon name={f.icon} size={18} strokeWidth={1.75} />
               <span>{pick(f.fr, f.en, f.ar)}</span>
@@ -66,30 +61,32 @@ const Blog = () => {
 
       <section className="blog-featured acts-container" id="blog-featured">
         <article className="blog-featured__card" data-reveal="zoom">
-          <div className="blog-featured__media">
-            <img src={active.image} alt="" />
-          </div>
+          <Link to={`/blog/${featured.slug}`} className="blog-featured__media">
+            <img src={featured.image} alt="" />
+          </Link>
           <div className="blog-featured__body">
             <span className="blog-chip">
-              {pick(active.categoryLabel, active.categoryLabel_en, active.categoryLabel_ar)}
+              {pick(featured.categoryLabel, featured.categoryLabel_en, featured.categoryLabel_ar)}
             </span>
-            <h2>{pick(active.title, active.title_en, active.title_ar)}</h2>
-            <p>{pick(active.excerpt, active.excerpt_en, active.excerpt_ar)}</p>
-            {active.body && (
-              <p className="blog-featured__body-text">
-                {pick(active.body, active.body_en, active.body_ar)}
-              </p>
-            )}
+            <h2>
+              <Link to={`/blog/${featured.slug}`}>
+                {pick(featured.title, featured.title_en, featured.title_ar)}
+              </Link>
+            </h2>
+            <p>{pick(featured.excerpt, featured.excerpt_en, featured.excerpt_ar)}</p>
             <div className="blog-meta">
               <span>
                 <Icon name="Calendar" size={14} />
-                {pick(active.date, active.date_en, active.date_ar)}
+                {pick(featured.date, featured.date_en, featured.date_ar)}
               </span>
               <span>
                 <Icon name="Clock" size={14} />
-                {active.readTime}
+                {featured.readTime}
               </span>
             </div>
+            <Link to={`/blog/${featured.slug}`} className="blog-featured__cta">
+              {t('blog_read_more')} <Icon name="ArrowRight" size={16} />
+            </Link>
           </div>
         </article>
       </section>
@@ -98,24 +95,12 @@ const Blog = () => {
         <div className="acts-container">
           <div className="blog-grid">
             {filtered.map((post, i) => (
-              <article
+              <Link
                 key={post.id}
-                className={`blog-card ${active?.id === post.id ? 'is-active' : ''}`}
+                to={`/blog/${post.slug}`}
+                className="blog-card"
                 data-reveal
                 data-delay={i * 60}
-                onClick={() => {
-                  setSelected(post);
-                  document.getElementById('blog-featured')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelected(post);
-                    document.getElementById('blog-featured')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
-                role="button"
-                tabIndex={0}
               >
                 <img src={post.image} alt="" loading="lazy" />
                 <div className="blog-card__body">
@@ -129,7 +114,7 @@ const Blog = () => {
                     <span>{post.readTime}</span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
           {filtered.length === 0 && (

@@ -3,6 +3,10 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
+import ResponsiveImage from '../components/ui/ResponsiveImage';
+import MobileBookingBar from '../components/ui/MobileBookingBar';
+import BottomSheet from '../components/ui/BottomSheet';
+import ImageLightbox from '../components/ui/ImageLightbox';
 import { useLang } from '../hooks/useLangHook';
 import {
   STAY_PLACE_FILTERS,
@@ -41,6 +45,7 @@ const Stays = () => {
     : 'all';
 
   const [selectedId, setSelectedId] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -84,19 +89,22 @@ const Stays = () => {
         ? t('stays_hero_guesthouses')
         : t('stays_hero_all');
 
+  const heroSrc =
+    type === 'guesthouse'
+      ? '/images/maison-hote-sud-1.png'
+      : '/images/home/acc-hotel.jpg';
+
   return (
-    <div className="acts-page stays-page">
+    <div className={`acts-page stays-page${selected ? ' has-mobile-bar' : ''}`}>
       <Navbar />
 
       <section className="acts-hero">
-        <img
+        <ResponsiveImage
           className="acts-hero__bg"
-          src={
-            type === 'guesthouse'
-              ? '/images/maison-hote-sud-1.png'
-              : '/images/home/acc-hotel.jpg'
-          }
+          src={heroSrc}
           alt=""
+          priority
+          sizes="100vw"
         />
         <div className="acts-hero__overlay" />
         <div className="acts-hero__inner" data-reveal="fade">
@@ -113,8 +121,8 @@ const Stays = () => {
         </div>
       </section>
 
-      <div className="acts-filters-wrap" data-reveal>
-        <div className="acts-filters" role="tablist" aria-label={t('stays_type_label')}>
+      <div className="acts-filters-wrap filter-pills-wrap is-scrollable" data-reveal>
+        <div className="acts-filters filter-pills" role="tablist" aria-label={t('stays_type_label')}>
           {STAY_TYPES.map((f) => (
             <button
               key={f.key}
@@ -133,19 +141,21 @@ const Stays = () => {
 
       <div className="stays-places acts-container" data-reveal>
         <p className="stays-places__label">{t('stays_place_label')}</p>
-        <div className="stays-places__list" role="tablist">
-          {STAY_PLACE_FILTERS.map((p) => (
-            <button
-              key={p.key}
-              type="button"
-              role="tab"
-              aria-selected={place === p.key}
-              className={`stays-places__btn ${place === p.key ? 'is-active' : ''}`}
-              onClick={() => setPlace(p.key)}
-            >
-              {pick(p.fr, p.en, p.ar)}
-            </button>
-          ))}
+        <div className="filter-pills-wrap is-scrollable">
+          <div className="stays-places__list filter-pills" role="tablist">
+            {STAY_PLACE_FILTERS.map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                role="tab"
+                aria-selected={place === p.key}
+                className={`stays-places__btn ${place === p.key ? 'is-active' : ''}`}
+                onClick={() => setPlace(p.key)}
+              >
+                {pick(p.fr, p.en, p.ar)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -199,7 +209,9 @@ const Stays = () => {
                         {stay.reviews ? ` · ${stay.reviews}` : ''}
                       </span>
                       <span className="acts-card__price">
-                        {t('acts_from')} {stay.price.toLocaleString()} DA
+                        {stay.pricePerPerson
+                          ? `${stay.price.toLocaleString()} DA ${t('per_person')}`
+                          : `${t('acts_from')} ${stay.price.toLocaleString()} DA`}
                       </span>
                     </div>
                   </div>
@@ -210,26 +222,15 @@ const Stays = () => {
         </div>
       </section>
 
-      {selected && (
-        <div
-          className="stays-detail"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedId(null)}
-        >
-          <div
-            className="stays-detail__panel"
-            onClick={(e) => e.stopPropagation()}
-            data-reveal="fade"
-          >
-            <button
-              type="button"
-              className="stays-detail__close"
-              aria-label="Close"
-              onClick={() => setSelectedId(null)}
-            >
-              <Icon name="X" size={20} />
-            </button>
+      <BottomSheet
+        open={!!selected}
+        onClose={() => setSelectedId(null)}
+        ariaLabel={selected ? pick(selected.name, selected.name_en, selected.name_ar) : undefined}
+        panelClassName="stays-detail__panel"
+        className="stays-detail bottom-sheet"
+      >
+        {selected && (
+          <>
             <div className="stays-detail__media">
               <img src={selected.image} alt="" />
             </div>
@@ -257,7 +258,9 @@ const Stays = () => {
                   {selected.reviews ? ` · ${selected.reviews} ${t('place_reviews')}` : ''}
                 </span>
                 <strong>
-                  {t('acts_from')} {selected.price.toLocaleString()} DA
+                  {selected.pricePerPerson
+                    ? `${selected.price.toLocaleString()} DA ${t('per_person')}`
+                    : `${t('acts_from')} ${selected.price.toLocaleString()} DA`}
                 </strong>
               </div>
               <h3>{t('stays_amenities')}</h3>
@@ -277,14 +280,21 @@ const Stays = () => {
               {selected.gallery?.length > 1 && (
                 <>
                   <h3>{t('stays_gallery')}</h3>
-                  <div className="stays-detail__gallery">
-                    {selected.gallery.map((src) => (
-                      <img key={src} src={src} alt="" loading="lazy" />
+                  <div className="stays-detail__gallery clickable-gallery">
+                    {selected.gallery.map((src, i) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() => setLightboxIndex(i)}
+                        aria-label={`${t('stays_gallery')} ${i + 1}`}
+                      >
+                        <img src={src} alt="" loading="lazy" />
+                      </button>
                     ))}
                   </div>
                 </>
               )}
-              <div className="stays-detail__actions">
+              <div className="stays-detail__actions stays-detail__actions--desktop">
                 <button
                   type="button"
                   className="premium-btn premium-btn--primary"
@@ -301,8 +311,27 @@ const Stays = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
+      </BottomSheet>
+
+      {selected && (
+        <MobileBookingBar
+          priceLabel={selected.pricePerPerson ? t('home_v2_coup_per_person') : t('acts_from')}
+          price={`${selected.price.toLocaleString()} DA`}
+          ctaLabel={t('stays_book_wa')}
+          ctaIcon="MessageCircle"
+          onCta={() => whatsapp(selected)}
+          className="stays-mobile-bar"
+        />
+      )}
+
+      {selected?.gallery && lightboxIndex != null && (
+        <ImageLightbox
+          images={selected.gallery}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
       )}
 
       <Footer />

@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
+import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
 import { FEATURED_TOURS } from '../data/tours';
+import { getPlacePathFromTour } from '../data/placeRoutes';
 import './Activities.css';
 import './Destinations.css';
 
@@ -37,10 +39,12 @@ export default function Destinations() {
       <Navbar />
 
       <section className="acts-hero">
-        <img
+        <ResponsiveImage
           className="acts-hero__bg"
           src="/images/djanet.jpeg"
           alt=""
+          priority
+          sizes="100vw"
         />
         <div className="acts-hero__overlay" />
         <div className="acts-hero__inner" data-reveal="fade">
@@ -67,8 +71,8 @@ export default function Destinations() {
         </div>
       </section>
 
-      <div className="acts-filters-wrap" data-reveal>
-        <div className="acts-filters" role="tablist">
+      <div className="acts-filters-wrap filter-pills-wrap is-scrollable" data-reveal>
+        <div className="acts-filters filter-pills" role="tablist">
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -94,11 +98,11 @@ export default function Destinations() {
                 className="acts-card"
                 data-reveal
                 data-delay={i * 60}
-                onClick={() => navigate(`/destination/${dest.id}`)}
+                onClick={() => navigate(getPlacePathFromTour(dest))}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    navigate(`/destination/${dest.id}`);
+                    navigate(getPlacePathFromTour(dest));
                   }
                 }}
                 role="link"
@@ -112,6 +116,11 @@ export default function Destinations() {
                     e.currentTarget.src = '/images/djanet.jpeg';
                   }}
                 />
+                {dest.badge && (
+                  <span className="acts-card__new">
+                    {pick(dest.badge.fr, dest.badge.en, dest.badge.ar)}
+                  </span>
+                )}
                 <div className="acts-card__body">
                   <h3>{pick(dest.name, dest.name_en, dest.name_ar)}</h3>
                   <p className="acts-card__tags">
@@ -126,9 +135,8 @@ export default function Destinations() {
                       <Icon name="Star" size={13} />
                       {dest.rating}
                     </span>
-                    <span>
-                      <Icon name="Clock" size={13} />
-                      {pick(dest.duration, dest.duration_en, dest.duration_ar)}
+                    <span className="acts-card__price">
+                      {dest.price.toLocaleString('fr-DZ')} DA
                     </span>
                   </div>
                 </div>

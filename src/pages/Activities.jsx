@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
+import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
 import { ACTIVITIES, ACTIVITY_FILTERS } from '../data/activities';
 import { FEATURED_TOURS } from '../data/tours';
+import { getPlacePathFromTour } from '../data/placeRoutes';
 import './Activities.css';
 
 const HERO_FEATURES = [
@@ -61,10 +63,12 @@ const Activities = () => {
       <Navbar />
 
       <section className="acts-hero">
-        <img
+        <ResponsiveImage
           className="acts-hero__bg"
           src="/images/quad.jpg"
           alt=""
+          priority
+          sizes="100vw"
         />
         <div className="acts-hero__overlay" />
         <div className="acts-hero__inner" data-reveal="fade">
@@ -91,8 +95,8 @@ const Activities = () => {
         </div>
       </section>
 
-      <div className="acts-filters-wrap" data-reveal>
-        <div className="acts-filters" role="tablist">
+      <div className="acts-filters-wrap filter-pills-wrap is-scrollable" data-reveal>
+        <div className="acts-filters filter-pills" role="tablist">
           {ACTIVITY_FILTERS.map((f) => (
             <button
               key={f.key}
@@ -210,13 +214,13 @@ const Activities = () => {
                 className="acts-dest-card"
                 data-reveal
                 data-delay={i * 60}
-                onClick={() => navigate(`/destination/${d.id}`)}
+                onClick={() => navigate(getPlacePathFromTour(d))}
                 role="link"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    navigate(`/destination/${d.id}`);
+                    navigate(getPlacePathFromTour(d));
                   }
                 }}
               >

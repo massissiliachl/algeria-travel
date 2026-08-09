@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { FEATURED_TOURS } from '../data/tours';
+import { getPlacePathFromTour } from '../data/placeRoutes';
 import './Activities.css';
 
 const FILTERS = [
@@ -104,11 +105,11 @@ const Tours = () => {
                 className="acts-card"
                 data-reveal
                 data-delay={i * 60}
-                onClick={() => navigate(`/destination/${tour.id}`)}
+                onClick={() => navigate(getPlacePathFromTour(tour))}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    navigate(`/destination/${tour.id}`);
+                    navigate(getPlacePathFromTour(tour));
                   }
                 }}
                 role="link"

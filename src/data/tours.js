@@ -1,5 +1,10 @@
 // src/data/tours.js
 
+import { TAGHIT_PACKAGES } from './taghitPackages';
+
+const taghitHotel = TAGHIT_PACKAGES.hotel;
+const taghitGuest = TAGHIT_PACKAGES.guesthouse;
+
 export const FEATURED_TOURS = [
     {
       id: 1,
@@ -240,5 +245,89 @@ export const FEATURED_TOURS = [
         { day: 2, title: "Ponts", title_en: "Bridges", desc: "Visite des ponts suspendus", desc_en: "Visit the suspended bridges" },
         { day: 3, title: "Départ", title_en: "Departure", desc: "Transfert", desc_en: "Transfer" },
       ],
+    },
+    {
+      id: 7,
+      name: "Taghit — Hôtel 4★",
+      name_en: "Taghit — 4★ Hotel",
+      name_ar: "تاغيت — فندق 4★",
+      subtitle: "Voyage coup de cœur · vol inclus",
+      subtitle_en: "Must-do escape · flight included",
+      subtitle_ar: "رحلة مفضلة · رحلة مشمولة",
+      description: taghitHotel.includes.map((i) => i.fr).join(', ') + `. ${taghitHotel.extra.fr}. ${taghitHotel.price.toLocaleString()} DA / personne.`,
+      description_en: taghitHotel.includes.map((i) => i.en).join(', ') + `. ${taghitHotel.extra.en}. ${taghitHotel.price.toLocaleString()} DZD / person.`,
+      fullDescription:
+        `Formule ${taghitHotel.title} Taghit — Voyage coup de cœur.\n` +
+        taghitHotel.includes.map((i) => `• ${i.fr}`).join('\n') +
+        `\n• ${taghitHotel.extra.fr}\n${taghitHotel.price.toLocaleString()} DA par personne`,
+      fullDescription_en:
+        `Taghit ${taghitHotel.title_en} package — must-do escape.\n` +
+        taghitHotel.includes.map((i) => `• ${i.en}`).join('\n') +
+        `\n• ${taghitHotel.extra.en}\n${taghitHotel.price.toLocaleString()} DZD per person`,
+      location: "Taghit, Béchar",
+      location_en: "Taghit, Béchar",
+      location_ar: "تاغيت، بشار",
+      bestTime: "Octobre – Mars",
+      bestTime_en: "October – March",
+      bestTime_ar: "أكتوبر – مارس",
+      duration: taghitHotel.duration,
+      duration_en: taghitHotel.duration_en,
+      duration_ar: taghitHotel.duration_ar,
+      price: taghitHotel.price,
+      rating: 4.9,
+      reviews: 142,
+      image: "/images/taghit.jpeg",
+      category: "desert",
+      placeSlug: "taghit",
+      pkg: "hotel",
+      badge: { fr: "NEW", en: "NEW", ar: "جديد" },
+      activities: [
+        { icon: "Hotel", label: "Hôtel 4★", label_en: "4★ hotel", label_ar: "فندق 4★" },
+        { icon: "Plane", label: "Vol inclus", label_en: "Flight included", label_ar: "رحلة مشمولة" },
+        { icon: "Car", label: "4×4 & dunes", label_en: "4×4 & dunes", label_ar: "دفع رباعي" },
+      ],
+      itinerary: [],
+    },
+    {
+      id: 8,
+      name: "Taghit — Maison d’hôte",
+      name_en: "Taghit — Guesthouse",
+      name_ar: "تاغيت — بيت ضيافة",
+      subtitle: "Voyage coup de cœur · bus Mercedes",
+      subtitle_en: "Must-do escape · Mercedes bus",
+      subtitle_ar: "رحلة مفضلة · حافلة مرسيدس",
+      description: taghitGuest.includes.map((i) => i.fr).join(', ') + '.',
+      description_en: taghitGuest.includes.map((i) => i.en).join(', ') + '.',
+      fullDescription:
+        `Formule ${taghitGuest.title} Taghit.\n` +
+        taghitGuest.includes.map((i) => `• ${i.fr}`).join('\n') +
+        `\n${taghitGuest.price.toLocaleString()} DA par personne`,
+      fullDescription_en:
+        `Taghit ${taghitGuest.title_en} package.\n` +
+        taghitGuest.includes.map((i) => `• ${i.en}`).join('\n') +
+        `\n${taghitGuest.price.toLocaleString()} DZD per person`,
+      location: "Taghit, Béchar",
+      location_en: "Taghit, Béchar",
+      location_ar: "تاغيت، بشار",
+      bestTime: "Octobre – Mars",
+      bestTime_en: "October – March",
+      bestTime_ar: "أكتوبر – مارس",
+      duration: taghitGuest.duration,
+      duration_en: taghitGuest.duration_en,
+      duration_ar: taghitGuest.duration_ar,
+      price: taghitGuest.price,
+      rating: 4.9,
+      reviews: 142,
+      image: "/images/taghit.jpeg",
+      category: "desert",
+      placeSlug: "taghit",
+      pkg: "guesthouse",
+      badge: { fr: "NEW", en: "NEW", ar: "جديد" },
+      activities: [
+        { icon: "House", label: "Maison d’hôte", label_en: "Guesthouse", label_ar: "بيت ضيافة" },
+        { icon: "Car", label: "Bus Mercedes", label_en: "Mercedes bus", label_ar: "حافلة مرسيدس" },
+        { icon: "ShieldCheck", label: "24h/24", label_en: "24/7", label_ar: "24/7" },
+      ],
+      itinerary: [],
     },
   ];

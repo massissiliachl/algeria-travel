@@ -1,6 +1,7 @@
 import { PLACES } from './places';
 import { ACTIVITIES } from './activities';
 import { FEATURED_TOURS } from './tours';
+import { getPlacePathFromTourId } from './placeRoutes';
 
 /** Normalize for accent-insensitive matching */
 export const normalizeQuery = (value = '') =>
@@ -18,6 +19,9 @@ const PLACE_ALIASES = {
   djanet: ['tassili', 'tin merzouga', 'sahara', 'desert', 'touareg'],
   ghardaia: ['mzab', 'm zab', 'ksour', 'mozabite', 'oasis', 'sahara'],
   hoggar: ['assekrem', 'tamanrasset', 'tam', 'sahara', 'montagne', 'tuareg'],
+  taghit: ['bechar', 'erg', 'dunes', 'ksar', 'oasis', 'sahara', 'sud ouest'],
+  timimoun: ['gourara', 'erg occidental', 'dunes rouges', 'ksour', 'sahara'],
+  constantine: ['ponts', 'pont suspendu', 'ahmed bey', 'ville des ponts'],
 };
 
 const ACTIVITY_ALIASES = {
@@ -137,7 +141,7 @@ export const searchCatalog = ({ destination = '', activity = '', q = '' } = {}) 
         id: tour.id,
         score,
         item: tour,
-        path: `/destination/${tour.id}`,
+        path: getPlacePathFromTourId(tour.id),
       });
     }
   });
@@ -167,8 +171,8 @@ export const suggestDestinations = (query, limit = 6) => {
     .filter((r) => r.type === 'place' || r.type === 'tour')
     .slice(0, limit)
     .map((r) => ({
-      type: r.type,
-      id: r.id,
+      type: r.type === 'tour' ? 'place' : r.type,
+      id: r.type === 'tour' ? getPlacePathFromTourId(r.id).replace('/place/', '') : r.id,
       label: r.item.name,
       label_en: r.item.name_en,
       label_ar: r.item.name_ar,
@@ -176,7 +180,7 @@ export const suggestDestinations = (query, limit = 6) => {
       hint_en: r.item.tagline_en || r.item.subtitle_en || r.item.location_en,
       hint_ar: r.item.tagline_ar || r.item.subtitle_ar || r.item.location_ar,
       image: r.item.image,
-      path: r.path,
+      path: r.type === 'tour' ? getPlacePathFromTourId(r.id) : r.path,
     }));
 };
 

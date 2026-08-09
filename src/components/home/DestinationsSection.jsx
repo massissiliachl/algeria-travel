@@ -34,7 +34,7 @@ const DestinationsSection = () => {
                 className="dest-card premium-card"
                 data-reveal
                 style={{ transitionDelay: `${i * 0.05}s` }}
-                onClick={() => navigate(`/destination/${dest.id}`)}
+                onClick={() => navigate(dest.link || `/place/${dest.placeId}`)}
               >
                 <div className="dest-card__img-wrap">
                   <img src={dest.image} alt={pick(dest.name, dest.name_en, dest.name_ar)} loading="lazy" />

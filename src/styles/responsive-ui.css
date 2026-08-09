@@ -1,0 +1,219 @@
+/* ═══ Composants responsive partagés ═══ */
+
+.mobile-booking-bar {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .mobile-booking-bar,
+  .place-mobile-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9000;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0));
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid rgba(26, 35, 50, 0.1);
+    box-shadow: 0 -8px 28px rgba(26, 35, 50, 0.12);
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-booking-bar__price span,
+  .place-mobile-bar__price span {
+    display: block;
+    font-size: 0.68rem;
+    color: #6b6560;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .mobile-booking-bar__price strong,
+  .place-mobile-bar__price strong {
+    font-size: 1.05rem;
+    color: #1a2332;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+
+  .mobile-booking-bar__btn,
+  .place-mobile-bar__btn {
+    flex: 1;
+    max-width: 220px;
+    min-height: var(--touch-min, 44px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 999px;
+    background: #1a2332;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0 18px;
+  }
+
+  .has-mobile-bar {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0)) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-booking-bar,
+  .place-mobile-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .mobile-booking-bar__price,
+  .place-mobile-bar__price {
+    text-align: center;
+  }
+
+  .mobile-booking-bar__btn,
+  .place-mobile-bar__btn {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* Bottom sheet */
+.bottom-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: rgba(12, 16, 22, 0.72);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.bottom-sheet__panel {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: min(92vh, 860px);
+  max-height: min(92svh, 860px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 22px;
+  padding: 28px 26px calc(26px + env(safe-area-inset-bottom, 0));
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+}
+
+.bottom-sheet__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: var(--touch-min, 44px);
+  height: var(--touch-min, 44px);
+  border: none;
+  border-radius: 50%;
+  background: #f6f5f2;
+  color: #1a2332;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .bottom-sheet {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .bottom-sheet__panel {
+    width: 100%;
+    max-height: 94vh;
+    max-height: 94svh;
+    border-radius: 20px 20px 0 0;
+    padding: 22px 16px calc(18px + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* Filtres scrollables (pills) */
+.filter-pills-wrap {
+  position: relative;
+}
+
+.filter-pills-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 32px;
+  background: linear-gradient(90deg, transparent, #fff 85%);
+  pointer-events: none;
+  border-radius: 0 18px 18px 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.filter-pills-wrap.is-scrollable::after {
+  opacity: 1;
+}
+
+.filter-pills {
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filter-pills > button,
+.filter-pills > .acts-filters__btn,
+.filter-pills > .stays-places__btn {
+  scroll-snap-align: start;
+  min-height: var(--touch-min, 44px);
+}
+
+/* Galerie cliquable */
+.clickable-gallery {
+  display: grid;
+  gap: 10px;
+}
+
+.clickable-gallery button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+}
+
+.clickable-gallery button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 35, 50, 0);
+  transition: background 0.2s ease;
+}
+
+.clickable-gallery button:hover::after,
+.clickable-gallery button:focus-visible::after {
+  background: rgba(26, 35, 50, 0.15);
+}
+
+.clickable-gallery button:focus-visible {
+  outline: 2px solid var(--gold, #b8935d);
+  outline-offset: 2px;
+}
+
+.clickable-gallery img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}

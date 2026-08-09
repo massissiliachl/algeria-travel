@@ -1,8 +1,11 @@
 import { FEATURED_TOURS } from './tours';
+import { getPlacePathFromTour } from './placeRoutes';
 
 /** Destinations homepage — mêmes données et images que Featured Tours */
 export const POPULAR_DESTINATIONS = FEATURED_TOURS.map((tour) => ({
   id: tour.id,
+  placeId: getPlacePathFromTour(tour).replace('/place/', ''),
+  link: getPlacePathFromTour(tour),
   name: tour.name,
   name_en: tour.name_en,
   name_ar: tour.name_ar,

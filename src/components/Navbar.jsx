@@ -81,7 +81,7 @@ const Navbar = ({ variant = 'default' }) => {
     }
     if (link.key === 'gallery') return location.pathname.startsWith('/gallery');
     if (link.key === 'tours') {
-      return location.pathname.startsWith('/tours') || location.pathname.startsWith('/destination/');
+      return location.pathname.startsWith('/tours') || location.pathname.startsWith('/place/');
     }
     if (link.key === 'blog') return location.pathname.startsWith('/blog');
     return location.pathname === link.href && !link.hash;

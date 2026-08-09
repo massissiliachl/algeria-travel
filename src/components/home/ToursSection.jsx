@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
 import { FEATURED_TOURS } from '../../data/tours';
+import { getPlacePathFromTour } from '../../data/placeRoutes';
 import Icon from '../ui/Icon';
 import './Sections.css';
 
@@ -46,7 +47,7 @@ const ToursSection = () => {
           </button>
           <div className="tour-cards" ref={scrollRef}>
             {FEATURED_TOURS.map((tour) => (
-              <article key={tour.id} className="tour-card premium-card" onClick={() => navigate(`/destination/${tour.id}`)}>
+              <article key={tour.id} className="tour-card premium-card" onClick={() => navigate(getPlacePathFromTour(tour))}>
                 <div className="tour-card__img">
                   <img src={tour.image} alt={tour.name} loading="lazy" />
                   <span className="premium-rating"><Icon name="Star" size={12} />{tour.rating}</span>
@@ -58,7 +59,7 @@ const ToursSection = () => {
                   <p>{pick(tour.subtitle, tour.subtitle_en, tour.subtitle_ar)}</p>
                   <div className="tour-card__footer">
                     <div className="tour-card__price">{tour.price.toLocaleString()} <span>DA</span></div>
-                    <button className="premium-btn premium-btn--primary" type="button" onClick={(e) => { e.stopPropagation(); navigate(`/destination/${tour.id}`); }}>
+                    <button className="premium-btn premium-btn--primary" type="button" onClick={(e) => { e.stopPropagation(); navigate(getPlacePathFromTour(tour)); }}>
                       {t('btn_reserver')}
                     </button>
                   </div>

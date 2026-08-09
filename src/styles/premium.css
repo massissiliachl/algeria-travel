@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap');
+/* Fonts chargées via public/index.html */
 
 /* ═══════════════════════════════════════════
    Algeria Travel — Design System
@@ -46,6 +46,13 @@
   --serif: 'Playfair Display', Georgia, serif;
   --sans: 'Montserrat', system-ui, sans-serif;
   --nav-h: 80px;
+
+  /* Breakpoints (référence) */
+  --bp-xl: 1200px;
+  --bp-lg: 992px;
+  --bp-md: 768px;
+  --bp-sm: 480px;
+  --touch-min: 44px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -297,7 +304,7 @@ body[data-theme='dark'] {
 .brand-breadcrumb a:hover { color: #fff; }
 .brand-breadcrumb span:last-child { color: #fff; font-weight: 600; }
 
-[data-reveal] {
+html.js [data-reveal]:not(.is-in):not(.revealed) {
   opacity: 0;
   transform: translateY(28px);
   transition:
@@ -305,20 +312,26 @@ body[data-theme='dark'] {
     transform 0.75s var(--ease);
   will-change: opacity, transform;
 }
-[data-reveal][data-reveal='left'] {
+html.js [data-reveal][data-reveal='left']:not(.is-in):not(.revealed) {
   transform: translateX(-32px);
 }
-[data-reveal][data-reveal='right'] {
+html.js [data-reveal][data-reveal='right']:not(.is-in):not(.revealed) {
   transform: translateX(32px);
 }
-[data-reveal][data-reveal='zoom'] {
+html.js [data-reveal][data-reveal='zoom']:not(.is-in):not(.revealed) {
   transform: scale(0.94);
 }
-[data-reveal][data-reveal='fade'] {
+html.js [data-reveal][data-reveal='fade']:not(.is-in):not(.revealed) {
   transform: none;
 }
 [data-reveal].is-in,
 [data-reveal].revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Sans JS : contenu visible immédiatement */
+html:not(.js) [data-reveal] {
   opacity: 1;
   transform: none;
 }
@@ -333,7 +346,7 @@ body[data-theme='dark'] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
+  html.js [data-reveal] {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;

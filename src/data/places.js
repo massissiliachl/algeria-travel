@@ -1,5 +1,7 @@
 /** Destinations accueil — fiches détaillées + réservation */
 
+import { resolveTaghitPlace } from './taghitPackages';
+
 export const PLACES = [
   {
     id: 'bejaia',
@@ -181,6 +183,102 @@ export const PLACES = [
       { icon: 'Tent', fr: 'Immersion touareg', en: 'Tuareg immersion', ar: 'انغماس طوارقي' },
     ],
   },
+  /** Défaut = formule Hôtel 4★ (99 990 DA). Maison d’hôte → /guesthouses */
+  resolveTaghitPlace('hotel'),
+  {
+    id: 'timimoun',
+    name: 'Timimoun',
+    name_en: 'Timimoun',
+    name_ar: 'تيميمون',
+    tagline: 'Perle rouge du Sahara',
+    tagline_en: 'Red pearl of the Sahara',
+    tagline_ar: 'لؤلؤة الصحراء الحمراء',
+    rating: 4.9,
+    reviews: 234,
+    temp: '30°C',
+    image: '/images/sahara1.jpeg',
+    gallery: ['/images/sahara1.jpeg', '/images/sahara2.jpeg', '/images/sahara3.jpeg'],
+    description:
+      'Dunes rouges du Grand Erg Occidental, ksour ocre et couchers de soleil magiques au cœur du Gourara.',
+    description_en:
+      'Red dunes of the Grand Western Erg, ochre ksour and magical sunsets in the heart of Gourara.',
+    description_ar:
+      'كثبان حمراء من العرق الغربي الكبير وقصور حمراء وغروب ساحر في قلب القورارة.',
+    bestTime: 'Octobre – Avril',
+    bestTime_en: 'October – April',
+    bestTime_ar: 'أكتوبر – أبريل',
+    duration: '5 jours',
+    duration_en: '5 days',
+    duration_ar: '5 أيام',
+    price: 45000,
+    oldPrice: 55000,
+    stay: 'Maison d’hôtes & campement saharien',
+    stay_en: 'Guest house & Saharan camp',
+    stay_ar: 'بيت ضيافة ومخيم صحراوي',
+    transport: 'Vol vers Timimoun + 4×4',
+    transport_en: 'Flight to Timimoun + 4×4',
+    transport_ar: 'رحلة إلى تيميمون + دفع رباعي',
+    includes: [
+      { fr: 'Hébergement 4 nuits', en: '4 nights accommodation', ar: 'إقامة 4 ليالٍ' },
+      { fr: 'Excursion dunes & ksour', en: 'Dunes & ksour excursion', ar: 'رحلة الكثبان والقصور' },
+      { fr: 'Repas traditionnels', en: 'Traditional meals', ar: 'وجبات تقليدية' },
+      { fr: 'Guide local', en: 'Local guide', ar: 'مرشد محلي' },
+    ],
+    highlights: [
+      { icon: 'Sun', fr: 'Dunes rouges', en: 'Red dunes', ar: 'كثبان حمراء' },
+      { icon: 'Landmark', fr: 'Ksour traditionnels', en: 'Traditional ksour', ar: 'قصور تقليدية' },
+      { icon: 'Sunset', fr: 'Couchers de soleil', en: 'Sunsets', ar: 'غروب الشمس' },
+    ],
+  },
+  {
+    id: 'constantine',
+    name: 'Constantine',
+    name_en: 'Constantine',
+    name_ar: 'قسنطينة',
+    tagline: 'Ville des ponts suspendus',
+    tagline_en: 'City of suspended bridges',
+    tagline_ar: 'مدينة الجسور المعلقة',
+    rating: 4.7,
+    reviews: 145,
+    temp: '20°C',
+    image: '/images/alger.jpeg',
+    gallery: ['/images/alger.jpeg', '/images/home/dest-alger.jpg'],
+    description:
+      'Perchée sur son rocher, Constantine fascine par ses ponts, son palais Ahmed Bey et son histoire millénaire.',
+    description_en:
+      'Perched on its rock, Constantine fascinates with its bridges, Ahmed Bey palace and millennia of history.',
+    description_ar:
+      'تتربع قسنطينة على صخرتها وتبهر بجسورها وقصر أحمد باي وتاريخها العريق.',
+    bestTime: 'Mars – Juin / Sept – Nov',
+    bestTime_en: 'March – June / Sept – Nov',
+    bestTime_ar: 'مارس – يونيو / سبتمبر – نوفمبر',
+    duration: '3 jours',
+    duration_en: '3 days',
+    duration_ar: '3 أيام',
+    price: 22000,
+    oldPrice: 28000,
+    stay: 'Hôtel centre-ville',
+    stay_en: 'Downtown hotel',
+    stay_ar: 'فندق وسط المدينة',
+    transport: 'Vol ou train + transferts locaux',
+    transport_en: 'Flight or train + local transfers',
+    transport_ar: 'طيران أو قطار + تنقلات محلية',
+    includes: [
+      { fr: 'Hébergement 2 nuits', en: '2 nights stay', ar: 'إقامة ليلتين' },
+      { fr: 'Visite des ponts', en: 'Bridges tour', ar: 'جولة الجسور' },
+      { fr: 'Palais Ahmed Bey', en: 'Ahmed Bey palace', ar: 'قصر أحمد باي' },
+      { fr: 'Guide francophone', en: 'French-speaking guide', ar: 'مرشد ناطق بالفرنسية' },
+    ],
+    highlights: [
+      { icon: 'Route', fr: 'Ponts suspendus', en: 'Suspended bridges', ar: 'جسور معلقة' },
+      { icon: 'Landmark', fr: 'Palais Ahmed Bey', en: 'Ahmed Bey palace', ar: 'قصر أحمد باي' },
+      { icon: 'Building2', fr: 'Médina & musées', en: 'Medina & museums', ar: 'مدينة قديمة ومتاحف' },
+    ],
+  },
 ];
 
-export const getPlaceById = (id) => PLACES.find((p) => p.id === id);
+export const getPlaceById = (id, pkg) => {
+  // Page destination Taghit = formule Hôtel 4★ uniquement
+  if (id === 'taghit') return resolveTaghitPlace('hotel');
+  return PLACES.find((p) => p.id === id);
+};

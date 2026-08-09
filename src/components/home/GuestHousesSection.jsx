@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
-import { GUEST_HOUSES, GUEST_HOUSE_BENEFITS } from '../../data/guestHouses';
+import { GUEST_HOUSES, GUEST_HOUSE_BENEFITS, MAISON_HOTE_IMAGES } from '../../data/guestHouses';
 import Icon from '../ui/Icon';
 import './GuestHousesSection.css';
 
@@ -15,6 +15,8 @@ const BENEFIT_KEYS = {
 
 const GuestHousesSection = () => {
   const { t, pick } = useLang();
+  const house = GUEST_HOUSES[0];
+  const photos = house?.gallery || MAISON_HOTE_IMAGES;
 
   return (
     <section className="guesthouses-section" id="guesthouses">
@@ -53,7 +55,7 @@ const GuestHousesSection = () => {
       <div className="guesthouses-showcase premium-container" data-reveal>
         <div className="guesthouses-showcase__main">
           <img
-            src="/images/maison-hote-sud-1.png"
+            src={photos[0]}
             alt={t('home_gh_photo_alt')}
             loading="lazy"
           />
@@ -64,7 +66,7 @@ const GuestHousesSection = () => {
         </div>
         <div className="guesthouses-showcase__side">
           <img
-            src="/images/maison-hote-sud-2.png"
+            src={photos[1] || photos[0]}
             alt={t('home_gh_photo_alt')}
             loading="lazy"
           />
@@ -86,42 +88,42 @@ const GuestHousesSection = () => {
           ))}
         </div>
 
-        <div className="guesthouses-grid">
-          {GUEST_HOUSES.map((house, i) => (
-            <article
-              key={house.id}
-              className="guesthouse-card"
-              data-reveal
-              style={{ transitionDelay: `${i * 0.04}s` }}
-            >
-              <div className="guesthouse-card__img">
-                <img src={house.image} alt={pick(house.name, house.name_en, house.name_ar)} loading="lazy" />
-                <span className="guesthouse-card__rating">
-                  <Icon name="Star" size={12} />{house.rating}
+        {house && (
+          <article className="guesthouse-featured" data-reveal>
+            <div className="guesthouse-featured__info">
+              <span className="guesthouse-featured__loc">
+                <Icon name="MapPin" size={14} />
+                {pick(house.location, house.location_en, house.location_ar)}
+              </span>
+              <h3>{pick(house.name, house.name_en, house.name_ar)}</h3>
+              <p>{pick(house.desc, house.desc_en, house.desc_ar)}</p>
+              <div className="guesthouse-featured__meta">
+                <span className="guesthouse-featured__rating">
+                  <Icon name="Star" size={14} /> {house.rating}
+                </span>
+                <span className="guesthouse-featured__price">
+                  {house.price.toLocaleString()} <small>DA {t('per_person')}</small>
                 </span>
               </div>
-              <div className="guesthouse-card__body">
-                <span className="guesthouse-card__loc">
-                  <Icon name="MapPin" size={13} />
-                  {pick(house.location, house.location_en, house.location_ar)}
-                </span>
-                <h3>{pick(house.name, house.name_en, house.name_ar)}</h3>
-                <p>{pick(house.desc, house.desc_en, house.desc_ar)}</p>
-                <div className="guesthouse-card__footer">
-                  <span className="guesthouse-card__price">
-                    {house.price.toLocaleString()} <small>DA/{t('home_per_night')}</small>
-                  </span>
-                  <button type="button" className="guesthouse-card__btn">
-                    {t('home_discover')}
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              <Link to="/guesthouses" className="guesthouse-featured__btn">
+                {t('home_discover')} <Icon name="ArrowRight" size={16} />
+              </Link>
+            </div>
+            <div className="guesthouse-featured__gallery">
+              {photos.map((src, i) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt=""
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                />
+              ))}
+            </div>
+          </article>
+        )}
 
         <div className="guesthouses-cta" data-reveal>
-          <Link to="/#guesthouses" className="guesthouses-cta__btn">
+          <Link to="/guesthouses" className="guesthouses-cta__btn">
             {t('home_gh_btn_all')} <Icon name="ArrowRight" size={16} />
           </Link>
         </div>

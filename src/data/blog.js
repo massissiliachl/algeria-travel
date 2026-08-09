@@ -3,6 +3,7 @@
 export const BLOG_POSTS = [
   {
     id: 1,
+    slug: 'timgad-coucher-soleil',
     title: 'Timgad au coucher du soleil : la Rome africaine',
     title_en: 'Timgad at sunset: Africa’s Rome',
     title_ar: 'تيمقاد عند الغروب: روما الأفريقية',
@@ -27,10 +28,10 @@ export const BLOG_POSTS = [
     date_ar: '20 مارس 2026',
     readTime: '7 min',
     image: '/images/hero.jpeg',
-    featured: true,
   },
   {
     id: 2,
+    slug: 'djanet-tassili',
     title: 'Djanet & le Tassili : art rupestre et dunes de feu',
     title_en: 'Djanet & Tassili: rock art and fire dunes',
     title_ar: 'جانت وتاسيلي: فن صخري وكثبان النار',
@@ -58,6 +59,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 3,
+    slug: 'stars-algerie',
     title: 'Quand les stars découvrent l’Algérie',
     title_en: 'When stars discover Algeria',
     title_ar: 'عندما يكتشف النجوم الجزائر',
@@ -85,6 +87,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 4,
+    slug: 'casbah-culture',
     title: 'Expérience culturelle : Casbah, musique & art de vivre',
     title_en: 'Cultural experience: Casbah, music & living heritage',
     title_ar: 'تجربة ثقافية: القصبة والموسيقى وفن العيش',
@@ -112,6 +115,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 5,
+    slug: 'ghardaia-mzab',
     title: 'Ghardaïa & la vallée du M’Zab : architecture vivante',
     title_en: 'Ghardaïa & the M’Zab valley: living architecture',
     title_ar: 'غرداية ووادي مزاب: عمارة حية',
@@ -139,6 +143,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 6,
+    slug: 'cuisine-algerienne',
     title: 'Table algérienne : couscous, chorba et makroud',
     title_en: 'Algerian table: couscous, chorba and makroud',
     title_ar: 'المائدة الجزائرية: كسكس وشوربة ومقروض',
@@ -166,6 +171,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 7,
+    slug: 'hoggar-assekrem',
     title: 'Hoggar : Assekrem et les montagnes du silence',
     title_en: 'Hoggar: Assekrem and the mountains of silence',
     title_ar: 'الهقار: أسكرام وجبال الصمت',
@@ -193,6 +199,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 8,
+    slug: 'photographier-sahara',
     title: 'Sahara en images : photographier le Grand Sud',
     title_en: 'Sahara in pictures: photographing the Great South',
     title_ar: 'الصحراء بالصور: تصوير الجنوب الكبير',
@@ -218,6 +225,48 @@ export const BLOG_POSTS = [
     readTime: '5 min',
     image: '/images/sahara3.jpeg',
   },
+  {
+    id: 9,
+    slug: 'maisons-dhotes-algerie',
+    title: 'Séjourner en maison d’hôte : l’Algérie authentique',
+    title_en: 'Stay in a guesthouse: authentic Algeria',
+    title_ar: 'الإقامة في بيت ضيافة: الجزائر الأصيلة',
+    excerpt:
+      'Plus qu’un lit : un foyer, une table partagée et des conseils locaux. Voici pourquoi la maison d’hôte est le meilleur moyen de découvrir l’Algérie.',
+    excerpt_en:
+      'More than a bed: a home, a shared table and local tips. Why a guesthouse is the best way to discover Algeria.',
+    excerpt_ar:
+      'أكثر من سرير: بيت ومائدة مشتركة ونصائح محلية. لماذا بيت الضيافة أفضل طريقة لاكتشاف الجزائر.',
+    body:
+      'En Algérie, la maison d’hôte n’est pas un simple hébergement : c’est une porte d’entrée vers le quotidien local. Que vous soyez à Alger, à Taghit, à Ghardaïa ou dans les oasis du Sud, vous dormez chez l’habitant, partagez souvent le petit-déjeuner — parfois le dîner — et repartez avec des adresses que les guides ne publient pas.\n\nPourquoi choisir une maison d’hôte ? D’abord pour l’accueil : familles, artisans et passionnés du patrimoine ouvrent leur porte. Ensuite pour le rapport qualité-prix : des chambres soignées, une cuisine du terroir et une proximité avec les marchés, ksours ou plages. Enfin pour l’impact : votre séjour soutient directement l’économie locale.\n\nComment bien réserver ? Vérifiez les inclusions (petit-déjeuner, navette, activités), demandez les horaires de prière ou de calme du quartier, et précisez vos besoins (climatisation, lit d’appoint, régime alimentaire). Sur Algeria Travel, nos maisons d’hôtes sélectionnées sont choisies pour leur hospitalité, leur propreté et leur ancrage culturel.\n\nIdées d’itinéraires : deux nuits en maison d’hôte à Alger pour la Casbah et les cafés, puis une parenthèse saharienne en riad ou guesthouse à Taghit ou Timimoun. Entre les deux, une étape à Ghardaïa révèle l’architecture mozabite vue de l’intérieur.\n\nPrêt à vivre l’Algérie autrement ? Explorez nos maisons d’hôtes et composez un séjour sur mesure avec notre équipe.',
+    body_en:
+      'In Algeria, a guesthouse is more than lodging: it is a doorway into local life. Whether in Algiers, Taghit, Ghardaïa or the southern oases, you stay with hosts, often share breakfast — sometimes dinner — and leave with tips no guidebook prints.\n\nWhy choose a guesthouse? First, the welcome: families, craftspeople and heritage lovers open their doors. Then value: carefully kept rooms, regional cooking and proximity to markets, ksours or beaches. Finally impact: your stay supports the local economy directly.\n\nHow to book well? Check inclusions (breakfast, shuttle, activities), ask about neighbourhood quiet hours, and state needs (AC, extra bed, diet). On Algeria Travel, our selected guesthouses are chosen for hospitality, cleanliness and cultural roots.\n\nItinerary ideas: two nights in Algiers for the Casbah and cafés, then a Saharan pause in Taghit or Timimoun. Between them, Ghardaïa reveals Mozabite architecture from the inside.\n\nReady to experience Algeria differently? Browse our guesthouses and craft a stay with our team.',
+    body_ar:
+      'في الجزائر بيت الضيافة ليس مجرد إقامة: إنه باب إلى الحياة المحلية. سواء في العاصمة أو تاغيت أو غرداية أو واحات الجنوب، تقيم عند المضيفين وتشارك غالباً الإفطار — وأحياناً العشاء — وتغادر بعناوين لا تذكرها الأدلة.\n\nلماذا بيت الضيافة؟ أولاً للترحيب: عائلات وحرفيون وعشاق التراث يفتحون أبوابهم. ثم للقيمة: غرف معتنى بها ومطبخ محلي وقرب من الأسواق والقصور أو الشواطئ. وأخيراً للأثر: إقامتك تدعم الاقتصاد المحلي مباشرة.\n\nكيف تحجز جيداً؟ تحقق من المشمولات واسأل عن هدوء الحي واذكر احتياجاتك. على Algeria Travel نختار بيوت الضيافة لحسن الضيافة والنظافة والجذور الثقافية.\n\nأفكار مسار: ليلتان في الجزائر للقصبة والمقاهي، ثم استراحة صحراوية في تاغيت أو تيميمون، وبينهما غرداية تكشف العمارة الميزابية من الداخل.\n\nهل أنت مستعد لعيش الجزائر بطريقة مختلفة؟ استكشف بيوت الضيافة وصمم إقامتك مع فريقنا.',
+    category: 'culture',
+    categoryLabel: 'Culture',
+    categoryLabel_en: 'Culture',
+    categoryLabel_ar: 'ثقافة',
+    date: '4 Août 2026',
+    date_en: 'August 4, 2026',
+    date_ar: '4 أغسطس 2026',
+    readTime: '9 min',
+    image: '/images/maison-hote-sud-1.png',
+    gallery: [
+      '/images/maison-hote-sud-1.png',
+      '/images/maison-hote-sud-2.png',
+      '/images/maison-hote-sud-3.png.jpeg',
+      '/images/maison-hote-sud-4.png.jpeg',
+      '/images/maison-hote-sud-5.png.jpeg',
+      '/images/maison-hote-sud-6.png.jpeg',
+      '/images/maison-hote-sud-7.png.jpeg',
+    ],
+    ctaPath: '/guesthouses',
+    ctaLabel: 'Voir les maisons d’hôte',
+    ctaLabel_en: 'Browse guesthouses',
+    ctaLabel_ar: 'عرض بيوت الضيافة',
+    featured: true,
+  },
 ];
 
 export const BLOG_FILTERS = [
@@ -227,3 +276,11 @@ export const BLOG_FILTERS = [
   { key: 'people', icon: 'Star', fr: 'Célébrités', en: 'Celebrities', ar: 'مشاهير' },
   { key: 'photo', icon: 'Camera', fr: 'Photo', en: 'Photo', ar: 'تصوير' },
 ];
+
+export function getBlogPostBySlug(slug) {
+  return BLOG_POSTS.find((p) => p.slug === slug) || null;
+}
+
+export function getRelatedBlogPosts(post, limit = 3) {
+  return BLOG_POSTS.filter((p) => p.id !== post.id && p.category === post.category).slice(0, limit);
+}

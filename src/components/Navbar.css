@@ -22,8 +22,10 @@
   border-bottom-color: rgba(26, 35, 50, 0.08);
 }
 
-.premium-nav--transparent .premium-nav__logo { color: #fff; }
-.premium-nav--transparent .premium-nav__logo span { color: #B8935D; }
+.premium-nav--transparent .premium-nav__logo,
+.premium-nav--transparent .premium-nav__logo span {
+  color: #B8935D;
+}
 .premium-nav--transparent .premium-nav__link { color: rgba(255, 255, 255, 0.92); }
 .premium-nav--transparent .premium-nav__link:hover,
 .premium-nav--transparent .premium-nav__link.active {

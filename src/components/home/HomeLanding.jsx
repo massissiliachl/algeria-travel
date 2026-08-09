@@ -2,13 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
 import Icon from '../ui/Icon';
+import ResponsiveImage from '../ui/ResponsiveImage';
 import {
   HOME_ACCOMMODATIONS,
   HOME_CIRCUITS_BANNER,
+  HOME_COUP_TAGHIT,
   HOME_DESTINATIONS,
   HOME_HERO,
 } from '../../data/homePage';
 import { FEATURED_TOURS } from '../../data/tours';
+import { getPlacePathFromTour } from '../../data/placeRoutes';
 import {
   resolveSearchNavigation,
   suggestActivities,
@@ -49,7 +52,6 @@ const HomeLanding = () => {
   });
   const [openSuggest, setOpenSuggest] = useState(null); // 'destination' | 'activity' | null
   const [email, setEmail] = useState('');
-  const [slide, setSlide] = useState(0);
   const searchWrapRef = useRef(null);
 
   const destSuggestions = suggestDestinations(search.destination);
@@ -61,8 +63,8 @@ const HomeLanding = () => {
         setOpenSuggest(null);
       }
     };
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
+    document.addEventListener('pointerdown', onDocClick);
+    return () => document.removeEventListener('pointerdown', onDocClick);
   }, []);
 
   const handleSearch = (e) => {
@@ -103,9 +105,11 @@ const HomeLanding = () => {
     <div className="home-v2">
       <section className="hv-hero" id="hero">
         <div className="hv-hero__media">
-          <img
+          <ResponsiveImage
             src={HOME_HERO.image}
             alt=""
+            priority
+            sizes="100vw"
             onError={(e) => {
               e.currentTarget.src = HOME_HERO.fallback;
             }}
@@ -114,34 +118,37 @@ const HomeLanding = () => {
         </div>
 
         <div className="hv-container hv-hero__content">
-          <h1 className="hv-hero__title hv-anim hv-anim--1">
-            {t('home_v2_title_before')} <em>{t('home_v2_title_em')}</em>{' '}
-            {t('home_v2_title_after')}
+          <p className="hv-hero__eyebrow hv-anim hv-anim--1">
+            {t('home_v2_hero_eyebrow')}
+            <Icon name="Heart" size={16} strokeWidth={1.5} />
+          </p>
+
+          <div className="hv-hero__badge" aria-label={t('home_v2_hero_badge')}>
+            <span className="hv-hero__badge-spark" aria-hidden />
+            {t('home_v2_hero_badge')}
+          </div>
+
+          <h1 className="hv-hero__title hv-anim hv-anim--2">
+            <span className="hv-hero__title-line">{t('home_v2_title_before')}</span>
+            <span className="hv-hero__title-line">
+              <em>{t('home_v2_title_em')}</em>
+            </span>
+            <span className="hv-hero__title-line">{t('home_v2_title_after')}</span>
           </h1>
-          <p className="hv-hero__subtitle hv-anim hv-anim--2">{t('home_v2_subtitle')}</p>
-          <div className="hv-hero__actions hv-anim hv-anim--3">
+          <span className="hv-hero__rule hv-anim hv-anim--2" aria-hidden />
+          <p className="hv-hero__subtitle hv-anim hv-anim--3">{t('home_v2_subtitle')}</p>
+          <div className="hv-hero__actions hv-anim hv-anim--4">
             <button
               type="button"
-              className="hv-hero__btn hv-hero__btn--solid"
+              className="hv-hero__cta"
               onClick={() => navigate('/destinations')}
             >
-              {t('home_v2_cta')}
-              <Icon name="ArrowRight" size={16} />
+              <span className="hv-hero__cta-text">{t('home_v2_cta')}</span>
+              <span className="hv-hero__cta-icon" aria-hidden>
+                <Icon name="ArrowRight" size={18} strokeWidth={2} />
+              </span>
             </button>
           </div>
-        </div>
-
-        <div className="hv-hero__slides hv-anim hv-anim--4" aria-hidden>
-          {['01', '02', '03'].map((n, i) => (
-            <button
-              key={n}
-              type="button"
-              className={slide === i ? 'is-active' : ''}
-              onClick={() => setSlide(i)}
-            >
-              {n}
-            </button>
-          ))}
         </div>
       </section>
 
@@ -149,7 +156,7 @@ const HomeLanding = () => {
         <form className="hv-search" onSubmit={handleSearch} role="search">
           <div className={`hv-search__field ${openSuggest === 'destination' ? 'is-open' : ''}`}>
             <label htmlFor="hv-dest">
-              <Icon name="MapPin" size={14} /> {t('home_search_destination')}
+              <Icon name="MapPin" size={12} /> {t('home_search_destination')}
             </label>
             <input
               id="hv-dest"
@@ -174,7 +181,7 @@ const HomeLanding = () => {
                       type="button"
                       role="option"
                       aria-selected="false"
-                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => e.preventDefault()}
                       onClick={() => pickSuggestion('destination', s)}
                     >
                       {s.image && <img src={s.image} alt="" />}
@@ -191,7 +198,7 @@ const HomeLanding = () => {
           </div>
           <div className="hv-search__field">
             <label htmlFor="hv-dates">
-              <Icon name="Calendar" size={14} /> {t('home_search_dates')}
+              <Icon name="Calendar" size={12} /> {t('home_search_dates')}
             </label>
             <input
               id="hv-dates"
@@ -203,7 +210,7 @@ const HomeLanding = () => {
           </div>
           <div className="hv-search__field">
             <label htmlFor="hv-travelers">
-              <Icon name="Users" size={14} /> {t('home_search_travelers')}
+              <Icon name="Users" size={12} /> {t('home_search_travelers')}
             </label>
             <select
               id="hv-travelers"
@@ -219,7 +226,7 @@ const HomeLanding = () => {
           </div>
           <div className={`hv-search__field ${openSuggest === 'activity' ? 'is-open' : ''}`}>
             <label htmlFor="hv-act">
-              <Icon name="Mountain" size={14} /> {t('home_search_activities')}
+              <Icon name="Mountain" size={12} /> {t('home_search_activities')}
             </label>
             <input
               id="hv-act"
@@ -244,7 +251,7 @@ const HomeLanding = () => {
                       type="button"
                       role="option"
                       aria-selected="false"
-                      onMouseDown={(e) => e.preventDefault()}
+                      onPointerDown={(e) => e.preventDefault()}
                       onClick={() => pickSuggestion('activity', s)}
                     >
                       {s.image && <img src={s.image} alt="" />}
@@ -260,11 +267,94 @@ const HomeLanding = () => {
             )}
           </div>
           <button type="submit" className="hv-search__btn">
-            <Icon name="Search" size={18} />
+            <Icon name="Search" size={16} />
             {t('home_search_btn')}
           </button>
         </form>
       </div>
+
+      <section className="hv-coup" aria-labelledby="hv-coup-title" data-reveal>
+        <div className="hv-container">
+          <div className="hv-coup__stage">
+            <Link to={HOME_COUP_TAGHIT.link} className="hv-coup__banner">
+              <span className="hv-coup__tag" aria-hidden>
+                <svg viewBox="0 0 72 72" className="hv-coup__tag-svg">
+                  <path
+                    className="hv-coup__tag-shape"
+                    d="M12 28 L36 8 L60 28 L52 58 L20 58 Z"
+                  />
+                  <circle cx="36" cy="22" r="3.5" className="hv-coup__tag-hole" />
+                </svg>
+                <span className="hv-coup__tag-label">{t('home_v2_coup_badge')}</span>
+              </span>
+
+              <div className="hv-coup__banner-copy">
+                <p className="hv-coup__eyebrow">{t('home_v2_coup_eyebrow')}</p>
+                <h2 id="hv-coup-title" className="hv-coup__title">
+                  {t('home_v2_coup_headline')}
+                </h2>
+                <p className="hv-coup__text">{t('home_v2_coup_text')}</p>
+              </div>
+
+              <div className="hv-coup__banner-media">
+                <img
+                  src={HOME_COUP_TAGHIT.image}
+                  alt={t('home_v2_coup_place')}
+                  onError={(e) => {
+                    e.currentTarget.src = HOME_COUP_TAGHIT.fallback;
+                  }}
+                />
+              </div>
+            </Link>
+
+            <div className="hv-coup__formulas" aria-label={t('home_v2_coup_meta_label')}>
+              {HOME_COUP_TAGHIT.packages.map((pkg) => (
+                <article key={pkg.id} className={`hv-coup__formula hv-coup__formula--${pkg.id}`}>
+                  <div className="hv-coup__formula-top">
+                    <span className="hv-coup__formula-icon">
+                      <Icon name={pkg.icon} size={20} strokeWidth={1.6} />
+                    </span>
+                    <div>
+                      <h3>{t(pkg.titleKey)}</h3>
+                      <p>{t(pkg.transportKey)}</p>
+                    </div>
+                  </div>
+
+                  <ul className="hv-coup__formula-list">
+                    {pkg.includes.map((key) => (
+                      <li key={key}>
+                        <Icon name="Check" size={15} strokeWidth={2.25} />
+                        <span>{t(key)}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {pkg.extraKey && (
+                    <p className="hv-coup__formula-extra">{t(pkg.extraKey)}</p>
+                  )}
+
+                  <div className="hv-coup__formula-foot">
+                    <div className="hv-coup__formula-price">
+                      <strong>
+                        {pkg.price.toLocaleString('fr-DZ')}
+                        <span> {t('home_v2_coup_price_unit')}</span>
+                      </strong>
+                      <em>{t('home_v2_coup_per_person')}</em>
+                    </div>
+                    <Link
+                      to={pkg.ctaPath || `${HOME_COUP_TAGHIT.link}?pkg=${pkg.id}`}
+                      className="hv-coup__formula-cta"
+                    >
+                      {t('home_v2_coup_cta')}
+                      <Icon name="ArrowRight" size={16} />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="hv-trust" aria-label="Avantages">
         <div className="hv-trust__grid">
@@ -409,13 +499,13 @@ const HomeLanding = () => {
                   className="hv-dest-card"
                   data-reveal
                   data-delay={i * 60}
-                  onClick={() => navigate(`/destination/${tour.id}`)}
+                  onClick={() => navigate(getPlacePathFromTour(tour))}
                   role="link"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      navigate(`/destination/${tour.id}`);
+                      navigate(getPlacePathFromTour(tour));
                     }
                   }}
                 >
