@@ -99,76 +99,25 @@
 .hv-anim--3 { animation-delay: 0.4s; }
 .hv-anim--4 { animation-delay: 0.55s; }
 
-/* Eyebrow or — badge NOUVEAU juste en dessous, aligné à gauche */
-.hv-hero__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 10px;
-  font-family: var(--script);
-  font-size: clamp(1.55rem, 3.2vw, 2.05rem);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  color: var(--gold);
-  line-height: 1;
-}
-
-.hv-hero__eyebrow svg {
-  color: var(--gold);
-  flex-shrink: 0;
-}
-
-/* Badge NOUVEAU — entre le script et le titre, toujours visible */
-.hv-hero__badge {
-  position: relative;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 2px 0 16px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: #E11D2E;
+/* Brand — signal hero-level (pas seulement la nav) */
+.hv-hero__brand {
+  margin: 0 0 18px;
+  font-family: var(--serif);
+  font-size: clamp(2.1rem, 5vw, 3.15rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
   color: #fff;
-  font-family: var(--sans);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  box-shadow: 0 8px 22px rgba(196, 20, 36, 0.45);
-  transform: rotate(-7deg);
-  transform-origin: left center;
-  align-self: flex-start;
-  opacity: 1;
-}
-
-[dir='rtl'] .hv-hero__badge {
-  transform: rotate(7deg);
-  transform-origin: right center;
-}
-
-.hv-hero__badge-spark {
-  position: absolute;
-  top: -12px;
-  right: -7px;
-  width: 22px;
-  height: 15px;
-  pointer-events: none;
-  background:
-    linear-gradient(#fff, #fff) 10px 0 / 2px 11px no-repeat,
-    linear-gradient(#fff, #fff) 16px 2px / 1.5px 8px no-repeat,
-    linear-gradient(#fff, #fff) 4px 3px / 1.5px 7px no-repeat;
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
-  transform: rotate(12deg);
 }
 
 .hv-hero__title {
   font-family: var(--serif);
-  font-size: clamp(2.5rem, 6.2vw, 4rem);
-  font-weight: 600;
-  line-height: 1.05;
+  font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+  font-weight: 500;
+  line-height: 1.15;
   margin: 0 0 14px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .hv-hero__title-line {
@@ -1523,19 +1472,13 @@
     max-width: 100%;
   }
 
-  .hv-hero__eyebrow {
-    font-size: clamp(1.45rem, 6.8vw, 1.8rem);
-    margin: 0 0 8px;
-  }
-
-  .hv-hero__badge {
-    margin: 4px 0 18px;
-    padding: 8px 12px;
-    font-size: 0.68rem;
+  .hv-hero__brand {
+    font-size: clamp(1.85rem, 9vw, 2.45rem);
+    margin-bottom: 14px;
   }
 
   .hv-hero__title {
-    font-size: clamp(2.3rem, 10vw, 2.9rem);
+    font-size: clamp(1.35rem, 5.5vw, 1.7rem);
   }
 
   .hv-hero__subtitle {

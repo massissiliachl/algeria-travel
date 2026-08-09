@@ -16,6 +16,7 @@ import DestinationRedirect from './pages/DestinationRedirect';
 import SearchResults from './pages/SearchResults';
 import Stays from './pages/Stays';
 import WhatsAppButton from './components/WhatsAppButton';
+import CookieBanner from './components/CookieBanner';
 
 import './App.css';
 
@@ -43,6 +44,7 @@ function AppRoutes() {
         <Route path="/contact" element={<Contact />} />
       </Routes>
       <WhatsAppButton />
+      <CookieBanner />
     </>
   );
 }

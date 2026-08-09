@@ -118,15 +118,9 @@ const HomeLanding = () => {
         </div>
 
         <div className="hv-container hv-hero__content">
-          <p className="hv-hero__eyebrow hv-anim hv-anim--1">
-            {t('home_v2_hero_eyebrow')}
-            <Icon name="Heart" size={16} strokeWidth={1.5} />
+          <p className="hv-hero__brand hv-anim hv-anim--1">
+            Algeria Travel
           </p>
-
-          <div className="hv-hero__badge" aria-label={t('home_v2_hero_badge')}>
-            <span className="hv-hero__badge-spark" aria-hidden />
-            {t('home_v2_hero_badge')}
-          </div>
 
           <h1 className="hv-hero__title hv-anim hv-anim--2">
             <span className="hv-hero__title-line">{t('home_v2_title_before')}</span>
