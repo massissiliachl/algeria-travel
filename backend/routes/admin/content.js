@@ -4,8 +4,8 @@ const { adminAuth } = require('../../middleware/adminAuth');
 const { asyncHandler } = require('../../lib/asyncHandler');
 const { makeAdminCrud } = require('../../lib/crudFactory');
 const {
-  mapPlace, mapTour, mapActivity, mapStay, mapBlog,
-  makeBuilders, placeFields, tourFields, activityFields, stayFields, blogFields,
+  mapPlace, mapTour, mapActivity, mapStay, mapBlog, mapGallery,
+  makeBuilders, placeFields, tourFields, activityFields, stayFields, blogFields, galleryFields,
 } = require('../../lib/mappers');
 
 const router = express.Router();
@@ -14,13 +14,14 @@ router.get(
   '/stats',
   adminAuth,
   asyncHandler(async (req, res) => {
-    const [reservations, tours, activities, stays, blog, places] = await Promise.all([
+    const [reservations, tours, activities, stays, blog, places, gallery] = await Promise.all([
       query(`select status, count(*)::int as count from public.reservations group by status`),
       query(`select count(*)::int as count from public.tours`),
       query(`select count(*)::int as count from public.activities`),
       query(`select count(*)::int as count from public.stays`),
       query(`select count(*)::int as count from public.blog_posts`),
       query(`select count(*)::int as count from public.places`),
+      query(`select count(*)::int as count from public.gallery_items`),
     ]);
 
     const byStatus = Object.fromEntries(reservations.rows.map((r) => [r.status, r.count]));
@@ -37,6 +38,7 @@ router.get(
       stays: stays.rows[0].count,
       blogPosts: blog.rows[0].count,
       places: places.rows[0].count,
+      gallery: gallery.rows[0].count,
     });
   })
 );
@@ -99,11 +101,21 @@ const blogCrud = makeAdminCrud({
   ...makeBuilders(blogFields),
 });
 
+const galleryCrud = makeAdminCrud({
+  table: 'gallery_items',
+  idColumn: 'id',
+  mapRow: mapGallery,
+  orderBy: 'sort_order asc, id asc',
+  notifyContentType: 'gallery',
+  ...makeBuilders(galleryFields),
+});
+
 router.use('/places', placeCrud);
 router.use('/tours', tourCrud);
 router.use('/activities', activityCrud);
 router.use('/stays', stayCrud);
 router.use('/blog', blogCrud);
+router.use('/gallery', galleryCrud);
 router.use('/notifications', require('./notifications'));
 
 module.exports = router;

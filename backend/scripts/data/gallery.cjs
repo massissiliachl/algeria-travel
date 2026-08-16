@@ -1,0 +1,17 @@
+module.exports = { GALLERY_ITEMS: [
+  { src: '/images/sahara1.jpeg', alt: 'Sahara', captionFr: 'Dunes du Sahara', sortOrder: 1 },
+  { src: '/images/sahara2.jpeg', alt: 'Sahara', captionFr: 'Coucher de soleil', sortOrder: 2 },
+  { src: '/images/sahara3.jpeg', alt: 'Sahara', captionFr: 'Expédition désert', sortOrder: 3 },
+  { src: '/images/sahara4.jpeg', alt: 'Sahara', captionFr: 'Paysage saharien', sortOrder: 4 },
+  { src: '/images/sahara5.jpeg', alt: 'Sahara', captionFr: 'Campement', sortOrder: 5 },
+  { src: '/images/sahara6.jpeg', alt: 'Sahara', captionFr: 'Aventure saharienne', sortOrder: 6 },
+  { src: '/images/sahara7.jpeg', alt: 'Sahara', captionFr: 'Horizon infini', sortOrder: 7 },
+  { src: '/images/sahara8.jpeg', alt: 'Sahara', captionFr: 'Balade en dunes', sortOrder: 8 },
+  { src: '/images/galery.jpg', alt: 'Galerie', captionFr: 'Moments Algeria Travel', sortOrder: 9 },
+  { src: '/images/quad.jpg', alt: 'Quad', captionFr: 'Quad dans le désert', sortOrder: 10 },
+  { src: '/images/quad1.jpeg', alt: 'Quad', captionFr: 'Aventure quad', sortOrder: 11 },
+  { src: '/images/quatre-quatre.jpg', alt: '4x4', captionFr: 'Excursion 4x4', sortOrder: 12 },
+  { src: '/images/chameau.jpg', alt: 'Chameau', captionFr: 'Balade à dos de chameau', sortOrder: 13 },
+  { src: '/images/kayak.jpeg', alt: 'Kayak', captionFr: 'Kayak en mer', sortOrder: 14 },
+  { src: '/images/visitekseurs.webp', alt: 'Visiteurs', captionFr: 'Nos voyageurs', sortOrder: 15 },
+] };

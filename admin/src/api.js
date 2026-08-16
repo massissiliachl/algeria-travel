@@ -56,10 +56,4 @@ export const api = {
     request(`/api/admin/${resource}/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   remove: (resource, id) =>
     request(`/api/admin/${resource}/${id}`, { method: 'DELETE' }),
-
-  notifyGallery: (payload = {}) =>
-    request('/api/admin/notifications/gallery', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
 };

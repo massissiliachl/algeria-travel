@@ -12,6 +12,7 @@ const { ACTIVITIES } = require(join(root, 'backend/scripts/data/activities.cjs')
 const { STAYS } = require(join(root, 'backend/scripts/data/stays.cjs'));
 const { BLOG_POSTS } = require(join(root, 'backend/scripts/data/blog.cjs'));
 const { PLACES } = require(join(root, 'backend/scripts/data/places.cjs'));
+const { GALLERY_ITEMS } = require(join(root, 'backend/scripts/data/gallery.cjs'));
 
 function blogRow(p) {
   return [
@@ -27,7 +28,7 @@ function blogRow(p) {
 async function seed() {
   console.log('[seed] Import des données statiques…');
 
-  await query('truncate public.tours, public.activities, public.stays, public.blog_posts, public.places restart identity cascade');
+  await query('truncate public.tours, public.activities, public.stays, public.blog_posts, public.places, public.gallery_items restart identity cascade');
 
   for (const t of FEATURED_TOURS) {
     await query(
@@ -95,6 +96,15 @@ async function seed() {
     );
   }
   console.log(`[seed] ${PLACES.length} destinations`);
+
+  for (const g of GALLERY_ITEMS) {
+    await query(
+      `insert into public.gallery_items (src, alt, caption_fr, sort_order, published)
+       values ($1, $2, $3, $4, true)`,
+      [g.src, g.alt || '', g.captionFr || '', g.sortOrder ?? 0]
+    );
+  }
+  console.log(`[seed] ${GALLERY_ITEMS.length} photos galerie`);
 
   console.log('[seed] Terminé.');
 }

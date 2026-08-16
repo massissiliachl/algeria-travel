@@ -6,6 +6,10 @@ const STORAGE_KEY = 'at_notify_last_seen';
 const OPTIN_KEY = 'at_notify_optin';
 const POLL_MS = 3 * 60 * 1000;
 
+function isSecureContextForPush() {
+  return window.isSecureContext || window.location.hostname === 'localhost';
+}
+
 const NotificationContext = createContext(null);
 
 function urlBase64ToUint8Array(base64String) {
@@ -97,7 +101,7 @@ export function NotificationProvider({ children }) {
   }, [enabled, showBrowserNotification]);
 
   const registerServiceWorker = useCallback(async () => {
-    if (!('serviceWorker' in navigator)) return null;
+    if (!('serviceWorker' in navigator) || !isSecureContextForPush()) return null;
     try {
       return await navigator.serviceWorker.register('/sw.js');
     } catch {
@@ -106,6 +110,7 @@ export function NotificationProvider({ children }) {
   }, []);
 
   const subscribePush = useCallback(async () => {
+    if (!isSecureContextForPush()) return false;
     const reg = await registerServiceWorker();
     if (!reg) return false;
 

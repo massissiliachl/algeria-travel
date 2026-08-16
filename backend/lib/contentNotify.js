@@ -27,9 +27,9 @@ const TYPE_LABELS = {
     ar: 'وجهة جديدة',
   },
   gallery: {
-    fr: 'Nouvelle galerie',
-    en: 'New gallery',
-    ar: 'معرض جديد',
+    fr: 'Nouvelle photo',
+    en: 'New photo',
+    ar: 'صورة جديدة',
   },
 };
 
@@ -53,7 +53,7 @@ function buildLink(contentType, row) {
 }
 
 function pickName(row) {
-  return row.name || row.title || row.id || '';
+  return row.caption_fr || row.captionFr || row.name || row.title || row.alt || (row.id ? `Photo #${row.id}` : '');
 }
 
 async function notifyContentPublished(contentType, row) {
@@ -68,9 +68,9 @@ async function notifyContentPublished(contentType, row) {
     titleFr: `${labels.fr} : ${name}`,
     titleEn: `${labels.en}: ${name}`,
     titleAr: `${labels.ar}: ${name}`,
-    bodyFr: row.subtitle || row.tagline || row.description?.slice(0, 120) || null,
-    bodyEn: row.subtitle_en || row.tagline_en || row.description_en?.slice(0, 120) || null,
-    bodyAr: row.subtitle_ar || row.tagline_ar || row.description_ar?.slice(0, 120) || null,
+    bodyFr: row.caption_fr || row.subtitle || row.tagline || row.description?.slice(0, 120) || null,
+    bodyEn: row.caption_en || row.subtitle_en || row.tagline_en || row.description_en?.slice(0, 120) || null,
+    bodyAr: row.caption_ar || row.subtitle_ar || row.tagline_ar || row.description_ar?.slice(0, 120) || null,
     link: buildLink(contentType, row),
   });
 }

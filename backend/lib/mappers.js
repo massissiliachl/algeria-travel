@@ -179,6 +179,32 @@ function mapBlog(row) {
   };
 }
 
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+const galleryFields = [
+  ['src', 'src'],
+  ['alt', 'alt'],
+  ['caption_fr', 'captionFr'],
+  ['caption_en', 'captionEn'],
+  ['caption_ar', 'captionAr'],
+  ['sort_order', 'sortOrder', num],
+  ['published', 'published', bool],
+];
+
+function mapGallery(row) {
+  return {
+    id: row.id,
+    src: row.src,
+    alt: row.alt || '',
+    captionFr: row.caption_fr,
+    captionEn: row.caption_en,
+    captionAr: row.caption_ar,
+    sortOrder: row.sort_order ?? 0,
+    published: row.published,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 function buildFromFields(body, fields, { requireId = false } = {}) {
   const columns = [];
   const values = [];
@@ -199,7 +225,7 @@ function makeBuilders(fields, opts) {
 }
 
 module.exports = {
-  mapPlace, mapTour, mapActivity, mapStay, mapBlog,
-  placeFields, tourFields, activityFields, stayFields, blogFields,
+  mapPlace, mapTour, mapActivity, mapStay, mapBlog, mapGallery,
+  placeFields, tourFields, activityFields, stayFields, blogFields, galleryFields,
   makeBuilders, buildFromFields,
 };

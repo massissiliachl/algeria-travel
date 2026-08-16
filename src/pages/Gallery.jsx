@@ -4,9 +4,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
+import { api } from '../services/api';
 import './Gallery.css';
 
-const INIT_IMAGES = [
+const FALLBACK_IMAGES = [
   { id: 1, src: '/images/sahara1.jpeg', likes: 412, dislikes: 8, comments: [] },
   { id: 2, src: '/images/sahara2.jpeg', likes: 287, dislikes: 5, comments: [] },
   { id: 3, src: '/images/sahara3.jpeg', likes: 534, dislikes: 11, comments: [] },
@@ -24,11 +25,45 @@ const INIT_IMAGES = [
   { id: 15, src: '/images/visitekseurs.webp', likes: 331, dislikes: 5, comments: [] },
 ];
 
-const STORAGE_KEY = 'gallery_reactions_v3';
+const REACTIONS_KEY = 'gallery_reactions_v4';
+
+function loadReactions() {
+  try {
+    const saved = localStorage.getItem(REACTIONS_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {
+    /* ignore */
+  }
+  return {};
+}
+
+function saveReactions(map) {
+  try {
+    localStorage.setItem(REACTIONS_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+function mergeWithReactions(apiItems, reactions) {
+  return apiItems.map((item) => {
+    const r = reactions[item.id] || {};
+    return {
+      id: item.id,
+      src: item.src,
+      alt: item.alt,
+      captionFr: item.captionFr,
+      likes: r.likes ?? 0,
+      dislikes: r.dislikes ?? 0,
+      comments: r.comments ?? [],
+    };
+  });
+}
 
 const Gallery = () => {
   const { t } = useLang();
-  const [images, setImages] = useState(INIT_IMAGES);
+  const [images, setImages] = useState(FALLBACK_IMAGES);
+  const [reactions, setReactions] = useState(loadReactions);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [ready, setReady] = useState(false);
   const [commentText, setCommentText] = useState('');
@@ -43,17 +78,19 @@ const Gallery = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     const id = requestAnimationFrame(() => setReady(true));
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length) setImages(parsed);
-      } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(INIT_IMAGES));
-      }
-    } catch {
-      setImages(INIT_IMAGES);
-    }
+
+    api
+      .getGallery()
+      .then((items) => {
+        if (!Array.isArray(items) || !items.length) return;
+        const rx = loadReactions();
+        setReactions(rx);
+        setImages(mergeWithReactions(items, rx));
+      })
+      .catch(() => {
+        setImages(FALLBACK_IMAGES);
+      });
+
     return () => cancelAnimationFrame(id);
   }, []);
 
@@ -97,13 +134,10 @@ const Gallery = () => {
     return () => io.disconnect();
   }, [images]);
 
-  const save = useCallback((next) => {
-    setImages(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
-    }
+  const persistReactions = useCallback((nextReactions, nextImages) => {
+    setReactions(nextReactions);
+    setImages(nextImages);
+    saveReactions(nextReactions);
   }, []);
 
   const spawnBurst = (kind) => {
@@ -129,21 +163,39 @@ const Gallery = () => {
   const handleLike = (id) => {
     spawnBurst('like');
     triggerPulse('like');
-    save(
-      images.map((img) =>
-        img.id === id ? { ...img, likes: (img.likes || 0) + 1 } : img
-      )
-    );
+    const img = images.find((i) => i.id === id);
+    const nextRx = {
+      ...reactions,
+      [id]: {
+        ...reactions[id],
+        likes: (img?.likes || 0) + 1,
+        dislikes: img?.dislikes || 0,
+        comments: img?.comments || [],
+      },
+    };
+    persistReactions(nextRx, mergeWithReactions(
+      images.map((i) => ({ id: i.id, src: i.src, alt: i.alt, captionFr: i.captionFr })),
+      nextRx
+    ));
   };
 
   const handleDislike = (id) => {
     spawnBurst('dislike');
     triggerPulse('dislike');
-    save(
-      images.map((img) =>
-        img.id === id ? { ...img, dislikes: (img.dislikes || 0) + 1 } : img
-      )
-    );
+    const img = images.find((i) => i.id === id);
+    const nextRx = {
+      ...reactions,
+      [id]: {
+        ...reactions[id],
+        likes: img?.likes || 0,
+        dislikes: (img?.dislikes || 0) + 1,
+        comments: img?.comments || [],
+      },
+    };
+    persistReactions(nextRx, mergeWithReactions(
+      images.map((i) => ({ id: i.id, src: i.src, alt: i.alt, captionFr: i.captionFr })),
+      nextRx
+    ));
   };
 
   const handleAddComment = (id) => {
@@ -154,13 +206,20 @@ const Gallery = () => {
       text: commentText.trim(),
       date: new Date().toLocaleDateString(),
     };
-    save(
-      images.map((img) =>
-        img.id === id
-          ? { ...img, comments: [comment, ...(img.comments || [])] }
-          : img
-      )
-    );
+    const img = images.find((i) => i.id === id);
+    const nextComments = [comment, ...(img?.comments || [])];
+    const nextRx = {
+      ...reactions,
+      [id]: {
+        likes: img?.likes || 0,
+        dislikes: img?.dislikes || 0,
+        comments: nextComments,
+      },
+    };
+    persistReactions(nextRx, mergeWithReactions(
+      images.map((i) => ({ id: i.id, src: i.src, alt: i.alt, captionFr: i.captionFr })),
+      nextRx
+    ));
     setCommentText('');
   };
 
@@ -202,6 +261,8 @@ const Gallery = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIndex, images]);
 
+  const heroImage = images[3]?.src || '/images/sahara4.jpeg';
+
   return (
     <div className={`gal ${ready ? 'is-ready' : ''}`}>
       <Navbar />
@@ -211,7 +272,7 @@ const Gallery = () => {
           className="gal-hero__media"
           style={{ transform: `translate3d(0, ${parallax}px, 0)` }}
         >
-          <img src="/images/sahara4.jpeg" alt="" />
+          <img src={heroImage} alt="" />
         </div>
         <div className="gal-hero__veil" />
         <div className="gal-hero__fluid" aria-hidden>
@@ -275,7 +336,7 @@ const Gallery = () => {
               }}
               aria-label={`${t('nav_gallery')} ${i + 1}`}
             >
-              <img src={image.src} alt="" loading="lazy" />
+              <img src={image.src} alt={image.alt || ''} loading="lazy" />
               <span className="gal-cell__likes" aria-hidden>
                 <Icon name="Heart" size={12} />
                 <span>{image.likes}</span>
@@ -327,7 +388,7 @@ const Gallery = () => {
                 className="gal-lb__pic"
                 key={currentImage.id}
                 src={currentImage.src}
-                alt=""
+                alt={currentImage.alt || ''}
               />
               <div className="gal-burst" aria-hidden>
                 {burst.map((p) => (

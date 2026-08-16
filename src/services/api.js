@@ -28,6 +28,7 @@ export const api = {
     return request(`/api/blog${qs ? `?${qs}` : ''}`);
   },
   getBlogPost: (slug) => request(`/api/blog/${slug}`),
+  getGallery: () => request('/api/gallery'),
   getStays: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
     return request(`/api/stays${qs ? `?${qs}` : ''}`);

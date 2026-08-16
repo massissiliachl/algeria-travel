@@ -63,6 +63,18 @@ export const ENTITIES = {
       { key: 'published', label: 'Statut', render: (r) => (r.published ? 'Publié' : 'Brouillon') },
     ],
   },
+  gallery: {
+    title: 'Galerie',
+    subtitle: 'Photos publiques du site',
+    resource: 'gallery',
+    idField: 'id',
+    columns: [
+      { key: 'captionFr', label: 'Légende' },
+      { key: 'src', label: 'Image' },
+      { key: 'sortOrder', label: 'Ordre' },
+      { key: 'published', label: 'Statut', render: (r) => (r.published ? 'Publié' : 'Brouillon') },
+    ],
+  },
 };
 
 export const FORM_CONFIGS = {
@@ -245,6 +257,24 @@ export const FORM_CONFIGS = {
           { name: 'excerptEn', label: 'Extrait (EN)', type: 'textarea', full: true },
           { name: 'body', label: 'Corps (FR)', type: 'textarea', full: true },
           { name: 'bodyEn', label: 'Corps (EN)', type: 'textarea', full: true },
+        ],
+      },
+    ],
+  },
+  gallery: {
+    resource: 'gallery',
+    title: 'Photo galerie',
+    sections: [
+      {
+        title: 'Photo',
+        fields: [
+          { name: 'src', label: 'URL de l\'image', required: true, full: true, hint: 'ex: /images/sahara1.jpeg' },
+          { name: 'alt', label: 'Texte alternatif' },
+          { name: 'captionFr', label: 'Légende (FR)' },
+          { name: 'captionEn', label: 'Légende (EN)' },
+          { name: 'captionAr', label: 'Légende (AR)' },
+          { name: 'sortOrder', label: 'Ordre d\'affichage', type: 'number' },
+          { name: 'published', label: 'Publié (notifie les abonnés)', type: 'checkbox' },
         ],
       },
     ],

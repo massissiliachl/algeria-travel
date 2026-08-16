@@ -10,6 +10,7 @@ const NAV = [
   { to: '/activities', label: 'Activités' },
   { to: '/stays', label: 'Hébergements' },
   { to: '/blog', label: 'Blog' },
+  { to: '/gallery', label: 'Galerie' },
 ];
 
 export default function Layout() {
