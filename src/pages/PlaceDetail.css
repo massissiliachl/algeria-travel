@@ -1066,3 +1066,67 @@
     padding: 22px 16px calc(18px + env(safe-area-inset-bottom, 0));
   }
 }
+
+.place-form__submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.place-form__error {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.place-form__honeypot {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.place-modal__ref {
+  margin: 16px 0 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  text-align: left;
+}
+
+.place-modal__ref p {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+
+.place-modal__ref-hint {
+  color: #64748b;
+  font-size: 0.82rem !important;
+}
+
+.place-modal__ref code {
+  font-family: ui-monospace, monospace;
+  color: #065f46;
+}
+
+.place-modal__token {
+  display: block;
+  margin-top: 8px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  word-break: break-all;
+  font-size: 0.75rem;
+}
+
+.place-modal__track-link {
+  display: inline-flex;
+  margin-top: 12px;
+  color: #c1602e;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}

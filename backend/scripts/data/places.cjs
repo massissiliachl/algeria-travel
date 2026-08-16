@@ -1,0 +1,573 @@
+exports.PLACES = [
+  {
+    "id": "bejaia",
+    "name": "Béjaïa",
+    "name_en": "Bejaia",
+    "name_ar": "بجاية",
+    "tagline": "Perle de la Kabylie",
+    "tagline_en": "Pearl of Kabylie",
+    "tagline_ar": "لؤلؤة القبائل",
+    "rating": 4.9,
+    "reviews": 268,
+    "temp": "22°C",
+    "image": "/images/bejaia.jpeg",
+    "gallery": [
+      "/images/bejaia.jpeg",
+      "/images/home/news-coast.jpg",
+      "/images/kayak.jpeg"
+    ],
+    "description": "Mer turquoise, Cap Carbon et montagnes du Djurdjura : Béjaïa offre mer et nature dans un même séjour.",
+    "description_en": "Turquoise sea, Cap Carbon and Djurdjura mountains: Béjaïa offers sea and nature in one trip.",
+    "description_ar": "بحر فيروزي وكاب كاربون وجبال جرجرة: بجاية تجمع البحر والطبيعة في إقامة واحدة.",
+    "bestTime": "Mai – Octobre",
+    "bestTime_en": "May – October",
+    "bestTime_ar": "ماي – أكتوبر",
+    "duration": "3 à 4 jours",
+    "duration_en": "3 to 4 days",
+    "duration_ar": "3 إلى 4 أيام",
+    "price": 25000,
+    "oldPrice": 30000,
+    "stay": "Hôtel Royal Béjaïa",
+    "stay_en": "Royal Bejaia Hotel",
+    "stay_ar": "فندق رويال بجاية",
+    "transport": "Route depuis Alger ou vol + véhicule",
+    "transport_en": "Road from Algiers or flight + vehicle",
+    "transport_ar": "طريق من الجزائر أو طيران + سيارة",
+    "includes": [
+      {
+        "fr": "Hébergement 2–3 nuits",
+        "en": "2–3 nights stay",
+        "ar": "إقامة 2–3 ليالٍ"
+      },
+      {
+        "fr": "Excursion Cap Carbon",
+        "en": "Cap Carbon outing",
+        "ar": "رحلة كاب كاربون"
+      },
+      {
+        "fr": "Repas traditionnels",
+        "en": "Traditional meals",
+        "ar": "وجبات تقليدية"
+      },
+      {
+        "fr": "Transferts locaux",
+        "en": "Local transfers",
+        "ar": "تنقلات محلية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Waves",
+        "fr": "Plages & criques",
+        "en": "Beaches & coves",
+        "ar": "شواطئ وخلجان"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Randonnées",
+        "en": "Hiking",
+        "ar": "تنزه"
+      },
+      {
+        "icon": "Fish",
+        "fr": "Poissons grillés",
+        "en": "Grilled fish",
+        "ar": "سمك مشوي"
+      }
+    ]
+  },
+  {
+    "id": "djanet",
+    "name": "Djanet",
+    "name_en": "Djanet",
+    "name_ar": "جانت",
+    "tagline": "Porte du Tassili",
+    "tagline_en": "Gateway to Tassili",
+    "tagline_ar": "بوابة تاسيلي",
+    "rating": 4.9,
+    "reviews": 198,
+    "temp": "28°C",
+    "image": "/images/djanet.jpeg",
+    "gallery": [
+      "/images/djanet.jpeg",
+      "/images/sahara1.jpeg",
+      "/images/sahara3.jpeg"
+    ],
+    "description": "Porte d’entrée du Tassili n’Ajjer : art rupestre, dunes et bivouacs sous les étoiles avec guides touaregs.",
+    "description_en": "Gateway to Tassili n’Ajjer: rock art, dunes and starlit bivouacs with Tuareg guides.",
+    "description_ar": "بوابة تاسيلي ناجر: فن صخري وكثبان ومبيت تحت النجوم مع مرشدين طوارق.",
+    "bestTime": "Novembre – Février",
+    "bestTime_en": "November – February",
+    "bestTime_ar": "نوفمبر – فبراير",
+    "duration": "6 à 8 jours",
+    "duration_en": "6 to 8 days",
+    "duration_ar": "6 إلى 8 أيام",
+    "price": 85000,
+    "oldPrice": 95000,
+    "stay": "Campement saharien / bivouac premium",
+    "stay_en": "Saharan camp / premium bivouac",
+    "stay_ar": "مخيم صحراوي / مبيت فاخر",
+    "transport": "Vol vers Djanet + 4×4 guidé",
+    "transport_en": "Flight to Djanet + guided 4×4",
+    "transport_ar": "رحلة إلى جانت + دفع رباعي مرشد",
+    "includes": [
+      {
+        "fr": "Vols internes (selon formule)",
+        "en": "Domestic flights (package)",
+        "ar": "رحلات داخلية (حسب الباقة)"
+      },
+      {
+        "fr": "Circuit 4×4 & trek",
+        "en": "4×4 & trek circuit",
+        "ar": "جولة دفع رباعي ومشي"
+      },
+      {
+        "fr": "Bivouacs & repas",
+        "en": "Bivouacs & meals",
+        "ar": "مبيت ووجبات"
+      },
+      {
+        "fr": "Guide touareg",
+        "en": "Tuareg guide",
+        "ar": "مرشد طوارقي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Palette",
+        "fr": "Art rupestre",
+        "en": "Rock art",
+        "ar": "فن صخري"
+      },
+      {
+        "icon": "Tent",
+        "fr": "Nuits sous les étoiles",
+        "en": "Nights under stars",
+        "ar": "ليالٍ تحت النجوم"
+      },
+      {
+        "icon": "Sun",
+        "fr": "Dunes Tin Merzouga",
+        "en": "Tin Merzouga dunes",
+        "ar": "كثبان تين مرزوقة"
+      }
+    ]
+  },
+  {
+    "id": "ghardaia",
+    "name": "Ghardaïa",
+    "name_en": "Ghardaia",
+    "name_ar": "غرداية",
+    "tagline": "Vallée du M’Zab",
+    "tagline_en": "M’Zab Valley",
+    "tagline_ar": "وادي مزاب",
+    "rating": 4.8,
+    "reviews": 245,
+    "temp": "26°C",
+    "image": "/images/ghardaia.jpeg",
+    "gallery": [
+      "/images/ghardaia.jpeg",
+      "/images/sahara5.jpeg",
+      "/images/maison-hote-sud-1.png"
+    ],
+    "description": "Cinq cités fortifiées du M’Zab, marchés et architecture mozabite : un joyau UNESCO au cœur du désert.",
+    "description_en": "Five fortified M’Zab cities, markets and Mozabite architecture: a UNESCO jewel in the desert.",
+    "description_ar": "خمس مدن مزاب المحصّنة وأسواق وعمارة ميزابية: جوهرة يونسكو في قلب الصحراء.",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "duration": "3 à 4 jours",
+    "duration_en": "3 to 4 days",
+    "duration_ar": "3 إلى 4 أيام",
+    "price": 35000,
+    "oldPrice": 42000,
+    "stay": "Maison d’hôtes traditionnelle mozabite",
+    "stay_en": "Traditional Mozabite guest house",
+    "stay_ar": "بيت ضيافة ميزابي تقليدي",
+    "transport": "Vol ou bus + transferts locaux",
+    "transport_en": "Flight or bus + local transfers",
+    "transport_ar": "طيران أو حافلة + تنقلات محلية",
+    "includes": [
+      {
+        "fr": "Hébergement 3 nuits",
+        "en": "3 nights stay",
+        "ar": "إقامة 3 ليالٍ"
+      },
+      {
+        "fr": "Visite des ksour",
+        "en": "Ksour visits",
+        "ar": "زيارة القصور"
+      },
+      {
+        "fr": "Guide local",
+        "en": "Local guide",
+        "ar": "مرشد محلي"
+      },
+      {
+        "fr": "Dégustation produits locaux",
+        "en": "Local tasting",
+        "ar": "تذوق منتجات محلية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Building2",
+        "fr": "Architecture M’Zab",
+        "en": "M’Zab architecture",
+        "ar": "عمارة مزاب"
+      },
+      {
+        "icon": "ShoppingBag",
+        "fr": "Marchés colorés",
+        "en": "Colourful markets",
+        "ar": "أسواق ملونة"
+      },
+      {
+        "icon": "Users",
+        "fr": "Hospitalité mozabite",
+        "en": "Mozabite hospitality",
+        "ar": "ضيافة ميزابية"
+      }
+    ]
+  },
+  {
+    "id": "hoggar",
+    "name": "Hoggar",
+    "name_en": "Hoggar",
+    "name_ar": "الهقار",
+    "tagline": "Montagnes du Sahara",
+    "tagline_en": "Sahara mountains",
+    "tagline_ar": "جبال الصحراء",
+    "rating": 5,
+    "reviews": 167,
+    "temp": "24°C",
+    "image": "/images/hogar.jpeg",
+    "gallery": [
+      "/images/hogar.jpeg",
+      "/images/sahara2.jpeg",
+      "/images/sahara7.jpeg"
+    ],
+    "description": "Massif volcanique autour de Tamanrasset. Lever de soleil à Assekrem, silence absolu et hospitalité touareg.",
+    "description_en": "Volcanic massif around Tamanrasset. Sunrise at Assekrem, absolute silence and Tuareg hospitality.",
+    "description_ar": "كتلة بركانية حول تمنراست. شروق أسكرام وصمت مطلق وضيافة طوارق.",
+    "bestTime": "Novembre – Février",
+    "bestTime_en": "November – February",
+    "bestTime_ar": "نوفمبر – فبراير",
+    "duration": "7 à 9 jours",
+    "duration_en": "7 to 9 days",
+    "duration_ar": "7 إلى 9 أيام",
+    "price": 95000,
+    "oldPrice": 105000,
+    "stay": "Campements & nuits en auberge à Tamanrasset",
+    "stay_en": "Camps & guesthouse nights in Tamanrasset",
+    "stay_ar": "مخيمات وليالٍ في نزل بتمنراست",
+    "transport": "Vol vers Tamanrasset + 4×4",
+    "transport_en": "Flight to Tamanrasset + 4×4",
+    "transport_ar": "رحلة إلى تمنراست + دفع رباعي",
+    "includes": [
+      {
+        "fr": "Circuit Assekrem",
+        "en": "Assekrem circuit",
+        "ar": "جولة أسكرام"
+      },
+      {
+        "fr": "Hébergement mixte",
+        "en": "Mixed accommodation",
+        "ar": "إقامة متنوعة"
+      },
+      {
+        "fr": "Repas sahariens",
+        "en": "Saharan meals",
+        "ar": "وجبات صحراوية"
+      },
+      {
+        "fr": "Équipe locale",
+        "en": "Local team",
+        "ar": "فريق محلي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Sunrise",
+        "fr": "Assekrem",
+        "en": "Assekrem",
+        "ar": "أسكرام"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Paysages volcaniques",
+        "en": "Volcanic landscapes",
+        "ar": "مناظر بركانية"
+      },
+      {
+        "icon": "Tent",
+        "fr": "Immersion touareg",
+        "en": "Tuareg immersion",
+        "ar": "انغماس طوارقي"
+      }
+    ]
+  },
+  {
+    "id": "taghit",
+    "name": "Taghit",
+    "name_en": "Taghit",
+    "name_ar": "تاغيت",
+    "tagline": "Joyau du Grand Erg",
+    "tagline_en": "Jewel of the Grand Erg",
+    "tagline_ar": "جوهرة العرق الكبير",
+    "rating": 4.9,
+    "reviews": 142,
+    "temp": "26°C",
+    "weather": "Ensoleillé",
+    "weather_en": "Sunny",
+    "weather_ar": "مشمس",
+    "idealFor": "Détente & Aventure",
+    "idealFor_en": "Relaxation & Adventure",
+    "idealFor_ar": "استرخاء ومغامرة",
+    "region": "Béchar, Algérie",
+    "region_en": "Béchar, Algeria",
+    "region_ar": "بشار، الجزائر",
+    "recommendedDuration": "2 à 3 jours",
+    "recommendedDuration_en": "2 to 3 days",
+    "recommendedDuration_ar": "يومان إلى 3 أيام",
+    "difficulty": "Facile à modérée",
+    "difficulty_en": "Easy to moderate",
+    "difficulty_ar": "سهل إلى متوسط",
+    "audience": "En couple, famille, amis",
+    "audience_en": "Couples, families, friends",
+    "audience_ar": "أزواج، عائلات، أصدقاء",
+    "image": "/images/taghit.jpeg",
+    "gallery": [
+      "/images/taghit.jpeg",
+      "/images/sahara5.jpeg",
+      "/images/sahara1.jpeg"
+    ],
+    "description": "Entre palmeraies, dunes dorées et patrimoine local, Taghit offre une expérience saharienne unique : ksar millénaire, sources naturelles et couchers de soleil inoubliables au pied du Grand Erg.",
+    "description_en": "Between palm groves, golden dunes and local heritage, Taghit offers a unique Saharan experience: ancient ksar, natural springs and unforgettable sunsets at the foot of the Grand Erg.",
+    "description_ar": "بين واحات النخيل والكثبان الذهبية والتراث المحلي، تقدم تاغيت تجربة صحراوية فريدة: قصر قديم وينابيع طبيعية وغروب لا يُنسى عند سفح العرق الكبير.",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "whyVisit": [
+      {
+        "icon": "TreePalm",
+        "fr": "Palmeraie et sources naturelles",
+        "en": "Palm grove and natural springs",
+        "ar": "واحة نخيل وينابيع طبيعية"
+      },
+      {
+        "icon": "Sunrise",
+        "fr": "Portes du désert du Grand Erg",
+        "en": "Gateway to the Grand Erg desert",
+        "ar": "بوابة صحراء العرق الكبير"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Randonnées et paysages époustouflants",
+        "en": "Hikes and breathtaking landscapes",
+        "ar": "تنزه ومناظر خلابة"
+      },
+      {
+        "icon": "Heart",
+        "fr": "Hospitalité et culture locale authentique",
+        "en": "Hospitality and authentic local culture",
+        "ar": "ضيافة وثقافة محلية أصيلة"
+      }
+    ],
+    "price": 99990,
+    "pricePerPerson": true,
+    "pkgTitle": "Hôtel 4 étoiles",
+    "pkgTitle_en": "4-star hotel",
+    "pkgTitle_ar": "فندق 4 نجوم",
+    "pkgIcon": "Hotel",
+    "stay": "Hôtel 4 étoiles · pension complète",
+    "stay_en": "4-star hotel · full board",
+    "stay_ar": "فندق 4 نجوم · إقامة كاملة",
+    "transport": "Vol Alger – Béchar – Alger + navette aéroport",
+    "transport_en": "Algiers – Béchar – Algiers flight + airport shuttle",
+    "transport_ar": "رحلة الجزائر – بشار – الجزائر + نقل المطار",
+    "duration": "Pension complète",
+    "duration_en": "Full board",
+    "duration_ar": "إقامة كاملة",
+    "includes": [
+      {
+        "fr": "Pension complète",
+        "en": "Full board",
+        "ar": "إقامة كاملة"
+      },
+      {
+        "fr": "Activités : 4×4, ski sur sable, dromadaire, visite des ksars incluse",
+        "en": "Activities: 4×4, sand skiing, camel, ksar visits included",
+        "ar": "أنشطة: دفع رباعي، تزلج على الرمال، جمل، زيارة القصور مشمولة"
+      },
+      {
+        "fr": "Transport navette aéroport",
+        "en": "Airport shuttle transfer",
+        "ar": "نقل المطار بالمكوك"
+      },
+      {
+        "fr": "Billet d’avion Alger – Béchar – Alger",
+        "en": "Flight ticket Algiers – Béchar – Algiers",
+        "ar": "تذكرة طيران الجزائر – بشار – الجزائر"
+      },
+      {
+        "fr": "Extras : buggy et quad",
+        "en": "Extras: buggy and quad",
+        "ar": "إضافات: باغي وكواد"
+      }
+    ]
+  },
+  {
+    "id": "timimoun",
+    "name": "Timimoun",
+    "name_en": "Timimoun",
+    "name_ar": "تيميمون",
+    "tagline": "Perle rouge du Sahara",
+    "tagline_en": "Red pearl of the Sahara",
+    "tagline_ar": "لؤلؤة الصحراء الحمراء",
+    "rating": 4.9,
+    "reviews": 234,
+    "temp": "30°C",
+    "image": "/images/sahara1.jpeg",
+    "gallery": [
+      "/images/sahara1.jpeg",
+      "/images/sahara2.jpeg",
+      "/images/sahara3.jpeg"
+    ],
+    "description": "Dunes rouges du Grand Erg Occidental, ksour ocre et couchers de soleil magiques au cœur du Gourara.",
+    "description_en": "Red dunes of the Grand Western Erg, ochre ksour and magical sunsets in the heart of Gourara.",
+    "description_ar": "كثبان حمراء من العرق الغربي الكبير وقصور حمراء وغروب ساحر في قلب القورارة.",
+    "bestTime": "Octobre – Avril",
+    "bestTime_en": "October – April",
+    "bestTime_ar": "أكتوبر – أبريل",
+    "duration": "5 jours",
+    "duration_en": "5 days",
+    "duration_ar": "5 أيام",
+    "price": 45000,
+    "oldPrice": 55000,
+    "stay": "Maison d’hôtes & campement saharien",
+    "stay_en": "Guest house & Saharan camp",
+    "stay_ar": "بيت ضيافة ومخيم صحراوي",
+    "transport": "Vol vers Timimoun + 4×4",
+    "transport_en": "Flight to Timimoun + 4×4",
+    "transport_ar": "رحلة إلى تيميمون + دفع رباعي",
+    "includes": [
+      {
+        "fr": "Hébergement 4 nuits",
+        "en": "4 nights accommodation",
+        "ar": "إقامة 4 ليالٍ"
+      },
+      {
+        "fr": "Excursion dunes & ksour",
+        "en": "Dunes & ksour excursion",
+        "ar": "رحلة الكثبان والقصور"
+      },
+      {
+        "fr": "Repas traditionnels",
+        "en": "Traditional meals",
+        "ar": "وجبات تقليدية"
+      },
+      {
+        "fr": "Guide local",
+        "en": "Local guide",
+        "ar": "مرشد محلي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Sun",
+        "fr": "Dunes rouges",
+        "en": "Red dunes",
+        "ar": "كثبان حمراء"
+      },
+      {
+        "icon": "Landmark",
+        "fr": "Ksour traditionnels",
+        "en": "Traditional ksour",
+        "ar": "قصور تقليدية"
+      },
+      {
+        "icon": "Sunset",
+        "fr": "Couchers de soleil",
+        "en": "Sunsets",
+        "ar": "غروب الشمس"
+      }
+    ]
+  },
+  {
+    "id": "constantine",
+    "name": "Constantine",
+    "name_en": "Constantine",
+    "name_ar": "قسنطينة",
+    "tagline": "Ville des ponts suspendus",
+    "tagline_en": "City of suspended bridges",
+    "tagline_ar": "مدينة الجسور المعلقة",
+    "rating": 4.7,
+    "reviews": 145,
+    "temp": "20°C",
+    "image": "/images/alger.jpeg",
+    "gallery": [
+      "/images/alger.jpeg",
+      "/images/home/dest-alger.jpg"
+    ],
+    "description": "Perchée sur son rocher, Constantine fascine par ses ponts, son palais Ahmed Bey et son histoire millénaire.",
+    "description_en": "Perched on its rock, Constantine fascinates with its bridges, Ahmed Bey palace and millennia of history.",
+    "description_ar": "تتربع قسنطينة على صخرتها وتبهر بجسورها وقصر أحمد باي وتاريخها العريق.",
+    "bestTime": "Mars – Juin / Sept – Nov",
+    "bestTime_en": "March – June / Sept – Nov",
+    "bestTime_ar": "مارس – يونيو / سبتمبر – نوفمبر",
+    "duration": "3 jours",
+    "duration_en": "3 days",
+    "duration_ar": "3 أيام",
+    "price": 22000,
+    "oldPrice": 28000,
+    "stay": "Hôtel centre-ville",
+    "stay_en": "Downtown hotel",
+    "stay_ar": "فندق وسط المدينة",
+    "transport": "Vol ou train + transferts locaux",
+    "transport_en": "Flight or train + local transfers",
+    "transport_ar": "طيران أو قطار + تنقلات محلية",
+    "includes": [
+      {
+        "fr": "Hébergement 2 nuits",
+        "en": "2 nights stay",
+        "ar": "إقامة ليلتين"
+      },
+      {
+        "fr": "Visite des ponts",
+        "en": "Bridges tour",
+        "ar": "جولة الجسور"
+      },
+      {
+        "fr": "Palais Ahmed Bey",
+        "en": "Ahmed Bey palace",
+        "ar": "قصر أحمد باي"
+      },
+      {
+        "fr": "Guide francophone",
+        "en": "French-speaking guide",
+        "ar": "مرشد ناطق بالفرنسية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Route",
+        "fr": "Ponts suspendus",
+        "en": "Suspended bridges",
+        "ar": "جسور معلقة"
+      },
+      {
+        "icon": "Landmark",
+        "fr": "Palais Ahmed Bey",
+        "en": "Ahmed Bey palace",
+        "ar": "قصر أحمد باي"
+      },
+      {
+        "icon": "Building2",
+        "fr": "Médina & musées",
+        "en": "Medina & museums",
+        "ar": "مدينة قديمة ومتاحف"
+      }
+    ]
+  }
+];

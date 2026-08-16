@@ -8,6 +8,7 @@ import MobileBookingBar from '../components/ui/MobileBookingBar';
 import BottomSheet from '../components/ui/BottomSheet';
 import ImageLightbox from '../components/ui/ImageLightbox';
 import { useLang } from '../hooks/useLangHook';
+import { api } from '../services/api';
 import { getPlaceById, PLACES } from '../data/places';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities';
 import './Activities.css';
@@ -32,6 +33,9 @@ const PlaceDetail = () => {
   const [bookingOpen, setBookingOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [bookingRef, setBookingRef] = useState(null);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -40,6 +44,7 @@ const PlaceDetail = () => {
     travelers: searchParams.get('travelers') || '2',
     stay: '',
     message: '',
+    website: '',
   });
 
   useEffect(() => {
@@ -138,15 +143,46 @@ const PlaceDetail = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.date) return;
-    setSent(true);
+
+    setSubmitting(true);
+    setFormError('');
+
+    try {
+      const result = await api.createReservation({
+        item_type: 'place',
+        item_id: place.id,
+        item_name: placeName,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        travel_date: form.date,
+        travelers: Number(form.travelers),
+        stay_type: form.stay || null,
+        message: form.message,
+        price_estimate: place.price,
+        website: form.website,
+      });
+      setBookingRef({
+        referenceCode: result.referenceCode,
+        accessToken: result.accessToken,
+      });
+      setSent(true);
+    } catch (err) {
+      setFormError(err.message || 'Une erreur est survenue.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const closeBooking = () => {
     setBookingOpen(false);
     setSent(false);
+    setFormError('');
+    setBookingRef(null);
+    setSubmitting(false);
     setForm({
       name: '',
       email: '',
@@ -155,6 +191,7 @@ const PlaceDetail = () => {
       travelers: '2',
       stay: '',
       message: '',
+      website: '',
     });
   };
 
@@ -483,6 +520,25 @@ const PlaceDetail = () => {
             </div>
             <h2>{t('place_form_success_title')}</h2>
             <p>{t('place_form_success_text')}</p>
+            {bookingRef && (
+              <div className="place-modal__ref">
+                <p>
+                  <strong>{t('place_form_ref_label')}</strong>{' '}
+                  <code>{bookingRef.referenceCode}</code>
+                </p>
+                <p className="place-modal__ref-hint">{t('place_form_ref_hint')}</p>
+                <details>
+                  <summary>{t('place_form_token_toggle')}</summary>
+                  <code className="place-modal__token">{bookingRef.accessToken}</code>
+                </details>
+                <Link
+                  to={`/suivi?ref=${encodeURIComponent(bookingRef.referenceCode)}`}
+                  className="place-modal__track-link"
+                >
+                  {t('place_form_track_link')}
+                </Link>
+              </div>
+            )}
             <button type="button" onClick={closeBooking}>
               {t('place_form_close')}
             </button>
@@ -496,6 +552,21 @@ const PlaceDetail = () => {
             <p className="place-modal__lead">{t('place_form_lead')}</p>
 
             <form className="place-form" onSubmit={onSubmit}>
+              <input
+                type="text"
+                name="website"
+                value={form.website}
+                onChange={onChange}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="place-form__honeypot"
+              />
+              {formError && (
+                <p className="place-form__error" role="alert">
+                  {formError}
+                </p>
+              )}
               <div className="place-form__row">
                 <label>
                   {t('place_form_name')}
@@ -583,8 +654,9 @@ const PlaceDetail = () => {
                   placeholder={t('place_form_message_ph')}
                 />
               </label>
-              <button type="submit" className="place-form__submit">
-                {t('place_form_submit')} <Icon name="Send" size={16} />
+              <button type="submit" className="place-form__submit" disabled={submitting}>
+                {submitting ? t('place_form_sending') : t('place_form_submit')}{' '}
+                {!submitting && <Icon name="Send" size={16} />}
               </button>
             </form>
           </>

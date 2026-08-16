@@ -8,6 +8,7 @@ const FOOTER_LINKS = [
   { to: '/destinations', tKey: 'nav_destinations' },
   { to: '/activities', tKey: 'nav_activities' },
   { to: '/tours', tKey: 'nav_tours' },
+  { to: '/suivi', tKey: 'nav_track' },
   { to: '/gallery', tKey: 'nav_gallery' },
   { to: '/blog', tKey: 'nav_blog' },
   { to: '/contact', tKey: 'nav_contact' },

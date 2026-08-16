@@ -1,0 +1,82 @@
+.track-bar-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.track-bar-widget__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b8935d;
+}
+
+.track-bar-widget__row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.track-bar-widget__row input {
+  width: 100%;
+  border: 1px solid rgba(26, 35, 50, 0.14);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  background: #fff;
+  color: #1a2332;
+  box-sizing: border-box;
+}
+
+.track-bar-widget__row input:focus {
+  outline: none;
+  border-color: #b8935d;
+  box-shadow: 0 0 0 3px rgba(184, 147, 93, 0.15);
+}
+
+.track-bar-widget__row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #1a2332;
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.track-bar-widget__row button:hover {
+  background: #243044;
+}
+
+.track-bar-widget--nav {
+  min-width: 320px;
+}
+
+.track-bar-widget--drawer .track-bar-widget__row {
+  grid-template-columns: 1fr;
+}
+
+.track-bar-widget--drawer .track-bar-widget__row button {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .track-bar-widget--nav {
+    min-width: 0;
+  }
+
+  .track-bar-widget__row button span {
+    display: none;
+  }
+}

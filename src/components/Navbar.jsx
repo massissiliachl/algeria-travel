@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLang } from '../hooks/useLangHook';
 import Icon from './ui/Icon';
+import TrackReservationBar from './TrackReservationBar';
+import NotificationBell from './NotificationBell';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -12,6 +14,7 @@ const NAV_LINKS = [
   { key: 'gallery', href: '/gallery', tKey: 'nav_gallery' },
   { key: 'tours', href: '/tours', tKey: 'nav_tours' },
   { key: 'blog', href: '/blog', tKey: 'nav_blog' },
+  { key: 'track', href: '/suivi', tKey: 'nav_track' },
   { key: 'contact', href: '/contact', tKey: 'nav_about' },
 ];
 
@@ -25,10 +28,12 @@ const Navbar = ({ variant = 'default' }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [trackOpen, setTrackOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { language, changeLanguage, t } = useLang();
   const langRef = useRef(null);
+  const trackRef = useRef(null);
   const isHome = variant === 'home' || location.pathname === '/';
   const transparent = isHome && !scrolled && !mobileOpen;
 
@@ -41,6 +46,7 @@ const Navbar = ({ variant = 'default' }) => {
   useEffect(() => {
     setMobileOpen(false);
     setLangOpen(false);
+    setTrackOpen(false);
   }, [location]);
 
   useEffect(() => {
@@ -53,6 +59,7 @@ const Navbar = ({ variant = 'default' }) => {
   useEffect(() => {
     const handler = (e) => {
       if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
+      if (trackRef.current && !trackRef.current.contains(e.target)) setTrackOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -84,6 +91,7 @@ const Navbar = ({ variant = 'default' }) => {
       return location.pathname.startsWith('/tours') || location.pathname.startsWith('/place/');
     }
     if (link.key === 'blog') return location.pathname.startsWith('/blog');
+    if (link.key === 'track') return location.pathname.startsWith('/suivi');
     return location.pathname === link.href && !link.hash;
   };
 
@@ -122,6 +130,9 @@ const Navbar = ({ variant = 'default' }) => {
             </Link>
           ))}
         </nav>
+        <div className="nav-mobile-drawer__track">
+          <TrackReservationBar variant="drawer" onDone={() => setMobileOpen(false)} />
+        </div>
         <div className="nav-mobile-drawer__langs">
           <p>{t('nav_language')}</p>
           <div>
@@ -181,6 +192,29 @@ const Navbar = ({ variant = 'default' }) => {
           </nav>
 
           <div className="premium-nav__actions">
+            <NotificationBell />
+
+            <div className="premium-nav__track" ref={trackRef}>
+              <button
+                className="premium-nav__icon-btn premium-nav__track-btn"
+                type="button"
+                aria-label={t('nav_track')}
+                aria-expanded={trackOpen}
+                onClick={() => {
+                  setLangOpen(false);
+                  setTrackOpen((o) => !o);
+                }}
+              >
+                <Icon name="Search" size={18} />
+                <span className="premium-nav__track-label">{t('nav_track_short')}</span>
+              </button>
+              {trackOpen && (
+                <div className="premium-nav__track-panel">
+                  <TrackReservationBar variant="nav" onDone={() => setTrackOpen(false)} />
+                </div>
+              )}
+            </div>
+
             <button className="premium-nav__icon-btn premium-nav__heart" type="button" aria-label="Wishlist">
               <Icon name="Heart" size={18} />
             </button>
@@ -228,6 +262,7 @@ const Navbar = ({ variant = 'default' }) => {
               className={`premium-nav__burger ${mobileOpen ? 'open' : ''}`}
               onClick={() => {
                 setLangOpen(false);
+                setTrackOpen(false);
                 setMobileOpen((o) => !o);
               }}
               aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}

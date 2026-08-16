@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LangProvider } from './hooks/useLangHook';
+import { NotificationProvider } from './hooks/useNotifications';
 import { useRevealOnScroll } from './hooks/useRevealOnScroll';
 import Home from './pages/Home';
 import Gallery from './pages/Gallery';
@@ -15,8 +16,10 @@ import PlaceDetail from './pages/PlaceDetail';
 import DestinationRedirect from './pages/DestinationRedirect';
 import SearchResults from './pages/SearchResults';
 import Stays from './pages/Stays';
+import TrackReservation from './pages/TrackReservation';
 import WhatsAppButton from './components/WhatsAppButton';
 import CookieBanner from './components/CookieBanner';
+import NotificationOptIn from './components/NotificationOptIn';
 
 import './App.css';
 
@@ -42,9 +45,11 @@ function AppRoutes() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/InfoDestination" element={<Navigate to="/destinations" replace />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/suivi" element={<TrackReservation />} />
       </Routes>
       <WhatsAppButton />
       <CookieBanner />
+      <NotificationOptIn />
     </>
   );
 }
@@ -57,9 +62,11 @@ function App() {
 
   return (
     <LangProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <NotificationProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </NotificationProvider>
     </LangProvider>
   );
 }

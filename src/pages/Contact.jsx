@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
+import { api } from '../services/api';
 import './Contact.css';
 
 const EMAILS = [
@@ -23,6 +24,7 @@ const Contact = () => {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
   const [openFaq, setOpenFaq] = useState(0);
   const [visible, setVisible] = useState(false);
 
@@ -43,15 +45,22 @@ const Contact = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return;
+
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    setError('');
+
+    try {
+      await api.sendContact(form);
       setSent(true);
       setForm({ name: '', email: '', phone: '', subject: '', message: '' });
-    }, 900);
+    } catch (err) {
+      setError(err.message || 'Une erreur est survenue.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -166,6 +175,11 @@ const Contact = () => {
                       placeholder={t('contact_placeholder_message')}
                     />
                   </label>
+                  {error ? (
+                    <p className="ct-error" role="alert">
+                      {error}
+                    </p>
+                  ) : null}
                   <button type="submit" className="ct-submit" disabled={sending}>
                     {sending ? t('contact_sending') : t('contact_send')}
                     <Icon name="Send" size={16} />

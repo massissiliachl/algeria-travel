@@ -20,6 +20,9 @@ const CookieBanner = () => {
   const save = (value) => {
     try {
       localStorage.setItem(STORAGE_KEY, value);
+      if (value === 'all') {
+        window.dispatchEvent(new CustomEvent('at-cookie-accepted'));
+      }
     } catch {
       /* ignore */
     }

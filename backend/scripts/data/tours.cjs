@@ -1,0 +1,622 @@
+exports.FEATURED_TOURS = [
+  {
+    "id": 1,
+    "name": "Timimoun",
+    "name_en": "Timimoun",
+    "name_ar": "تيميمون",
+    "subtitle": "Perle du Sahara",
+    "subtitle_en": "Pearl of the Sahara",
+    "subtitle_ar": "لؤلؤة الصحراء",
+    "description": "Découvrez les dunes rouges de Timimoun, les ksour traditionnels et les couchers de soleil magiques du Grand Erg Occidental.",
+    "description_en": "Discover the red dunes of Timimoun, traditional ksour and magical sunsets of the Great Western Erg.",
+    "fullDescription": "Timimoun, surnommée la rouge, est une ville oasis située au cœur du Sahara algérien. Ses dunes de sable rouge offrent des paysages à couper le souffle.",
+    "fullDescription_en": "Timimoun, nicknamed the red, is an oasis town located in the heart of the Algerian Sahara.",
+    "location": "Gourara, Grand Sud",
+    "location_en": "Gourara, Deep South",
+    "location_ar": "الجرارة، الجنوب العميق",
+    "bestTime": "Octobre – Avril",
+    "bestTime_en": "October – April",
+    "bestTime_ar": "أكتوبر – أبريل",
+    "duration": "5 jours",
+    "duration_en": "5 days",
+    "duration_ar": "5 أيام",
+    "price": 45000,
+    "oldPrice": 55000,
+    "rating": 4.9,
+    "reviews": 234,
+    "image": "/images/sahara1.jpeg",
+    "category": "desert",
+    "activities": [
+      {
+        "icon": "Sun",
+        "label": "Dunes",
+        "label_en": "Dunes",
+        "label_ar": "كثبان"
+      },
+      {
+        "icon": "Landmark",
+        "label": "Ksour",
+        "label_en": "Ksour",
+        "label_ar": "قصور"
+      },
+      {
+        "icon": "Sunset",
+        "label": "Coucher de soleil",
+        "label_en": "Sunset",
+        "label_ar": "غروب الشمس"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrivée",
+        "title_en": "Arrival",
+        "desc": "Accueil et thé à la menthe",
+        "desc_en": "Welcome and mint tea"
+      },
+      {
+        "day": 2,
+        "title": "Ksour",
+        "title_en": "Ksour",
+        "desc": "Découverte des villages rouges",
+        "desc_en": "Discover the red villages"
+      },
+      {
+        "day": 3,
+        "title": "Dunes",
+        "title_en": "Dunes",
+        "desc": "Trek et coucher de soleil",
+        "desc_en": "Trek and sunset"
+      },
+      {
+        "day": 4,
+        "title": "Artisanat",
+        "title_en": "Crafts",
+        "desc": "Atelier poterie",
+        "desc_en": "Pottery workshop"
+      },
+      {
+        "day": 5,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Transfert aéroport",
+        "desc_en": "Airport transfer"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Tassili n'Ajjer",
+    "name_en": "Tassili n'Ajjer",
+    "name_ar": "تاسيلي ناجر",
+    "subtitle": "Patrimoine mondial UNESCO",
+    "subtitle_en": "UNESCO World Heritage",
+    "subtitle_ar": "تراث اليونسكو العالمي",
+    "description": "Explorez les célèbres gravures rupestres, les arches rocheuses et les paysages lunaires de Djanet.",
+    "description_en": "Explore the famous rock engravings, rock arches and lunar landscapes of Djanet.",
+    "fullDescription": "Le Tassili n'Ajjer est l'un des sites les plus extraordinaires au monde. Classé au patrimoine mondial de l'UNESCO.",
+    "fullDescription_en": "Tassili n'Ajjer is one of the most extraordinary sites in the world.",
+    "location": "Djanet, Sahara",
+    "location_en": "Djanet, Sahara",
+    "location_ar": "جانت، الصحراء",
+    "bestTime": "Novembre – Février",
+    "bestTime_en": "November – February",
+    "bestTime_ar": "نوفمبر – فبراير",
+    "duration": "8 jours",
+    "duration_en": "8 days",
+    "duration_ar": "8 أيام",
+    "price": 85000,
+    "oldPrice": 95000,
+    "rating": 5,
+    "reviews": 178,
+    "image": "/images/djanet.jpeg",
+    "category": "nature",
+    "activities": [
+      {
+        "icon": "Palette",
+        "label": "Art rupestre",
+        "label_en": "Rock art",
+        "label_ar": "فن صخري"
+      },
+      {
+        "icon": "Footprints",
+        "label": "Trek",
+        "label_en": "Trek",
+        "label_ar": "مشي"
+      },
+      {
+        "icon": "Tent",
+        "label": "Bivouac",
+        "label_en": "Bivouac",
+        "label_ar": "مبيت"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrivée",
+        "title_en": "Arrival",
+        "desc": "Préparation trek",
+        "desc_en": "Trek preparation"
+      },
+      {
+        "day": 2,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Route en 4x4",
+        "desc_en": "4x4 route"
+      },
+      {
+        "day": 3,
+        "title": "Gravures",
+        "title_en": "Engravings",
+        "desc": "Art préhistorique",
+        "desc_en": "Prehistoric art"
+      },
+      {
+        "day": 4,
+        "title": "Canyons",
+        "title_en": "Canyons",
+        "desc": "Trek dans les gorges",
+        "desc_en": "Gorge trek"
+      },
+      {
+        "day": 5,
+        "title": "Bivouac",
+        "title_en": "Bivouac",
+        "desc": "Nuit sous les étoiles",
+        "desc_en": "Night under the stars"
+      },
+      {
+        "day": 6,
+        "title": "Retour",
+        "title_en": "Return",
+        "desc": "Route retour",
+        "desc_en": "Return route"
+      },
+      {
+        "day": 7,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Transfert aéroport",
+        "desc_en": "Airport transfer"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Ghardaïa",
+    "name_en": "Ghardaïa",
+    "name_ar": "غرداية",
+    "subtitle": "Vallée du M'Zab",
+    "subtitle_en": "M'Zab Valley",
+    "subtitle_ar": "وادي مزاب",
+    "description": "Partez à la découverte des cités millénaires du M'Zab et de leur patrimoine exceptionnel.",
+    "description_en": "Discover the millennia-old cities of M'Zab and their exceptional heritage.",
+    "fullDescription": "La vallée du M'Zab est un chef-d'œuvre d'architecture adaptée à l'environnement désertique.",
+    "fullDescription_en": "The M'Zab valley is a masterpiece of architecture adapted to the desert environment.",
+    "location": "Vallée du M'Zab",
+    "location_en": "M'Zab Valley",
+    "location_ar": "وادي مزاب",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "duration": "4 jours",
+    "duration_en": "4 days",
+    "duration_ar": "4 أيام",
+    "price": 35000,
+    "oldPrice": 42000,
+    "rating": 4.8,
+    "reviews": 312,
+    "image": "/images/ghardaia.jpeg",
+    "category": "culture",
+    "activities": [
+      {
+        "icon": "Landmark",
+        "label": "Architecture",
+        "label_en": "Architecture",
+        "label_ar": "عمارة"
+      },
+      {
+        "icon": "Palette",
+        "label": "Artisanat",
+        "label_en": "Crafts",
+        "label_ar": "حرف يدوية"
+      },
+      {
+        "icon": "Building2",
+        "label": "Mosquées",
+        "label_en": "Mosques",
+        "label_ar": "مساجد"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrivée",
+        "title_en": "Arrival",
+        "desc": "Panorama sur la vallée",
+        "desc_en": "Valley panorama"
+      },
+      {
+        "day": 2,
+        "title": "Ksour",
+        "title_en": "Ksour",
+        "desc": "Tour architectural",
+        "desc_en": "Architecture tour"
+      },
+      {
+        "day": 3,
+        "title": "Palmeraie",
+        "title_en": "Palm grove",
+        "desc": "Atelier local",
+        "desc_en": "Local workshop"
+      },
+      {
+        "day": 4,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Transfert",
+        "desc_en": "Transfer"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Béjaïa",
+    "name_en": "Béjaïa",
+    "name_ar": "بجاية",
+    "subtitle": "Mer & Montagne",
+    "subtitle_en": "Sea & Mountain",
+    "subtitle_ar": "البحر والجبال",
+    "description": "Cap Carbon, les grottes d'Aokas et les magnifiques plages de la côte béjaouie.",
+    "description_en": "Cap Carbon, Aokas caves and the magnificent beaches of the Béjaïa coast.",
+    "fullDescription": "Béjaïa offre un cadre naturel exceptionnel où la mer Méditerranée rencontre les montagnes du Djurdjura.",
+    "fullDescription_en": "Béjaïa offers an exceptional natural setting where the Mediterranean Sea meets the Djurdjura mountains.",
+    "location": "Béjaïa, Méditerranée",
+    "location_en": "Béjaïa, Mediterranean",
+    "location_ar": "بجاية، المتوسط",
+    "bestTime": "Mai – Octobre",
+    "bestTime_en": "May – October",
+    "bestTime_ar": "ماي – أكتوبر",
+    "duration": "3 jours",
+    "duration_en": "3 days",
+    "duration_ar": "3 أيام",
+    "price": 25000,
+    "oldPrice": 30000,
+    "rating": 4.9,
+    "reviews": 290,
+    "image": "/images/bejaia.jpeg",
+    "category": "nature",
+    "activities": [
+      {
+        "icon": "Umbrella",
+        "label": "Plage",
+        "label_en": "Beach",
+        "label_ar": "شاطئ"
+      },
+      {
+        "icon": "Mountain",
+        "label": "Randonnée",
+        "label_en": "Hiking",
+        "label_ar": "تنزه"
+      },
+      {
+        "icon": "Bird",
+        "label": "Oiseaux",
+        "label_en": "Birds",
+        "label_ar": "طيور"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrivée",
+        "title_en": "Arrival",
+        "desc": "Installation",
+        "desc_en": "Check-in"
+      },
+      {
+        "day": 2,
+        "title": "Cap Carbon",
+        "title_en": "Cap Carbon",
+        "desc": "Visite du cap",
+        "desc_en": "Visit the cape"
+      },
+      {
+        "day": 3,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Transfert",
+        "desc_en": "Transfer"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Le Hoggar",
+    "name_en": "Hoggar",
+    "name_ar": "الهقار",
+    "subtitle": "Au cœur du désert",
+    "subtitle_en": "Heart of the desert",
+    "subtitle_ar": "في قلب الصحراء",
+    "description": "Vivez une aventure inoubliable dans les montagnes du Hoggar et admirez le lever du soleil à Assekrem.",
+    "description_en": "Experience an unforgettable adventure in the Hoggar mountains and watch the sunrise at Assekrem.",
+    "fullDescription": "Le Hoggar est un massif montagneux d'origine volcanique situé au cœur du Sahara.",
+    "fullDescription_en": "The Hoggar is a volcanic mountain range located in the heart of the Sahara.",
+    "location": "Tamanrasset, Sahara",
+    "location_en": "Tamanrasset, Sahara",
+    "location_ar": "تمنراست، الصحراء",
+    "bestTime": "Novembre – Février",
+    "bestTime_en": "November – February",
+    "bestTime_ar": "نوفمبر – فبراير",
+    "duration": "9 jours",
+    "duration_en": "9 days",
+    "duration_ar": "9 أيام",
+    "price": 95000,
+    "oldPrice": 105000,
+    "rating": 5,
+    "reviews": 167,
+    "image": "/images/hogar.jpeg",
+    "category": "desert",
+    "activities": [
+      {
+        "icon": "Mountain",
+        "label": "Montagnes",
+        "label_en": "Mountains",
+        "label_ar": "جبال"
+      },
+      {
+        "icon": "Sunrise",
+        "label": "Lever du soleil",
+        "label_en": "Sunrise",
+        "label_ar": "شروق الشمس"
+      },
+      {
+        "icon": "Tent",
+        "label": "Camping",
+        "label_en": "Camping",
+        "label_ar": "تخييم"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrivée",
+        "title_en": "Arrival",
+        "desc": "Accueil",
+        "desc_en": "Welcome"
+      },
+      {
+        "day": 2,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Route vers Assekrem",
+        "desc_en": "Road to Assekrem"
+      },
+      {
+        "day": 3,
+        "title": "Assekrem",
+        "title_en": "Assekrem",
+        "desc": "Lever du soleil",
+        "desc_en": "Sunrise"
+      },
+      {
+        "day": 4,
+        "title": "Trek",
+        "title_en": "Trek",
+        "desc": "Randonnée",
+        "desc_en": "Hiking"
+      },
+      {
+        "day": 5,
+        "title": "Camp",
+        "title_en": "Camp",
+        "desc": "Nuit au bivouac",
+        "desc_en": "Night at the bivouac"
+      },
+      {
+        "day": 6,
+        "title": "Retour",
+        "title_en": "Return",
+        "desc": "Route retour",
+        "desc_en": "Return route"
+      },
+      {
+        "day": 7,
+        "title": "Tamanrasset",
+        "title_en": "Tamanrasset",
+        "desc": "Visite",
+        "desc_en": "Visit"
+      },
+      {
+        "day": 8,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Transfert",
+        "desc_en": "Transfer"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Constantine",
+    "name_en": "Constantine",
+    "name_ar": "قسنطينة",
+    "subtitle": "Ville des ponts",
+    "subtitle_en": "City of bridges",
+    "subtitle_ar": "مدينة الجسور",
+    "description": "Découvrez les ponts suspendus, le palais Ahmed Bey et l'histoire fascinante de Constantine.",
+    "description_en": "Discover the suspended bridges, the Ahmed Bey palace and the fascinating history of Constantine.",
+    "fullDescription": "Constantine, perchée sur un rocher vertigineux, est l'une des villes les plus impressionnantes d'Afrique.",
+    "fullDescription_en": "Constantine, perched on a dizzying rock, is one of the most impressive cities in Africa.",
+    "location": "Constantine, Nord-Est",
+    "location_en": "Constantine, Northeast",
+    "location_ar": "قسنطينة، الشمال الشرقي",
+    "bestTime": "Mars – Juin / Sept – Nov",
+    "bestTime_en": "March – June / September – November",
+    "bestTime_ar": "مارس – يونيو / سبتمبر – نوفمبر",
+    "duration": "3 jours",
+    "duration_en": "3 days",
+    "duration_ar": "3 أيام",
+    "price": 22000,
+    "oldPrice": 28000,
+    "rating": 4.7,
+    "reviews": 145,
+    "image": "/images/alger.jpeg",
+    "category": "culture",
+    "activities": [
+      {
+        "icon": "Route",
+        "label": "Ponts",
+        "label_en": "Bridges",
+        "label_ar": "جسور"
+      },
+      {
+        "icon": "Landmark",
+        "label": "Palais",
+        "label_en": "Palace",
+        "label_ar": "قصر"
+      },
+      {
+        "icon": "Building2",
+        "label": "Musée",
+        "label_en": "Museum",
+        "label_ar": "متحف"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrivée",
+        "title_en": "Arrival",
+        "desc": "Installation",
+        "desc_en": "Check-in"
+      },
+      {
+        "day": 2,
+        "title": "Ponts",
+        "title_en": "Bridges",
+        "desc": "Visite des ponts suspendus",
+        "desc_en": "Visit the suspended bridges"
+      },
+      {
+        "day": 3,
+        "title": "Départ",
+        "title_en": "Departure",
+        "desc": "Transfert",
+        "desc_en": "Transfer"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Taghit — Hôtel 4★",
+    "name_en": "Taghit — 4★ Hotel",
+    "name_ar": "تاغيت — فندق 4★",
+    "subtitle": "Voyage coup de cœur · vol inclus",
+    "subtitle_en": "Must-do escape · flight included",
+    "subtitle_ar": "رحلة مفضلة · رحلة مشمولة",
+    "description": "Pension complète, Activités : 4×4, ski sur sable, dromadaire, visite des ksars incluse, Transport navette aéroport, Billet d’avion Alger – Béchar – Alger. Extras : buggy et quad. 99 990 DA / personne.",
+    "description_en": "Full board, Activities: 4×4, sand skiing, camel, ksar visits included, Airport shuttle transfer, Flight ticket Algiers – Béchar – Algiers. Extras: buggy and quad. 99 990 DZD / person.",
+    "fullDescription": "Formule Hôtel 4 étoiles Taghit — Voyage coup de cœur.\n• Pension complète\n• Activités : 4×4, ski sur sable, dromadaire, visite des ksars incluse\n• Transport navette aéroport\n• Billet d’avion Alger – Béchar – Alger\n• Extras : buggy et quad\n99 990 DA par personne",
+    "fullDescription_en": "Taghit 4-star hotel package — must-do escape.\n• Full board\n• Activities: 4×4, sand skiing, camel, ksar visits included\n• Airport shuttle transfer\n• Flight ticket Algiers – Béchar – Algiers\n• Extras: buggy and quad\n99 990 DZD per person",
+    "location": "Taghit, Béchar",
+    "location_en": "Taghit, Béchar",
+    "location_ar": "تاغيت، بشار",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "duration": "Pension complète",
+    "duration_en": "Full board",
+    "duration_ar": "إقامة كاملة",
+    "price": 99990,
+    "rating": 4.9,
+    "reviews": 142,
+    "image": "/images/taghit.jpeg",
+    "category": "desert",
+    "placeSlug": "taghit",
+    "pkg": "hotel",
+    "badge": {
+      "fr": "NEW",
+      "en": "NEW",
+      "ar": "جديد"
+    },
+    "activities": [
+      {
+        "icon": "Hotel",
+        "label": "Hôtel 4★",
+        "label_en": "4★ hotel",
+        "label_ar": "فندق 4★"
+      },
+      {
+        "icon": "Plane",
+        "label": "Vol inclus",
+        "label_en": "Flight included",
+        "label_ar": "رحلة مشمولة"
+      },
+      {
+        "icon": "Car",
+        "label": "4×4 & dunes",
+        "label_en": "4×4 & dunes",
+        "label_ar": "دفع رباعي"
+      }
+    ],
+    "itinerary": []
+  },
+  {
+    "id": 8,
+    "name": "Taghit — Maison d’hôte",
+    "name_en": "Taghit — Guesthouse",
+    "name_ar": "تاغيت — بيت ضيافة",
+    "subtitle": "Voyage coup de cœur · bus Mercedes",
+    "subtitle_en": "Must-do escape · Mercedes bus",
+    "subtitle_ar": "رحلة مفضلة · حافلة مرسيدس",
+    "description": "Pension complète, Activités : 4×4, snowboard sur sable, dromadaire, visite des ksars, qaada en pleine dune, déjeuner ou dîner en palmeraie, Bus Mercedes confortable Alger – Taghit – Alger, Assistance 24h/24.",
+    "description_en": "Full board, Activities: 4×4, sand snowboarding, camel, ksar visits, dune qaada, palm grove lunch or dinner, Comfortable Mercedes bus Algiers – Taghit – Algiers, 24/7 assistance.",
+    "fullDescription": "Formule Maison d’hôte authentique Taghit.\n• Pension complète\n• Activités : 4×4, snowboard sur sable, dromadaire, visite des ksars, qaada en pleine dune, déjeuner ou dîner en palmeraie\n• Bus Mercedes confortable Alger – Taghit – Alger\n• Assistance 24h/24\n60 000 DA par personne",
+    "fullDescription_en": "Taghit Authentic guesthouse package.\n• Full board\n• Activities: 4×4, sand snowboarding, camel, ksar visits, dune qaada, palm grove lunch or dinner\n• Comfortable Mercedes bus Algiers – Taghit – Algiers\n• 24/7 assistance\n60 000 DZD per person",
+    "location": "Taghit, Béchar",
+    "location_en": "Taghit, Béchar",
+    "location_ar": "تاغيت، بشار",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "duration": "Pension complète",
+    "duration_en": "Full board",
+    "duration_ar": "إقامة كاملة",
+    "price": 60000,
+    "rating": 4.9,
+    "reviews": 142,
+    "image": "/images/taghit.jpeg",
+    "category": "desert",
+    "placeSlug": "taghit",
+    "pkg": "guesthouse",
+    "badge": {
+      "fr": "NEW",
+      "en": "NEW",
+      "ar": "جديد"
+    },
+    "activities": [
+      {
+        "icon": "House",
+        "label": "Maison d’hôte",
+        "label_en": "Guesthouse",
+        "label_ar": "بيت ضيافة"
+      },
+      {
+        "icon": "Car",
+        "label": "Bus Mercedes",
+        "label_en": "Mercedes bus",
+        "label_ar": "حافلة مرسيدس"
+      },
+      {
+        "icon": "ShieldCheck",
+        "label": "24h/24",
+        "label_en": "24/7",
+        "label_ar": "24/7"
+      }
+    ],
+    "itinerary": []
+  }
+];
