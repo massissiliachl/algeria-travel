@@ -272,6 +272,437 @@
   animation: bookingPricePop 0.32s ease;
 }
 
+/* ── Payment mode (2 cards) ── */
+.booking-pay-mode {
+  padding: 0 22px 6px;
+  animation: bookingFadeUp 0.55s ease var(--bf-delay, 0ms) both;
+}
+
+.booking-pay-mode__head {
+  margin-bottom: 14px;
+}
+
+.booking-pay-mode__head h3 {
+  margin: 0 0 4px;
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--bk-ink);
+}
+
+.booking-pay-mode__head p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--bk-muted);
+  line-height: 1.5;
+}
+
+.booking-pay-mode__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.booking-pay-mode__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 16px 16px;
+  border: 2px solid rgba(26, 35, 50, 0.08);
+  border-radius: 20px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: inherit;
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.22s ease;
+}
+
+.booking-pay-mode__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(26, 35, 50, 0.1);
+}
+
+.booking-pay-mode__card.is-selected {
+  border-color: var(--bk-gold);
+  box-shadow:
+    0 20px 48px rgba(184, 147, 93, 0.22),
+    0 0 0 1px rgba(184, 147, 93, 0.12) inset;
+  transform: translateY(-4px);
+}
+
+.booking-pay-mode__card--sand.is-selected {
+  background: linear-gradient(160deg, #fff 0%, #f8f4ed 100%);
+}
+
+.booking-pay-mode__card--dark.is-selected {
+  background: linear-gradient(160deg, #1a2332 0%, #2a3548 100%);
+  color: #fff;
+}
+
+.booking-pay-mode__glow {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 147, 93, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.booking-pay-mode__card.is-selected .booking-pay-mode__glow {
+  opacity: 1;
+}
+
+.booking-pay-mode__icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--bk-sand);
+  color: var(--bk-gold);
+  transition: background 0.28s ease, color 0.28s ease, transform 0.28s ease;
+}
+
+.booking-pay-mode__card--dark .booking-pay-mode__icon-wrap {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--bk-gold-soft);
+}
+
+.booking-pay-mode__card.is-selected .booking-pay-mode__icon-wrap {
+  transform: scale(1.06);
+}
+
+.booking-pay-mode__card--dark.is-selected .booking-pay-mode__icon-wrap {
+  background: rgba(184, 147, 93, 0.25);
+  color: #fff;
+}
+
+.booking-pay-mode__content {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+
+.booking-pay-mode__content strong {
+  font-size: 0.95rem;
+  font-weight: 750;
+  line-height: 1.25;
+  color: var(--bk-ink);
+}
+
+.booking-pay-mode__card--dark.is-selected .booking-pay-mode__content strong {
+  color: #fff;
+}
+
+.booking-pay-mode__content > span {
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--bk-muted);
+}
+
+.booking-pay-mode__card--dark.is-selected .booking-pay-mode__content > span {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.booking-pay-mode__badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(184, 147, 93, 0.15);
+  color: #8a6b3e;
+}
+
+.booking-pay-mode__card--dark.is-selected .booking-pay-mode__badge {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--bk-gold-soft);
+}
+
+.booking-pay-mode__tick {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(26, 35, 50, 0.12);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+}
+
+.booking-pay-mode__card.is-selected .booking-pay-mode__tick {
+  background: linear-gradient(135deg, #25a06f, #1b8a5a);
+  border-color: transparent;
+  transform: scale(1.08);
+}
+
+/* Card payment panel */
+.booking-card-checkout {
+  margin-top: 4px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, #fff 0%, #f6f2eb 100%);
+  border: 1px solid rgba(184, 147, 93, 0.22);
+  box-shadow: 0 12px 32px rgba(26, 35, 50, 0.06);
+  animation: bookingFadeUp 0.45s ease both;
+}
+
+.booking-card-checkout__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.booking-card-checkout__step {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bk-ink);
+  color: var(--bk-gold-soft);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.booking-card-checkout__head h4 {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+  font-weight: 750;
+  color: var(--bk-ink);
+}
+
+.booking-card-checkout__head p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--bk-muted);
+  line-height: 1.45;
+}
+
+.booking-card-checkout__layout {
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.booking-pay-card-visual--live {
+  animation: bookingCardShine 4s ease-in-out infinite;
+}
+
+.booking-pay-card-visual__holder {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-card-form {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-card-form__amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(26, 35, 50, 0.05);
+  border: 1px solid rgba(26, 35, 50, 0.06);
+}
+
+.booking-card-form__amount span {
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--bk-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.booking-card-form__amount strong {
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.1rem;
+  color: var(--bk-ink);
+}
+
+.booking-card-form__field {
+  display: grid;
+  gap: 6px;
+}
+
+.booking-card-form__field > span {
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--bk-ink);
+}
+
+.booking-card-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.booking-input--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+}
+
+.booking-card-form__brands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.booking-card-form__brands span {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(26, 35, 50, 0.08);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--bk-muted);
+}
+
+.booking-card-form__secure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(37, 160, 111, 0.08);
+  border: 1px solid rgba(37, 160, 111, 0.15);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: #166534;
+}
+
+.booking-card-form__secure svg {
+  flex-shrink: 0;
+  color: #25a06f;
+}
+
+.booking-pay-card-panel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(26, 35, 50, 0.04), rgba(184, 147, 93, 0.08));
+  border: 1px solid rgba(184, 147, 93, 0.2);
+  animation: bookingFadeUp 0.45s ease both;
+}
+
+.booking-pay-card-visual {
+  position: relative;
+  width: 168px;
+  aspect-ratio: 1.586;
+  padding: 16px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1a2332 0%, #3d4f6a 45%, #1a2332 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow: 0 16px 36px rgba(26, 35, 50, 0.35);
+  overflow: hidden;
+  animation: bookingCardShine 4s ease-in-out infinite;
+}
+
+.booking-pay-card-visual__chip {
+  width: 34px;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #d4b896, #b8935d);
+  margin-bottom: 18px;
+}
+
+.booking-pay-card-visual__number {
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+  margin-bottom: 14px;
+}
+
+.booking-pay-card-visual__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.62rem;
+  opacity: 0.7;
+}
+
+.booking-pay-card-visual__brand {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 1;
+}
+
+.booking-pay-card-visual__shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  animation: bookingShine 3.5s ease-in-out infinite;
+}
+
+.booking-pay-card-panel__secure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+}
+
+.booking-pay-card-panel__secure svg {
+  color: #25a06f;
+  flex-shrink: 0;
+}
+
+.booking-pay-card-panel__note {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--bk-muted);
+}
+
+@keyframes bookingCardShine {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 /* GDPR custom checkbox */
 .booking-sheet__gdpr {
   display: flex;
@@ -353,6 +784,25 @@
 
 .booking-sheet__submit:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.booking-sheet__submit.is-card {
+  background: linear-gradient(135deg, #b8935d 0%, #d4b896 45%, #8a6b3e 100%);
+  background-size: 200% 100%;
+  color: #1a2332;
+}
+
+.booking-sheet__submit.is-card:hover:not(:disabled) {
+  box-shadow: 0 14px 32px rgba(184, 147, 93, 0.4);
+}
+
+.booking-sheet__submit.is-card .booking-sheet__submit-shine {
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 62%
+  );
 }
 
 .booking-sheet__submit:disabled {
@@ -635,6 +1085,33 @@
     padding: 18px 16px 22px;
   }
 
+  .booking-pay-mode {
+    padding: 0 16px 4px;
+  }
+
+  .booking-pay-mode__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-pay-card-panel {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .booking-card-checkout__layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .booking-card-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-pay-card-panel__secure {
+    justify-content: center;
+  }
+
   .booking-sheet__grid--2 {
     grid-template-columns: 1fr;
   }
@@ -646,6 +1123,8 @@
   .booking-field,
   .booking-sheet__gdpr,
   .booking-sheet__submit,
+  .booking-pay-mode,
+  .booking-pay-card-panel,
   .booking-sheet__hero h2,
   .booking-sheet__lead,
   .booking-sheet__price,

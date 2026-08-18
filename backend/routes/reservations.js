@@ -5,6 +5,7 @@ const { generateReferenceCode, generateAccessToken, hashAccessToken } = require(
 const { validateReservationItem } = require('../lib/validateReservationItem');
 const { isValidPhone } = require('../lib/phone');
 const { calcBookingTotal } = require('../lib/bookingPrice');
+const { isValidPaymentMethod, normalizePaymentMethod } = require('../lib/paymentMethod');
 const {
   sendReservationClientEmail,
   sendReservationAdminEmail,
@@ -93,6 +94,11 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       price_per_person: pricePerPerson,
       price_estimate: priceEstimate,
       gdpr_consent: gdprConsent,
+      payment_method: paymentMethod,
+      card_holder: cardHolder,
+      card_last4: cardLast4,
+      card_brand: cardBrand,
+      card_expiry: cardExpiry,
       website,
     } = req.body;
 
@@ -121,6 +127,42 @@ router.post('/', reservationLimiter, async (req, res, next) => {
 
     if (!gdprConsent) {
       return res.status(400).json({ error: 'Vous devez accepter la politique de confidentialité.' });
+    }
+
+    if (!isValidPaymentMethod(paymentMethod)) {
+      return res.status(400).json({ error: 'Veuillez choisir un moyen de paiement.' });
+    }
+
+    const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
+
+    if (req.body.card_number || req.body.cvv || req.body.card_cvv) {
+      return res.status(400).json({ error: 'Ne transmettez jamais le numéro complet ni le CVV via ce formulaire.' });
+    }
+
+    let cardMeta = {
+      holder: null,
+      last4: null,
+      brand: null,
+      expiry: null,
+    };
+
+    if (normalizedPaymentMethod === 'card') {
+      const holder = cardHolder?.trim();
+      const last4 = cardLast4?.trim();
+      const brand = cardBrand?.trim().toLowerCase() || null;
+      const expiry = cardExpiry?.trim();
+
+      if (!holder || holder.length < 3) {
+        return res.status(400).json({ error: 'Nom du titulaire de la carte requis.' });
+      }
+      if (!/^\d{4}$/.test(last4 || '')) {
+        return res.status(400).json({ error: 'Informations de carte invalides.' });
+      }
+      if (!/^\d{2}\/\d{2}$/.test(expiry || '')) {
+        return res.status(400).json({ error: 'Date d’expiration de carte invalide.' });
+      }
+
+      cardMeta = { holder, last4, brand, expiry };
     }
 
     if (!EMAIL_RE.test(email.trim())) {
@@ -174,9 +216,10 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         item_type, item_id, item_name,
         client_name, client_email, client_phone,
         travel_date, travelers, stay_type, message,
-        price_estimate, unit_price, price_per_person, gdpr_consent_at,
+        price_estimate, unit_price, price_per_person, payment_method,
+        card_holder, card_last4, card_brand, card_expiry, gdpr_consent_at,
         reference_code, access_token_hash
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now(), $14, $15)`,
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, now(), $19, $20)`,
       [
         normalizedItemType,
         itemId.trim(),
@@ -191,6 +234,11 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         computedTotal,
         Number.isFinite(unit) ? Math.round(unit) : null,
         perPerson,
+        normalizedPaymentMethod,
+        cardMeta.holder,
+        cardMeta.last4,
+        cardMeta.brand,
+        cardMeta.expiry,
         referenceCode,
         accessTokenHash,
       ]
@@ -206,6 +254,9 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       travelDate,
       travelers: travelersCount,
       priceEstimate: computedTotal,
+      paymentMethod: normalizedPaymentMethod,
+      cardLast4: cardMeta.last4,
+      cardBrand: cardMeta.brand,
       accessToken,
     };
 
@@ -219,6 +270,11 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       travelDate,
       travelers: travelersCount,
       priceEstimate: computedTotal,
+      paymentMethod: normalizedPaymentMethod,
+      cardHolder: cardMeta.holder,
+      cardLast4: cardMeta.last4,
+      cardBrand: cardMeta.brand,
+      cardExpiry: cardMeta.expiry,
       message: message?.trim() || null,
     };
 

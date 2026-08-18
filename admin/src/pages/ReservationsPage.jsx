@@ -9,6 +9,14 @@ const FILTERS = [
   { key: 'rejected', label: 'Refusées' },
 ];
 
+const PAYMENT_LABELS = {
+  pre_request: 'Demande préalable',
+  card: 'Paiement par carte',
+  transfer: 'Virement bancaire',
+  paypal: 'PayPal',
+  cash: 'Espèces à l’arrivée',
+};
+
 export default function ReservationsPage() {
   const [filter, setFilter] = useState('pending');
   const [data, setData] = useState([]);
@@ -152,6 +160,14 @@ export default function ReservationsPage() {
             <div><dt>Voyageurs</dt><dd>{selected.travelers}</dd></div>
             <div><dt>Hébergement</dt><dd>{selected.stayType || '—'}</dd></div>
             <div><dt>Prix estimé</dt><dd>{selected.priceEstimate ? `${selected.priceEstimate.toLocaleString()} DA` : '—'}</dd></div>
+            <div><dt>Paiement</dt><dd>{PAYMENT_LABELS[selected.paymentMethod] || selected.paymentMethod || '—'}</dd></div>
+            {selected.paymentMethod === 'card' && (
+              <>
+                <div><dt>Titulaire carte</dt><dd>{selected.cardHolder || '—'}</dd></div>
+                <div><dt>Carte</dt><dd>{selected.cardBrand ? `${selected.cardBrand.toUpperCase()} ·••• ${selected.cardLast4}` : '—'}</dd></div>
+                <div><dt>Expiration</dt><dd>{selected.cardExpiry || '—'}</dd></div>
+              </>
+            )}
             <div><dt>Message client</dt><dd>{selected.message || '—'}</dd></div>
           </dl>
           <div style={{ padding: '0 20px 20px' }}>

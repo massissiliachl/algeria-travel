@@ -5,6 +5,9 @@ import Icon from '../ui/Icon';
 import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
 import { calcBookingTotal } from '../../utils/bookingPrice';
+import { PAYMENT_MODES } from '../../utils/paymentMethods';
+import { validateCardPayment, cardPaymentMeta } from '../../utils/cardPayment';
+import CardPaymentForm from './CardPaymentForm';
 import './BookingSheet.css';
 
 const EMPTY_FORM = {
@@ -14,8 +17,16 @@ const EMPTY_FORM = {
   date: '',
   travelers: '2',
   stay: '',
+  payment: 'pre_request',
   message: '',
   website: '',
+};
+
+const EMPTY_CARD = {
+  holder: '',
+  number: '',
+  expiry: '',
+  cvv: '',
 };
 
 function BookingField({ icon, label, children, delay = 0, className = '' }) {
@@ -49,6 +60,8 @@ export default function BookingSheet({
 }) {
   const { t } = useLang();
   const [form, setForm] = useState({ ...EMPTY_FORM, stay: defaultStay });
+  const [card, setCard] = useState(EMPTY_CARD);
+  const [paidWithCard, setPaidWithCard] = useState(false);
   const [gdpr, setGdpr] = useState(false);
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -66,6 +79,8 @@ export default function BookingSheet({
   useEffect(() => {
     if (open) {
       setForm({ ...EMPTY_FORM, stay: defaultStay });
+      setCard(EMPTY_CARD);
+      setPaidWithCard(false);
       setGdpr(false);
       setSent(false);
       setFormError('');
@@ -95,18 +110,41 @@ export default function BookingSheet({
     setForm((prev) => ({ ...prev, travelers: String(clamped) }));
   };
 
+  const setPaymentMode = (mode) => {
+    setForm((prev) => ({ ...prev, payment: mode }));
+    if (mode !== 'card') setCard(EMPTY_CARD);
+    setFormError('');
+  };
+
+  const isCardMode = form.payment === 'card';
+  const submitLabel = isCardMode
+    ? `${t('booking_submit_card')} · ${totalPrice.toLocaleString()} DA`
+    : t('booking_submit_pre_request');
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (!form.payment) {
+      setFormError(t('booking_payment_required'));
+      return;
+    }
     if (!gdpr) {
       setFormError(t('booking_gdpr_required'));
       return;
+    }
+
+    if (isCardMode) {
+      const cardError = validateCardPayment(card, t);
+      if (cardError) {
+        setFormError(cardError);
+        return;
+      }
     }
 
     setSubmitting(true);
     setFormError('');
 
     try {
-      const result = await api.createReservation({
+      const payload = {
         item_type: itemType,
         item_id: itemId,
         item_name: itemName,
@@ -120,9 +158,17 @@ export default function BookingSheet({
         unit_price: unitPrice,
         price_per_person: pricePerPerson,
         price_estimate: totalPrice,
+        payment_method: form.payment,
         gdpr_consent: true,
         website: form.website,
-      });
+      };
+
+      if (isCardMode) {
+        Object.assign(payload, cardPaymentMeta(card));
+      }
+
+      const result = await api.createReservation(payload);
+      setPaidWithCard(isCardMode);
       setBookingRef({
         referenceCode: result.referenceCode,
         accessToken: result.accessToken,
@@ -153,8 +199,8 @@ export default function BookingSheet({
                 <Icon name="Check" size={30} strokeWidth={2.5} />
               </div>
             </div>
-            <h2>{t('place_form_success_title')}</h2>
-            <p>{t('place_form_success_text')}</p>
+            <h2>{paidWithCard ? t('booking_card_success_title') : t('place_form_success_title')}</h2>
+            <p>{paidWithCard ? t('booking_card_success_text') : t('place_form_success_text')}</p>
             {bookingRef && (
               <div className="booking-sheet__ref">
                 <p>
@@ -211,6 +257,46 @@ export default function BookingSheet({
                 <small>DA</small>
               </strong>
             </div>
+
+            <section
+              className="booking-pay-mode"
+              style={{ '--bf-delay': '180ms' }}
+              aria-labelledby="booking-pay-mode-title"
+            >
+              <div className="booking-pay-mode__head">
+                <h3 id="booking-pay-mode-title">{t('booking_pay_mode_title')}</h3>
+                <p>{t('booking_pay_mode_lead')}</p>
+              </div>
+
+              <div className="booking-pay-mode__grid" role="radiogroup" aria-label={t('booking_pay_mode_title')}>
+                {PAYMENT_MODES.map((mode) => {
+                  const selected = form.payment === mode.id;
+                  return (
+                    <button
+                      key={mode.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      className={`booking-pay-mode__card booking-pay-mode__card--${mode.accent} ${selected ? 'is-selected' : ''}`}
+                      onClick={() => setPaymentMode(mode.id)}
+                    >
+                      <span className="booking-pay-mode__glow" aria-hidden="true" />
+                      <span className="booking-pay-mode__icon-wrap" aria-hidden="true">
+                        <Icon name={mode.icon} size={26} strokeWidth={1.6} />
+                      </span>
+                      <span className="booking-pay-mode__content">
+                        <strong>{t(`booking_pay_${mode.id}`)}</strong>
+                        <span>{t(`booking_pay_${mode.id}_desc`)}</span>
+                        <em className="booking-pay-mode__badge">{t(`booking_pay_${mode.id}_badge`)}</em>
+                      </span>
+                      <span className="booking-pay-mode__tick" aria-hidden="true">
+                        {selected && <Icon name="Check" size={14} strokeWidth={3} />}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             <form className="booking-sheet__form" onSubmit={onSubmit}>
               <input
@@ -329,7 +415,7 @@ export default function BookingSheet({
                 )}
               </div>
 
-              <BookingField icon="MessageSquare" label={t('place_form_message')} delay={280}>
+              <BookingField icon="MessageSquare" label={t('place_form_message')} delay={300}>
                 <textarea
                   name="message"
                   rows={3}
@@ -340,7 +426,16 @@ export default function BookingSheet({
                 />
               </BookingField>
 
-              <label className="booking-sheet__gdpr" style={{ '--bf-delay': '320ms' }}>
+              {isCardMode && (
+                <CardPaymentForm
+                  card={card}
+                  onChange={setCard}
+                  t={t}
+                  totalPrice={totalPrice}
+                />
+              )}
+
+              <label className="booking-sheet__gdpr" style={{ '--bf-delay': '340ms' }}>
                 <input
                   type="checkbox"
                   checked={gdpr}
@@ -361,9 +456,9 @@ export default function BookingSheet({
 
               <button
                 type="submit"
-                className={`booking-sheet__submit ${submitting ? 'is-loading' : ''}`}
+                className={`booking-sheet__submit ${submitting ? 'is-loading' : ''} ${isCardMode ? 'is-card' : ''}`}
                 disabled={submitting}
-                style={{ '--bf-delay': '360ms' }}
+                style={{ '--bf-delay': '380ms' }}
               >
                 <span className="booking-sheet__submit-shine" aria-hidden="true" />
                 {submitting ? (
@@ -373,8 +468,8 @@ export default function BookingSheet({
                   </>
                 ) : (
                   <>
-                    {t('place_form_submit')}
-                    <Icon name="Send" size={16} />
+                    {submitLabel}
+                    <Icon name={isCardMode ? 'CreditCard' : 'Send'} size={16} />
                   </>
                 )}
               </button>
