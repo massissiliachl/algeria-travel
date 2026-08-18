@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { LangProvider } from './hooks/useLangHook';
 import { NotificationProvider } from './hooks/useNotifications';
 import { useRevealOnScroll } from './hooks/useRevealOnScroll';
@@ -61,13 +62,15 @@ function App() {
   }, []);
 
   return (
-    <LangProvider>
-      <NotificationProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </NotificationProvider>
-    </LangProvider>
+    <HelmetProvider>
+      <LangProvider>
+        <NotificationProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </NotificationProvider>
+      </LangProvider>
+    </HelmetProvider>
   );
 }
 

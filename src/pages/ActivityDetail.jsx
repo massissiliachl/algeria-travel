@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { useLang } from '../hooks/useLangHook';
 import { ACTIVITIES, ACTIVITY_CATEGORIES } from '../data/activities';
 import Icon from '../components/ui/Icon';
+import SeoHead from '../components/SeoHead';
 import './ActivityDetail.css';
 
 const ActivityDetail = () => {
@@ -42,6 +43,9 @@ const ActivityDetail = () => {
   const cat = ACTIVITY_CATEGORIES[activity.category];
   const gallery = activity.gallery?.length ? activity.gallery : [activity.image];
   const included = pick(activity.included, activity.included_en, activity.included_ar) || [];
+  const seoTitle = pick(activity.name, activity.name_en, activity.name_ar);
+  const seoDesc = pick(activity.fullDesc, activity.fullDesc_en, activity.fullDesc_ar)
+    || pick(activity.desc, activity.desc_en, activity.desc_ar);
 
   const tabs = [
     { key: 'overview', label: t('act_page_tab_overview') },
@@ -64,6 +68,12 @@ const ActivityDetail = () => {
 
   return (
     <div className="act-page">
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        path={`/activity/${activity.id}`}
+        image={activity.image}
+      />
       <Navbar />
 
       <section className="act-page-hero">

@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
+import SeoHead from '../components/SeoHead';
 import './Gallery.css';
 
 const FALLBACK_IMAGES = [
@@ -265,6 +266,12 @@ const Gallery = () => {
 
   return (
     <div className={`gal ${ready ? 'is-ready' : ''}`}>
+      <SeoHead
+        title={t('seo_gallery_title')}
+        description={t('seo_gallery_desc')}
+        path="/gallery"
+        image={heroImage}
+      />
       <Navbar />
 
       <header className="gal-hero" ref={heroRef}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { BrandIcon } from '../components/icons';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -26,9 +27,18 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={onSubmit}>
-        <h1>Administration</h1>
-        <p>Connectez-vous avec votre clé admin (ADMIN_API_KEY du backend).</p>
+        <div className="login-brand">
+          <div className="login-brand-icon">
+            <BrandIcon size={28} />
+          </div>
+          <h1>Administration</h1>
+          <p className="login-subtitle">
+            Connectez-vous avec votre clé admin pour accéder au panneau de gestion.
+          </p>
+        </div>
+
         {error && <div className="alert alert-error">{error}</div>}
+
         <div className="field">
           <label htmlFor="key">Clé admin</label>
           <input
@@ -41,7 +51,13 @@ export default function LoginPage() {
             autoFocus
           />
         </div>
-        <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 16 }} disabled={loading}>
+
+        <button
+          type="submit"
+          className="btn btn-primary"
+          style={{ width: '100%', marginTop: 20, justifyContent: 'center' }}
+          disabled={loading}
+        >
           {loading ? 'Connexion…' : 'Se connecter'}
         </button>
       </form>

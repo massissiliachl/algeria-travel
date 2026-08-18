@@ -7,6 +7,7 @@ import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
 import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './Destinations.css';
 
@@ -36,6 +37,12 @@ export default function Destinations() {
 
   return (
     <div className="acts-page dest-page">
+      <SeoHead
+        title={t('seo_destinations_title')}
+        description={t('seo_destinations_desc')}
+        path="/destinations"
+        image="/images/djanet.jpeg"
+      />
       <Navbar />
 
       <section className="acts-hero">

@@ -11,6 +11,7 @@ import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
 import { getPlaceById, PLACES } from '../data/places';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './PlaceDetail.css';
 
@@ -199,6 +200,12 @@ const PlaceDetail = () => {
 
   return (
     <div className="acts-page place-page has-mobile-bar">
+      <SeoHead
+        title={placeName}
+        description={pick(place.description, place.description_en, place.description_ar)}
+        path={`/place/${place.id}`}
+        image={place.image}
+      />
       <Navbar />
 
       <section className="place-hero">

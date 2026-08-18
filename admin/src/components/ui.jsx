@@ -32,6 +32,15 @@ export function PageHeader({ title, subtitle, action }) {
   );
 }
 
+export function LoadingState({ label = 'Chargement…' }) {
+  return (
+    <div className="loading-state">
+      <div className="loading-spinner" aria-hidden="true" />
+      <span>{label}</span>
+    </div>
+  );
+}
+
 export function Field({ label, children, className = '' }) {
   return (
     <div className={`field ${className}`}>

@@ -13,6 +13,7 @@ import {
   STAY_TYPES,
   filterStays,
 } from '../data/stays';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './Stays.css';
 
@@ -96,6 +97,12 @@ const Stays = () => {
 
   return (
     <div className={`acts-page stays-page${selected ? ' has-mobile-bar' : ''}`}>
+      <SeoHead
+        title={t('seo_stays_title')}
+        description={t('seo_stays_desc')}
+        path="/stays"
+        image={heroSrc}
+      />
       <Navbar />
 
       <section className="acts-hero">

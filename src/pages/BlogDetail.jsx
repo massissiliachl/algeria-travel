@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { getBlogPostBySlug, getRelatedBlogPosts } from '../data/blog';
+import SeoHead from '../components/SeoHead';
 import './Blog.css';
 import './BlogDetail.css';
 
@@ -37,9 +38,17 @@ const BlogDetail = () => {
   const paragraphs = body.split(/\n\n+/).filter(Boolean);
   const gallery = post.gallery?.length ? post.gallery : [post.image];
   const related = getRelatedBlogPosts(post, 3);
+  const seoTitle = pick(post.title, post.title_en, post.title_ar);
+  const seoDesc = pick(post.excerpt, post.excerpt_en, post.excerpt_ar);
 
   return (
     <div className="blog-detail-page">
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        path={`/blog/${post.slug}`}
+        image={post.image}
+      />
       <Navbar />
 
       <section className="blog-detail-hero">

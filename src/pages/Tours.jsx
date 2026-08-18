@@ -6,6 +6,7 @@ import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 
 const FILTERS = [
@@ -45,6 +46,12 @@ const Tours = () => {
 
   return (
     <div className="acts-page">
+      <SeoHead
+        title={t('seo_tours_title')}
+        description={t('seo_tours_desc')}
+        path="/tours"
+        image="/images/home/circuits-4x4.png"
+      />
       <Navbar />
 
       <section className="acts-hero">

@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { searchCatalog } from '../data/search';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './SearchResults.css';
 
@@ -31,6 +32,12 @@ const SearchResults = () => {
 
   return (
     <div className="acts-page search-page">
+      <SeoHead
+        title={t('seo_search_title')}
+        description={t('seo_search_desc')}
+        path="/search"
+        noindex
+      />
       <Navbar />
 
       <section className="search-hero">

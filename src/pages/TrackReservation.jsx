@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
+import SeoHead from '../components/SeoHead';
 import './TrackReservation.css';
 
 const STATUS_KEYS = {
@@ -75,6 +76,12 @@ const TrackReservation = () => {
 
   return (
     <div className="track-page">
+      <SeoHead
+        title={t('seo_track_title')}
+        description={t('seo_track_desc')}
+        path="/suivi"
+        noindex
+      />
       <Navbar />
 
       <section className="track-hero">

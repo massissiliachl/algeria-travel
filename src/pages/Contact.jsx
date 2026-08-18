@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
+import SeoHead from '../components/SeoHead';
 import './Contact.css';
 
 const EMAILS = [
@@ -65,6 +66,12 @@ const Contact = () => {
 
   return (
     <div className={`ct-page ${visible ? 'is-ready' : ''}`}>
+      <SeoHead
+        title={t('seo_contact_title')}
+        description={t('seo_contact_desc')}
+        path="/contact"
+        image="/images/bejaia.jpeg"
+      />
       <Navbar />
 
       <section className="ct-hero">

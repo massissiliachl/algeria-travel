@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { BLOG_POSTS, BLOG_FILTERS } from '../data/blog';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './Blog.css';
 
@@ -21,6 +22,12 @@ const Blog = () => {
 
   return (
     <div className="acts-page blog-page">
+      <SeoHead
+        title={t('seo_blog_title')}
+        description={t('seo_blog_desc')}
+        path="/blog"
+        image="/images/hero.jpeg"
+      />
       <Navbar />
 
       <section className="acts-hero blog-hero">

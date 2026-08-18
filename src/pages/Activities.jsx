@@ -8,6 +8,7 @@ import { useLang } from '../hooks/useLangHook';
 import { ACTIVITIES, ACTIVITY_FILTERS } from '../data/activities';
 import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import SeoHead from '../components/SeoHead';
 import './Activities.css';
 
 const HERO_FEATURES = [
@@ -60,6 +61,12 @@ const Activities = () => {
 
   return (
     <div className="acts-page">
+      <SeoHead
+        title={t('seo_activities_title')}
+        description={t('seo_activities_desc')}
+        path="/activities"
+        image="/images/quad.jpg"
+      />
       <Navbar />
 
       <section className="acts-hero">
