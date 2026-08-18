@@ -534,3 +534,83 @@
     transform: none;
   }
 }
+
+.privacy-page .ct-hero--compact {
+  min-height: 280px;
+  background: linear-gradient(135deg, #1a2332, #2a3548);
+}
+
+.privacy-page .ct-breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.privacy-page .ct-breadcrumb a {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.privacy-body {
+  padding: 48px 0 72px;
+}
+
+.privacy-updated {
+  color: var(--ct-muted);
+  font-size: 0.88rem;
+  margin-bottom: 28px;
+}
+
+.privacy-section {
+  margin-bottom: 28px;
+}
+
+.privacy-section h2 {
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.25rem;
+  margin: 0 0 10px;
+}
+
+.privacy-section p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--ct-muted);
+}
+
+.privacy-contact {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(26, 35, 50, 0.1);
+}
+
+.privacy-contact a {
+  color: var(--ct-gold);
+  font-weight: 600;
+}
+
+.booking-gdpr {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #3a3835;
+  cursor: pointer;
+}
+
+.booking-gdpr input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.booking-gdpr a {
+  color: var(--ct-gold);
+  font-weight: 600;
+}
+
+.place-form__honeypot {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
+}

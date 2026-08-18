@@ -6,6 +6,7 @@ import { useLang } from '../hooks/useLangHook';
 import { ACTIVITIES, ACTIVITY_CATEGORIES } from '../data/activities';
 import Icon from '../components/ui/Icon';
 import SeoHead from '../components/SeoHead';
+import BookingSheet from '../components/booking/BookingSheet';
 import './ActivityDetail.css';
 
 const ActivityDetail = () => {
@@ -15,8 +16,7 @@ const ActivityDetail = () => {
   const [activity, setActivity] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [tab, setTab] = useState('overview');
-  const [date, setDate] = useState('');
-  const [people, setPeople] = useState(2);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     const found = ACTIVITIES.find((a) => a.id === id);
@@ -55,14 +55,10 @@ const ActivityDetail = () => {
 
   const handleReserve = (e) => {
     e.preventDefault();
-    if (!date) {
-      alert(t('act_modal_date_required'));
-      return;
-    }
-    alert(
-      `${t('act_modal_booked')}\n${pick(activity.name, activity.name_en, activity.name_ar)}\n${date} — ${people} ${t('act_modal_people')}`
-    );
+    setBookingOpen(true);
   };
+
+  const activityName = pick(activity.name, activity.name_en, activity.name_ar);
 
   const others = ACTIVITIES.filter((a) => a.id !== activity.id).slice(0, 3);
 
@@ -209,18 +205,6 @@ const ActivityDetail = () => {
               <em>{t('act_modal_per_person')}</em>
             </div>
             <form onSubmit={handleReserve}>
-              <label>
-                {t('act_modal_choose_date')}
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-              </label>
-              <label>
-                {t('act_modal_people')}
-                <select value={people} onChange={(e) => setPeople(Number(e.target.value))}>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </select>
-              </label>
               <button type="submit" className="act-page-book__btn">{t('btn_reserver')}</button>
             </form>
             <Link to="/contact" className="act-page-book__link">
@@ -229,6 +213,17 @@ const ActivityDetail = () => {
           </div>
         </aside>
       </div>
+
+      <BookingSheet
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        itemType="activity"
+        itemId={activity.id}
+        itemName={activityName}
+        unitPrice={activity.price}
+        pricePerPerson
+        titleEm={activityName}
+      />
 
       <Footer />
     </div>

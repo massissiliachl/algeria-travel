@@ -165,7 +165,7 @@ const Footer = () => {
           </p>
           <div className="site-footer__legal">
             <Link to="/contact">{t('footer_legal')}</Link>
-            <Link to="/contact">{t('footer_privacy')}</Link>
+            <Link to="/privacy">{t('footer_privacy')}</Link>
           </div>
         </div>
       </div>

@@ -5,10 +5,9 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import ResponsiveImage from '../components/ui/ResponsiveImage';
 import MobileBookingBar from '../components/ui/MobileBookingBar';
-import BottomSheet from '../components/ui/BottomSheet';
 import ImageLightbox from '../components/ui/ImageLightbox';
+import BookingSheet from '../components/booking/BookingSheet';
 import { useLang } from '../hooks/useLangHook';
-import { api } from '../services/api';
 import { getPlaceById, PLACES } from '../data/places';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities';
 import SeoHead from '../components/SeoHead';
@@ -33,20 +32,6 @@ const PlaceDetail = () => {
 
   const [bookingOpen, setBookingOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  const [sent, setSent] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [bookingRef, setBookingRef] = useState(null);
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    date: searchParams.get('dates') || '',
-    travelers: searchParams.get('travelers') || '2',
-    stay: '',
-    message: '',
-    website: '',
-  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -72,20 +57,6 @@ const PlaceDetail = () => {
   }, [place, navigate, id, searchParams]);
 
   useEffect(() => {
-    setForm((prev) => ({
-      ...prev,
-      date: searchParams.get('dates') || prev.date,
-      travelers: searchParams.get('travelers') || prev.travelers,
-      stay:
-        id === 'taghit'
-          ? searchParams.get('pkg') === 'guesthouse'
-            ? 'guesthouse'
-            : 'hotel'
-          : prev.stay,
-    }));
-  }, [searchParams, id]);
-
-  useEffect(() => {
     document.body.style.overflow = bookingOpen || lightboxIndex != null ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
@@ -97,9 +68,7 @@ const PlaceDetail = () => {
   const isPerPerson = place.id === 'taghit' || place.pricePerPerson;
   const priceLabel = isPerPerson ? t('home_v2_coup_per_person') : t('acts_from');
   const placeName = pick(place.name, place.name_en, place.name_ar);
-  const whyItems = place.whyVisit?.length
-    ? place.whyVisit
-    : place.highlights || [];
+  const whyItems = place.whyVisit?.length ? place.whyVisit : place.highlights || [];
   const gallery = place.gallery?.length ? place.gallery : [place.image];
   const region = pick(
     place.region || `${placeName}, Algérie`,
@@ -139,64 +108,9 @@ const PlaceDetail = () => {
     { icon: 'Users', label: t('place_fact_travelers'), value: audience },
   ];
 
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.date) return;
-
-    setSubmitting(true);
-    setFormError('');
-
-    try {
-      const result = await api.createReservation({
-        item_type: 'place',
-        item_id: place.id,
-        item_name: placeName,
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        travel_date: form.date,
-        travelers: Number(form.travelers),
-        stay_type: form.stay || null,
-        message: form.message,
-        price_estimate: place.price,
-        website: form.website,
-      });
-      setBookingRef({
-        referenceCode: result.referenceCode,
-        accessToken: result.accessToken,
-      });
-      setSent(true);
-    } catch (err) {
-      setFormError(err.message || 'Une erreur est survenue.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const closeBooking = () => {
-    setBookingOpen(false);
-    setSent(false);
-    setFormError('');
-    setBookingRef(null);
-    setSubmitting(false);
-    setForm({
-      name: '',
-      email: '',
-      phone: '',
-      date: '',
-      travelers: '2',
-      stay: '',
-      message: '',
-      website: '',
-    });
-  };
-
   const similar = PLACES.filter((p) => p.id !== place.id).slice(0, 3);
+  const stayField = id === 'taghit' ? 'hotel-only' : 'full';
+  const defaultStay = id === 'taghit' ? 'hotel' : '';
 
   return (
     <div className="acts-page place-page has-mobile-bar">
@@ -513,162 +427,18 @@ const PlaceDetail = () => {
         />
       )}
 
-      <BottomSheet
+      <BookingSheet
         open={bookingOpen}
-        onClose={closeBooking}
-        titleId="place-book-title"
-        panelClassName="place-modal__panel"
-        className="place-modal bottom-sheet"
-      >
-        {sent ? (
-          <div className="place-modal__success">
-            <div className="place-modal__success-icon">
-              <Icon name="Check" size={28} />
-            </div>
-            <h2>{t('place_form_success_title')}</h2>
-            <p>{t('place_form_success_text')}</p>
-            {bookingRef && (
-              <div className="place-modal__ref">
-                <p>
-                  <strong>{t('place_form_ref_label')}</strong>{' '}
-                  <code>{bookingRef.referenceCode}</code>
-                </p>
-                <p className="place-modal__ref-hint">{t('place_form_ref_hint')}</p>
-                <details>
-                  <summary>{t('place_form_token_toggle')}</summary>
-                  <code className="place-modal__token">{bookingRef.accessToken}</code>
-                </details>
-                <Link
-                  to={`/suivi?ref=${encodeURIComponent(bookingRef.referenceCode)}`}
-                  className="place-modal__track-link"
-                >
-                  {t('place_form_track_link')}
-                </Link>
-              </div>
-            )}
-            <button type="button" onClick={closeBooking}>
-              {t('place_form_close')}
-            </button>
-          </div>
-        ) : (
-          <>
-            <p className="place-modal__eyebrow">{t('place_form_eyebrow')}</p>
-            <h2 id="place-book-title">
-              {t('place_form_title')} <em>{placeName}</em>
-            </h2>
-            <p className="place-modal__lead">{t('place_form_lead')}</p>
-
-            <form className="place-form" onSubmit={onSubmit}>
-              <input
-                type="text"
-                name="website"
-                value={form.website}
-                onChange={onChange}
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                className="place-form__honeypot"
-              />
-              {formError && (
-                <p className="place-form__error" role="alert">
-                  {formError}
-                </p>
-              )}
-              <div className="place-form__row">
-                <label>
-                  {t('place_form_name')}
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={onChange}
-                    required
-                    placeholder={t('place_form_name_ph')}
-                  />
-                </label>
-                <label>
-                  {t('place_form_email')}
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={onChange}
-                    required
-                    placeholder={t('place_form_email_ph')}
-                  />
-                </label>
-              </div>
-              <div className="place-form__row">
-                <label>
-                  {t('place_form_phone')}
-                  <input
-                    name="phone"
-                    value={form.phone}
-                    onChange={onChange}
-                    placeholder={t('place_form_phone_ph')}
-                  />
-                </label>
-                <label>
-                  {t('place_form_date')}
-                  <input
-                    type="date"
-                    name="date"
-                    value={form.date}
-                    onChange={onChange}
-                    required
-                  />
-                </label>
-              </div>
-              <div className="place-form__row">
-                <label>
-                  {t('place_form_travelers')}
-                  <select
-                    name="travelers"
-                    value={form.travelers}
-                    onChange={onChange}
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                      <option key={n} value={n}>
-                        {n}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  {t('place_form_stay')}
-                  <select name="stay" value={form.stay || (id === 'taghit' ? 'hotel' : '')} onChange={onChange}>
-                    {id !== 'taghit' && (
-                      <option value="">{t('place_form_stay_ph')}</option>
-                    )}
-                    <option value="hotel">{t('place_form_stay_hotel')}</option>
-                    {id !== 'taghit' && (
-                      <>
-                        <option value="guesthouse">
-                          {t('place_form_stay_guest')}
-                        </option>
-                        <option value="camp">{t('place_form_stay_camp')}</option>
-                      </>
-                    )}
-                  </select>
-                </label>
-              </div>
-              <label>
-                {t('place_form_message')}
-                <textarea
-                  name="message"
-                  rows={4}
-                  value={form.message}
-                  onChange={onChange}
-                  placeholder={t('place_form_message_ph')}
-                />
-              </label>
-              <button type="submit" className="place-form__submit" disabled={submitting}>
-                {submitting ? t('place_form_sending') : t('place_form_submit')}{' '}
-                {!submitting && <Icon name="Send" size={16} />}
-              </button>
-            </form>
-          </>
-        )}
-      </BottomSheet>
+        onClose={() => setBookingOpen(false)}
+        itemType="place"
+        itemId={place.id}
+        itemName={placeName}
+        unitPrice={place.price}
+        pricePerPerson={isPerPerson}
+        stayField={stayField}
+        defaultStay={defaultStay}
+        titleEm={placeName}
+      />
 
       <Footer />
     </div>

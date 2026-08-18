@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
@@ -14,11 +14,11 @@ import {
   filterStays,
 } from '../data/stays';
 import SeoHead from '../components/SeoHead';
+import BookingSheet from '../components/booking/BookingSheet';
 import './Activities.css';
 import './Stays.css';
 
 const Stays = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t, pick } = useLang();
@@ -47,6 +47,7 @@ const Stays = () => {
 
   const [selectedId, setSelectedId] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -231,7 +232,10 @@ const Stays = () => {
 
       <BottomSheet
         open={!!selected}
-        onClose={() => setSelectedId(null)}
+        onClose={() => {
+          setSelectedId(null);
+          setBookingOpen(false);
+        }}
         ariaLabel={selected ? pick(selected.name, selected.name_en, selected.name_ar) : undefined}
         panelClassName="stays-detail__panel"
         className="stays-detail bottom-sheet"
@@ -305,16 +309,16 @@ const Stays = () => {
                 <button
                   type="button"
                   className="premium-btn premium-btn--primary"
-                  onClick={() => whatsapp(selected)}
+                  onClick={() => setBookingOpen(true)}
                 >
-                  <Icon name="MessageCircle" size={16} /> {t('stays_book_wa')}
+                  <Icon name="Send" size={16} /> {t('stays_book_online')}
                 </button>
                 <button
                   type="button"
                   className="premium-btn premium-btn--ghost"
-                  onClick={() => navigate('/contact')}
+                  onClick={() => whatsapp(selected)}
                 >
-                  {t('stays_contact')}
+                  <Icon name="MessageCircle" size={16} /> {t('stays_book_wa')}
                 </button>
               </div>
             </div>
@@ -326,10 +330,24 @@ const Stays = () => {
         <MobileBookingBar
           priceLabel={selected.pricePerPerson ? t('home_v2_coup_per_person') : t('acts_from')}
           price={`${selected.price.toLocaleString()} DA`}
-          ctaLabel={t('stays_book_wa')}
-          ctaIcon="MessageCircle"
-          onCta={() => whatsapp(selected)}
+          ctaLabel={t('stays_book_online')}
+          ctaIcon="Send"
+          onCta={() => setBookingOpen(true)}
           className="stays-mobile-bar"
+        />
+      )}
+
+      {selected && (
+        <BookingSheet
+          open={bookingOpen}
+          onClose={() => setBookingOpen(false)}
+          itemType="stay"
+          itemId={selected.id}
+          itemName={pick(selected.name, selected.name_en, selected.name_ar)}
+          unitPrice={selected.price}
+          pricePerPerson={Boolean(selected.pricePerPerson)}
+          defaultStay={selected.type === 'guesthouse' ? 'guesthouse' : 'hotel'}
+          titleEm={pick(selected.name, selected.name_en, selected.name_ar)}
         />
       )}
 

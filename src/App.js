@@ -18,6 +18,7 @@ import DestinationRedirect from './pages/DestinationRedirect';
 import SearchResults from './pages/SearchResults';
 import Stays from './pages/Stays';
 import TrackReservation from './pages/TrackReservation';
+import Privacy from './pages/Privacy';
 import WhatsAppButton from './components/WhatsAppButton';
 import CookieBanner from './components/CookieBanner';
 import NotificationOptIn from './components/NotificationOptIn';
@@ -46,6 +47,7 @@ function AppRoutes() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/InfoDestination" element={<Navigate to="/destinations" replace />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/suivi" element={<TrackReservation />} />
       </Routes>
       <WhatsAppButton />

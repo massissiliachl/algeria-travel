@@ -22,7 +22,9 @@ const Contact = () => {
     phone: '',
     subject: '',
     message: '',
+    website: '',
   });
+  const [gdpr, setGdpr] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -48,15 +50,20 @@ const Contact = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return;
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.message.trim()) return;
+    if (!gdpr) {
+      setError(t('booking_gdpr_required'));
+      return;
+    }
 
     setSending(true);
     setError('');
 
     try {
-      await api.sendContact(form);
+      await api.sendContact({ ...form, gdpr_consent: true });
       setSent(true);
-      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+      setForm({ name: '', email: '', phone: '', subject: '', message: '', website: '' });
+      setGdpr(false);
     } catch (err) {
       setError(err.message || 'Une erreur est survenue.');
     } finally {
@@ -117,6 +124,16 @@ const Contact = () => {
                 </div>
               ) : (
                 <form className="ct-form" onSubmit={onSubmit}>
+                  <input
+                    type="text"
+                    name="website"
+                    value={form.website}
+                    onChange={onChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="place-form__honeypot"
+                  />
                   <div className="ct-form__row">
                     <label>
                       {t('contact_label_name')}
@@ -142,12 +159,13 @@ const Contact = () => {
                   </div>
                   <div className="ct-form__row">
                     <label>
-                      {t('contact_label_phone')}
+                      {t('contact_label_phone')} *
                       <input
                         type="tel"
                         name="phone"
                         value={form.phone}
                         onChange={onChange}
+                        required
                         placeholder={t('contact_placeholder_phone')}
                       />
                     </label>
@@ -181,6 +199,21 @@ const Contact = () => {
                       required
                       placeholder={t('contact_placeholder_message')}
                     />
+                  </label>
+                  <label className="booking-gdpr">
+                    <input
+                      type="checkbox"
+                      checked={gdpr}
+                      onChange={(e) => setGdpr(e.target.checked)}
+                      required
+                    />
+                    <span>
+                      {t('booking_gdpr_prefix')}{' '}
+                      <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+                        {t('footer_privacy')}
+                      </Link>
+                      . *
+                    </span>
                   </label>
                   {error ? (
                     <p className="ct-error" role="alert">

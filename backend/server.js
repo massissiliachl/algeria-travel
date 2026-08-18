@@ -21,6 +21,7 @@ app.use(
 app.use(express.json());
 
 app.use('/api/reservations', reservationsRoutes);
+app.use('/api/contact', require('./routes/contact'));
 app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin', require('./routes/admin/content'));

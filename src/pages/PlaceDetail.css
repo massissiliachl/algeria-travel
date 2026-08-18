@@ -1088,6 +1088,61 @@
   pointer-events: none;
 }
 
+.booking-price-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f6f5f2;
+  border: 1px solid rgba(26, 35, 50, 0.08);
+}
+
+.booking-price-summary span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b6560;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.booking-price-summary strong {
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.25rem;
+  color: #1a2332;
+}
+
+.booking-price-summary strong small {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6b6560;
+}
+
+.booking-gdpr {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #3a3835;
+  cursor: pointer;
+}
+
+.booking-gdpr input {
+  margin-top: 3px;
+  flex-shrink: 0;
+  width: auto;
+}
+
+.booking-gdpr a {
+  color: #b8935d;
+  font-weight: 600;
+}
+
 .place-modal__ref {
   margin: 16px 0 12px;
   padding: 14px 16px;

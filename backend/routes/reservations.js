@@ -3,6 +3,12 @@ const { query } = require('../config/db');
 const { createRateLimiter } = require('../middleware/rateLimit');
 const { generateReferenceCode, generateAccessToken, hashAccessToken } = require('../lib/reservationTokens');
 const { validateReservationItem } = require('../lib/validateReservationItem');
+const { isValidPhone } = require('../lib/phone');
+const { calcBookingTotal } = require('../lib/bookingPrice');
+const {
+  sendReservationClientEmail,
+  sendReservationAdminEmail,
+} = require('../lib/reservationEmails');
 
 const router = express.Router();
 
@@ -83,11 +89,13 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       travelers = 1,
       stay_type: stayType,
       message,
+      unit_price: unitPrice,
+      price_per_person: pricePerPerson,
       price_estimate: priceEstimate,
+      gdpr_consent: gdprConsent,
       website,
     } = req.body;
 
-    // Honeypot anti-bot : champ caché rempli = rejet silencieux
     if (website?.trim()) {
       return res.status(201).json({
         success: true,
@@ -101,6 +109,18 @@ router.post('/', reservationLimiter, async (req, res, next) => {
 
     if (!name?.trim() || !email?.trim() || !travelDate) {
       return res.status(400).json({ error: 'Nom, email et date de voyage sont requis.' });
+    }
+
+    if (!phone?.trim()) {
+      return res.status(400).json({ error: 'Le numéro de téléphone est requis.' });
+    }
+
+    if (!isValidPhone(phone)) {
+      return res.status(400).json({ error: 'Numéro de téléphone invalide (8 chiffres minimum).' });
+    }
+
+    if (!gdprConsent) {
+      return res.status(400).json({ error: 'Vous devez accepter la politique de confidentialité.' });
     }
 
     if (!EMAIL_RE.test(email.trim())) {
@@ -138,6 +158,13 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'La date de voyage doit être dans le futur.' });
     }
 
+    const perPerson = Boolean(pricePerPerson);
+    const unit = unitPrice != null ? Number(unitPrice) : Number(priceEstimate);
+    const computedTotal = calcBookingTotal(unit, travelersCount, perPerson);
+    if (computedTotal == null) {
+      return res.status(400).json({ error: 'Prix estimé invalide.' });
+    }
+
     const referenceCode = await createUniqueReference();
     const accessToken = generateAccessToken();
     const accessTokenHash = hashAccessToken(accessToken);
@@ -146,21 +173,24 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       `insert into public.reservations (
         item_type, item_id, item_name,
         client_name, client_email, client_phone,
-        travel_date, travelers, stay_type, message, price_estimate,
+        travel_date, travelers, stay_type, message,
+        price_estimate, unit_price, price_per_person, gdpr_consent_at,
         reference_code, access_token_hash
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now(), $14, $15)`,
       [
         normalizedItemType,
         itemId.trim(),
         itemName.trim(),
         name.trim(),
         email.trim().toLowerCase(),
-        phone?.trim() || null,
+        phone.trim(),
         travelDate,
         travelersCount,
         normalizedStayType,
         message?.trim() || null,
-        priceEstimate != null ? Number(priceEstimate) : null,
+        computedTotal,
+        Number.isFinite(unit) ? Math.round(unit) : null,
+        perPerson,
         referenceCode,
         accessTokenHash,
       ]
@@ -168,11 +198,45 @@ router.post('/', reservationLimiter, async (req, res, next) => {
 
     console.log(`[Reservation] ${referenceCode} — ${itemName.trim()} (${email.trim()})`);
 
+    const emailPayload = {
+      email: email.trim().toLowerCase(),
+      name: name.trim(),
+      referenceCode,
+      itemName: itemName.trim(),
+      travelDate,
+      travelers: travelersCount,
+      priceEstimate: computedTotal,
+      accessToken,
+    };
+
+    const adminPayload = {
+      referenceCode,
+      itemType: normalizedItemType,
+      itemName: itemName.trim(),
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      travelDate,
+      travelers: travelersCount,
+      priceEstimate: computedTotal,
+      message: message?.trim() || null,
+    };
+
+    await Promise.all([
+      sendReservationClientEmail(emailPayload).catch((err) =>
+        console.warn('[Mail] Réservation client:', err.message)
+      ),
+      sendReservationAdminEmail(adminPayload).catch((err) =>
+        console.warn('[Mail] Réservation admin:', err.message)
+      ),
+    ]);
+
     res.status(201).json({
       success: true,
       message: 'Demande de réservation envoyée. Notre équipe vous recontacte sous 24h.',
       referenceCode,
       accessToken,
+      priceEstimate: computedTotal,
     });
   } catch (err) {
     if (err.message?.includes('relation "public.reservations" does not exist')) {
