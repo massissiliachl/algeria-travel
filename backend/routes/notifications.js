@@ -4,6 +4,8 @@ const {
   getVapidPublicKey,
   isPushConfigured,
   getFeedSince,
+  saveFcmToken,
+  removeFcmToken,
   saveSubscription,
   removeSubscription,
 } = require('../lib/notificationService');
@@ -38,6 +40,34 @@ router.get(
         createdAt: row.created_at,
       })),
     });
+  })
+);
+
+router.post(
+  '/subscribe-fcm',
+  asyncHandler(async (req, res) => {
+    const { token, lang, userAgent } = req.body || {};
+    if (!token?.trim()) {
+      return res.status(400).json({ error: 'Token FCM requis.' });
+    }
+
+    await saveFcmToken({
+      token: token.trim(),
+      lang: lang || 'fr',
+      userAgent: userAgent || null,
+    });
+
+    res.json({ success: true });
+  })
+);
+
+router.post(
+  '/unsubscribe-fcm',
+  asyncHandler(async (req, res) => {
+    const { token } = req.body || {};
+    if (!token) return res.status(400).json({ error: 'Token requis.' });
+    await removeFcmToken(token);
+    res.json({ success: true });
   })
 );
 

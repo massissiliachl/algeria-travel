@@ -45,6 +45,11 @@ export const api = {
     return request(`/api/notifications/feed${qs}`);
   },
   getNotificationVapidKey: () => request('/api/notifications/vapid-public-key'),
+  subscribeFcmToken: (token, lang, userAgent) =>
+    request('/api/notifications/subscribe-fcm', {
+      method: 'POST',
+      body: JSON.stringify({ token, lang, userAgent }),
+    }),
   subscribeNotifications: (subscription, lang) =>
     request('/api/notifications/subscribe', {
       method: 'POST',

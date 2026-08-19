@@ -1,9 +1,12 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { getToken, onMessage } from 'firebase/messaging';
 import { useLang } from './useLangHook';
 import { api } from '../services/api';
+import { FIREBASE_VAPID_KEY, getFirebaseMessaging } from '../firebase';
 
 const STORAGE_KEY = 'at_notify_last_seen';
 const OPTIN_KEY = 'at_notify_optin';
+const FCM_TOKEN_KEY = 'at_fcm_token';
 const POLL_MS = 3 * 60 * 1000;
 
 function isSecureContextForPush() {
@@ -11,15 +14,6 @@ function isSecureContextForPush() {
 }
 
 const NotificationContext = createContext(null);
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const raw = window.atob(base64);
-  const arr = new Uint8Array(raw.length);
-  for (let i = 0; i < raw.length; i += 1) arr[i] = raw.charCodeAt(i);
-  return arr;
-}
 
 function pickTitle(item, language) {
   if (language === 'en') return item.titleEn || item.titleFr;
@@ -44,8 +38,7 @@ export function NotificationProvider({ children }) {
   });
   const [items, setItems] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [vapidKey, setVapidKey] = useState(null);
-  const subscriptionRef = useRef(null);
+  const fcmTokenRef = useRef(null);
 
   const markAllRead = useCallback(() => {
     const now = new Date().toISOString();
@@ -58,24 +51,22 @@ export function NotificationProvider({ children }) {
   }, []);
 
   const showBrowserNotification = useCallback(
-    (item) => {
+    (title, body, link = '/') => {
       if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
-      const title = pickTitle(item, language);
-      const body = pickBody(item, language);
       try {
-        new Notification(title, {
+        const notification = new Notification(title, {
           body: body || '',
           icon: '/logo.png',
-          tag: `at-${item.id}`,
-        }).onclick = () => {
+        });
+        notification.onclick = () => {
           window.focus();
-          window.location.href = item.link || '/';
+          window.location.href = link;
         };
       } catch {
         /* ignore */
       }
     },
-    [language]
+    []
   );
 
   const fetchFeed = useCallback(async () => {
@@ -90,7 +81,13 @@ export function NotificationProvider({ children }) {
         const newItems = feed.filter((item) => new Date(item.createdAt) > new Date(since));
         if (newItems.length) {
           setUnreadCount((c) => c + newItems.length);
-          newItems.slice(0, 3).forEach(showBrowserNotification);
+          newItems.slice(0, 3).forEach((item) => {
+            showBrowserNotification(
+              pickTitle(item, language),
+              pickBody(item, language),
+              item.link || '/'
+            );
+          });
         }
       } else if (feed.length) {
         setUnreadCount(feed.length);
@@ -98,42 +95,46 @@ export function NotificationProvider({ children }) {
     } catch {
       /* API may be offline */
     }
-  }, [enabled, showBrowserNotification]);
+  }, [enabled, language, showBrowserNotification]);
 
-  const registerServiceWorker = useCallback(async () => {
-    if (!('serviceWorker' in navigator) || !isSecureContextForPush()) return null;
-    try {
-      return await navigator.serviceWorker.register('/sw.js');
-    } catch {
-      return null;
-    }
-  }, []);
-
-  const subscribePush = useCallback(async () => {
-    if (!isSecureContextForPush()) return false;
-    const reg = await registerServiceWorker();
-    if (!reg) return false;
-
-    let publicKey = vapidKey;
-    if (!publicKey) {
-      const info = await api.getNotificationVapidKey();
-      publicKey = info.publicKey;
-      setVapidKey(publicKey);
-      if (!publicKey) return false;
-    }
+  const registerFirebaseMessaging = useCallback(async () => {
+    if (!isSecureContextForPush() || !('serviceWorker' in navigator)) return false;
 
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') return false;
 
-    const subscription = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    await navigator.serviceWorker.ready;
+
+    const messaging = await getFirebaseMessaging();
+    if (!messaging) return false;
+
+    const token = await getToken(messaging, {
+      vapidKey: FIREBASE_VAPID_KEY,
+      serviceWorkerRegistration: registration,
     });
 
-    await api.subscribeNotifications(subscription.toJSON(), language);
-    subscriptionRef.current = subscription;
+    if (!token) return false;
+
+    await api.subscribeFcmToken(token, language, navigator.userAgent);
+    fcmTokenRef.current = token;
+    try {
+      localStorage.setItem(FCM_TOKEN_KEY, token);
+    } catch {
+      /* ignore */
+    }
+
+    onMessage(messaging, (payload) => {
+      const title =
+        payload.notification?.title || payload.data?.title || 'Algeria Travel';
+      const body = payload.notification?.body || payload.data?.body || '';
+      const link = payload.data?.link || '/';
+      showBrowserNotification(title, body, link);
+      fetchFeed();
+    });
+
     return true;
-  }, [language, registerServiceWorker, vapidKey]);
+  }, [fetchFeed, language, showBrowserNotification]);
 
   const enableNotifications = useCallback(async () => {
     try {
@@ -143,13 +144,14 @@ export function NotificationProvider({ children }) {
     }
     setEnabled(true);
 
+    let pushOk = false;
     if ('Notification' in window) {
-      await subscribePush();
+      pushOk = await registerFirebaseMessaging();
     }
 
     await fetchFeed();
-    return true;
-  }, [fetchFeed, subscribePush]);
+    return pushOk || true;
+  }, [fetchFeed, registerFirebaseMessaging]);
 
   const declineNotifications = useCallback(() => {
     try {
@@ -168,8 +170,10 @@ export function NotificationProvider({ children }) {
   }, [enabled, fetchFeed]);
 
   useEffect(() => {
-    api.getNotificationVapidKey().then((info) => setVapidKey(info.publicKey)).catch(() => {});
-  }, []);
+    if (!enabled || fcmTokenRef.current) return undefined;
+    registerFirebaseMessaging().catch(() => {});
+    return undefined;
+  }, [enabled, registerFirebaseMessaging]);
 
   return (
     <NotificationContext.Provider

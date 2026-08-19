@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLang } from '../hooks/useLangHook';
 import Icon from './ui/Icon';
+import NotificationEnableButton from './NotificationEnableButton';
 import './Footer.css';
 
 const FOOTER_LINKS = [
@@ -73,6 +74,7 @@ const Footer = () => {
               <Icon name="MessageCircle" size={18} />
               {t('footer_whatsapp')}
             </a>
+            <NotificationEnableButton />
           </div>
 
           <nav className="site-footer__nav" aria-label={t('footer_quick')}>
