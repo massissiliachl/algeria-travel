@@ -56,4 +56,21 @@ export const api = {
     request(`/api/admin/${resource}/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   remove: (resource, id) =>
     request(`/api/admin/${resource}/${id}`, { method: 'DELETE' }),
+
+  listMedia: () => request('/api/admin/media'),
+
+  uploadFile: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_BASE}/api/admin/media/upload`, {
+      method: 'POST',
+      headers: { 'x-admin-key': getKey() },
+      body: formData,
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Erreur upload (${res.status})`);
+    return data;
+  },
 };

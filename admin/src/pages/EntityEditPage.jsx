@@ -3,13 +3,16 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { FORM_CONFIGS } from '../config/entities';
 import { Field, PageHeader, parseJsonField, stringifyJson } from '../components/ui';
+import ImageField from '../components/ImageField';
+import GalleryField from '../components/GalleryField';
 
 function buildInitial(config) {
   const initial = {};
   config.sections.forEach((s) =>
     s.fields.forEach((f) => {
       if (f.type === 'checkbox') initial[f.name] = f.name === 'published';
-      else if (f.type === 'json') initial[f.name] = f.name === 'gallery' || f.name === 'filters' || f.name === 'places' || f.name === 'included' || f.name === 'activities' || f.name === 'itinerary' || f.name === 'includes' || f.name === 'highlights' ? '[]' : '{}';
+      else if (f.type === 'gallery') initial[f.name] = '[]';
+      else if (f.type === 'json') initial[f.name] = f.name === 'filters' || f.name === 'places' || f.name === 'included' || f.name === 'activities' || f.name === 'itinerary' || f.name === 'includes' || f.name === 'highlights' ? '[]' : '{}';
       else initial[f.name] = '';
     })
   );
@@ -21,7 +24,9 @@ function preparePayload(form, config) {
   const payload = { ...form };
   config.sections.forEach((s) =>
     s.fields.forEach((f) => {
-      if (f.type === 'json') {
+      if (f.type === 'gallery') {
+        payload[f.name] = parseJsonField(form[f.name], []);
+      } else if (f.type === 'json') {
         payload[f.name] = parseJsonField(form[f.name], f.name === 'amenities' || f.name === 'tags' ? {} : []);
       }
       if (f.type === 'number' && payload[f.name] !== '') {
@@ -56,7 +61,7 @@ export default function EntityEditPage() {
         const next = { ...data };
         config.sections.forEach((s) =>
           s.fields.forEach((f) => {
-            if (f.type === 'json') next[f.name] = stringifyJson(data[f.name]);
+            if (f.type === 'json' || f.type === 'gallery') next[f.name] = stringifyJson(data[f.name]);
             if (f.type === 'checkbox') next[f.name] = Boolean(data[f.name]);
             if (f.type === 'number' && data[f.name] != null) next[f.name] = data[f.name];
           })
@@ -115,7 +120,15 @@ export default function EntityEditPage() {
             <div className="form-grid">
               {section.fields.map((f) => (
                 <Field key={f.name} label={f.label} className={f.full ? 'full' : ''}>
-                  {f.type === 'textarea' || f.type === 'json' ? (
+                  {f.type === 'image' ? (
+                    <ImageField
+                      value={form[f.name] ?? ''}
+                      onChange={(url) => onChange(f.name, url)}
+                      required={f.required}
+                    />
+                  ) : f.type === 'gallery' ? (
+                    <GalleryField value={form[f.name] ?? '[]'} onChange={(val) => onChange(f.name, val)} />
+                  ) : f.type === 'textarea' || f.type === 'json' ? (
                     <textarea
                       rows={f.type === 'json' ? 6 : 4}
                       value={form[f.name] ?? ''}

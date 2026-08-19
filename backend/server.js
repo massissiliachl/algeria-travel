@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const { testConnection, closePool } = require('./config/db');
 const reservationsRoutes = require('./routes/reservations');
@@ -19,11 +20,13 @@ app.use(
   })
 );
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 app.use('/api/reservations', reservationsRoutes);
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/admin', require('./routes/admin/media'));
 app.use('/api/admin', require('./routes/admin/content'));
 app.use('/api', require('./routes/content'));
 
