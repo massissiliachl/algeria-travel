@@ -1,0 +1,27 @@
+.notify-ios-hint {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(184, 147, 93, 0.12);
+  border: 1px solid rgba(184, 147, 93, 0.28);
+  color: #3a3835;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.notify-ios-hint strong {
+  color: #1a2332;
+}
+
+.notify-ios-hint--footer {
+  margin-top: 12px;
+  max-width: 320px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.notify-ios-hint--footer strong {
+  color: #f3efe8;
+}

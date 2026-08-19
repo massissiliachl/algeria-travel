@@ -356,6 +356,8 @@
   "notify_enable_btn": "🔔 Enable notifications",
   "notify_optin_decline": "No thanks",
   "notify_optin_loading": "Enabling…",
+  "notify_ios_hint_label": "iPhone:",
+  "notify_ios_hint": "to receive our alerts, add this site to your Home Screen (Share ↑ → Add to Home Screen), then enable notifications.",
   "notify_bell_label": "Notifications",
   "notify_bell_title": "What's new",
   "notify_bell_empty": "No news yet.",

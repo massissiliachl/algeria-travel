@@ -250,6 +250,8 @@
   "notify_enable_btn": "🔔 تفعيل الإشعارات",
   "notify_optin_decline": "لا شكراً",
   "notify_optin_loading": "جاري التفعيل…",
+  "notify_ios_hint_label": "iPhone:",
+  "notify_ios_hint": "لتلقي تنبيهاتنا، أضف الموقع إلى الشاشة الرئيسية (مشاركة ↑ → على الشاشة الرئيسية)، ثم فعّل الإشعارات.",
   "notify_bell_label": "الإشعارات",
   "notify_bell_title": "المستجدات",
   "notify_bell_empty": "لا توجد مستجدات حالياً.",

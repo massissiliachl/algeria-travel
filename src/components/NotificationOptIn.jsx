@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Icon from './ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { useNotifications, shouldShowNotificationOptIn } from '../hooks/useNotifications';
+import IosNotificationHint from './IosNotificationHint';
 import './NotificationOptIn.css';
 
 const COOKIE_EVENT = 'at-cookie-accepted';
@@ -52,6 +53,7 @@ export default function NotificationOptIn() {
             <li>{t('notify_optin_gallery')}</li>
             <li>{t('notify_optin_blog')}</li>
           </ul>
+          <IosNotificationHint />
         </div>
         <div className="notify-optin__actions">
           <button type="button" className="notify-optin__btn notify-optin__btn--ghost" onClick={onDecline}>

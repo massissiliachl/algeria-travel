@@ -356,6 +356,8 @@
   "notify_enable_btn": "🔔 Activer les notifications",
   "notify_optin_decline": "Non merci",
   "notify_optin_loading": "Activation…",
+  "notify_ios_hint_label": "iPhone :",
+  "notify_ios_hint": "pour recevoir nos alertes, ajoutez le site à votre écran d'accueil (Partager ↑ → Sur l'écran d'accueil), puis activez les notifications.",
   "notify_bell_label": "Notifications",
   "notify_bell_title": "Nouveautés",
   "notify_bell_empty": "Aucune nouveauté pour le moment.",

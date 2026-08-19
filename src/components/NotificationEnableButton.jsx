@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLang } from '../hooks/useLangHook';
 import { useNotifications } from '../hooks/useNotifications';
+import IosNotificationHint from './IosNotificationHint';
 import './NotificationEnableButton.css';
 
 export default function NotificationEnableButton({ className = '' }) {
@@ -22,13 +23,16 @@ export default function NotificationEnableButton({ className = '' }) {
   };
 
   return (
-    <button
-      type="button"
-      className={`notify-enable-btn ${className}`.trim()}
-      onClick={onClick}
-      disabled={loading}
-    >
-      {loading ? t('notify_optin_loading') : t('notify_enable_btn')}
-    </button>
+    <>
+      <button
+        type="button"
+        className={`notify-enable-btn ${className}`.trim()}
+        onClick={onClick}
+        disabled={loading}
+      >
+        {loading ? t('notify_optin_loading') : t('notify_enable_btn')}
+      </button>
+      <IosNotificationHint className="notify-ios-hint--footer" />
+    </>
   );
 }
