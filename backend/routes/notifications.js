@@ -25,22 +25,29 @@ router.get(
   '/feed',
   asyncHandler(async (req, res) => {
     const since = req.query.since || null;
-    const items = await getFeedSince(since);
-    res.json({
-      items: items.map((row) => ({
-        id: row.id,
-        contentType: row.content_type,
-        contentId: row.content_id,
-        titleFr: row.title_fr,
-        titleEn: row.title_en,
-        titleAr: row.title_ar,
-        bodyFr: row.body_fr,
-        bodyEn: row.body_en,
-        bodyAr: row.body_ar,
-        link: row.link,
-        createdAt: row.created_at,
-      })),
-    });
+    try {
+      const items = await getFeedSince(since);
+      res.json({
+        items: items.map((row) => ({
+          id: row.id,
+          contentType: row.content_type,
+          contentId: row.content_id,
+          titleFr: row.title_fr,
+          titleEn: row.title_en,
+          titleAr: row.title_ar,
+          bodyFr: row.body_fr,
+          bodyEn: row.body_en,
+          bodyAr: row.body_ar,
+          link: row.link,
+          createdAt: row.created_at,
+        })),
+      });
+    } catch (err) {
+      if (err.message?.includes('site_notifications') || err.code === '42P01') {
+        return res.json({ items: [] });
+      }
+      throw err;
+    }
   })
 );
 
