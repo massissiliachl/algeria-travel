@@ -5,8 +5,10 @@ import './styles/premium.css';
 import './styles/responsive-ui.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { registerPushServiceWorker } from './utils/registerPushServiceWorker';
 
 document.documentElement.classList.add('js');
+registerPushServiceWorker();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

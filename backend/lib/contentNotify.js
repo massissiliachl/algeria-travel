@@ -62,7 +62,7 @@ async function notifyContentPublished(contentType, row) {
   const labels = TYPE_LABELS[contentType] || TYPE_LABELS.places;
   const name = pickName(row);
 
-  return publishNotification({
+  const result = await publishNotification({
     contentType,
     contentId: row.id || row.slug || '',
     titleFr: `${labels.fr} : ${name}`,
@@ -73,6 +73,12 @@ async function notifyContentPublished(contentType, row) {
     bodyAr: row.caption_ar || row.subtitle_ar || row.tagline_ar || row.description_ar?.slice(0, 120) || null,
     link: buildLink(contentType, row),
   });
+
+  console.log(
+    `[notify] ${contentType} publié — FCM: ${result.fcm?.sent || 0} envoyé(s), ${result.fcm?.failed || 0} échec(s), abonnés: ${result.fcm?.configured ? 'oui' : 'non'}`
+  );
+
+  return result;
 }
 
 module.exports = { notifyContentPublished, TYPE_LABELS, buildLink };

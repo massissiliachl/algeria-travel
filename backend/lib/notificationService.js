@@ -8,7 +8,8 @@ const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:Algeria.travel@gmail.
 const FIREBASE_VAPID_PUBLIC =
   process.env.FIREBASE_VAPID_PUBLIC_KEY ||
   'BEhwHkpMuA62eyXN2EzRn0TIZg8uC8bsU8OImw4E5skGnYCwTVgJ1QxQmbcmjaR6uQvXBnKPEgQAPvjjxBmfNt0';
-const SITE = process.env.SITE_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+const { resolveSiteUrl } = require('./siteUrl');
+const SITE = resolveSiteUrl();
 
 let vapidReady = false;
 
@@ -56,6 +57,7 @@ async function sendFcmToAll(notification) {
   const body = notification.body_fr || '';
   const link = notification.link || '/';
   const absoluteLink = link.startsWith('http') ? link : `${SITE}${link}`;
+  const icon = `${SITE}/icons/icon-192.png`;
 
   await Promise.all(
     result.rows.map(async (row) => {
@@ -70,9 +72,12 @@ async function sendFcmToAll(notification) {
             id: String(notification.id),
           },
           webpush: {
+            headers: { Urgency: 'high' },
             notification: {
-              icon: '/logo.png',
-              badge: '/logo.png',
+              title,
+              body,
+              icon,
+              badge: icon,
             },
             fcmOptions: { link: absoluteLink },
           },

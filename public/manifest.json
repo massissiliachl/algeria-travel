@@ -1,14 +1,28 @@
 {
   "short_name": "Algeria Travel",
   "name": "Algeria Travel — Voyages en Algérie",
+  "gcm_sender_id": "101759537014",
   "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
     {
       "src": "logo.svg",
       "type": "image/svg+xml",
       "sizes": "any"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#1A2332",
   "background_color": "#FFFFFF"

@@ -12,6 +12,7 @@ export default function NotificationOptIn() {
   const { enableNotifications, declineNotifications } = useNotifications();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const openIfNeeded = () => {
@@ -25,9 +26,27 @@ export default function NotificationOptIn() {
 
   const onAccept = async () => {
     setLoading(true);
-    await enableNotifications();
-    setLoading(false);
-    setVisible(false);
+    setError('');
+    try {
+      const result = await enableNotifications();
+      if (!result?.apiOk) {
+        setError(t('notify_api_offline'));
+        return;
+      }
+      if (!result?.pushOk) {
+        setError(
+          result?.error === 'ios_standalone_required'
+            ? t('notify_ios_hint')
+            : t('notify_push_failed')
+        );
+        return;
+      }
+      setVisible(false);
+    } catch (err) {
+      setError(err.message || t('notify_api_offline'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onDecline = () => {
@@ -54,6 +73,7 @@ export default function NotificationOptIn() {
             <li>{t('notify_optin_blog')}</li>
           </ul>
           <IosNotificationHint />
+          {error && <p className="notify-optin__error">{error}</p>}
         </div>
         <div className="notify-optin__actions">
           <button type="button" className="notify-optin__btn notify-optin__btn--ghost" onClick={onDecline}>

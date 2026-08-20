@@ -1,0 +1,37 @@
+# Render — 1 service Web : API + site React + admin
+# Dashboard → New → Blueprint → connecter le repo GitHub
+
+services:
+  - type: web
+    name: algeria-travel
+    runtime: node
+    buildCommand: npm install && npm run build:render && cd backend && npm install
+    startCommand: node backend/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVE_FRONTEND
+        value: true
+      - key: SERVE_ADMIN
+        value: true
+      - key: REACT_APP_API_URL
+        value: ""
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_API_KEY
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        value: algeria-travel
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: mailto:Algeria.travel@gmail.com

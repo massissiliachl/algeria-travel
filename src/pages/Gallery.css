@@ -284,6 +284,16 @@
   padding: clamp(28px, 5vw, 56px) clamp(14px, 2.5vw, 28px) clamp(48px, 7vw, 80px);
 }
 
+.gal-empty {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  text-align: center;
+  color: #6b6560;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
 .gal-bento {
   display: grid;
   grid-template-columns: repeat(12, 1fr);

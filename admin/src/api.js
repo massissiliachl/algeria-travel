@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL || '';
+import { resolveApiBase } from './utils/apiBase';
+
+const API_BASE = resolveApiBase();
 
 function getKey() {
   return sessionStorage.getItem('admin_key') || '';

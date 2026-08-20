@@ -1,4 +1,6 @@
-const API_BASE = process.env.REACT_APP_API_URL || '';
+import { resolveApiBase } from '../utils/apiBase';
+
+const API_BASE = resolveApiBase();
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {

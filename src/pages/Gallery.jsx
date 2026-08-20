@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
+import { resolveMediaUrl, MEDIA_PLACEHOLDER } from '../utils/mediaUrl';
 import SeoHead from '../components/SeoHead';
 import './Gallery.css';
 
@@ -49,9 +50,10 @@ function saveReactions(map) {
 function mergeWithReactions(apiItems, reactions) {
   return apiItems.map((item) => {
     const r = reactions[item.id] || {};
+    const src = item.src?.startsWith('/images/') ? item.src : resolveMediaUrl(item.src);
     return {
       id: item.id,
-      src: item.src,
+      src,
       alt: item.alt,
       captionFr: item.captionFr,
       likes: r.likes ?? 0,
@@ -59,6 +61,11 @@ function mergeWithReactions(apiItems, reactions) {
       comments: r.comments ?? [],
     };
   });
+}
+
+function onImgError(e) {
+  if (e.currentTarget.src.includes('logo.svg')) return;
+  e.currentTarget.src = MEDIA_PLACEHOLDER;
 }
 
 const Gallery = () => {
@@ -83,9 +90,12 @@ const Gallery = () => {
     api
       .getGallery()
       .then((items) => {
-        if (!Array.isArray(items) || !items.length) return;
         const rx = loadReactions();
         setReactions(rx);
+        if (!Array.isArray(items) || !items.length) {
+          setImages(mergeWithReactions(FALLBACK_IMAGES, rx));
+          return;
+        }
         setImages(mergeWithReactions(items, rx));
       })
       .catch(() => {
@@ -262,7 +272,7 @@ const Gallery = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIndex, images]);
 
-  const heroImage = images[3]?.src || '/images/sahara4.jpeg';
+  const heroImage = images[3]?.src || images[0]?.src || '/images/sahara4.jpeg';
 
   return (
     <div className={`gal ${ready ? 'is-ready' : ''}`}>
@@ -279,7 +289,7 @@ const Gallery = () => {
           className="gal-hero__media"
           style={{ transform: `translate3d(0, ${parallax}px, 0)` }}
         >
-          <img src={heroImage} alt="" />
+          <img src={heroImage} alt="" onError={onImgError} />
         </div>
         <div className="gal-hero__veil" />
         <div className="gal-hero__fluid" aria-hidden>
@@ -343,7 +353,7 @@ const Gallery = () => {
               }}
               aria-label={`${t('nav_gallery')} ${i + 1}`}
             >
-              <img src={image.src} alt={image.alt || ''} loading="lazy" />
+              <img src={image.src} alt={image.alt || ''} loading="lazy" onError={onImgError} />
               <span className="gal-cell__likes" aria-hidden>
                 <Icon name="Heart" size={12} />
                 <span>{image.likes}</span>
@@ -396,6 +406,7 @@ const Gallery = () => {
                 key={currentImage.id}
                 src={currentImage.src}
                 alt={currentImage.alt || ''}
+                onError={onImgError}
               />
               <div className="gal-burst" aria-hidden>
                 {burst.map((p) => (

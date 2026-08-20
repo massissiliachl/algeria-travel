@@ -3,6 +3,8 @@ import { getToken, onMessage } from 'firebase/messaging';
 import { useLang } from './useLangHook';
 import { api } from '../services/api';
 import { FIREBASE_VAPID_KEY, getFirebaseMessaging } from '../firebase';
+import { registerPushServiceWorker } from '../utils/registerPushServiceWorker';
+import { isIosSafariBrowser } from '../utils/isIosSafari';
 
 const STORAGE_KEY = 'at_notify_last_seen';
 const OPTIN_KEY = 'at_notify_optin';
@@ -39,6 +41,7 @@ export function NotificationProvider({ children }) {
   const [items, setItems] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const fcmTokenRef = useRef(null);
+  const onMessageBoundRef = useRef(false);
 
   const markAllRead = useCallback(() => {
     const now = new Date().toISOString();
@@ -56,7 +59,7 @@ export function NotificationProvider({ children }) {
       try {
         const notification = new Notification(title, {
           body: body || '',
-          icon: '/logo.png',
+          icon: '/icons/icon-192.png',
         });
         notification.onclick = () => {
           window.focus();
@@ -69,71 +72,112 @@ export function NotificationProvider({ children }) {
     []
   );
 
-  const fetchFeed = useCallback(async () => {
-    if (!enabled) return;
+  const fetchFeed = useCallback(async ({ force = false } = {}) => {
+    if (!enabled && !force) return true;
     try {
       const since = localStorage.getItem(STORAGE_KEY);
-      const data = await api.getNotificationFeed(since || undefined);
+      const data = await api.getNotificationFeed();
       const feed = data.items || [];
       setItems(feed);
 
       if (since) {
         const newItems = feed.filter((item) => new Date(item.createdAt) > new Date(since));
-        if (newItems.length) {
-          setUnreadCount((c) => c + newItems.length);
-          newItems.slice(0, 3).forEach((item) => {
-            showBrowserNotification(
-              pickTitle(item, language),
-              pickBody(item, language),
-              item.link || '/'
-            );
-          });
-        }
+        setUnreadCount(newItems.length);
+        newItems.slice(0, 3).forEach((item) => {
+          showBrowserNotification(
+            pickTitle(item, language),
+            pickBody(item, language),
+            item.link || '/'
+          );
+        });
       } else if (feed.length) {
         setUnreadCount(feed.length);
       }
-    } catch {
-      /* API may be offline */
+      return true;
+    } catch (err) {
+      console.warn('[notify] API feed indisponible:', err.message);
+      return false;
     }
   }, [enabled, language, showBrowserNotification]);
 
   const registerFirebaseMessaging = useCallback(async () => {
-    if (!isSecureContextForPush() || !('serviceWorker' in navigator)) return false;
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return false;
-
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-    await navigator.serviceWorker.ready;
-
-    const messaging = await getFirebaseMessaging();
-    if (!messaging) return false;
-
-    const token = await getToken(messaging, {
-      vapidKey: FIREBASE_VAPID_KEY,
-      serviceWorkerRegistration: registration,
-    });
-
-    if (!token) return false;
-
-    await api.subscribeFcmToken(token, language, navigator.userAgent);
-    fcmTokenRef.current = token;
-    try {
-      localStorage.setItem(FCM_TOKEN_KEY, token);
-    } catch {
-      /* ignore */
+    if (!isSecureContextForPush() || !('serviceWorker' in navigator)) {
+      console.warn('[notify] Contexte non sécurisé ou service worker indisponible.');
+      return false;
     }
 
-    onMessage(messaging, (payload) => {
-      const title =
-        payload.notification?.title || payload.data?.title || 'Algeria Travel';
-      const body = payload.notification?.body || payload.data?.body || '';
-      const link = payload.data?.link || '/';
-      showBrowserNotification(title, body, link);
-      fetchFeed();
-    });
+    if (typeof Notification === 'undefined') return false;
 
-    return true;
+    if (isIosSafariBrowser()) {
+      console.warn('[notify] iPhone : ouvrez le site depuis l’icône écran d’accueil.');
+      return { pushOk: false, apiOk: true, error: 'ios_standalone_required' };
+    }
+
+    if (Notification.permission === 'denied') {
+      console.warn('[notify] Notifications bloquées dans le navigateur.');
+      return false;
+    }
+
+    if (Notification.permission === 'default') {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.warn('[notify] Permission notifications refusée.');
+        return false;
+      }
+    }
+
+    try {
+      const registration = await registerPushServiceWorker();
+      if (!registration) return false;
+      await navigator.serviceWorker.ready;
+
+      const messaging = await getFirebaseMessaging();
+      if (!messaging) {
+        console.warn('[notify] Firebase Messaging non supporté sur ce navigateur.');
+        return false;
+      }
+
+      const token = await getToken(messaging, {
+        vapidKey: FIREBASE_VAPID_KEY,
+        serviceWorkerRegistration: registration,
+      });
+
+      if (!token) {
+        console.warn('[notify] Token FCM non obtenu.');
+        return false;
+      }
+
+      const stored = localStorage.getItem(FCM_TOKEN_KEY);
+      if (token !== fcmTokenRef.current || token !== stored) {
+        await api.subscribeFcmToken(token, language, navigator.userAgent);
+      }
+      fcmTokenRef.current = token;
+      try {
+        localStorage.setItem(FCM_TOKEN_KEY, token);
+      } catch {
+        /* ignore */
+      }
+
+      if (!onMessageBoundRef.current) {
+        onMessageBoundRef.current = true;
+        onMessage(messaging, (payload) => {
+          const title =
+            payload.notification?.title || payload.data?.title || 'Algeria Travel';
+          const body = payload.notification?.body || payload.data?.body || '';
+          const link = payload.data?.link || '/';
+          showBrowserNotification(title, body, link);
+          fetchFeed({ force: true });
+        });
+      }
+
+      return { pushOk: true, apiOk: true };
+    } catch (err) {
+      console.error('[notify] Échec abonnement FCM:', err);
+      if (err.message?.includes('404') || err.message?.includes('Erreur API')) {
+        return { pushOk: false, apiOk: false, error: 'api_offline' };
+      }
+      return { pushOk: false, apiOk: true, error: 'push_failed' };
+    }
   }, [fetchFeed, language, showBrowserNotification]);
 
   const enableNotifications = useCallback(async () => {
@@ -144,13 +188,20 @@ export function NotificationProvider({ children }) {
     }
     setEnabled(true);
 
-    let pushOk = false;
+    let result = { pushOk: false, apiOk: true, error: null };
     if ('Notification' in window) {
-      pushOk = await registerFirebaseMessaging();
+      const reg = await registerFirebaseMessaging();
+      if (typeof reg === 'object' && reg !== null) result = { ...result, ...reg };
+      else result.pushOk = Boolean(reg);
     }
 
-    await fetchFeed();
-    return pushOk || true;
+    const feedOk = await fetchFeed({ force: true });
+    if (!feedOk) {
+      result.apiOk = false;
+      result.error = result.error || 'api_offline';
+    }
+
+    return result;
   }, [fetchFeed, registerFirebaseMessaging]);
 
   const declineNotifications = useCallback(() => {
@@ -170,9 +221,20 @@ export function NotificationProvider({ children }) {
   }, [enabled, fetchFeed]);
 
   useEffect(() => {
-    if (!enabled || fcmTokenRef.current) return undefined;
+    if (!enabled) return undefined;
     registerFirebaseMessaging().catch(() => {});
     return undefined;
+  }, [enabled, registerFirebaseMessaging]);
+
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        registerFirebaseMessaging().catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', refresh);
+    return () => document.removeEventListener('visibilitychange', refresh);
   }, [enabled, registerFirebaseMessaging]);
 
   return (

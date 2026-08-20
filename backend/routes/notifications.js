@@ -1,5 +1,6 @@
 const express = require('express');
 const { asyncHandler } = require('../lib/asyncHandler');
+const { query } = require('../config/db');
 const {
   getVapidPublicKey,
   isPushConfigured,
@@ -57,7 +58,8 @@ router.post(
       userAgent: userAgent || null,
     });
 
-    res.json({ success: true });
+    const count = await query('select count(*)::int as n from public.fcm_tokens');
+    res.json({ success: true, subscribers: count.rows[0]?.n || 0 });
   })
 );
 
