@@ -26,6 +26,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://algeriatravel.com/hotels</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/guesthouses</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://algeriatravel.com/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -39,6 +49,11 @@
     <loc>https://algeriatravel.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://algeriatravel.com/place/bejaia</loc>
@@ -62,6 +77,36 @@
   </url>
   <url>
     <loc>https://algeriatravel.com/place/timimoun</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/place/alger</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/place/oran</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/place/jijel</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/place/annaba</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/place/tipaza</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://algeriatravel.com/place/tlemcen</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -68,6 +68,10 @@ const PlaceDetail = () => {
   const isPerPerson = place.id === 'taghit' || place.pricePerPerson;
   const priceLabel = isPerPerson ? t('home_v2_coup_per_person') : t('acts_from');
   const placeName = pick(place.name, place.name_en, place.name_ar);
+  const seoTitle = pick(place.seoTitle, place.seoTitle_en, place.seoTitle_ar) || placeName;
+  const seoDescription =
+    pick(place.seoDescription, place.seoDescription_en, place.seoDescription_ar)
+    || pick(place.description, place.description_en, place.description_ar);
   const whyItems = place.whyVisit?.length ? place.whyVisit : place.highlights || [];
   const gallery = place.gallery?.length ? place.gallery : [place.image];
   const region = pick(
@@ -115,8 +119,8 @@ const PlaceDetail = () => {
   return (
     <div className="acts-page place-page has-mobile-bar">
       <SeoHead
-        title={placeName}
-        description={pick(place.description, place.description_en, place.description_ar)}
+        title={seoTitle}
+        description={seoDescription}
         path={`/place/${place.id}`}
         image={place.image}
       />

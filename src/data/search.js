@@ -15,6 +15,12 @@ export const normalizeQuery = (value = '') =>
     .trim();
 
 const PLACE_ALIASES = {
+  alger: ['alger', 'algiers', 'algeria capital', 'casbah', 'capitale', 'الجزائر'],
+  oran: ['oran', 'ouest', 'santa cruz', 'mediterranee', 'plage', 'وهران'],
+  jijel: ['jijel', 'cote verte', 'criques', 'plage', 'جيجel'],
+  annaba: ['annaba', 'hippo regius', 'est', 'plage', 'عنابة'],
+  tipaza: ['tipaza', 'tipasa', 'ruines romaines', 'archéologie', 'تيبasa'],
+  tlemcen: ['tlemcen', 'mansourah', 'andalou', 'cascades', 'تلمسان'],
   bejaia: ['bejaya', 'kabylie', 'cap carbon', 'plage', 'mer', 'cote', 'coast'],
   djanet: ['tassili', 'tin merzouga', 'sahara', 'desert', 'touareg'],
   ghardaia: ['mzab', 'm zab', 'ksour', 'mozabite', 'oasis', 'sahara'],

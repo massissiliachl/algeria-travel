@@ -37,6 +37,15 @@ export const TAGHIT_PLACE = {
     'Between palm groves, golden dunes and local heritage, Taghit offers a unique Saharan experience: ancient ksar, natural springs and unforgettable sunsets at the foot of the Grand Erg.',
   description_ar:
     'بين واحات النخيل والكثبان الذهبية والتراث المحلي، تقدم تاغيت تجربة صحراوية فريدة: قصر قديم وينابيع طبيعية وغروب لا يُنسى عند سفح العرق الكبير.',
+  seoTitle: 'Tourisme Taghit — Sahara & Grand Erg',
+  seoTitle_en: 'Taghit Tourism — Sahara Algeria Desert Tour',
+  seoTitle_ar: 'سياحة تاغيت — جولة الصحراء',
+  seoDescription:
+    'Tourisme Taghit et circuit Sahara Algérie : dunes, ksour et palmeraies. Séjour sur mesure avec Algeria Travel, agence de voyage.',
+  seoDescription_en:
+    'Taghit tourism and Sahara Algeria tour: dunes, ksour and palm groves. Tailor-made desert trip with Algeria Travel agency.',
+  seoDescription_ar:
+    'سياحة تاغيت وجولة صحراء الجزائر: كثبان وقصور وواحات. إقامة مخصصة مع Algeria Travel.',
   bestTime: 'Octobre – Mars',
   bestTime_en: 'October – March',
   bestTime_ar: 'أكتوبر – مارس',
