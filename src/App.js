@@ -17,6 +17,8 @@ import PlaceDetail from './pages/PlaceDetail';
 import DestinationRedirect from './pages/DestinationRedirect';
 import SearchResults from './pages/SearchResults';
 import Stays from './pages/Stays';
+import Hotels from './pages/Hotels';
+import HotelDetail from './pages/HotelDetail';
 import TrackReservation from './pages/TrackReservation';
 import Privacy from './pages/Privacy';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -39,7 +41,8 @@ function AppRoutes() {
         <Route path="/activities" element={<Activities />} />
         <Route path="/activity/:id" element={<ActivityDetail />} />
         <Route path="/stays" element={<Stays />} />
-        <Route path="/hotels" element={<Stays />} />
+        <Route path="/hotels" element={<Hotels />} />
+        <Route path="/hotels/:id" element={<HotelDetail />} />
         <Route path="/guesthouses" element={<Stays />} />
         <Route path="/tours" element={<Tours />} />
         <Route path="/blog" element={<Blog />} />

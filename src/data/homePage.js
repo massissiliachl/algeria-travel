@@ -11,7 +11,7 @@ const hotel = TAGHIT_PACKAGES.hotel;
 const guest = TAGHIT_PACKAGES.guesthouse;
 
 export const HOME_COUP_TAGHIT = {
-  image: '/images/taghit.jpeg',
+  image: '/images/home/taghit.webp',
   fallback: '/images/sahara5.jpeg',
   link: '/place/taghit',
   packages: [
@@ -111,7 +111,7 @@ export const HOME_ACCOMMODATIONS = [
     ar: 'فنادق',
     cta: { fr: 'Voir les hôtels', en: 'See hotels', ar: 'عرض الفنادق' },
     image: '/images/home/acc-hotel.jpg',
-    link: '/stays?type=hotels',
+    link: '/hotels',
   },
   {
     key: 'guesthouses',

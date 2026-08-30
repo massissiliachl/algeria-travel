@@ -14,11 +14,12 @@ router.get(
   '/stats',
   adminAuth,
   asyncHandler(async (req, res) => {
-    const [reservations, tours, activities, stays, blog, places, gallery] = await Promise.all([
+    const [reservations, tours, activities, stays, hotels, blog, places, gallery] = await Promise.all([
       query(`select status, count(*)::int as count from public.reservations group by status`),
       query(`select count(*)::int as count from public.tours`),
       query(`select count(*)::int as count from public.activities`),
       query(`select count(*)::int as count from public.stays`),
+      query(`select count(*)::int as count from public.stays where type = 'hotel'`),
       query(`select count(*)::int as count from public.blog_posts`),
       query(`select count(*)::int as count from public.places`),
       query(`select count(*)::int as count from public.gallery_items`),
@@ -36,6 +37,7 @@ router.get(
       tours: tours.rows[0].count,
       activities: activities.rows[0].count,
       stays: stays.rows[0].count,
+      hotels: hotels.rows[0].count,
       blogPosts: blog.rows[0].count,
       places: places.rows[0].count,
       gallery: gallery.rows[0].count,
@@ -92,6 +94,17 @@ const stayCrud = makeAdminCrud({
   ...makeBuilders(stayFields, { requireId: true }),
 });
 
+const hotelCrud = makeAdminCrud({
+  table: 'stays',
+  idColumn: 'id',
+  mapRow: mapStay,
+  orderBy: 'name asc',
+  notifyContentType: 'hotels',
+  fixedWhere: "type = 'hotel'",
+  insertDefaults: { type: 'hotel' },
+  ...makeBuilders(stayFields, { requireId: true }),
+});
+
 const blogCrud = makeAdminCrud({
   table: 'blog_posts',
   idColumn: 'id',
@@ -114,6 +127,7 @@ router.use('/places', placeCrud);
 router.use('/tours', tourCrud);
 router.use('/activities', activityCrud);
 router.use('/stays', stayCrud);
+router.use('/hotels', hotelCrud);
 router.use('/blog', blogCrud);
 router.use('/gallery', galleryCrud);
 router.use('/notifications', require('./notifications'));

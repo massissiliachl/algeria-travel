@@ -9,9 +9,8 @@ import SeoHead from '../components/SeoHead';
 import './Contact.css';
 
 const EMAILS = [
-  'Algeria.travel@gmail.com',
+  'travelalgeriadz@gmail.com',
   'visit.bougie@gmail.com',
-  'Algeriatravel@gmail.com',
 ];
 
 const Contact = () => {

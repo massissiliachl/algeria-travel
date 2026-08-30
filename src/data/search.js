@@ -28,6 +28,7 @@ const PLACE_ALIASES = {
   taghit: ['bechar', 'erg', 'dunes', 'ksar', 'oasis', 'sahara', 'sud ouest'],
   timimoun: ['gourara', 'erg occidental', 'dunes rouges', 'ksour', 'sahara'],
   constantine: ['ponts', 'pont suspendu', 'ahmed bey', 'ville des ponts'],
+  
 };
 
 const ACTIVITY_ALIASES = {

@@ -137,9 +137,16 @@ const stayFields = [
   ['location', 'location'], ['location_en', 'locationEn'], ['location_ar', 'locationAr'],
   ['desc', 'desc'], ['desc_en', 'descEn'], ['desc_ar', 'descAr'],
   ['image', 'image'], ['gallery', 'gallery', (v) => jsonStr(v, [])],
-  ['price', 'price', num], ['price_per_person', 'pricePerPerson', bool],
+  ['price', 'price', num], ['old_price', 'oldPrice', num],
+  ['price_per_person', 'pricePerPerson', bool],
   ['rating', 'rating', num], ['reviews', 'reviews', num],
   ['amenities', 'amenities', (v) => jsonStr(v, {})], ['published', 'published', bool],
+  ['wilaya', 'wilaya'], ['wilaya_key', 'wilayaKey'],
+  ['stars', 'stars', num], ['availability', 'availability'],
+  ['rooms_available', 'roomsAvailable', num],
+  ['address', 'address'], ['address_en', 'addressEn'], ['address_ar', 'addressAr'],
+  ['lat', 'lat', num], ['lng', 'lng', num],
+  ['check_in', 'checkIn'], ['check_out', 'checkOut'], ['phone', 'phone'],
 ];
 
 function mapStay(row) {
@@ -148,9 +155,17 @@ function mapStay(row) {
     name: row.name, nameEn: row.name_en, nameAr: row.name_ar,
     location: row.location, locationEn: row.location_en, locationAr: row.location_ar,
     desc: row.desc, descEn: row.desc_en, descAr: row.desc_ar,
-    image: row.image, gallery: row.gallery, price: row.price,
+    image: row.image, gallery: row.gallery, price: row.price, oldPrice: row.old_price,
     pricePerPerson: row.price_per_person, rating: Number(row.rating), reviews: row.reviews,
     amenities: row.amenities, published: row.published,
+    wilaya: row.wilaya, wilayaKey: row.wilaya_key,
+    stars: row.stars != null ? Number(row.stars) : null,
+    availability: row.availability || 'available',
+    roomsAvailable: row.rooms_available,
+    address: row.address, addressEn: row.address_en, addressAr: row.address_ar,
+    lat: row.lat != null ? Number(row.lat) : null,
+    lng: row.lng != null ? Number(row.lng) : null,
+    checkIn: row.check_in, checkOut: row.check_out, phone: row.phone,
     createdAt: row.created_at, updatedAt: row.updated_at,
   };
 }

@@ -336,9 +336,9 @@ exports.PLACES = [
     "audience": "En couple, famille, amis",
     "audience_en": "Couples, families, friends",
     "audience_ar": "أزواج، عائلات، أصدقاء",
-    "image": "/images/taghit.jpeg",
+    "image": "/images/home/taghit.webp",
     "gallery": [
-      "/images/taghit.jpeg",
+      "/images/home/taghit.webp",
       "/images/sahara5.jpeg",
       "/images/sahara1.jpeg"
     ],

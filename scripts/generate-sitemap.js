@@ -20,6 +20,7 @@ const placeIds = [
 ];
 
 const activityIds = extractIds('src/data/activities.js', /^\s+id: '([^']+)',/gm);
+const hotelIds = extractIds('src/data/hotels.js', /^\s+id: '([^']+)',/gm);
 const blogSlugs = extractIds('src/data/blog.js', /^\s+slug: '([^']+)',/gm);
 
 const STATIC_PAGES = [
@@ -47,6 +48,11 @@ const urls = [
     loc: `/activity/${id}`,
     changefreq: 'monthly',
     priority: '0.7',
+  })),
+  ...hotelIds.map((id) => ({
+    loc: `/hotels/${id}`,
+    changefreq: 'monthly',
+    priority: '0.75',
   })),
   ...blogSlugs.map((slug) => ({
     loc: `/blog/${slug}`,

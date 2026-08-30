@@ -23,6 +23,7 @@ const corsOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5174',
+  'http://localhost:5175',
   ...(process.env.CORS_ORIGINS || '')
     .split(',')
     .map((value) => value.trim())
@@ -55,6 +56,9 @@ app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin', require('./routes/admin/media'));
 app.use('/api/admin', require('./routes/admin/content'));
+app.use('/api/admin/hotel-users', require('./routes/admin/hotelUsers'));
+app.use('/api/admin/hotels/:hotelId/availability', require('./routes/admin/hotelAvailability'));
+app.use('/api/partner', require('./routes/partner'));
 app.use('/api', require('./routes/content'));
 
 app.get('/api/health', async (req, res) => {
@@ -71,6 +75,7 @@ app.get('/api/health', async (req, res) => {
 
 const buildPath = path.join(__dirname, '../build');
 const adminPath = path.join(__dirname, '../admin/dist');
+const partnerPath = path.join(__dirname, '../partner/dist');
 const serveFrontend =
   process.env.SERVE_FRONTEND === 'true' ||
   (process.env.NODE_ENV === 'production' && fs.existsSync(path.join(buildPath, 'index.html')));
@@ -78,6 +83,18 @@ const serveAdmin =
   process.env.SERVE_ADMIN !== 'false' &&
   (serveFrontend || process.env.SERVE_ADMIN === 'true') &&
   fs.existsSync(path.join(adminPath, 'index.html'));
+const servePartner =
+  process.env.SERVE_PARTNER !== 'false' &&
+  (serveFrontend || process.env.SERVE_PARTNER === 'true') &&
+  fs.existsSync(path.join(partnerPath, 'index.html'));
+
+if (servePartner) {
+  app.use('/partner', express.static(partnerPath, { index: 'index.html' }));
+  app.get(/^\/partner(\/.*)?$/, (req, res, next) => {
+    if (req.path.includes('.')) return next();
+    res.sendFile(path.join(partnerPath, 'index.html'), (err) => { if (err) next(err); });
+  });
+}
 
 if (serveAdmin) {
   app.use('/admin', express.static(adminPath, { index: 'index.html' }));
@@ -89,7 +106,7 @@ if (serveAdmin) {
 
 if (serveFrontend) {
   app.use(express.static(buildPath));
-  app.get(/^(?!\/api\/|\/admin).*/, (req, res, next) => {
+  app.get(/^(?!\/api\/|\/admin|\/partner).*/, (req, res, next) => {
     if (req.path.startsWith('/uploads/') || req.path.startsWith('/images/')) return next();
     res.sendFile(path.join(buildPath, 'index.html'), (err) => { if (err) next(err); });
   });

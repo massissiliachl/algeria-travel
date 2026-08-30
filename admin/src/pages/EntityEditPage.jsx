@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
-import { FORM_CONFIGS } from '../config/entities';
+import { FORM_CONFIGS, WILAYA_OPTIONS } from '../config/entities';
 import { Field, PageHeader, parseJsonField, stringifyJson } from '../components/ui';
 import ImageField from '../components/ImageField';
 import GalleryField from '../components/GalleryField';
+import HotelPartnerPanel from '../components/HotelPartnerPanel';
 
 function buildInitial(config) {
   const initial = {};
@@ -17,6 +18,14 @@ function buildInitial(config) {
     })
   );
   if (config.resource === 'stays') initial.type = 'hotel';
+  if (config.resource === 'hotels') {
+    initial.type = 'hotel';
+    initial.availability = 'available';
+    initial.stars = 3;
+    initial.checkIn = '14:00';
+    initial.checkOut = '12:00';
+    initial.amenities = '{"fr":[],"en":[],"ar":[]}';
+  }
   return initial;
 }
 
@@ -84,6 +93,16 @@ export default function EntityEditPage() {
     setSuccess('');
     try {
       const payload = preparePayload(form, config);
+      if (config.resource === 'hotels') {
+        payload.type = 'hotel';
+        if (payload.wilayaKey && !payload.wilaya) {
+          const w = WILAYA_OPTIONS.find((x) => x.key === payload.wilayaKey);
+          if (w) payload.wilaya = w.code;
+        }
+        if (payload.wilayaKey && !payload.placeId) {
+          payload.placeId = payload.wilayaKey;
+        }
+      }
       if (isNew) {
         await api.create(config.resource, payload);
         setSuccess('Créé avec succès.');
@@ -113,6 +132,10 @@ export default function EntityEditPage() {
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
+      {entityKey === 'hotels' && !isNew && id && (
+        <HotelPartnerPanel hotelId={id} hotelName={form.name || id} />
+      )}
+
       <form className="panel" style={{ padding: 20 }} onSubmit={onSubmit}>
         {config.sections.map((section) => (
           <div key={section.title} className="form-section">
@@ -137,8 +160,11 @@ export default function EntityEditPage() {
                     />
                   ) : f.type === 'select' ? (
                     <select value={form[f.name] ?? ''} onChange={(e) => onChange(f.name, e.target.value)}>
+                      {!f.required && <option value="">—</option>}
                       {f.options.map((o) => (
-                        <option key={o} value={o}>{o}</option>
+                        <option key={o} value={o}>
+                          {f.optionLabels?.[o] || o}
+                        </option>
                       ))}
                     </select>
                   ) : f.type === 'checkbox' ? (

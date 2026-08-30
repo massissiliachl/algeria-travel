@@ -16,6 +16,11 @@ const TYPE_LABELS = {
     en: 'New stay',
     ar: 'إقامة جديدة',
   },
+  hotels: {
+    fr: 'Nouvel hôtel',
+    en: 'New hotel',
+    ar: 'فندق جديد',
+  },
   blog_posts: {
     fr: 'Nouvel article',
     en: 'New blog post',
@@ -41,6 +46,8 @@ function buildLink(contentType, row) {
       return `/activity/${row.id}`;
     case 'stays':
       return '/stays';
+    case 'hotels':
+      return `/hotels/${row.id}`;
     case 'blog_posts':
       return `/blog/${row.slug || row.id}`;
     case 'places':

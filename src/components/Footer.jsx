@@ -8,6 +8,8 @@ import './Footer.css';
 const FOOTER_LINKS = [
   { to: '/destinations', tKey: 'nav_destinations' },
   { to: '/activities', tKey: 'nav_activities' },
+  { to: '/hotels', tKey: 'hotels_nav' },
+  { to: '/stays', tKey: 'stays_nav' },
   { to: '/tours', tKey: 'nav_tours' },
   { to: '/suivi', tKey: 'nav_track' },
   { to: '/gallery', tKey: 'nav_gallery' },

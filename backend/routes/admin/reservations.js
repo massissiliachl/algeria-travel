@@ -1,6 +1,7 @@
 const express = require('express');
 const { query } = require('../../config/db');
 const { adminAuth } = require('../../middleware/adminAuth');
+const { bookHotelRooms, releaseHotelRooms } = require('../../lib/hotelAvailability');
 
 const router = express.Router();
 
@@ -17,6 +18,9 @@ function mapReservation(row) {
     clientEmail: row.client_email,
     clientPhone: row.client_phone,
     travelDate: row.travel_date,
+    checkInDate: row.check_in_date,
+    checkOutDate: row.check_out_date,
+    roomsRequested: row.rooms_requested,
     travelers: row.travelers,
     stayType: row.stay_type,
     message: row.message,
@@ -88,6 +92,21 @@ router.patch('/:id', async (req, res, next) => {
       return res.status(400).json({ error: 'Statut invalide.' });
     }
 
+    const prevResult = await query('select * from public.reservations where id = $1', [req.params.id]);
+    if (!prevResult.rows.length) {
+      return res.status(404).json({ error: 'Réservation introuvable.' });
+    }
+
+    const prevRow = prevResult.rows[0];
+    const oldStatus = prevRow.status;
+    const newStatus = status || oldStatus;
+
+    if (oldStatus !== 'confirmed' && newStatus === 'confirmed') {
+      await bookHotelRooms(prevRow);
+    } else if (oldStatus === 'confirmed' && newStatus !== 'confirmed') {
+      await releaseHotelRooms(prevRow);
+    }
+
     const result = await query(
       `update public.reservations
        set status = coalesce($2, status),
@@ -96,10 +115,6 @@ router.patch('/:id', async (req, res, next) => {
        returning *`,
       [req.params.id, status || null, adminNotes ?? null]
     );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Réservation introuvable.' });
-    }
 
     const reservation = mapReservation(result.rows[0]);
     console.log(`[Reservation] Mise à jour admin — ${reservation.id} → ${reservation.status}`);

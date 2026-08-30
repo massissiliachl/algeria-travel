@@ -56,7 +56,7 @@ export default function Privacy() {
           ))}
           <p className="privacy-contact">
             {t('privacy_contact_prefix')}{' '}
-            <a href="mailto:Algeria.travel@gmail.com">Algeria.travel@gmail.com</a>
+            <a href="mailto:travelalgeriadz@gmail.com">Algeria.travel@gmail.com</a>
           </p>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AdminNotificationBell from './AdminNotificationBell';
 import {
   BrandIcon,
   DashboardIcon,
@@ -21,6 +22,7 @@ const NAV = [
   { to: '/places', label: 'Destinations', icon: PlacesIcon },
   { to: '/tours', label: 'Circuits', icon: ToursIcon },
   { to: '/activities', label: 'Activités', icon: ActivitiesIcon },
+  { to: '/hotels', label: 'Hôtels', icon: StaysIcon },
   { to: '/stays', label: 'Hébergements', icon: StaysIcon },
   { to: '/blog', label: 'Blog', icon: BlogIcon },
   { to: '/gallery', label: 'Galerie', icon: GalleryIcon },
@@ -29,6 +31,7 @@ const NAV = [
 export default function Layout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const onLogout = () => {
@@ -76,6 +79,10 @@ export default function Layout() {
             <ExternalLinkIcon />
             Voir le site public
           </a>
+          <a href="http://localhost:5175/partner/" target="_blank" rel="noreferrer" style={{ marginTop: 8, display: 'flex' }}>
+            <ExternalLinkIcon />
+            Portail hôtel (/partner)
+          </a>
           <button
             type="button"
             className="btn btn-secondary"
@@ -98,10 +105,11 @@ export default function Layout() {
             <MenuIcon />
           </button>
           <strong style={{ fontFamily: 'var(--serif)', fontSize: '1rem' }}>Algeria Travel</strong>
-          <div style={{ width: 40 }} />
+          <AdminNotificationBell />
+          <div style={{ width: 8 }} />
         </div>
 
-        <div className="admin-main-inner">
+        <div className={`admin-main-inner${location.pathname.includes('/hotels/') ? ' admin-main-inner--wide' : ''}`}>
           <Outlet />
         </div>
       </main>

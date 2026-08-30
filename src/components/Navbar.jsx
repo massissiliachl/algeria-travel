@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { key: 'destinations', href: '/destinations', tKey: 'nav_destinations' },
   { key: 'activities', href: '/activities', tKey: 'nav_activities' },
   { key: 'gallery', href: '/gallery', tKey: 'nav_gallery' },
+  { key: 'hotels', href: '/hotels', tKey: 'hotels_nav' },
   { key: 'tours', href: '/tours', tKey: 'nav_tours' },
   { key: 'blog', href: '/blog', tKey: 'nav_blog' },
   { key: 'track', href: '/suivi', tKey: 'nav_track' },

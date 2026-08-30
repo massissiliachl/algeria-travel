@@ -36,6 +36,19 @@ export const api = {
     return request(`/api/stays${qs ? `?${qs}` : ''}`);
   },
   getStay: (id) => request(`/api/stays/${id}`),
+  getHotels: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/api/hotels${qs ? `?${qs}` : ''}`);
+  },
+  getHotel: (id) => request(`/api/hotels/${id}`),
+  getHotelAvailability: (id, params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/api/hotels/${id}/availability${qs ? `?${qs}` : ''}`);
+  },
+  checkHotelAvailability: (id, params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/api/hotels/${id}/availability/check?${qs}`);
+  },
   sendContact: (payload) =>
     request('/api/contact', { method: 'POST', body: JSON.stringify(payload) }),
   createReservation: (payload) =>

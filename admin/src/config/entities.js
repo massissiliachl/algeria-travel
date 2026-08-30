@@ -1,3 +1,19 @@
+export const WILAYA_OPTIONS = [
+  { code: '06', key: 'bejaia', label: '06 — Béjaïa' },
+  { code: '16', key: 'alger', label: '16 — Alger' },
+  { code: '31', key: 'oran', label: '31 — Oran' },
+  { code: '25', key: 'constantine', label: '25 — Constantine' },
+  { code: '23', key: 'annaba', label: '23 — Annaba' },
+  { code: '47', key: 'ghardaia', label: '47 — Ghardaïa' },
+  { code: '11', key: 'tamanrasset', label: '11 — Tamanrasset' },
+  { code: '33', key: 'illizi', label: '33 — Illizi' },
+  { code: '08', key: 'bechar', label: '08 — Béchar' },
+  { code: '49', key: 'timimoun', label: '49 — Timimoun' },
+  { code: '07', key: 'biskra', label: '07 — Biskra' },
+];
+
+const AVAILABILITY_OPTIONS = ['available', 'limited', 'unavailable'];
+
 export const ENTITIES = {
   places: {
     title: 'Destinations',
@@ -47,6 +63,27 @@ export const ENTITIES = {
       { key: 'type', label: 'Type' },
       { key: 'placeId', label: 'Destination' },
       { key: 'price', label: 'Prix (DA)', render: (r) => r.price?.toLocaleString?.() || '—' },
+      { key: 'published', label: 'Statut', render: (r) => (r.published ? 'Publié' : 'Brouillon') },
+    ],
+  },
+  hotels: {
+    title: 'Hôtels',
+    subtitle: 'Hôtels par wilaya — page /hotels',
+    resource: 'hotels',
+    idField: 'id',
+    columns: [
+      { key: 'name', label: 'Nom' },
+      { key: 'wilayaKey', label: 'Wilaya' },
+      { key: 'stars', label: 'Étoiles', render: (r) => (r.stars ? `${r.stars}★` : '—') },
+      { key: 'price', label: 'Prix/nuit (DA)', render: (r) => r.price?.toLocaleString?.() || '—' },
+      {
+        key: 'availability',
+        label: 'Dispo.',
+        render: (r) =>
+          ({ available: 'Disponible', limited: 'Limité', unavailable: 'Complet' }[r.availability] ||
+            r.availability ||
+            '—'),
+      },
       { key: 'published', label: 'Statut', render: (r) => (r.published ? 'Publié' : 'Brouillon') },
     ],
   },
@@ -226,6 +263,87 @@ export const FORM_CONFIGS = {
           { name: 'image', label: 'Image', type: 'image', full: true },
           { name: 'gallery', label: 'Galerie photos', type: 'gallery', full: true },
           { name: 'amenities', label: 'Équipements (JSON {fr,en,ar})', type: 'json', full: true },
+        ],
+      },
+    ],
+  },
+  hotels: {
+    resource: 'hotels',
+    title: 'Hôtel',
+    sections: [
+      {
+        title: 'Identité & wilaya',
+        fields: [
+          { name: 'id', label: 'ID (slug URL)', required: true, full: true, hint: 'ex: hotel-royal-bejaia' },
+          {
+            name: 'wilayaKey',
+            label: 'Wilaya',
+            type: 'select',
+            required: true,
+            options: WILAYA_OPTIONS.map((w) => w.key),
+            optionLabels: Object.fromEntries(WILAYA_OPTIONS.map((w) => [w.key, w.label])),
+          },
+          { name: 'wilaya', label: 'Code wilaya', hint: 'ex: 06 (rempli auto si possible)' },
+          { name: 'name', label: 'Nom (FR)', required: true },
+          { name: 'nameEn', label: 'Nom (EN)' },
+          { name: 'nameAr', label: 'Nom (AR)' },
+          { name: 'stars', label: 'Étoiles (1-5)', type: 'number' },
+          {
+            name: 'availability',
+            label: 'Disponibilité',
+            type: 'select',
+            options: AVAILABILITY_OPTIONS,
+            optionLabels: {
+              available: 'Disponible',
+              limited: 'Places limitées',
+              unavailable: 'Complet',
+            },
+          },
+          { name: 'roomsAvailable', label: 'Chambres disponibles', type: 'number' },
+          { name: 'published', label: 'Publié sur le site', type: 'checkbox' },
+        ],
+      },
+      {
+        title: 'Tarifs & avis',
+        fields: [
+          { name: 'price', label: 'Prix/nuit (DA)', type: 'number', required: true },
+          { name: 'oldPrice', label: 'Ancien prix (DA)', type: 'number' },
+          { name: 'rating', label: 'Note (0-5)', type: 'number' },
+          { name: 'reviews', label: 'Nb avis', type: 'number' },
+          { name: 'checkIn', label: 'Heure arrivée', hint: 'ex: 14:00' },
+          { name: 'checkOut', label: 'Heure départ', hint: 'ex: 12:00' },
+        ],
+      },
+      {
+        title: 'Localisation',
+        fields: [
+          { name: 'location', label: 'Ville affichée (FR)' },
+          { name: 'locationEn', label: 'Ville (EN)' },
+          { name: 'locationAr', label: 'Ville (AR)' },
+          { name: 'address', label: 'Adresse (FR)', full: true },
+          { name: 'addressEn', label: 'Adresse (EN)', full: true },
+          { name: 'addressAr', label: 'Adresse (AR)', full: true },
+          { name: 'phone', label: 'Téléphone' },
+          { name: 'lat', label: 'Latitude', type: 'number' },
+          { name: 'lng', label: 'Longitude', type: 'number' },
+          { name: 'placeId', label: 'Slug destination liée (optionnel)' },
+        ],
+      },
+      {
+        title: 'Description & médias',
+        fields: [
+          { name: 'desc', label: 'Description (FR)', type: 'textarea', full: true },
+          { name: 'descEn', label: 'Description (EN)', type: 'textarea', full: true },
+          { name: 'descAr', label: 'Description (AR)', type: 'textarea', full: true },
+          { name: 'image', label: 'Photo principale', type: 'image', full: true },
+          { name: 'gallery', label: 'Galerie photos', type: 'gallery', full: true },
+          {
+            name: 'amenities',
+            label: 'Équipements (JSON {fr,en,ar})',
+            type: 'json',
+            full: true,
+            hint: '{"fr":["Wifi","Piscine"],"en":["Wifi","Pool"],"ar":["واي فاي","مسبح"]}',
+          },
         ],
       },
     ],

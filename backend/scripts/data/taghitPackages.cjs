@@ -29,8 +29,8 @@ exports.TAGHIT_PLACE = {
   audience: 'En couple, famille, amis',
   audience_en: 'Couples, families, friends',
   audience_ar: 'أزواج، عائلات، أصدقاء',
-  image: '/images/taghit.jpeg',
-  gallery: ['/images/taghit.jpeg', '/images/sahara5.jpeg', '/images/sahara1.jpeg'],
+  image: '/images/home/taghit.webp',
+  gallery: ['/images/home/taghit.webp', '/images/sahara5.jpeg', '/images/sahara1.jpeg'],
   description:
     'Entre palmeraies, dunes dorées et patrimoine local, Taghit offre une expérience saharienne unique : ksar millénaire, sources naturelles et couchers de soleil inoubliables au pied du Grand Erg.',
   description_en:

@@ -27,6 +27,11 @@
     "build": "node scripts/generate-sitemap.js && react-scripts build",
     "build:render": "npm run build && cd admin && npm install && npm run build",
     "test": "react-scripts test",
+    "test:ci": "react-scripts test --watchAll=false --passWithNoTests",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "test:all": "npm run test:ci && cd backend && npm test",
     "eject": "react-scripts eject"
   },
   "engines": {
@@ -49,5 +54,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

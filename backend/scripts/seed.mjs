@@ -64,8 +64,10 @@ async function seed() {
     await query(
       `insert into public.stays (
         id, type, place_id, name, name_en, name_ar, location, location_en, location_ar,
-        "desc", desc_en, desc_ar, image, gallery, price, price_per_person, rating, reviews, amenities
-      ) values (${Array.from({ length: 19 }, (_, i) => `$${i + 1}`).join(', ')})`,
+        "desc", desc_en, desc_ar, image, gallery, price, price_per_person, rating, reviews, amenities,
+        wilaya, wilaya_key, stars, availability, rooms_available,
+        address, address_en, address_ar, lat, lng, check_in, check_out, phone, old_price, published
+      ) values (${Array.from({ length: 34 }, (_, i) => `$${i + 1}`).join(', ')})`,
       stayRow(s)
     );
   }

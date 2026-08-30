@@ -5,11 +5,13 @@ const { generateReferenceCode, generateAccessToken, hashAccessToken } = require(
 const { validateReservationItem } = require('../lib/validateReservationItem');
 const { isValidPhone } = require('../lib/phone');
 const { calcBookingTotal } = require('../lib/bookingPrice');
+const { checkStayAvailability } = require('../lib/hotelAvailability');
 const { isValidPaymentMethod, normalizePaymentMethod } = require('../lib/paymentMethod');
 const {
   sendReservationClientEmail,
   sendReservationAdminEmail,
 } = require('../lib/reservationEmails');
+const { createPartnerNotification } = require('../lib/partnerNotifications');
 
 const router = express.Router();
 
@@ -87,6 +89,9 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       email,
       phone,
       travel_date: travelDate,
+      check_in_date: checkInDate,
+      check_out_date: checkOutDate,
+      rooms_requested: roomsRequested,
       travelers = 1,
       stay_type: stayType,
       message,
@@ -113,7 +118,26 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Destination ou circuit requis.' });
     }
 
-    if (!name?.trim() || !email?.trim() || !travelDate) {
+    if (!name?.trim() || !email?.trim()) {
+      return res.status(400).json({ error: 'Nom et email sont requis.' });
+    }
+
+    const normalizedItemType = itemType.trim().toLowerCase();
+    const isHotelStay =
+      normalizedItemType === 'stay' &&
+      (stayType?.trim().toLowerCase() === 'hotel' || !stayType?.trim());
+
+    let effectiveTravelDate = travelDate;
+    let effectiveCheckIn = checkInDate?.trim() || null;
+    let effectiveCheckOut = checkOutDate?.trim() || null;
+    const roomsCount = Math.max(1, Number(roomsRequested) || 1);
+
+    if (isHotelStay) {
+      if (!effectiveCheckIn || !effectiveCheckOut) {
+        return res.status(400).json({ error: 'Dates d’arrivée et de départ requises.' });
+      }
+      effectiveTravelDate = effectiveCheckIn;
+    } else if (!effectiveTravelDate) {
       return res.status(400).json({ error: 'Nom, email et date de voyage sont requis.' });
     }
 
@@ -169,14 +193,9 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Adresse email invalide.' });
     }
 
-    const normalizedItemType = itemType.trim().toLowerCase();
-    if (!VALID_ITEM_TYPES.has(normalizedItemType)) {
+    const normalizedItemTypeEarly = itemType.trim().toLowerCase();
+    if (!VALID_ITEM_TYPES.has(normalizedItemTypeEarly)) {
       return res.status(400).json({ error: 'Type de réservation invalide.' });
-    }
-
-    const itemValid = await validateReservationItem(normalizedItemType, itemId.trim());
-    if (!itemValid) {
-      return res.status(400).json({ error: 'Destination ou circuit invalide.' });
     }
 
     const travelersCount = Number(travelers);
@@ -184,12 +203,30 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Nombre de voyageurs invalide (1 à 20).' });
     }
 
-    const normalizedStayType = stayType?.trim().toLowerCase() || null;
+    const normalizedStayType = stayType?.trim().toLowerCase() || (isHotelStay ? 'hotel' : null);
     if (normalizedStayType && !VALID_STAY_TYPES.has(normalizedStayType)) {
       return res.status(400).json({ error: 'Type d’hébergement invalide.' });
     }
 
-    const parsedDate = new Date(travelDate);
+    const itemValid = await validateReservationItem(normalizedItemTypeEarly, itemId.trim());
+    if (!itemValid) {
+      return res.status(400).json({ error: 'Destination ou circuit invalide.' });
+    }
+
+    let hotelStayPricing = null;
+    if (isHotelStay) {
+      hotelStayPricing = await checkStayAvailability(
+        itemId.trim(),
+        effectiveCheckIn,
+        effectiveCheckOut,
+        roomsCount
+      );
+      if (!hotelStayPricing.ok) {
+        return res.status(409).json({ error: hotelStayPricing.error });
+      }
+    }
+
+    const parsedDate = new Date(effectiveTravelDate);
     if (Number.isNaN(parsedDate.getTime())) {
       return res.status(400).json({ error: 'Date de voyage invalide.' });
     }
@@ -202,24 +239,29 @@ router.post('/', reservationLimiter, async (req, res, next) => {
 
     const perPerson = Boolean(pricePerPerson);
     const unit = unitPrice != null ? Number(unitPrice) : Number(priceEstimate);
-    const computedTotal = calcBookingTotal(unit, travelersCount, perPerson);
-    if (computedTotal == null) {
+    let computedTotal = isHotelStay
+      ? hotelStayPricing.totalPrice
+      : calcBookingTotal(unit, travelersCount, perPerson);
+    if (computedTotal == null || !Number.isFinite(computedTotal)) {
       return res.status(400).json({ error: 'Prix estimé invalide.' });
     }
+    computedTotal = Math.round(computedTotal);
 
     const referenceCode = await createUniqueReference();
     const accessToken = generateAccessToken();
     const accessTokenHash = hashAccessToken(accessToken);
 
-    await query(
+    const insertResult = await query(
       `insert into public.reservations (
         item_type, item_id, item_name,
         client_name, client_email, client_phone,
-        travel_date, travelers, stay_type, message,
+        travel_date, check_in_date, check_out_date, rooms_requested,
+        travelers, stay_type, message,
         price_estimate, unit_price, price_per_person, payment_method,
         card_holder, card_last4, card_brand, card_expiry, gdpr_consent_at,
         reference_code, access_token_hash
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, now(), $19, $20)`,
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, now(), $22, $23)
+      returning id`,
       [
         normalizedItemType,
         itemId.trim(),
@@ -227,7 +269,10 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         name.trim(),
         email.trim().toLowerCase(),
         phone.trim(),
-        travelDate,
+        effectiveTravelDate,
+        isHotelStay ? effectiveCheckIn : null,
+        isHotelStay ? effectiveCheckOut : null,
+        isHotelStay ? roomsCount : null,
         travelersCount,
         normalizedStayType,
         message?.trim() || null,
@@ -244,6 +289,14 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       ]
     );
 
+    const reservationId = insertResult.rows[0]?.id;
+
+    if (isHotelStay && reservationId) {
+      await createPartnerNotification(itemId.trim(), reservationId).catch((err) =>
+        console.warn('[PartnerNotify]', err.message)
+      );
+    }
+
     console.log(`[Reservation] ${referenceCode} — ${itemName.trim()} (${email.trim()})`);
 
     const emailPayload = {
@@ -251,7 +304,9 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       name: name.trim(),
       referenceCode,
       itemName: itemName.trim(),
-      travelDate,
+      travelDate: effectiveTravelDate,
+      checkInDate: isHotelStay ? effectiveCheckIn : null,
+      checkOutDate: isHotelStay ? effectiveCheckOut : null,
       travelers: travelersCount,
       priceEstimate: computedTotal,
       paymentMethod: normalizedPaymentMethod,
@@ -267,7 +322,10 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
-      travelDate,
+      travelDate: effectiveTravelDate,
+      checkInDate: isHotelStay ? effectiveCheckIn : null,
+      checkOutDate: isHotelStay ? effectiveCheckOut : null,
+      roomsRequested: isHotelStay ? roomsCount : null,
       travelers: travelersCount,
       priceEstimate: computedTotal,
       paymentMethod: normalizedPaymentMethod,

@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import ReservationsPage from './pages/ReservationsPage';
 import EntityListPage from './pages/EntityListPage';
 import EntityEditPage from './pages/EntityEditPage';
+import HotelEditPage from './pages/HotelEditPage';
 import './styles/admin.css';
 
 function AppRoutes() {
@@ -29,6 +30,7 @@ function AppRoutes() {
         <Route index element={<DashboardPage />} />
         <Route path="reservations" element={<ReservationsPage />} />
         <Route path=":entityKey" element={<EntityListPage />} />
+        <Route path="hotels/:id" element={<HotelEditPage />} />
         <Route path=":entityKey/:id" element={<EntityEditPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

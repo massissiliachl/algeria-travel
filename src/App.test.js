@@ -1,8 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { countNights } from './utils/hotelAvailability';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('sanity: le moteur de réservation hôtel calcule les nuits', () => {
+  expect(countNights('2026-08-01', '2026-08-03')).toBe(2);
 });

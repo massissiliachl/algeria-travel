@@ -20,6 +20,7 @@ export default function DashboardPage() {
     { label: 'Réservations confirmées', value: stats.reservations.confirmed, className: 'confirmed', to: '/reservations', icon: 'confirmed' },
     { label: 'Circuits', value: stats.tours, to: '/tours', icon: 'tours' },
     { label: 'Activités', value: stats.activities, to: '/activities', icon: 'activities' },
+    { label: 'Hôtels', value: stats.hotels, to: '/hotels', icon: 'stays' },
     { label: 'Hébergements', value: stats.stays, to: '/stays', icon: 'stays' },
     { label: 'Articles blog', value: stats.blogPosts, to: '/blog', icon: 'blog' },
     { label: 'Destinations', value: stats.places, to: '/places', icon: 'places' },
@@ -85,6 +86,7 @@ export default function DashboardPage() {
             <Link to="/reservations" className="btn btn-primary">Voir les réservations</Link>
             <Link to="/tours/new" className="btn btn-secondary">Nouveau circuit</Link>
             <Link to="/activities/new" className="btn btn-secondary">Nouvelle activité</Link>
+            <Link to="/hotels/new" className="btn btn-secondary">Nouvel hôtel</Link>
             <Link to="/stays/new" className="btn btn-secondary">Nouvel hébergement</Link>
             <Link to="/blog/new" className="btn btn-secondary">Nouvel article</Link>
             <Link to="/gallery/new" className="btn btn-secondary">Nouvelle photo galerie</Link>

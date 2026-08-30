@@ -34,12 +34,20 @@ function activityRow(a) {
 
 function stayRow(s) {
   return [
-    s.id, s.type, s.placeId, s.name, s.name_en, s.name_ar,
+    s.id, s.type, s.placeId ?? s.wilayaKey ?? null,
+    s.name, s.name_en, s.name_ar,
     s.location, s.location_en, s.location_ar,
     s.desc, s.desc_en, s.desc_ar,
     s.image, j(s.gallery), s.price,
     s.pricePerPerson || false, s.rating, s.reviews,
     j(s.amenities || {}),
+    s.wilaya ?? null, s.wilayaKey ?? null,
+    s.stars ?? null, s.availability ?? 'available', s.roomsAvailable ?? null,
+    s.address ?? null, s.address_en ?? null, s.address_ar ?? null,
+    s.lat ?? null, s.lng ?? null,
+    s.checkIn ?? null, s.checkOut ?? null, s.phone ?? null,
+    s.oldPrice ?? null,
+    s.published !== false,
   ];
 }
 

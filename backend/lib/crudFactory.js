@@ -17,14 +17,23 @@ function makeAdminCrud({
   buildUpdate,
   orderBy = 'created_at desc',
   notifyContentType = null,
+  fixedWhere = null,
+  insertDefaults = null,
 }) {
   const router = express.Router();
   router.use(adminAuth);
 
+  const whereId = (paramRef = '$1') =>
+    fixedWhere ? `${idColumn} = ${paramRef} and ${fixedWhere}` : `${idColumn} = ${paramRef}`;
+
   router.get(
     '/',
     asyncHandler(async (req, res) => {
-      const result = await query(`select * from public.${table} order by ${orderBy}`);
+      let sql = `select * from public.${table}`;
+      const params = [];
+      if (fixedWhere) sql += ` where ${fixedWhere}`;
+      sql += ` order by ${orderBy}`;
+      const result = await query(sql, params);
       res.json({ total: result.rows.length, items: result.rows.map(mapRow) });
     })
   );
@@ -32,7 +41,7 @@ function makeAdminCrud({
   router.get(
     '/:id',
     asyncHandler(async (req, res) => {
-      const result = await query(`select * from public.${table} where ${idColumn} = $1`, [req.params.id]);
+      const result = await query(`select * from public.${table} where ${whereId()}`, [req.params.id]);
       if (!result.rows.length) return res.status(404).json({ error: 'Introuvable.' });
       res.json(mapRow(result.rows[0]));
     })
@@ -41,7 +50,8 @@ function makeAdminCrud({
   router.post(
     '/',
     asyncHandler(async (req, res) => {
-      const { columns, values } = buildInsert(req.body);
+      const body = insertDefaults ? { ...insertDefaults, ...req.body } : req.body;
+      const { columns, values } = buildInsert(body);
       const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
       const result = await query(
         `insert into public.${table} (${columns.map(q).join(', ')}) values (${placeholders}) returning *`,
@@ -61,7 +71,7 @@ function makeAdminCrud({
   router.put(
     '/:id',
     asyncHandler(async (req, res) => {
-      const prev = await query(`select published from public.${table} where ${idColumn} = $1`, [
+      const prev = await query(`select published from public.${table} where ${whereId()}`, [
         req.params.id,
       ]);
       const { columns, values } = buildUpdate(req.body);
@@ -69,7 +79,7 @@ function makeAdminCrud({
       const sets = columns.map((col, i) => `${q(col)} = $${i + 1}`).join(', ');
       values.push(req.params.id);
       const result = await query(
-        `update public.${table} set ${sets} where ${idColumn} = $${values.length} returning *`,
+        `update public.${table} set ${sets} where ${whereId(`$${values.length}`)} returning *`,
         values
       );
       if (!result.rows.length) return res.status(404).json({ error: 'Introuvable.' });
@@ -88,7 +98,7 @@ function makeAdminCrud({
   router.delete(
     '/:id',
     asyncHandler(async (req, res) => {
-      const result = await query(`delete from public.${table} where ${idColumn} = $1 returning ${idColumn}`, [
+      const result = await query(`delete from public.${table} where ${whereId()} returning ${idColumn}`, [
         req.params.id,
       ]);
       if (!result.rows.length) return res.status(404).json({ error: 'Introuvable.' });
@@ -99,7 +109,14 @@ function makeAdminCrud({
   return router;
 }
 
-function makePublicRead({ table, idColumn, mapRow, orderBy = 'created_at desc' }) {
+function makePublicRead({
+  table,
+  idColumn,
+  mapRow,
+  orderBy = 'created_at desc',
+  fixedWhere = null,
+  queryMap = {},
+}) {
   const router = express.Router();
 
   router.get(
@@ -108,6 +125,8 @@ function makePublicRead({ table, idColumn, mapRow, orderBy = 'created_at desc' }
       let sql = `select * from public.${table}`;
       const params = [];
       const conditions = [];
+
+      if (fixedWhere) conditions.push(fixedWhere);
 
       if (req.query.category) {
         params.push(req.query.category);
@@ -120,6 +139,10 @@ function makePublicRead({ table, idColumn, mapRow, orderBy = 'created_at desc' }
       if (req.query.place) {
         params.push(req.query.place);
         conditions.push(`place_id = $${params.length}`);
+      }
+      if (req.query.wilaya && queryMap.wilaya) {
+        params.push(req.query.wilaya);
+        conditions.push(`${queryMap.wilaya} = $${params.length}`);
       }
 
       conditions.push('coalesce(published, true) = true');
@@ -134,8 +157,10 @@ function makePublicRead({ table, idColumn, mapRow, orderBy = 'created_at desc' }
     '/:id',
     asyncHandler(async (req, res) => {
       const col = idColumn === 'slug' ? 'slug' : idColumn;
+      const conditions = [`${col} = $1`, 'coalesce(published, true) = true'];
+      if (fixedWhere) conditions.push(fixedWhere);
       const result = await query(
-        `select * from public.${table} where ${col} = $1 and coalesce(published, true) = true`,
+        `select * from public.${table} where ${conditions.join(' and ')}`,
         [req.params.id]
       );
       if (!result.rows.length) return res.status(404).json({ error: 'Introuvable.' });

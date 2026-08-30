@@ -12,7 +12,7 @@ module.exports = function proxy(app) {
   );
 
   app.use(
-    ['/uploads', '/images'],
+    '/uploads',
     createProxyMiddleware({
       target,
       changeOrigin: true,

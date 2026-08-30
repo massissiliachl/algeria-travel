@@ -75,4 +75,39 @@ export const api = {
     if (!res.ok) throw new Error(data.error || `Erreur upload (${res.status})`);
     return data;
   },
+
+  listHotelUsers: () => request('/api/admin/hotel-users'),
+
+  getHotelUserByHotel: (hotelId) => request(`/api/admin/hotel-users/by-hotel/${hotelId}`),
+
+  createHotelUser: (payload) =>
+    request('/api/admin/hotel-users', { method: 'POST', body: JSON.stringify(payload) }),
+
+  updateHotelUser: (id, payload) =>
+    request(`/api/admin/hotel-users/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+
+  deleteHotelUser: (id) =>
+    request(`/api/admin/hotel-users/${id}`, { method: 'DELETE' }),
+
+  getHotelAvailability: (hotelId, params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/api/admin/hotels/${hotelId}/availability${qs ? `?${qs}` : ''}`);
+  },
+
+  getHotelRoomAvailability: (hotelId, roomIndex, params = {}) => {
+    const qs = new URLSearchParams({ ...params, room: String(roomIndex) }).toString();
+    return request(`/api/admin/hotels/${hotelId}/availability?${qs}`);
+  },
+
+  updateHotelAvailability: (hotelId, payload) =>
+    request(`/api/admin/hotels/${hotelId}/availability`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  updateHotelRoomAvailability: (hotelId, roomIndex, payload) =>
+    request(`/api/admin/hotels/${hotelId}/availability`, {
+      method: 'PUT',
+      body: JSON.stringify({ ...payload, roomIndex }),
+    }),
 };

@@ -15,6 +15,9 @@ const EMPTY_FORM = {
   email: '',
   phone: '',
   date: '',
+  checkIn: '',
+  checkOut: '',
+  rooms: '1',
   travelers: '2',
   stay: '',
   payment: 'pre_request',
@@ -57,6 +60,11 @@ export default function BookingSheet({
   stayField = 'none',
   defaultStay = '',
   titleEm,
+  bookingMode = 'default',
+  defaultCheckIn = '',
+  defaultCheckOut = '',
+  defaultRooms = 1,
+  stayTotalPrice = null,
 }) {
   const { t } = useLang();
   const [form, setForm] = useState({ ...EMPTY_FORM, stay: defaultStay });
@@ -70,15 +78,23 @@ export default function BookingSheet({
   const [entered, setEntered] = useState(false);
   const [pricePulse, setPricePulse] = useState(false);
 
+  const isHotelBooking = bookingMode === 'hotel';
   const travelersCount = Number(form.travelers) || 1;
-  const totalPrice = useMemo(
-    () => calcBookingTotal(unitPrice, travelersCount, pricePerPerson),
-    [unitPrice, travelersCount, pricePerPerson]
-  );
+  const roomsCount = Math.max(1, Number(form.rooms) || 1);
+  const totalPrice = useMemo(() => {
+    if (isHotelBooking && stayTotalPrice != null) return stayTotalPrice;
+    return calcBookingTotal(unitPrice, travelersCount, pricePerPerson);
+  }, [isHotelBooking, stayTotalPrice, unitPrice, travelersCount, pricePerPerson]);
 
   useEffect(() => {
     if (open) {
-      setForm({ ...EMPTY_FORM, stay: defaultStay });
+      setForm({
+        ...EMPTY_FORM,
+        stay: defaultStay,
+        checkIn: defaultCheckIn || '',
+        checkOut: defaultCheckOut || '',
+        rooms: String(defaultRooms || 1),
+      });
       setCard(EMPTY_CARD);
       setPaidWithCard(false);
       setGdpr(false);
@@ -91,7 +107,7 @@ export default function BookingSheet({
     }
     setEntered(false);
     return undefined;
-  }, [open, defaultStay, itemId]);
+  }, [open, defaultStay, defaultCheckIn, defaultCheckOut, defaultRooms, itemId]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -140,6 +156,17 @@ export default function BookingSheet({
       }
     }
 
+    if (isHotelBooking) {
+      if (!form.checkIn || !form.checkOut) {
+        setFormError(t('hotels_booking_dates_required'));
+        return;
+      }
+      if (form.checkOut <= form.checkIn) {
+        setFormError(t('hotels_booking_dates_invalid'));
+        return;
+      }
+    }
+
     setSubmitting(true);
     setFormError('');
 
@@ -151,7 +178,10 @@ export default function BookingSheet({
         name: form.name,
         email: form.email,
         phone: form.phone,
-        travel_date: form.date,
+        travel_date: isHotelBooking ? form.checkIn : form.date,
+        check_in_date: isHotelBooking ? form.checkIn : undefined,
+        check_out_date: isHotelBooking ? form.checkOut : undefined,
+        rooms_requested: isHotelBooking ? roomsCount : undefined,
         travelers: travelersCount,
         stay_type: form.stay || null,
         message: form.message,
@@ -353,65 +383,150 @@ export default function BookingSheet({
                     className="booking-input"
                   />
                 </BookingField>
-                <BookingField icon="Calendar" label={`${t('place_form_date')} *`} delay={160}>
+                <BookingField icon="Calendar" label={`${t('hotels_checkin')} *`} delay={160}>
                   <input
                     type="date"
-                    name="date"
-                    value={form.date}
+                    name={isHotelBooking ? 'checkIn' : 'date'}
+                    value={isHotelBooking ? form.checkIn : form.date}
                     onChange={onChange}
                     required
                     className="booking-input"
                   />
                 </BookingField>
+                {isHotelBooking ? (
+                  <BookingField icon="Calendar" label={`${t('hotels_checkout')} *`} delay={180}>
+                    <input
+                      type="date"
+                      name="checkOut"
+                      value={form.checkOut}
+                      onChange={onChange}
+                      min={form.checkIn || undefined}
+                      required
+                      className="booking-input"
+                    />
+                  </BookingField>
+                ) : (
+                  <BookingField icon="Users" label={t('place_form_travelers')} delay={200}>
+                    <div className="booking-stepper">
+                      <button
+                        type="button"
+                        className="booking-stepper__btn"
+                        onClick={() => setTravelers(travelersCount - 1)}
+                        disabled={travelersCount <= 1}
+                        aria-label="-"
+                      >
+                        <Icon name="Minus" size={16} />
+                      </button>
+                      <span key={travelersCount} className="booking-stepper__value">
+                        {travelersCount}
+                      </span>
+                      <button
+                        type="button"
+                        className="booking-stepper__btn"
+                        onClick={() => setTravelers(travelersCount + 1)}
+                        disabled={travelersCount >= 8}
+                        aria-label="+"
+                      >
+                        <Icon name="Plus" size={16} />
+                      </button>
+                    </div>
+                  </BookingField>
+                )}
               </div>
 
               <div className="booking-sheet__grid booking-sheet__grid--2">
-                <BookingField icon="Users" label={t('place_form_travelers')} delay={200}>
-                  <div className="booking-stepper">
-                    <button
-                      type="button"
-                      className="booking-stepper__btn"
-                      onClick={() => setTravelers(travelersCount - 1)}
-                      disabled={travelersCount <= 1}
-                      aria-label="-"
-                    >
-                      <Icon name="Minus" size={16} />
-                    </button>
-                    <span key={travelersCount} className="booking-stepper__value">
-                      {travelersCount}
-                    </span>
-                    <button
-                      type="button"
-                      className="booking-stepper__btn"
-                      onClick={() => setTravelers(travelersCount + 1)}
-                      disabled={travelersCount >= 8}
-                      aria-label="+"
-                    >
-                      <Icon name="Plus" size={16} />
-                    </button>
-                  </div>
-                </BookingField>
+                {isHotelBooking ? (
+                  <>
+                    <BookingField icon="Bed" label={t('hotels_rooms_label')} delay={200}>
+                      <select
+                        name="rooms"
+                        value={form.rooms}
+                        onChange={onChange}
+                        className="booking-input"
+                      >
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <option key={n} value={n}>
+                            {n}
+                          </option>
+                        ))}
+                      </select>
+                    </BookingField>
+                    <BookingField icon="Users" label={t('place_form_travelers')} delay={220}>
+                      <div className="booking-stepper">
+                        <button
+                          type="button"
+                          className="booking-stepper__btn"
+                          onClick={() => setTravelers(travelersCount - 1)}
+                          disabled={travelersCount <= 1}
+                          aria-label="-"
+                        >
+                          <Icon name="Minus" size={16} />
+                        </button>
+                        <span key={travelersCount} className="booking-stepper__value">
+                          {travelersCount}
+                        </span>
+                        <button
+                          type="button"
+                          className="booking-stepper__btn"
+                          onClick={() => setTravelers(travelersCount + 1)}
+                          disabled={travelersCount >= 8}
+                          aria-label="+"
+                        >
+                          <Icon name="Plus" size={16} />
+                        </button>
+                      </div>
+                    </BookingField>
+                  </>
+                ) : (
+                  <>
+                    <BookingField icon="Users" label={t('place_form_travelers')} delay={200}>
+                      <div className="booking-stepper">
+                        <button
+                          type="button"
+                          className="booking-stepper__btn"
+                          onClick={() => setTravelers(travelersCount - 1)}
+                          disabled={travelersCount <= 1}
+                          aria-label="-"
+                        >
+                          <Icon name="Minus" size={16} />
+                        </button>
+                        <span key={travelersCount} className="booking-stepper__value">
+                          {travelersCount}
+                        </span>
+                        <button
+                          type="button"
+                          className="booking-stepper__btn"
+                          onClick={() => setTravelers(travelersCount + 1)}
+                          disabled={travelersCount >= 8}
+                          aria-label="+"
+                        >
+                          <Icon name="Plus" size={16} />
+                        </button>
+                      </div>
+                    </BookingField>
 
-                {stayField !== 'none' && (
-                  <BookingField icon="Hotel" label={t('place_form_stay')} delay={240}>
-                    <select
-                      name="stay"
-                      value={form.stay}
-                      onChange={onChange}
-                      className="booking-input"
-                    >
-                      {stayField === 'full' && (
-                        <option value="">{t('place_form_stay_ph')}</option>
-                      )}
-                      <option value="hotel">{t('place_form_stay_hotel')}</option>
-                      {stayField === 'full' && (
-                        <>
-                          <option value="guesthouse">{t('place_form_stay_guest')}</option>
-                          <option value="camp">{t('place_form_stay_camp')}</option>
-                        </>
-                      )}
-                    </select>
-                  </BookingField>
+                    {stayField !== 'none' && (
+                      <BookingField icon="Hotel" label={t('place_form_stay')} delay={240}>
+                        <select
+                          name="stay"
+                          value={form.stay}
+                          onChange={onChange}
+                          className="booking-input"
+                        >
+                          {stayField === 'full' && (
+                            <option value="">{t('place_form_stay_ph')}</option>
+                          )}
+                          <option value="hotel">{t('place_form_stay_hotel')}</option>
+                          {stayField === 'full' && (
+                            <>
+                              <option value="guesthouse">{t('place_form_stay_guest')}</option>
+                              <option value="camp">{t('place_form_stay_camp')}</option>
+                            </>
+                          )}
+                        </select>
+                      </BookingField>
+                    )}
+                  </>
                 )}
               </div>
 
