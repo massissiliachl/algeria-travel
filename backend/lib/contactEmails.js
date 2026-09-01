@@ -6,6 +6,7 @@ const SUBJECT_LABELS = {
   reservation: 'Réservation',
   information: "Demande d'information",
   devis: 'Demande de devis',
+  proposition: 'Proposition de voyage',
   autres: 'Autres',
 };
 

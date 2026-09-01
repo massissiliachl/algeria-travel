@@ -184,6 +184,7 @@ const Contact = () => {
                           {t('contact_subject_info')}
                         </option>
                         <option value="devis">{t('contact_subject_quote')}</option>
+                        <option value="proposition">{t('contact_subject_proposal')}</option>
                         <option value="autres">{t('contact_subject_other')}</option>
                       </select>
                     </label>

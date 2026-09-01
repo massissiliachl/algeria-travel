@@ -176,7 +176,7 @@ export const HOME_SHOWCASE_CARDS = [
     ar: 'فنادق',
     descKey: 'home_showcase_hotels_desc',
     ctaKey: 'home_showcase_hotels_cta',
-    image: '/images/home/acc-hotel.jpg',
+    image: '/images/hotels/hotel.avif',
     fallback: '/images/bejaia.jpeg',
     link: '/hotels',
   },

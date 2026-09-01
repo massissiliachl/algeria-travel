@@ -18,6 +18,7 @@ import {
   suggestActivities,
   suggestDestinations,
 } from '../../data/search';
+import { api } from '../../services/api';
 import './HomeLanding.css';
 
 const TRUST = [
@@ -52,7 +53,17 @@ const HomeLanding = () => {
     activity: '',
   });
   const [openSuggest, setOpenSuggest] = useState(null); // 'destination' | 'activity' | null
-  const [email, setEmail] = useState('');
+  const [proposal, setProposal] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    website: '',
+  });
+  const [proposalGdpr, setProposalGdpr] = useState(false);
+  const [proposalSending, setProposalSending] = useState(false);
+  const [proposalSent, setProposalSent] = useState(false);
+  const [proposalError, setProposalError] = useState('');
   const searchWrapRef = useRef(null);
 
   const destSuggestions = suggestDestinations(search.destination);
@@ -91,11 +102,35 @@ const HomeLanding = () => {
     navigate(suggestion.path);
   };
 
-  const handleNews = (e) => {
+  const handleProposalChange = (e) => {
+    const { name, value } = e.target;
+    setProposal((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleProposal = async (e) => {
     e.preventDefault();
-    if (email.includes('@')) alert(t('footer_newsletter_success'));
-    else alert(t('footer_newsletter_invalid'));
-    setEmail('');
+    if (!proposalGdpr) {
+      setProposalError(t('booking_gdpr_required'));
+      return;
+    }
+
+    setProposalSending(true);
+    setProposalError('');
+
+    try {
+      await api.sendContact({
+        ...proposal,
+        subject: 'proposition',
+        gdpr_consent: true,
+      });
+      setProposalSent(true);
+      setProposal({ name: '', email: '', phone: '', message: '', website: '' });
+      setProposalGdpr(false);
+    } catch (err) {
+      setProposalError(err.message || 'Une erreur est survenue.');
+    } finally {
+      setProposalSending(false);
+    }
   };
 
   const scrollTrack = (ref, dir) => {
@@ -648,18 +683,87 @@ const HomeLanding = () => {
             <div className="hv-news__body">
               <h2>{t('home_v2_news_title')}</h2>
               <p>{t('home_v2_news_text')}</p>
-              <form className="hv-news__form" onSubmit={handleNews}>
-                <input
-                  type="email"
-                  placeholder={t('footer_email_placeholder')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <button type="submit" aria-label={t('footer_subscribe')}>
-                  <Icon name="ArrowRight" size={18} />
-                </button>
-              </form>
+
+              {proposalSent ? (
+                <div className="hv-news__success" role="status">
+                  <Icon name="Check" size={22} />
+                  <p>{t('contact_success')}</p>
+                  <button type="button" onClick={() => setProposalSent(false)}>
+                    {t('home_v2_proposal_again')}
+                  </button>
+                </div>
+              ) : (
+                <form className="hv-news__form" onSubmit={handleProposal}>
+                  <input
+                    type="text"
+                    name="website"
+                    value={proposal.website}
+                    onChange={handleProposalChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="hv-news__honeypot"
+                  />
+                  <div className="hv-news__fields">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder={t('contact_placeholder_name')}
+                      value={proposal.name}
+                      onChange={handleProposalChange}
+                      required
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder={t('contact_placeholder_email')}
+                      value={proposal.email}
+                      onChange={handleProposalChange}
+                      required
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder={t('contact_placeholder_phone')}
+                      value={proposal.phone}
+                      onChange={handleProposalChange}
+                      required
+                    />
+                    <textarea
+                      name="message"
+                      rows={3}
+                      placeholder={t('home_v2_proposal_placeholder')}
+                      value={proposal.message}
+                      onChange={handleProposalChange}
+                      required
+                    />
+                  </div>
+                  <label className="hv-news__gdpr">
+                    <input
+                      type="checkbox"
+                      checked={proposalGdpr}
+                      onChange={(e) => setProposalGdpr(e.target.checked)}
+                      required
+                    />
+                    <span>
+                      {t('booking_gdpr_prefix')}{' '}
+                      <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+                        {t('footer_privacy')}
+                      </Link>
+                      .
+                    </span>
+                  </label>
+                  {proposalError ? (
+                    <p className="hv-news__error" role="alert">
+                      {proposalError}
+                    </p>
+                  ) : null}
+                  <button type="submit" className="hv-news__submit" disabled={proposalSending}>
+                    {proposalSending ? t('contact_sending') : t('home_v2_proposal_submit')}
+                    <Icon name="Send" size={16} />
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>

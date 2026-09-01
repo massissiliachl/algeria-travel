@@ -7,7 +7,7 @@ const { sendContactClientEmail, sendContactAdminEmail } = require('../lib/contac
 const router = express.Router();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VALID_SUBJECTS = new Set(['reservation', 'information', 'devis', 'autres']);
+const VALID_SUBJECTS = new Set(['reservation', 'information', 'devis', 'autres', 'proposition']);
 
 const contactLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
