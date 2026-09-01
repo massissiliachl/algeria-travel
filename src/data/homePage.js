@@ -7,6 +7,68 @@ export const HOME_HERO = {
   fallback: '/images/heroaccueil.png',
 };
 
+/** Destinations rondes — bulles accueil */
+export const HOME_SPOT_DESTINATIONS = [
+  {
+    id: 'taghit',
+    name: 'Taghit',
+    name_en: 'Taghit',
+    name_ar: 'تاغيت',
+    image: '/images/home/taghit.webp',
+    fallback: '/images/sahara5.jpeg',
+    link: '/place/taghit',
+  },
+  {
+    id: 'djanet',
+    name: 'Djanet',
+    name_en: 'Djanet',
+    name_ar: 'جانت',
+    image: '/images/djanet.jpeg',
+    link: '/place/djanet',
+  },
+  {
+    id: 'alger',
+    name: 'Alger',
+    name_en: 'Algiers',
+    name_ar: 'الجزائر',
+    image: '/images/home/dest-alger.jpg',
+    fallback: '/images/alger.jpeg',
+    link: '/place/alger',
+  },
+  {
+    id: 'ghardaia',
+    name: 'Ghardaïa',
+    name_en: 'Ghardaia',
+    name_ar: 'غرداية',
+    image: '/images/ghardaia.jpeg',
+    link: '/place/ghardaia',
+  },
+  {
+    id: 'beni-isguen',
+    name: 'Beni Isguen',
+    name_en: 'Beni Isguen',
+    name_ar: 'بني يزقن',
+    image: '/images/ghardaia.jpeg',
+    link: '/place/ghardaia',
+  },
+  {
+    id: 'el-atteuf',
+    name: 'El Atteuf',
+    name_en: 'El Atteuf',
+    name_ar: 'العطوف',
+    image: '/images/ghardaia.jpeg',
+    link: '/place/ghardaia',
+  },
+  {
+    id: 'timimoun',
+    name: 'Timimoun',
+    name_en: 'Timimoun',
+    name_ar: 'تيميمون',
+    image: '/images/sahara1.jpeg',
+    link: '/place/timimoun',
+  },
+];
+
 const hotel = TAGHIT_PACKAGES.hotel;
 const guest = TAGHIT_PACKAGES.guesthouse;
 
@@ -103,24 +165,31 @@ export const HOME_DESTINATIONS = [
   },
 ];
 
-export const HOME_ACCOMMODATIONS = [
+/** Cartes Hôtels / Expériences — bandeau accueil (mockup) */
+export const HOME_SHOWCASE_CARDS = [
   {
     key: 'hotels',
+    featured: true,
+    badgeKey: 'home_showcase_badge',
     fr: 'Hôtels',
     en: 'Hotels',
     ar: 'فنادق',
-    cta: { fr: 'Voir les hôtels', en: 'See hotels', ar: 'عرض الفنادق' },
+    descKey: 'home_showcase_hotels_desc',
+    ctaKey: 'home_showcase_hotels_cta',
     image: '/images/home/acc-hotel.jpg',
+    fallback: '/images/bejaia.jpeg',
     link: '/hotels',
   },
   {
-    key: 'guesthouses',
-    fr: 'Maisons d’hôtes',
-    en: 'Guest houses',
-    ar: 'بيوت الضيافة',
-    cta: { fr: 'Voir les maisons d’hôtes', en: 'See guest houses', ar: 'عرض بيوت الضيافة' },
-    image: '/images/maison-hote-sud-1.png',
-    link: '/stays?type=guesthouses',
+    key: 'experiences',
+    fr: 'Expériences',
+    en: 'Experiences',
+    ar: 'تجارب',
+    descKey: 'home_showcase_exp_desc',
+    ctaKey: 'home_showcase_exp_cta',
+    image: '/images/sahara5.jpeg',
+    fallback: '/images/home/circuits-4x4.png',
+    link: '/activities',
   },
 ];
 

@@ -17,7 +17,7 @@ const ResponsiveImage = ({
   ...rest
 }) => {
   const loading = priority ? 'eager' : 'lazy';
-  const fetchPriority = priority ? 'high' : undefined;
+  const fetchpriority = priority ? 'high' : undefined;
 
   if (srcSet) {
     return (
@@ -28,7 +28,7 @@ const ResponsiveImage = ({
         alt={alt}
         className={className}
         loading={loading}
-        fetchPriority={fetchPriority}
+        {...(fetchpriority ? { fetchpriority } : {})}
         decoding={priority ? 'sync' : 'async'}
         width={width}
         height={height}
@@ -44,7 +44,7 @@ const ResponsiveImage = ({
       alt={alt}
       className={className}
       loading={loading}
-      fetchPriority={fetchPriority}
+      {...(fetchpriority ? { fetchpriority } : {})}
       decoding={priority ? 'sync' : 'async'}
       width={width}
       height={height}

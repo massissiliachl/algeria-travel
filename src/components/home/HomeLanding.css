@@ -732,7 +732,7 @@
   min-height: 44px;
   padding: 0 18px;
   border-radius: 999px;
-  background: var(--coup-ink);
+  background: var(--coup-ember-deep);
   color: #fff;
   text-decoration: none;
   font-size: 0.84rem;
@@ -741,16 +741,8 @@
 }
 
 .hv-coup__formula-cta:hover {
-  background: #2A3548;
-  transform: translateY(-1px);
-}
-
-.hv-coup__formula--hotel .hv-coup__formula-cta {
-  background: var(--coup-ember-deep);
-}
-
-.hv-coup__formula--hotel .hv-coup__formula-cta:hover {
   background: #82603A;
+  transform: translateY(-1px);
 }
 
 .hv-trust__grid {
@@ -1130,6 +1122,345 @@
 
 .hv-stats__grid > div:not(:last-child) {
   border-right: 1px solid rgba(26, 35, 50, 0.1);
+}
+
+/* Destinations bulles circulaires */
+.hv-spots {
+  padding: 28px 0 32px;
+  background: #fff;
+}
+
+.hv-spots__track {
+  display: flex;
+  gap: clamp(16px, 3vw, 28px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 4px 8px;
+  align-items: flex-start;
+}
+
+.hv-spots__track::-webkit-scrollbar {
+  display: none;
+}
+
+.hv-spot {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 76px;
+  max-width: 96px;
+  text-decoration: none;
+  color: var(--ink);
+  scroll-snap-align: start;
+}
+
+.hv-spot__img {
+  display: block;
+  width: clamp(68px, 14vw, 88px);
+  height: clamp(68px, 14vw, 88px);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 18px rgba(26, 35, 50, 0.14);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.hv-spot:hover .hv-spot__img {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26, 35, 50, 0.18);
+}
+
+.hv-spot__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hv-spot__img--more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+}
+
+.hv-spot__name {
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.25;
+  color: var(--forest);
+}
+
+.hv-spot--more .hv-spot__name {
+  color: var(--gold);
+}
+
+@media (min-width: 900px) {
+  .hv-spots__track {
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: visible;
+  }
+}
+
+/* Showcase Hôtels / Expériences */
+.hv-showcase {
+  padding: 48px 0 0;
+  background: #fff;
+}
+
+.hv-showcase__carousel {
+  position: relative;
+}
+
+.hv-showcase__track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 52px 4px 2px;
+}
+
+.hv-showcase__track::-webkit-scrollbar {
+  display: none;
+}
+
+.hv-showcase-card {
+  position: relative;
+  flex: 0 0 260px;
+  min-height: 300px;
+  border-radius: 22px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  scroll-snap-align: start;
+  isolation: isolate;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
+}
+
+.hv-showcase-card--featured {
+  flex: 0 0 calc(100% - 68px);
+  min-height: 320px;
+}
+
+.hv-showcase-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.16);
+}
+
+.hv-showcase-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.hv-showcase-card:hover img {
+  transform: scale(1.04);
+}
+
+.hv-showcase-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 16, 28, 0.08) 0%,
+    rgba(8, 16, 28, 0.18) 42%,
+    rgba(8, 16, 28, 0.72) 100%
+  );
+}
+
+.hv-showcase-card__badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(196, 165, 116, 0.95);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hv-showcase-card__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 22px 20px 24px;
+}
+
+.hv-showcase-card__body h3 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: clamp(1.65rem, 4vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.hv-showcase-card__body p {
+  margin: 0 0 16px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 28ch;
+}
+
+.hv-showcase-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--forest);
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.hv-showcase-card:hover .hv-showcase-card__cta {
+  background: #f8fafc;
+}
+
+.hv-showcase__nav {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--forest);
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.14);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.hv-showcase__nav:hover {
+  background: #f8fafc;
+}
+
+.hv-showcase__nav:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+/* Bandeau confiance sous showcase */
+.hv-showcase-trust {
+  padding: 20px 0 36px;
+  background: #fff;
+}
+
+.hv-showcase-trust__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px clamp(16px, 4vw, 32px);
+  background: #fff;
+  border: 1px solid rgba(26, 35, 50, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+.hv-showcase-trust__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 4px 8px;
+}
+
+.hv-showcase-trust__item:not(:last-child) {
+  border-right: 1px solid rgba(26, 35, 50, 0.08);
+}
+
+.hv-showcase-trust__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--gold);
+  background: rgba(184, 147, 93, 0.1);
+}
+
+.hv-showcase-trust__item span:last-child {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--forest);
+}
+
+@media (min-width: 900px) {
+  .hv-showcase {
+    padding: 12px 0 0;
+  }
+
+  .hv-showcase__track {
+    display: grid;
+    grid-template-columns: 1.85fr 1fr;
+    gap: 14px;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .hv-showcase-card,
+  .hv-showcase-card--featured {
+    flex: unset;
+    min-height: 340px;
+  }
+
+  .hv-showcase__nav {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hv-showcase-trust__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 8px;
+  }
+
+  .hv-showcase-trust__item:not(:last-child) {
+    border-right: none;
+  }
+
+  .hv-showcase-trust__item:nth-child(odd) {
+    border-right: 1px solid rgba(26, 35, 50, 0.08);
+  }
+
+  .hv-showcase-trust__item:nth-child(-n + 2) {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(26, 35, 50, 0.08);
+  }
 }
 
 /* Accommodations */

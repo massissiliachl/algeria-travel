@@ -4,11 +4,12 @@ import { useLang } from '../../hooks/useLangHook';
 import Icon from '../ui/Icon';
 import ResponsiveImage from '../ui/ResponsiveImage';
 import {
-  HOME_ACCOMMODATIONS,
   HOME_CIRCUITS_BANNER,
   HOME_COUP_TAGHIT,
   HOME_DESTINATIONS,
   HOME_HERO,
+  HOME_SHOWCASE_CARDS,
+  HOME_SPOT_DESTINATIONS,
 } from '../../data/homePage';
 import { FEATURED_TOURS } from '../../data/tours';
 import { getPlacePathFromTour } from '../../data/placeRoutes';
@@ -43,7 +44,7 @@ const HomeLanding = () => {
   const { t, pick } = useLang();
   const destRef = useRef(null);
   const toursRef = useRef(null);
-  const accRef = useRef(null);
+  const showcaseRef = useRef(null);
   const [search, setSearch] = useState({
     destination: '',
     dates: '',
@@ -266,6 +267,34 @@ const HomeLanding = () => {
           </button>
         </form>
       </div>
+
+      <section className="hv-spots" aria-label={t('home_spots_label')}>
+        <div className="hv-container">
+          <div className="hv-spots__track">
+            {HOME_SPOT_DESTINATIONS.map((spot) => (
+              <Link key={spot.id} to={spot.link} className="hv-spot">
+                <span className="hv-spot__img">
+                  <img
+                    src={spot.image}
+                    alt=""
+                    loading="lazy"
+                    onError={(e) => {
+                      if (spot.fallback) e.currentTarget.src = spot.fallback;
+                    }}
+                  />
+                </span>
+                <span className="hv-spot__name">{pick(spot.name, spot.name_en, spot.name_ar)}</span>
+              </Link>
+            ))}
+            <Link to="/destinations" className="hv-spot hv-spot--more" aria-label={t('home_spots_more')}>
+              <span className="hv-spot__img hv-spot__img--more">
+                <Icon name="ArrowRight" size={20} strokeWidth={2} />
+              </span>
+              <span className="hv-spot__name">{t('home_spots_more')}</span>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section className="hv-coup" aria-labelledby="hv-coup-title" data-reveal>
         <div className="hv-container">
@@ -543,53 +572,70 @@ const HomeLanding = () => {
         </div>
       </section>
 
-      <section className="hv-acc" id="guesthouses">
+      <section className="hv-showcase" id="hotels" aria-label={t('home_showcase_label')}>
         <div className="hv-container">
-          <div className="hv-section-head hv-section-head--center" data-reveal>
-            <div>
-              <span className="hv-eyebrow">{t('home_v2_acc_eyebrow')}</span>
-              <h2>{t('home_v2_acc_title')}</h2>
-            </div>
-          </div>
-
-          <div className="hv-carousel">
-            <div className="hv-carousel__track hv-acc__track" ref={accRef}>
-              {HOME_ACCOMMODATIONS.map((acc, i) => (
-                <article
-                  key={acc.key}
-                  className="hv-acc-card"
+          <div className="hv-showcase__carousel">
+            <div className="hv-showcase__track" ref={showcaseRef}>
+              {HOME_SHOWCASE_CARDS.map((card) => (
+                <Link
+                  key={card.key}
+                  to={card.link}
+                  className={`hv-showcase-card${card.featured ? ' hv-showcase-card--featured' : ''}`}
                   data-reveal
-                  data-delay={i * 70}
-                  onClick={() => navigate(acc.link || '/stays')}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      navigate(acc.link || '/stays');
-                    }
-                  }}
-                  role="link"
-                  tabIndex={0}
                 >
-                  <img src={acc.image} alt="" loading="lazy" />
-                  <div className="hv-acc-card__body">
-                    <h3>{pick(acc.fr, acc.en, acc.ar)}</h3>
-                    <span>
-                      {pick(acc.cta.fr, acc.cta.en, acc.cta.ar)}{' '}
-                      <Icon name="ArrowRight" size={14} />
+                  <img
+                    src={card.image}
+                    alt=""
+                    loading="lazy"
+                    onError={(e) => {
+                      if (card.fallback) e.currentTarget.src = card.fallback;
+                    }}
+                  />
+                  <div className="hv-showcase-card__overlay" aria-hidden />
+                  {card.badgeKey && (
+                    <span className="hv-showcase-card__badge">
+                      <Icon name="Star" size={11} strokeWidth={0} fill="currentColor" />
+                      {t(card.badgeKey)}
+                    </span>
+                  )}
+                  <div className="hv-showcase-card__body">
+                    <h3>{pick(card.fr, card.en, card.ar)}</h3>
+                    <p>{t(card.descKey)}</p>
+                    <span className="hv-showcase-card__cta">
+                      {t(card.ctaKey)}
+                      <Icon name="ArrowRight" size={15} strokeWidth={2.25} />
                     </span>
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
             <button
               type="button"
-              className="hv-carousel__next"
-              onClick={() => scrollTrack(accRef, 1)}
-              aria-label="Suivant"
+              className="hv-showcase__nav"
+              onClick={() => scrollTrack(showcaseRef, 1)}
+              aria-label={t('carousel_next')}
             >
-              <Icon name="ChevronRight" size={20} />
+              <Icon name="ChevronRight" size={20} strokeWidth={2} />
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="hv-showcase-trust" aria-label={t('home_showcase_trust_label')}>
+        <div className="hv-showcase-trust__grid">
+          {[
+            { icon: 'Tag', titleKey: 'home_showcase_trust_prices' },
+            { icon: 'CalendarCheck', titleKey: 'home_showcase_trust_realtime' },
+            { icon: 'ShieldCheck', titleKey: 'home_showcase_trust_secure' },
+            { icon: 'Headphones', titleKey: 'home_showcase_trust_support' },
+          ].map((item) => (
+            <div key={item.titleKey} className="hv-showcase-trust__item">
+              <span className="hv-showcase-trust__icon">
+                <Icon name={item.icon} size={20} strokeWidth={1.75} />
+              </span>
+              <span>{t(item.titleKey)}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -597,7 +643,7 @@ const HomeLanding = () => {
         <div className="hv-container">
           <div className="hv-news__card" data-reveal="zoom">
             <div className="hv-news__visual">
-              <img src="/images/home/news-coast.jpg" alt="" />
+              <img src="/images/home/algeria.webp" alt="" />
             </div>
             <div className="hv-news__body">
               <h2>{t('home_v2_news_title')}</h2>

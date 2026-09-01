@@ -151,61 +151,6 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://algeriatravel.com/hotels/hotel-el-djazair</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-sheraton-oran</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-royal-oran</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-constantine-palais</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-annaba-sabri</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-belvedere-ghardaia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-le-rym-ghardaia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-tahat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-zeriba-djanet</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-taghit-oasis</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://algeriatravel.com/hotels/hotel-timimoun-palmeraie</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://algeriatravel.com/blog/timgad-coucher-soleil</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

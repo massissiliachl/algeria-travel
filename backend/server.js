@@ -4,6 +4,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const helmet = require('helmet');
 const { testConnection, closePool } = require('./config/db');
 const { resolveSiteUrl, resolveFrontendUrl, resolveAdminUrl } = require('./lib/siteUrl');
 const reservationsRoutes = require('./routes/reservations');
@@ -11,6 +12,36 @@ const adminReservationsRoutes = require('./routes/admin/reservations');
 
 const app = express();
 app.set('trust proxy', 1);
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        connectSrc: [
+          "'self'",
+          'https://*.googleapis.com',
+          'https://*.firebaseio.com',
+          'https://fcmregistrations.googleapis.com',
+          'https://firebaseinstallations.googleapis.com',
+          'https://firebase.googleapis.com',
+          'wss://*.firebaseio.com',
+        ],
+        frameSrc: ["'self'", 'https://www.google.com', 'https://maps.google.com'],
+        workerSrc: ["'self'", 'blob:'],
+        manifestSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+      },
+    },
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = resolveFrontendUrl();
 const ADMIN_URL = resolveAdminUrl();
