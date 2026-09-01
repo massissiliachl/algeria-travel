@@ -1,11 +1,11 @@
-/** Destinations mises en avant — page hôtels (maquette) */
+/** Destinations mises en avant — page hôtels (photos réelles) */
 
 export const POPULAR_DESTINATIONS = [
   {
     key: 'alger',
     wilayaKey: 'alger',
-    priceFrom: 6000,
-    image: '/images/home/dest-alger.jpg',
+    priceFrom: 18000,
+    image: '/images/hotels/tahat-1.jpg',
     fr: 'Alger',
     en: 'Algiers',
     ar: 'الجزائر',
@@ -13,8 +13,8 @@ export const POPULAR_DESTINATIONS = [
   {
     key: 'oran',
     wilayaKey: 'oran',
-    priceFrom: 8000,
-    image: '/images/home/dest-oran.jpg',
+    priceFrom: 22000,
+    image: '/images/hotels/sheraton-oran.jpg',
     fr: 'Oran',
     en: 'Oran',
     ar: 'وهران',
@@ -23,7 +23,7 @@ export const POPULAR_DESTINATIONS = [
     key: 'bejaia',
     wilayaKey: 'bejaia',
     priceFrom: 14500,
-    image: '/images/hotels/royal-bejaia-1.jpg',
+    image: '/images/hotels/bejaia/bejaia-coast.jpg',
     fr: 'Béjaïa',
     en: 'Bejaia',
     ar: 'بجاية',
@@ -31,19 +31,19 @@ export const POPULAR_DESTINATIONS = [
   {
     key: 'constantine',
     wilayaKey: 'constantine',
-    priceFrom: 7000,
-    image: '/images/home/exp-culture.jpg',
+    priceFrom: 12000,
+    image: '/images/hotels/constantine-bridge.png',
     fr: 'Constantine',
     en: 'Constantine',
     ar: 'قسنطينة',
   },
   {
-    key: 'tlemcen',
-    wilayaKey: 'tlemcen',
-    priceFrom: 5500,
-    image: '/images/home/dest-alger.jpg',
-    fr: 'Tlemcen',
-    en: 'Tlemcen',
-    ar: 'تلمسان',
+    key: 'ghardaia',
+    wilayaKey: 'ghardaia',
+    priceFrom: 11000,
+    image: '/images/hotels/le-rym-ghardaia.jpg',
+    fr: 'Ghardaïa',
+    en: 'Ghardaia',
+    ar: 'غرداية',
   },
 ];

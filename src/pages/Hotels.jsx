@@ -88,7 +88,14 @@ const Hotels = () => {
       .then((rows) => {
         if (cancelled) return;
         const normalized = normalizeHotels(rows);
-        if (normalized.length) setHotels(normalized);
+        if (normalized.length) {
+          const byId = new Map(HOTELS.map((h) => [h.id, h]));
+          normalized.forEach((h) => {
+            const base = byId.get(h.id) || {};
+            byId.set(h.id, { ...base, ...h, image: h.image || base.image });
+          });
+          setHotels([...byId.values()]);
+        }
       })
       .catch(() => {})
       .finally(() => {
@@ -226,10 +233,6 @@ const Hotels = () => {
     setSearchParams(params);
   };
 
-  const scrollToResults = () => {
-    document.getElementById('hotels-results')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <div className="htl-page htl-page--v3">
       <SeoHead
@@ -250,11 +253,26 @@ const Hotels = () => {
         />
         <div className="htl-hero__overlay htl-hero__overlay--v3" />
         <div className="htl-container htl-hero__inner">
+          <p className="htl-hero__eyebrow htl-hero__eyebrow--v3">{t('hotels_hero_eyebrow')}</p>
           <h1 className="htl-hero__title htl-hero__title--v3">
             {t('hotels_hero_v2_title_before')}
             <em>{t('hotels_hero_v2_title_em')}</em>
           </h1>
           <p className="htl-hero__subtitle htl-hero__subtitle--v3">{t('hotels_hero_v2_subtitle')}</p>
+          <ul className="htl-hero__perks" aria-label={t('hotels_trust_title')}>
+            <li>
+              <Icon name="ShieldCheck" size={16} />
+              {t('hotels_feat_selected')}
+            </li>
+            <li>
+              <Icon name="Zap" size={16} />
+              {t('hotels_feat_avail')}
+            </li>
+            <li>
+              <Icon name="Tag" size={16} />
+              {t('hotels_feat_price')}
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -332,12 +350,15 @@ const Hotels = () => {
 
       <section className="htl-results htl-results--v3" id="hotels-results">
         {mobileFiltersOpen && (
-          <div className="htl-filters-drawer">
+          <div className="htl-filters-drawer" role="dialog" aria-modal="true" aria-label={t('hotels_filters')}>
             <div className="htl-filters-drawer__backdrop" onClick={() => setMobileFiltersOpen(false)} />
             <div className="htl-filters-drawer__panel">
-              <button type="button" className="htl-filters-drawer__close" onClick={() => setMobileFiltersOpen(false)}>
-                ×
-              </button>
+              <div className="htl-filters-drawer__head">
+                <h3>{t('hotels_filters')}</h3>
+                <button type="button" className="htl-filters-drawer__close" onClick={() => setMobileFiltersOpen(false)} aria-label="Fermer">
+                  <Icon name="X" size={20} />
+                </button>
+              </div>
               <HotelFiltersPanel
                 wilaya={wilaya}
                 priceRange={priceRange}
@@ -357,88 +378,128 @@ const Hotels = () => {
         )}
 
         <div className="htl-container">
-          <div className="htl-section-head">
-            <h2>{t('hotels_popular_title')}</h2>
-            <div className="htl-section-head__actions">
-              <button type="button" className="htl-mobile-filters-btn htl-mobile-filters-btn--inline" onClick={() => setMobileFiltersOpen(true)}>
-                <Icon name="Compass" size={16} />
-                {t('hotels_filters')}
-              </button>
-              <button type="button" className="htl-link htl-link--arrow" onClick={scrollToResults}>
-                {t('hotels_see_all')}
-                <Icon name="ArrowRight" size={14} />
-              </button>
+          <div className="htl-results__layout htl-results__layout--v3">
+            <aside className="htl-filters--desktop" aria-label={t('hotels_filters')}>
+              <HotelFiltersPanel
+                wilaya={wilaya}
+                priceRange={priceRange}
+                starFilters={starFilters}
+                amenityFilters={amenityFilters}
+                starCounts={starCounts}
+                onWilayaChange={setWilaya}
+                onPriceChange={setPriceRange}
+                onStarToggle={toggleStar}
+                onAmenityToggle={toggleAmenity}
+                onReset={resetFilters}
+                t={t}
+                pick={pick}
+              />
+            </aside>
+
+            <div className="htl-results__main">
+              <header className="htl-section-head htl-section-head--results">
+                <div>
+                  <p className="htl-section-head__eyebrow">{t('hotels_results_eyebrow')}</p>
+                  <h2>{t('hotels_results_title')}</h2>
+                </div>
+                <button type="button" className="htl-mobile-filters-btn htl-mobile-filters-btn--inline" onClick={() => setMobileFiltersOpen(true)}>
+                  <Icon name="SlidersHorizontal" size={16} />
+                  {t('hotels_filters')}
+                </button>
+              </header>
+
+              {checkIn && checkOut && nights > 0 && (
+                <div className="htl-search-context">
+                  <Icon name="CalendarCheck" size={18} />
+                  <span>
+                    {nights} {nights > 1 ? t('hotels_nights') : t('hotels_night')} · {guests.adults}{' '}
+                    {t('hotels_guests_adults')}
+                    {wilaya !== 'all' && wilayaLabel ? ` · ${wilayaLabel}` : ''}
+                  </span>
+                </div>
+              )}
+
+              <HotelFilterChips
+                wilaya={wilaya}
+                wilayaLabel={wilayaLabel}
+                priceRange={priceRange}
+                starFilters={starFilters}
+                amenityFilters={amenityFilters}
+                checkIn={checkIn}
+                checkOut={checkOut}
+                nights={nights}
+                t={t}
+                onClearWilaya={() => setWilaya('all')}
+                onClearStars={(s) => setStarFilters((prev) => prev.filter((n) => n !== s))}
+                onClearAmenity={(key) =>
+                  setAmenityFilters((prev) => prev.filter((k) => k !== key))
+                }
+                onClearPrice={() => setPriceRange([PRICE_MIN, PRICE_MAX])}
+                onClearDates={clearDates}
+                onResetAll={resetFilters}
+              />
+
+              <div className="htl-results__toolbar">
+                <p className="htl-results__count">
+                  <strong>{filtered.length}</strong> {t('hotels_available_label')}
+                  {wilaya !== 'all' && wilayaLabel ? ` · ${wilayaLabel}` : ''}
+                </p>
+                <label className="htl-results__sort">
+                  <Icon name="ArrowUpDown" size={16} />
+                  <span className="sr-only">{t('hotels_sort_label')}</span>
+                  <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t('hotels_sort_label')}>
+                    {SORT_OPTIONS.map((o) => (
+                      <option key={o.key} value={o.key}>
+                        {t(o.labelKey)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {loading ? (
+                <div className="htl-pop-list htl-pop-list--loading" aria-busy="true" aria-live="polite">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="htl-pop-card htl-pop-card--skeleton">
+                      <div className="htl-pop-card__media htl-skeleton" />
+                      <div className="htl-pop-card__body">
+                        <div className="htl-skeleton htl-skeleton--line htl-skeleton--lg" />
+                        <div className="htl-skeleton htl-skeleton--line" />
+                        <div className="htl-skeleton htl-skeleton--line htl-skeleton--sm" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className="htl-empty-state">
+                  <span className="htl-empty-state__icon" aria-hidden="true">
+                    <Icon name="Building2" size={32} />
+                  </span>
+                  <h3>{t('hotels_empty')}</h3>
+                  <p>{t('hotels_hero_v2_subtitle')}</p>
+                  <button type="button" className="htl-btn htl-btn--primary" onClick={resetFilters}>
+                    {t('hotels_filters_reset')}
+                  </button>
+                </div>
+              ) : (
+                <div className="htl-pop-list">
+                  {filtered.map((hotel) => (
+                    <HotelPopularCard
+                      key={hotel.id}
+                      hotel={hotel}
+                      pick={pick}
+                      t={t}
+                      lang={amenityLang}
+                      isFavorite={favorites.has(hotel.id)}
+                      onToggleFavorite={toggleFavorite}
+                      onOpen={() => openHotel(hotel)}
+                      nights={nights}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-
-          {checkIn && checkOut && nights > 0 && (
-            <div className="htl-search-context">
-              <Icon name="CalendarCheck" size={18} />
-              <span>
-                {nights} {nights > 1 ? t('hotels_nights') : t('hotels_night')} · {guests.adults}{' '}
-                {t('hotels_guests_adults')}
-                {wilaya !== 'all' && wilayaLabel ? ` · ${wilayaLabel}` : ''}
-              </span>
-            </div>
-          )}
-
-          <HotelFilterChips
-            wilaya={wilaya}
-            wilayaLabel={wilayaLabel}
-            priceRange={priceRange}
-            starFilters={starFilters}
-            amenityFilters={amenityFilters}
-            checkIn={checkIn}
-            checkOut={checkOut}
-            nights={nights}
-            t={t}
-            onClearWilaya={() => setWilaya('all')}
-            onClearStars={(s) => setStarFilters((prev) => prev.filter((n) => n !== s))}
-            onClearAmenity={(key) =>
-              setAmenityFilters((prev) => prev.filter((k) => k !== key))
-            }
-            onClearPrice={() => setPriceRange([PRICE_MIN, PRICE_MAX])}
-            onClearDates={clearDates}
-            onResetAll={resetFilters}
-          />
-
-          <div className="htl-results__bar">
-            <p>
-              <strong>{filtered.length}</strong> {t('hotels_available_label')}
-              {wilaya !== 'all' && wilayaLabel && ` — ${wilayaLabel}`}
-            </p>
-            <label className="htl-results__sort">
-              <span>{t('hotels_sort_label')} :</span>
-              <select value={sort} onChange={(e) => setSort(e.target.value)}>
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.key} value={o.key}>
-                    {t(o.labelKey)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          {loading ? (
-            <p className="htl-empty">{t('loader_text') || 'Chargement…'}</p>
-          ) : filtered.length === 0 ? (
-            <p className="htl-empty">{t('hotels_empty')}</p>
-          ) : (
-            <div className="htl-pop-list">
-              {filtered.map((hotel) => (
-                <HotelPopularCard
-                  key={hotel.id}
-                  hotel={hotel}
-                  pick={pick}
-                  t={t}
-                  isFavorite={favorites.has(hotel.id)}
-                  onToggleFavorite={toggleFavorite}
-                  onOpen={() => openHotel(hotel)}
-                  nights={nights}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </section>
 

@@ -25,7 +25,14 @@ export default function PopularDestinations({ activeWilaya, onSelect, t, pick })
                 className={`htl-dest-card${isActive ? ' is-active' : ''}`}
                 onClick={() => onSelect(dest.wilayaKey)}
               >
-                <img src={dest.image} alt="" loading="lazy" />
+                <img
+                  src={dest.image}
+                  alt=""
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/bejaia.jpeg';
+                  }}
+                />
                 <div className="htl-dest-card__overlay">
                   <strong>{label}</strong>
                   <span>

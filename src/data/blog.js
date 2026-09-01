@@ -267,6 +267,44 @@ export const BLOG_POSTS = [
     ctaLabel_ar: 'عرض بيوت الضيافة',
     featured: true,
   },
+  {
+    id: 10,
+    slug: 'que-faire-constantine',
+    title: 'Que faire à Constantine : guide de la ville des ponts',
+    title_en: 'Things to do in Constantine: city of bridges guide',
+    title_ar: 'ماذا تفعل في قسنطينة: دليل مدينة الجسور',
+    excerpt:
+      'Ponts vertigineux, palais ottoman, musées et chakhchoukha… notre sélection pour explorer Constantine en 2 à 3 jours.',
+    excerpt_en:
+      'Dizzying bridges, Ottoman palace, museums and chakhchoukha… our pick for exploring Constantine in 2–3 days.',
+    excerpt_ar:
+      'جسور شاهقة وقصر عثماني ومتاحف وشخشوخة… اختياراتنا لاستكشاف قسنطينة في يومين إلى ثلاثة.',
+    body:
+      'Constantine ne se visite pas : on la ressent. Accrochée aux falaises du Rhummel, la « ville des ponts » surprend dès l’arrivée — le vide sous les tabliers, la brise qui monte des gorges, et cette impression que la ville flotte entre ciel et roche.\n\nCommencez par le pont Sidi M\'Cid, le plus spectaculaire : 175 mètres au-dessus du vide, inauguré en 1912. La traversée à pied est un moment fort — gardez votre appareil photo, mais prenez aussi le temps de regarder sans écran. Non loin, le pont Bab El-Kantara et la passerelle Mellah Slimane (Perregaux) offrent d’autres angles sur la médina et le fleuve. Le pont Sidi Rached, avec ses 27 arches, relie le centre-ville à la gare : une promenade idéale au coucher du soleil.\n\nCôté patrimoine, le palais Ahmed Bey est incontournable. Résidence du dernier bey ottoman, il mêle courants, faïences et boiseries de cèdre ; aujourd’hui musée, il raconte la résistance locale face à la conquête française. Le musée national de Cirta, quant à lui, retrace l’histoire de la région — de la Numidie aux mosaïques romaines — dans un bâtiment Art déco du centre-ville. Montez jusqu’au monument aux morts pour une vue panoramique sur les gorges.\n\nLes sites spirituels marquent aussi le paysage : la mosquée Emir Abdelkader, l’une des plus vastes d’Afrique, avec ses minarets élancés et ses vitraux ; la Grande Mosquée du vieux Constantine, fondée au VIIIe siècle, plus intime mais tout aussi impressionnante. Habillez-vous modestement et évitez les heures de prière si vous souhaitez visiter en silence.\n\nLa nature n’est jamais loin : sentiers le long du Rhummel, jardins ombragés, et excursions possibles vers le Djebel El Wahch pour randonneurs motivés. En ville, laissez-vous guider par l’odeur des mhajeb et de la chakhchoukha — spécialités constantinoises à partager autour d’un thé à la menthe.\n\nQuand partir ? Le printemps (mars–juin) et l’automne (septembre–novembre) offrent le meilleur équilibre : lumière douce, températures agréables pour marcher sur les ponts. Le tramway et les taxis facilitent les déplacements ; le centre historique se parcourt aussi très bien à pied.\n\nConstantine se combine naturellement avec un séjour à Alger ou une escapade vers Sétif et les ruines romaines voisines. Sur Algeria Travel, nous proposons des formules avec hébergement, guide francophone et visites des incontournables — pour que vous profitiez de la ville, pas seulement de la liste des monuments.',
+    body_en:
+      'Constantine is not just visited — it is felt. Clinging to the Rhummel cliffs, the "city of bridges" stuns on arrival: the void beneath the spans, the breeze rising from the gorges, and the sense that the city floats between sky and rock.\n\nStart with Sidi M\'Cid bridge, the most spectacular: 175 metres above the drop, opened in 1912. Walking across is a highlight — bring your camera, but also look up without a screen. Nearby, Bab El-Kantara bridge and the Mellah Slimane (Perregaux) footbridge offer other angles on the medina and river. Sidi Rached bridge, with 27 arches, links downtown to the station — ideal at sunset.\n\nFor heritage, Ahmed Bey palace is a must. Last Ottoman bey\'s residence, it blends courtyards, tilework and cedar ceilings; now a museum, it tells local resistance to the French conquest. Cirta National Museum traces regional history — from Numidia to Roman mosaics — in a downtown Art Deco building. Climb to the war memorial for a panoramic view of the gorges.\n\nSpiritual landmarks shape the skyline too: Emir Abdelkader Mosque, one of Africa\'s largest, with slender minarets and stained glass; the Great Mosque of old Constantine, founded in the 8th century, more intimate but equally striking. Dress modestly and avoid prayer times if you want a quiet visit.\n\nNature is never far: paths along the Rhummel, shaded gardens, and trips toward Djebel El Wahch for keen hikers. In town, follow the scent of mhajeb and chakhchoukha — Constantine specialities best shared over mint tea.\n\nWhen to go? Spring (March–June) and autumn (September–November) offer the best balance: soft light, pleasant temperatures for walking the bridges. Tram and taxis make getting around easy; the historic centre is very walkable.\n\nConstantine pairs naturally with Algiers or a side trip to Sétif and nearby Roman sites. On Algeria Travel we offer packages with accommodation, French-speaking guide and must-see visits — so you enjoy the city, not just a checklist.',
+    body_ar:
+      'قسنطينة لا تُزار فقط — تُحس. المعلقة فوق منحدرات الرمال، «مدينة الجسور» تدهش من اللحظة الأولى: الفراغ تحت الجسور والنسيم الصاعد من المضيق وإحساس أن المدينة تطفو بين السماء والصخر.\n\nابدأ بجسر سيدي مسيد، الأكثر روعة: 175 متراً فوق الهاوية، افتُتح عام 1912. عبوره مشياً لحظة لا تُنسى — التقط الصور لكن انظر أيضاً بلا شاشة. قريباً جسر باب القنطارة وجسر ملاح سليمان (بيرجو) يقدمان زوايا أخرى على المدينة القديمة والنهر. جسر سيدي راشد ب27 قوساً يربط الوسط بالمحطة — مثالية عند الغروب.\n\nفي التراث، قصر أحمد باي لا غنى عنه. مقر آخر باي عثماني، يجمع بين الأفنية والزليج والأخشاب؛ متحف اليوم يروي مقاومة المنطقة. متحف قيرطا الوطني يتتبع تاريخ المنطقة من النوميديا إلى الفسيفساء الرومانية. اصعد إلى نصب التذكار لإطلالة بانورامية على المضيق.\n\nالمعالم الدينية تشكل أفق المدينة: مسجد الأمير عبد القادر من أكبر مساجد أفريقيا؛ الجامع الكبير في قسنطينة القديمة من القرن الثامن. البس باحترام وتجنب أوقات الصلاة للزيارة الهادئة.\n\nالطبيعة قريبة دائماً: مسارات على طول الرمال وحدائق وظهرية. في المدينة، اتبع رائحة المحاجب والشخشوخة — أطباق قسنطينة تُشارك مع شاي بالنعناع.\n\nمتى تذهب؟ الربيع والخريف أفضل توازن. الترام وسيارات الأجرة يسهلان التنقل؛ الوسط التاريخي يُمشى سيراً.\n\nقسنطينة تتكامل طبيعياً مع الجزائر أو سطيف. على Algeria Travel نقدم باقات مع إقامة ومرشد وزيارات للمعالم — لتستمتع بالمدينة لا بقائمة فقط.',
+    category: 'destinations',
+    categoryLabel: 'Destinations',
+    categoryLabel_en: 'Destinations',
+    categoryLabel_ar: 'وجهات',
+    date: '1 Sep 2026',
+    date_en: 'Sep 1, 2026',
+    date_ar: '1 سبتمبر 2026',
+    readTime: '10 min',
+    image: '/images/hotels/constantine-bridge.png',
+    gallery: [
+      '/images/hotels/constantine-bridge.png',
+      '/images/home/exp-culture.jpg',
+      '/images/alger.jpeg',
+    ],
+    ctaPath: '/place/constantine',
+    ctaLabel: 'Découvrir Constantine',
+    ctaLabel_en: 'Explore Constantine',
+    ctaLabel_ar: 'اكتشف قسنطينة',
+    featured: true,
+  },
 ];
 
 export const BLOG_FILTERS = [

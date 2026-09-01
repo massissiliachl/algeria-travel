@@ -505,14 +505,15 @@ exports.PLACES = [
     "rating": 4.7,
     "reviews": 145,
     "temp": "20°C",
-    "image": "/images/alger.jpeg",
+    "image": "/images/hotels/constantine-bridge.png",
     "gallery": [
-      "/images/alger.jpeg",
-      "/images/home/dest-alger.jpg"
+      "/images/hotels/constantine-bridge.png",
+      "/images/home/exp-culture.jpg",
+      "/images/alger.jpeg"
     ],
-    "description": "Perchée sur son rocher, Constantine fascine par ses ponts, son palais Ahmed Bey et son histoire millénaire.",
-    "description_en": "Perched on its rock, Constantine fascinates with its bridges, Ahmed Bey palace and millennia of history.",
-    "description_ar": "تتربع قسنطينة على صخرتها وتبهر بجسورها وقصر أحمد باي وتاريخها العريق.",
+    "description": "Perchée au-dessus des gorges du Rhummel, Constantine — la « ville des ponts » — mêle paysages vertigineux et patrimoine millénaire. Du pont Sidi M'Cid au palais Ahmed Bey, en passant par le musée national de Cirta, la mosquée Emir Abdelkader et les saveurs de la chakhchoukha, chaque coin de la ville raconte une histoire. Idéale en printemps ou en automne pour une escapade culturelle de 2 à 3 jours.",
+    "description_en": "Perched above the Rhummel gorges, Constantine — the \"city of bridges\" — blends vertiginous landscapes with millennia of heritage. From Sidi M'Cid bridge to Ahmed Bey palace, Cirta National Museum, Emir Abdelkader Mosque and the flavours of chakhchoukha, every corner tells a story. Best in spring or autumn for a 2–3 day cultural break.",
+    "description_ar": "تتربع قسنطينة فوق مرتفعات وادي الرمال — «مدينة الجسور» — حيث تختلط المناظر المذهلة بتراث عريق. من جسر سيدي مسيد إلى قصر أحمد باي، مروراً بمتحف قيرطا الوطني ومسجد الأمير عبد القادر ومذاق الشخشوخة، كل زاوية تحكي قصة. مثالية في الربيع أو الخريف لرحلة ثقافية من يومين إلى ثلاثة.",
     "bestTime": "Mars – Juin / Sept – Nov",
     "bestTime_en": "March – June / Sept – Nov",
     "bestTime_ar": "مارس – يونيو / سبتمبر – نوفمبر",
@@ -524,9 +525,9 @@ exports.PLACES = [
     "stay": "Hôtel centre-ville",
     "stay_en": "Downtown hotel",
     "stay_ar": "فندق وسط المدينة",
-    "transport": "Vol ou train + transferts locaux",
-    "transport_en": "Flight or train + local transfers",
-    "transport_ar": "طيران أو قطار + تنقلات محلية",
+    "transport": "Vol ou train + tramway & taxis locaux",
+    "transport_en": "Flight or train + tram & local taxis",
+    "transport_ar": "طيران أو قطار + ترامواي وت taxis محلية",
     "includes": [
       {
         "fr": "Hébergement 2 nuits",
@@ -534,14 +535,19 @@ exports.PLACES = [
         "ar": "إقامة ليلتين"
       },
       {
-        "fr": "Visite des ponts",
-        "en": "Bridges tour",
-        "ar": "جولة الجسور"
+        "fr": "Pont Sidi M'Cid & ponts historiques",
+        "en": "Sidi M'Cid & historic bridges",
+        "ar": "جسر سيدي مسيد والجسور التاريخية"
       },
       {
-        "fr": "Palais Ahmed Bey",
-        "en": "Ahmed Bey palace",
-        "ar": "قصر أحمد باي"
+        "fr": "Palais Ahmed Bey & musée de Cirta",
+        "en": "Ahmed Bey palace & Cirta Museum",
+        "ar": "قصر أحمد باي ومتحف قيرطا"
+      },
+      {
+        "fr": "Mosquée Emir Abdelkader",
+        "en": "Emir Abdelkader Mosque",
+        "ar": "مسجد الأمير عبد القادر"
       },
       {
         "fr": "Guide francophone",
@@ -552,9 +558,9 @@ exports.PLACES = [
     "highlights": [
       {
         "icon": "Route",
-        "fr": "Ponts suspendus",
-        "en": "Suspended bridges",
-        "ar": "جسور معلقة"
+        "fr": "Pont Sidi M'Cid (175 m)",
+        "en": "Sidi M'Cid bridge (175 m)",
+        "ar": "جسر سيدي مسيد"
       },
       {
         "icon": "Landmark",
@@ -564,9 +570,21 @@ exports.PLACES = [
       },
       {
         "icon": "Building2",
-        "fr": "Médina & musées",
-        "en": "Medina & museums",
-        "ar": "مدينة قديمة ومتاحف"
+        "fr": "Musée national de Cirta",
+        "en": "Cirta National Museum",
+        "ar": "متحف قيرطا الوطني"
+      },
+      {
+        "icon": "UtensilsCrossed",
+        "fr": "Chakhchoukha & mhajeb",
+        "en": "Chakhchoukha & mhajeb",
+        "ar": "شخشوخة ومحاجب"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Gorges du Rhummel",
+        "en": "Rhummel gorges",
+        "ar": "مضيق الرمال"
       }
     ]
   }

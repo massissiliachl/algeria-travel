@@ -1,20 +1,20 @@
 /** Images vignettes wilayas — page hôtels */
 
 export const WILAYA_IMAGES = {
-  alger: '/images/home/dest-alger.jpg',
-  oran: '/images/home/dest-oran.jpg',
-  bejaia: '/images/home/acc-hotel.jpg',
-  constantine: '/images/home/exp-culture.jpg',
+  alger: '/images/hotels/tahat-1.jpg',
+  oran: '/images/hotels/sheraton-oran.jpg',
+  bejaia: '/images/hotels/royal-bejaia-1.jpg',
+  constantine: '/images/hotels/constantine-bridge.png',
   annaba: '/images/home/hero-coast.jpg',
-  ghardaia: '/images/home/dest-ghardaia.jpg',
-  tamanrasset: '/images/home/dest-djanet.jpg',
-  illizi: '/images/home/dest-djanet.jpg',
-  bechar: '/images/home/hero-coast.jpg',
-  timimoun: '/images/home/hero-coast.jpg',
-  biskra: '/images/home/hero-coast.jpg',
+  ghardaia: '/images/hotels/le-rym-ghardaia.jpg',
+  tamanrasset: '/images/hotels/zeriba-djanet-1.jpg',
+  illizi: '/images/hotels/zeriba-djanet-1.jpg',
+  bechar: '/images/sahara5.jpeg',
+  timimoun: '/images/sahara4.jpeg',
+  biskra: '/images/sahara3.jpeg',
 };
 
-export const WILAYA_FALLBACK_IMAGE = '/images/home/acc-hotel.jpg';
+export const WILAYA_FALLBACK_IMAGE = '/images/hotels/hotel.avif';
 
 export const AMENITY_FILTERS = [
   { key: 'wifi', match: ['wifi', 'wi-fi', 'wi fi'], icon: 'Globe', labelKey: 'hotels_amenity_wifi' },
