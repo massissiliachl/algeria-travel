@@ -2,7 +2,7 @@ const { sendMail } = require('./mail');
 const { paymentMethodLabel } = require('./paymentMethod');
 
 const SITE = process.env.SITE_URL || process.env.FRONTEND_URL || 'https://algeriatravel.com';
-const ADMIN = process.env.ADMIN_EMAIL || 'Algeria.travel@gmail.com';
+const ADMIN = process.env.ADMIN_EMAIL || 'travelalgeriadz@gmail.com';
 const ADMIN_PANEL = process.env.ADMIN_URL || 'http://localhost:5173';
 
 function fmtPrice(amount) {

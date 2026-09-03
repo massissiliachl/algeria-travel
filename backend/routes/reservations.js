@@ -336,15 +336,6 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       message: message?.trim() || null,
     };
 
-    await Promise.all([
-      sendReservationClientEmail(emailPayload).catch((err) =>
-        console.warn('[Mail] Réservation client:', err.message)
-      ),
-      sendReservationAdminEmail(adminPayload).catch((err) =>
-        console.warn('[Mail] Réservation admin:', err.message)
-      ),
-    ]);
-
     res.status(201).json({
       success: true,
       message: 'Demande de réservation envoyée. Notre équipe vous recontacte sous 24h.',
@@ -352,6 +343,15 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       accessToken,
       priceEstimate: computedTotal,
     });
+
+    Promise.all([
+      sendReservationClientEmail(emailPayload).catch((err) =>
+        console.warn('[Mail] Réservation client:', err.message)
+      ),
+      sendReservationAdminEmail(adminPayload).catch((err) =>
+        console.warn('[Mail] Réservation admin:', err.message)
+      ),
+    ]);
   } catch (err) {
     if (err.message?.includes('relation "public.reservations" does not exist')) {
       err.status = 503;

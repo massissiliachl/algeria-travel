@@ -2,6 +2,25 @@ const { Pool } = require('pg');
 
 let pool = null;
 
+function buildConnectionString(url) {
+  if (!url) return url;
+  // Pooler Supabase (6543) : mode transaction + pas de prepared statements
+  if (url.includes(':6543') && !/[?&]pgbouncer=/.test(url)) {
+    return `${url}${url.includes('?') ? '&' : '?'}pgbouncer=true`;
+  }
+  return url;
+}
+
+function isRetriableDbError(err) {
+  const msg = err?.message || '';
+  return (
+    /connection timeout/i.test(msg) ||
+    /connection terminated/i.test(msg) ||
+    /ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND/i.test(msg) ||
+    err?.code === '57P01'
+  );
+}
+
 function getPool() {
   if (pool) return pool;
 
@@ -11,11 +30,12 @@ function getPool() {
   }
 
   pool = new Pool({
-    connectionString,
+    connectionString: buildConnectionString(connectionString),
     ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 15000,
-    idleTimeoutMillis: 30000,
-    max: 10,
+    connectionTimeoutMillis: 20_000,
+    idleTimeoutMillis: 20_000,
+    max: 5,
+    keepAlive: true,
   });
 
   pool.on('error', (err) => {
@@ -25,12 +45,21 @@ function getPool() {
   return pool;
 }
 
-async function query(text, params) {
-  const client = await getPool().connect();
+async function query(text, params, attempt = 0) {
   try {
-    return await client.query(text, params);
-  } finally {
-    client.release();
+    const client = await getPool().connect();
+    try {
+      return await client.query(text, params);
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    if (isRetriableDbError(err) && attempt < 2) {
+      console.warn(`[DB] Reconnexion (tentative ${attempt + 1}) :`, err.message);
+      await closePool();
+      return query(text, params, attempt + 1);
+    }
+    throw err;
   }
 }
 

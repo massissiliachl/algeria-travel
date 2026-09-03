@@ -111,7 +111,7 @@ export const BLOG_POSTS = [
     date_en: 'March 1, 2026',
     date_ar: '1 مارس 2026',
     readTime: '7 min',
-    image: '/images/home/exp-culture.jpg',
+    image: '/images/hotels/casbah.webp',
   },
   {
     id: 5,
@@ -167,7 +167,7 @@ export const BLOG_POSTS = [
     date_en: 'Feb 15, 2026',
     date_ar: '15 فبراير 2026',
     readTime: '5 min',
-    image: '/images/bejaia.jpeg',
+    image: '/images/couscous-algerien.jpg',
   },
   {
     id: 7,

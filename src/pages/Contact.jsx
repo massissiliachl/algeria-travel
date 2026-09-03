@@ -13,6 +13,13 @@ const EMAILS = [
   'visit.bougie@gmail.com',
 ];
 
+const ABOUT_STATS = [
+  { icon: 'Calendar', valueKey: 'about_stat1_value', labelKey: 'about_stat1_label' },
+  { icon: 'Compass', valueKey: 'about_stat2_value', labelKey: 'about_stat2_label' },
+  { icon: 'Globe', valueKey: 'about_stat3_value', labelKey: 'about_stat3_label' },
+  { icon: 'MapPin', valueKey: 'about_stat4_value', labelKey: 'about_stat4_label' },
+];
+
 const Contact = () => {
   const { t } = useLang();
   const [form, setForm] = useState({
@@ -100,11 +107,38 @@ const Contact = () => {
         </div>
       </section>
 
+      <section className="ct-about">
+        <div className="ct-container">
+          <div className="ct-about__grid">
+            <div className="ct-about__story ct-reveal">
+              <p className="ct-eyebrow">{t('about_badge')}</p>
+              <h2>
+                {t('about_title')}{' '}
+                <em>{t('about_title_span')}</em>
+              </h2>
+              <p>{t('about_p1')}</p>
+              <p>{t('about_p2')}</p>
+            </div>
+            <ul className="ct-about__stats ct-reveal ct-reveal--delay">
+              {ABOUT_STATS.map(({ icon, valueKey, labelKey }) => (
+                <li key={valueKey}>
+                  <span className="ct-about__stat-icon">
+                    <Icon name={icon} size={20} />
+                  </span>
+                  <strong>{t(valueKey)}</strong>
+                  <span>{t(labelKey)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <section className="ct-main">
         <div className="ct-container">
           <div className="ct-layout">
             <div className="ct-form-panel ct-reveal">
-              <p className="ct-eyebrow">{t('nav_contact')}</p>
+              <p className="ct-eyebrow">{t('contact_form_badge')}</p>
               <h2>
                 {t('contact_form_title')}{' '}
                 <em>{t('contact_form_title_span')}</em>

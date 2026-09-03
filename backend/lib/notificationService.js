@@ -4,7 +4,7 @@ const { isFirebaseConfigured, getMessaging } = require('./firebaseAdmin');
 
 const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY;
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:Algeria.travel@gmail.com';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:travelalgeriadz@gmail.com';
 const FIREBASE_VAPID_PUBLIC =
   process.env.FIREBASE_VAPID_PUBLIC_KEY ||
   'BEhwHkpMuA62eyXN2EzRn0TIZg8uC8bsU8OImw4E5skGnYCwTVgJ1QxQmbcmjaR6uQvXBnKPEgQAPvjjxBmfNt0';

@@ -61,15 +61,15 @@ router.post('/', contactLimiter, async (req, res, next) => {
       message: message.trim(),
     };
 
-    await Promise.all([
-      sendContactClientEmail(payload).catch((err) => console.warn('[Mail] Contact client:', err.message)),
-      sendContactAdminEmail(payload).catch((err) => console.warn('[Mail] Contact admin:', err.message)),
-    ]);
-
     res.status(201).json({
       success: true,
       message: 'Message envoyé. Nous vous répondrons sous 24h.',
     });
+
+    Promise.all([
+      sendContactClientEmail(payload).catch((err) => console.warn('[Mail] Contact client:', err.message)),
+      sendContactAdminEmail(payload).catch((err) => console.warn('[Mail] Contact admin:', err.message)),
+    ]);
   } catch (err) {
     if (err.message?.includes('relation "public.contact_messages" does not exist')) {
       err.status = 503;

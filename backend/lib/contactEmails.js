@@ -1,6 +1,6 @@
 const { sendMail } = require('./mail');
 
-const ADMIN = process.env.ADMIN_EMAIL || 'Algeria.travel@gmail.com';
+const ADMIN = process.env.ADMIN_EMAIL || 'travelalgeriadz@gmail.com';
 
 const SUBJECT_LABELS = {
   reservation: 'Réservation',
