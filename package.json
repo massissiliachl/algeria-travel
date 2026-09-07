@@ -14,12 +14,16 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node backend/server.js",
+    "dev": "react-scripts start",
     "start:api": "node backend/server.js",
     "build": "node scripts/generate-sitemap.js && react-scripts build",
     "build:render": "npm run build && cd admin && npm install && npm run build",
+    "postinstall": "cd backend && npm install",
+    "migrate:render": "node scripts/render-migrate.js",
     "eject": "react-scripts eject"
   },
+  "main": "backend/server.js",
   "engines": {
     "node": ">=18"
   },
