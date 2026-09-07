@@ -8,6 +8,7 @@ import ImageLightbox from '../components/ui/ImageLightbox';
 import SeoHead from '../components/SeoHead';
 import BookingSheet from '../components/booking/BookingSheet';
 import { useLang } from '../hooks/useLangHook';
+import { useFavorites } from '../hooks/useFavorites';
 import { getHotelById, HOTELS } from '../data/hotels';
 import { getWilayaByKey } from '../data/wilayas';
 import { api } from '../services/api';
@@ -16,6 +17,7 @@ import HotelAvailabilityCalendar from '../components/hotels/HotelAvailabilityCal
 import HotelGalleryGrid from '../components/hotels/HotelGalleryGrid';
 import HotelBookingWidget from '../components/hotels/HotelBookingWidget';
 import HotelScoreBadge from '../components/hotels/HotelScoreBadge';
+import HotelReviewsSummary from '../components/hotels/HotelReviewsSummary';
 import {
   buildFallbackAvailability,
   calcStayTotal,
@@ -25,14 +27,6 @@ import {
 import { getReviewDistribution } from '../utils/hotelRating';
 import '../components/hotels/HotelAvailabilityCalendar.css';
 import './Hotels.css';
-
-function loadFavorites() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem('hotel_favorites') || '[]'));
-  } catch {
-    return new Set();
-  }
-}
 
 const Stars = ({ count }) => (
   <span className="htl-detail__stars" aria-label={`${count} stars`}>
@@ -53,6 +47,7 @@ const HotelDetail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t, pick } = useLang();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [hotel, setHotel] = useState(null);
   const [allHotels, setAllHotels] = useState(HOTELS);
   const [lightboxIndex, setLightboxIndex] = useState(null);
@@ -61,32 +56,24 @@ const HotelDetail = () => {
   const [checkIn, setCheckIn] = useState(searchParams.get('checkIn') || '');
   const [checkOut, setCheckOut] = useState(searchParams.get('checkOut') || '');
   const [rooms, setRooms] = useState(Math.max(1, Number(searchParams.get('rooms')) || 1));
-  const [isFavorite, setIsFavorite] = useState(() => loadFavorites().has(id));
-
-  useEffect(() => {
-    setIsFavorite(loadFavorites().has(id));
-  }, [id]);
+  const hotelIsFavorite = isFavorite('hotel', id);
 
   useEffect(() => {
     let cancelled = false;
+    const staticHotel = getHotelById(id);
 
     const load = async () => {
-      try {
-        const row = await api.getHotel(id);
-        if (!cancelled) {
-          setHotel(normalizeHotel(row));
-          return;
-        }
-      } catch {
-        /* fallback statique */
-      }
-
-      const found = getHotelById(id);
-      if (!found) {
-        navigate('/hotels');
+      if (staticHotel) {
+        if (!cancelled) setHotel(staticHotel);
         return;
       }
-      if (!cancelled) setHotel(found);
+
+      try {
+        const row = await api.getHotel(id);
+        if (!cancelled) setHotel(normalizeHotel(row));
+      } catch {
+        if (!cancelled) navigate('/hotels');
+      }
     };
 
     load();
@@ -114,6 +101,11 @@ const HotelDetail = () => {
     const end = new Date();
     end.setMonth(end.getMonth() + 3);
     const to = end.toISOString().slice(0, 10);
+
+    if (getHotelById(hotel.id)) {
+      setAvailabilityDays(buildFallbackAvailability(hotel, today, to).days);
+      return undefined;
+    }
 
     api
       .getHotelAvailability(hotel.id, { from: today, to })
@@ -150,12 +142,8 @@ const HotelDetail = () => {
     setCheckOut(outDate || '');
   };
 
-  const toggleFavorite = () => {
-    const favs = loadFavorites();
-    if (favs.has(hotel?.id)) favs.delete(hotel.id);
-    else favs.add(hotel.id);
-    localStorage.setItem('hotel_favorites', JSON.stringify([...favs]));
-    setIsFavorite(favs.has(hotel?.id));
+  const onToggleFavorite = () => {
+    if (hotel?.id) toggleFavorite('hotel', hotel.id);
   };
 
   const openBooking = () => {
@@ -232,8 +220,8 @@ const HotelDetail = () => {
             <div className="htl-detail__title-row">
               <h1>{hotelName}</h1>
               <div className="htl-detail__actions">
-                <button type="button" className="htl-detail__action" onClick={toggleFavorite} aria-label="Favori">
-                  <Icon name="Heart" size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+                <button type="button" className="htl-detail__action" onClick={onToggleFavorite} aria-label={t('favorites_add')}>
+                  <Icon name="Heart" size={20} fill={hotelIsFavorite ? 'currentColor' : 'none'} />
                 </button>
                 <button type="button" className="htl-detail__action" onClick={shareHotel} aria-label="Partager">
                   <Icon name="Share2" size={20} />
@@ -249,7 +237,12 @@ const HotelDetail = () => {
               </button>
             </p>
           </div>
-          <HotelScoreBadge rating={hotel.rating} reviews={hotel.reviews} t={t} size="lg" />
+          <HotelReviewsSummary
+            rating={hotel.rating}
+            reviews={hotel.reviews}
+            t={t}
+            variant="inline"
+          />
         </header>
 
         <HotelGalleryGrid
@@ -278,19 +271,12 @@ const HotelDetail = () => {
 
             <section className="htl-detail__section">
               <h2>{t('hotels_reviews_title')}</h2>
-              <div className="htl-detail__reviews">
-                <HotelScoreBadge rating={hotel.rating} reviews={hotel.reviews} t={t} size="lg" />
-                <div className="htl-detail__reviews-bars">
-                  {reviewBars.map(({ star, pct }) => (
-                    <div key={star} className="htl-detail__review-bar">
-                      <span>{star}</span>
-                      <div className="htl-detail__review-track">
-                        <div className="htl-detail__review-fill" style={{ width: `${pct}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <HotelReviewsSummary
+                rating={hotel.rating}
+                reviews={hotel.reviews}
+                bars={reviewBars}
+                t={t}
+              />
             </section>
 
             <section className="htl-detail__section">

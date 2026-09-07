@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLang } from '../hooks/useLangHook';
 import Icon from './ui/Icon';
 import NotificationEnableButton from './NotificationEnableButton';
+import { CONTACT_EMAILS, SOCIAL_LINKS } from '../data/contact';
 import './Footer.css';
 
 const FOOTER_LINKS = [
@@ -17,9 +18,8 @@ const FOOTER_LINKS = [
 ];
 
 const SOCIALS = [
-  { type: 'instagram', href: 'https://www.instagram.com/', label: 'Instagram' },
-  { type: 'facebook', href: 'https://www.facebook.com/', label: 'Facebook' },
-  { type: 'tiktok', href: 'https://www.tiktok.com/', label: 'TikTok' },
+  { type: 'instagram', href: SOCIAL_LINKS.instagram, label: 'Instagram @visit.bejaia' },
+  { type: 'facebook', href: SOCIAL_LINKS.facebook, label: 'Facebook Visit Béjaïa' },
 ];
 
 const SocialIcon = ({ type }) => {
@@ -77,9 +77,11 @@ const Footer = () => {
               <Icon name="Phone" size={16} />
               00213 557 664 089
             </a>
-            <a href="mailto:Algeria.travel@gmail.com" className="site-footer__mail">
-              Algeria.travel@gmail.com
-            </a>
+            {CONTACT_EMAILS.map((mail) => (
+              <a key={mail} href={`mailto:${mail}`} className="site-footer__mail">
+                {mail}
+              </a>
+            ))}
             <p className="site-footer__addr">Russel en face Stade · Béjaïa · Algérie</p>
             <div className="site-footer__actions">
               <a

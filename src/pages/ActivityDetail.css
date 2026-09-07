@@ -349,7 +349,34 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin: 18px 0 12px;
+  margin: 12px 0 12px;
+}
+
+.act-page-book__fav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(164, 92, 66, 0.28);
+  border-radius: 10px;
+  background: #fff;
+  color: #A45C42;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.act-page-book__fav:hover {
+  background: rgba(164, 92, 66, 0.06);
+}
+
+.act-page-book__fav.is-on {
+  background: rgba(164, 92, 66, 0.1);
+  border-color: #A45C42;
+  color: #8B4A36;
 }
 
 .act-page-book label {

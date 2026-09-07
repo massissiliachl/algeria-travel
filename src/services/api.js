@@ -1,11 +1,14 @@
 import { resolveApiBase } from '../utils/apiBase';
-
-const API_BASE = resolveApiBase();
+import { getFavoriteClientId } from '../utils/favoriteClientId';
 
 async function request(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options,
+  const { headers: optionHeaders, ...rest } = options;
+  const res = await fetch(`${resolveApiBase()}${path}`, {
+    ...rest,
+    headers: {
+      'Content-Type': 'application/json',
+      ...optionHeaders,
+    },
   });
 
   const data = await res.json().catch(() => ({}));
@@ -30,7 +33,16 @@ export const api = {
     return request(`/api/blog${qs ? `?${qs}` : ''}`);
   },
   getBlogPost: (slug) => request(`/api/blog/${slug}`),
-  getGallery: () => request('/api/gallery'),
+  getGallery: () =>
+    request('/api/gallery', {
+      headers: { 'x-favorite-client': getFavoriteClientId() },
+    }),
+  setGalleryReaction: (itemId, reaction) =>
+    request(`/api/gallery/${itemId}/reaction`, {
+      method: 'POST',
+      headers: { 'x-favorite-client': getFavoriteClientId() },
+      body: JSON.stringify({ reaction }),
+    }),
   getStays: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
     return request(`/api/stays${qs ? `?${qs}` : ''}`);
@@ -69,5 +81,20 @@ export const api = {
     request('/api/notifications/subscribe', {
       method: 'POST',
       body: JSON.stringify({ subscription, lang }),
+    }),
+  getFavorites: () =>
+    request('/api/favorites', {
+      headers: { 'x-favorite-client': getFavoriteClientId() },
+    }),
+  addFavorite: (itemType, itemId) =>
+    request('/api/favorites', {
+      method: 'POST',
+      headers: { 'x-favorite-client': getFavoriteClientId() },
+      body: JSON.stringify({ item_type: itemType, item_id: String(itemId) }),
+    }),
+  removeFavorite: (itemType, itemId) =>
+    request(`/api/favorites/${encodeURIComponent(itemType)}/${encodeURIComponent(String(itemId))}`, {
+      method: 'DELETE',
+      headers: { 'x-favorite-client': getFavoriteClientId() },
     }),
 };

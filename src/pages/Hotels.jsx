@@ -6,6 +6,7 @@ import Icon from '../components/ui/Icon';
 import ResponsiveImage from '../components/ui/ResponsiveImage';
 import SeoHead from '../components/SeoHead';
 import { useLang } from '../hooks/useLangHook';
+import { useFavorites } from '../hooks/useFavorites';
 import { WILAYAS } from '../data/wilayas';
 import { HOTELS, countHotelsByWilaya } from '../data/hotels';
 import { AMENITY_FILTERS, PRICE_MAX, PRICE_MIN } from '../data/hotelFilters';
@@ -15,7 +16,6 @@ import HotelsValueBar from '../components/hotels/HotelsValueBar';
 import PopularDestinations from '../components/hotels/PopularDestinations';
 import HotelPopularCard from '../components/hotels/HotelPopularCard';
 import HotelFiltersPanel from '../components/hotels/HotelFiltersPanel';
-import HotelsOffersBanner from '../components/hotels/HotelsOffersBanner';
 import HotelFilterChips from '../components/hotels/HotelFilterChips';
 import { countNights } from '../utils/hotelAvailability';
 import './Hotels.css';
@@ -34,21 +34,13 @@ function hotelHasAmenity(hotel, filterKey, lang) {
   return list.some((item) => filter.match.some((m) => item.toLowerCase().includes(m)));
 }
 
-function loadFavorites() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem('hotel_favorites') || '[]'));
-  } catch {
-    return new Set();
-  }
-}
-
 const Hotels = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t, pick, language } = useLang();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [hotels, setHotels] = useState(HOTELS);
   const [loading, setLoading] = useState(true);
-  const [favorites, setFavorites] = useState(loadFavorites);
   const [sort, setSort] = useState('recommended');
   const [priceRange, setPriceRange] = useState([PRICE_MIN, PRICE_MAX]);
   const [starFilters, setStarFilters] = useState([]);
@@ -182,14 +174,8 @@ const Hotels = () => {
     );
   };
 
-  const toggleFavorite = (id) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      localStorage.setItem('hotel_favorites', JSON.stringify([...next]));
-      return next;
-    });
+  const onToggleFavorite = (id) => {
+    toggleFavorite('hotel', id);
   };
 
   const openHotel = (hotel) => {
@@ -490,8 +476,8 @@ const Hotels = () => {
                       pick={pick}
                       t={t}
                       lang={amenityLang}
-                      isFavorite={favorites.has(hotel.id)}
-                      onToggleFavorite={toggleFavorite}
+                      isFavorite={isFavorite('hotel', hotel.id)}
+                      onToggleFavorite={onToggleFavorite}
                       onOpen={() => openHotel(hotel)}
                       nights={nights}
                     />
@@ -503,7 +489,6 @@ const Hotels = () => {
         </div>
       </section>
 
-      <HotelsOffersBanner t={t} />
       <Footer />
     </div>
   );

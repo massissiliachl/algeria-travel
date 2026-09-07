@@ -21,9 +21,11 @@ import Hotels from './pages/Hotels';
 import HotelDetail from './pages/HotelDetail';
 import TrackReservation from './pages/TrackReservation';
 import Privacy from './pages/Privacy';
+import Favorites from './pages/Favorites';
 import WhatsAppButton from './components/WhatsAppButton';
 import CookieBanner from './components/CookieBanner';
 import NotificationOptIn from './components/NotificationOptIn';
+import { FavoritesProvider } from './hooks/useFavorites';
 
 import './App.css';
 
@@ -51,6 +53,7 @@ function AppRoutes() {
         <Route path="/InfoDestination" element={<Navigate to="/destinations" replace />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/favorites" element={<Favorites />} />
         <Route path="/suivi" element={<TrackReservation />} />
       </Routes>
       <WhatsAppButton />
@@ -69,11 +72,13 @@ function App() {
   return (
     <HelmetProvider>
       <LangProvider>
-        <NotificationProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </NotificationProvider>
+        <FavoritesProvider>
+          <NotificationProvider>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <AppRoutes />
+            </BrowserRouter>
+          </NotificationProvider>
+        </FavoritesProvider>
       </LangProvider>
     </HelmetProvider>
   );

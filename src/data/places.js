@@ -15,7 +15,7 @@ export const PLACES = [
     reviews: 268,
     temp: '22°C',
     image: '/images/bejaia.jpeg',
-    gallery: ['/images/bejaia.jpeg', '/images/home/news-coast.jpg', '/images/kayak.jpeg'],
+    gallery: ['/images/bejaia.jpeg', '/images/bejaia-kasbah.jpg', '/images/kayak.jpeg'],
     description:
       'Mer turquoise, Cap Carbon et montagnes du Djurdjura : Béjaïa offre mer et nature dans un même séjour.',
     description_en:

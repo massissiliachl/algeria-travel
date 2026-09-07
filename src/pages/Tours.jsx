@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
+import { useFavorites } from '../hooks/useFavorites';
 import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
 import SeoHead from '../components/SeoHead';
@@ -26,8 +27,8 @@ const HERO_FEATURES = [
 const Tours = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [filter, setFilter] = useState('all');
-  const [favorites, setFavorites] = useState(() => new Set());
 
   const filtered = useMemo(() => {
     if (filter === 'all') return FEATURED_TOURS;
@@ -36,12 +37,7 @@ const Tours = () => {
 
   const toggleFav = (e, id) => {
     e.stopPropagation();
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    toggleFavorite('tour', id);
   };
 
   return (
@@ -125,7 +121,7 @@ const Tours = () => {
                 <img src={tour.image} alt="" loading="lazy" />
                 <button
                   type="button"
-                  className={`acts-card__fav ${favorites.has(tour.id) ? 'is-on' : ''}`}
+                  className={`acts-card__fav ${isFavorite('tour', tour.id) ? 'is-on' : ''}`}
                   aria-label="Favorite"
                   onClick={(e) => toggleFav(e, tour.id)}
                 >
@@ -133,7 +129,7 @@ const Tours = () => {
                     name="Heart"
                     size={16}
                     strokeWidth={2}
-                    fill={favorites.has(tour.id) ? 'currentColor' : 'none'}
+                    fill={isFavorite('tour', tour.id) ? 'currentColor' : 'none'}
                   />
                 </button>
                 <div className="acts-card__body">

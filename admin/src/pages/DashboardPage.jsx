@@ -4,16 +4,90 @@ import { api } from '../api';
 import { PageHeader, LoadingState } from '../components/ui';
 import { StatIcons, InfoIcon } from '../components/icons';
 
+function FavoritesTopTable({ title, rows, editPathPrefix, emptyLabel }) {
+  if (!rows.length) {
+    return (
+      <div className="fav-stats-block">
+        <h3>{title}</h3>
+        <p className="fav-stats-empty">{emptyLabel}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fav-stats-block">
+      <h3>{title}</h3>
+      <div className="table-wrap">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nom</th>
+              <th>ID</th>
+              <th>Favoris</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={row.itemId}>
+                <td>{index + 1}</td>
+                <td>
+                  <Link to={`${editPathPrefix}/${row.itemId}`} className="fav-stats-link">
+                    {row.name}
+                  </Link>
+                </td>
+                <td><code>{row.itemId}</code></td>
+                <td><strong>{row.count}</strong></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.getStats().then(setStats).catch((e) => setError(e.message));
+    api
+      .getStats()
+      .then(async (contentStats) => {
+        if (!contentStats.favorites) {
+          try {
+            contentStats.favorites = await api.getFavoriteStats();
+          } catch {
+            contentStats.favorites = {
+              ready: false,
+              message:
+                'Backend à redémarrer — dans un terminal : cd backend puis npm run dev. Ensuite rechargez cette page.',
+              totals: { favorites: 0, uniqueVisitors: 0 },
+              byType: {},
+              topActivities: [],
+              topHotels: [],
+              topTours: [],
+            };
+          }
+        }
+        setStats(contentStats);
+      })
+      .catch((e) => setError(e.message));
   }, []);
 
   if (error) return <div className="alert alert-error">{error}</div>;
   if (!stats) return <LoadingState label="Chargement du tableau de bord…" />;
+
+  const favoriteStats = stats.favorites || {
+    ready: false,
+    message: 'Statistiques favoris indisponibles.',
+    totals: { favorites: 0, uniqueVisitors: 0 },
+    byType: {},
+    topActivities: [],
+    topHotels: [],
+    topTours: [],
+  };
 
   const cards = [
     { label: 'Réservations en attente', value: stats.reservations.pending, className: 'pending', to: '/reservations', icon: 'pending' },
@@ -53,8 +127,8 @@ export default function DashboardPage() {
               <span>Contenus publiés</span>
             </div>
             <div className="dashboard-welcome-stat">
-              <strong>{stats.reservations.pending}</strong>
-              <span>En attente</span>
+              <strong>{favoriteStats.totals.favorites}</strong>
+              <span>Favoris visiteurs</span>
             </div>
           </div>
         </div>
@@ -75,6 +149,55 @@ export default function DashboardPage() {
             </Link>
           );
         })}
+      </div>
+
+      <div className="panel fav-stats-panel">
+        <div className="panel-head">
+          <h2>Favoris visiteurs (sans compte)</h2>
+          <span className="fav-stats-summary">
+            {favoriteStats.totals.uniqueVisitors} visiteur{favoriteStats.totals.uniqueVisitors > 1 ? 's' : ''} · {favoriteStats.totals.favorites} favori{favoriteStats.totals.favorites > 1 ? 's' : ''}
+          </span>
+        </div>
+        <div className="panel-body">
+          {!favoriteStats.ready ? (
+            <p className="panel-note">
+              <InfoIcon />
+              {favoriteStats.message}
+            </p>
+          ) : (
+            <>
+              <div className="fav-stats-types">
+                {Object.entries(favoriteStats.byType).map(([type, count]) => (
+                  <span key={type} className="fav-stats-type-chip">
+                    {type} · <strong>{count}</strong>
+                  </span>
+                ))}
+              </div>
+
+              <FavoritesTopTable
+                title="Top activités favorites"
+                rows={favoriteStats.topActivities}
+                editPathPrefix="/activities"
+                emptyLabel="Aucune activité en favori pour le moment."
+              />
+
+              <div className="fav-stats-grid">
+                <FavoritesTopTable
+                  title="Top hôtels favorites"
+                  rows={favoriteStats.topHotels}
+                  editPathPrefix="/hotels"
+                  emptyLabel="Aucun hôtel en favori."
+                />
+                <FavoritesTopTable
+                  title="Top circuits favorites"
+                  rows={favoriteStats.topTours}
+                  editPathPrefix="/tours"
+                  emptyLabel="Aucun circuit en favori."
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="panel">

@@ -761,5 +761,16 @@
   "seo_track_title": "Suivi de réservation",
   "seo_track_desc": "Consultez l'état de votre demande de réservation Algeria Travel avec votre référence et code d'accès.",
   "seo_search_title": "Recherche",
-  "seo_search_desc": "Trouvez destinations, circuits et activités en Algérie sur Algeria Travel."
+  "seo_search_desc": "Trouvez destinations, circuits et activités en Algérie sur Algeria Travel.",
+  "nav_favorites": "Favoris",
+  "favorites_eyebrow": "Ma sélection",
+  "favorites_page_title": "Mes favoris",
+  "favorites_page_desc": "Retrouvez vos hôtels, activités et circuits enregistrés.",
+  "favorites_empty_title": "Aucun favori pour le moment",
+  "favorites_empty_desc": "Ajoutez des hôtels, activités ou circuits en cliquant sur le cœur.",
+  "favorites_remove": "Retirer des favoris",
+  "favorites_add": "Ajouter aux favoris",
+  "favorites_type_hotel": "Hôtel",
+  "favorites_type_activity": "Activité",
+  "favorites_type_tour": "Circuit"
 }

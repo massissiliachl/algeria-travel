@@ -71,9 +71,15 @@ async function testConnection() {
 }
 
 async function closePool() {
-  if (pool) {
-    await pool.end();
-    pool = null;
+  if (!pool) return;
+  const current = pool;
+  pool = null;
+  try {
+    await current.end();
+  } catch (err) {
+    if (!/more than once/i.test(err.message || '')) {
+      console.error('[DB] closePool:', err.message);
+    }
   }
 }
 

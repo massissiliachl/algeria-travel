@@ -114,7 +114,6 @@ export function NotificationProvider({ children }) {
     }
 
     if (Notification.permission === 'denied') {
-      console.warn('[notify] Notifications bloquées dans le navigateur.');
       return false;
     }
 

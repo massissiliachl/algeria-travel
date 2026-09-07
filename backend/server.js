@@ -52,6 +52,7 @@ const corsOrigins = [
   ADMIN_URL,
   SITE_URL,
   'http://localhost:3000',
+  'http://localhost:3001',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
@@ -75,6 +76,7 @@ app.use(
       callback(null, isAllowedOrigin(origin));
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'x-favorite-client', 'x-admin-key', 'Authorization'],
   })
 );
 app.use(express.json());
@@ -82,9 +84,11 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 app.use('/api/reservations', reservationsRoutes);
+app.use('/api/favorites', require('./routes/favorites'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/admin/favorites', require('./routes/admin/favorites'));
 app.use('/api/admin', require('./routes/admin/media'));
 app.use('/api/admin', require('./routes/admin/content'));
 app.use('/api/admin/hotel-users', require('./routes/admin/hotelUsers'));
@@ -153,7 +157,7 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error('[API]', err.message);
+  console.error('[API]', req.method, req.path, err.message);
   res.status(err.status || 500).json({ error: err.message || 'Erreur serveur' });
 });
 
@@ -163,14 +167,37 @@ const server = app.listen(PORT, async () => {
     try {
       const db = await testConnection();
       console.log(`[DB] Connecté à ${db.database}`);
+      console.log(`[API] Serveur actif — http://localhost:${PORT}/api/health (Ctrl+C pour arrêter)`);
     } catch (err) {
       console.error('[DB]', err.message);
+      console.log(`[API] Serveur actif sans DB — http://localhost:${PORT}/api/health (Ctrl+C pour arrêter)`);
     }
+  } else {
+    console.log(`[API] Serveur actif — http://localhost:${PORT}/api/health (Ctrl+C pour arrêter)`);
   }
 });
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n[API] Le port ${PORT} est déjà utilisé par une autre instance.`);
+    console.error('[API] Dans backend/, exécutez : npm run stop');
+    console.error('[API] Puis relancez : npm start\n');
+  } else {
+    console.error('[API] Impossible de démarrer :', err.message);
+  }
+  process.exit(1);
+});
+
+if (process.stdin.isTTY) {
+  process.stdin.resume();
+}
+
 async function shutdown(signal) {
-  server.close(async () => { await closePool(); process.exit(0); });
+  console.log(`\n[API] Arrêt (${signal})…`);
+  server.close(async () => {
+    await closePool();
+    process.exit(0);
+  });
 }
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));

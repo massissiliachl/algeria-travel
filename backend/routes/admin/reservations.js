@@ -62,6 +62,10 @@ router.get('/', async (req, res, next) => {
       reservations: result.rows.map(mapReservation),
     });
   } catch (err) {
+    if (/connection|timeout|ECONNRESET|ECONNREFUSED|ETIMEDOUT/i.test(err?.message || '')) {
+      err.status = 503;
+      err.message = 'Base de données temporairement indisponible. Réessayez dans quelques secondes.';
+    }
     next(err);
   }
 });

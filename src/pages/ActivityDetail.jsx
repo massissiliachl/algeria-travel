@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useLang } from '../hooks/useLangHook';
+import { useFavorites } from '../hooks/useFavorites';
 import { ACTIVITIES, ACTIVITY_CATEGORIES } from '../data/activities';
 import Icon from '../components/ui/Icon';
 import SeoHead from '../components/SeoHead';
@@ -13,6 +14,7 @@ const ActivityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, pick } = useLang();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [activity, setActivity] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [tab, setTab] = useState('overview');
@@ -59,6 +61,11 @@ const ActivityDetail = () => {
   };
 
   const activityName = pick(activity.name, activity.name_en, activity.name_ar);
+  const activityIsFavorite = isFavorite('activity', activity.id);
+
+  const onToggleFavorite = () => {
+    toggleFavorite('activity', activity.id);
+  };
 
   const others = ACTIVITIES.filter((a) => a.id !== activity.id).slice(0, 3);
 
@@ -204,6 +211,15 @@ const ActivityDetail = () => {
               <strong>{activity.price.toLocaleString()} <small>DA</small></strong>
               <em>{t('act_modal_per_person')}</em>
             </div>
+            <button
+              type="button"
+              className={`act-page-book__fav${activityIsFavorite ? ' is-on' : ''}`}
+              onClick={onToggleFavorite}
+              aria-label={activityIsFavorite ? t('favorites_remove') : t('favorites_add')}
+            >
+              <Icon name="Heart" size={18} strokeWidth={2} fill={activityIsFavorite ? 'currentColor' : 'none'} />
+              {activityIsFavorite ? t('favorites_remove') : t('favorites_add')}
+            </button>
             <form onSubmit={handleReserve}>
               <button type="submit" className="act-page-book__btn">{t('btn_reserver')}</button>
             </form>

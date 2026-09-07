@@ -6,14 +6,10 @@ import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
 import SeoHead from '../components/SeoHead';
+import { CONTACT_EMAILS } from '../data/contact';
 import './Contact.css';
 
-const EMAILS = [
-  'travelalgeriadz@gmail.com',
-  'visit.bougie@gmail.com',
-];
-
-const ABOUT_STATS = [
+const ABOUT_VALUES = [
   { icon: 'Calendar', valueKey: 'about_stat1_value', labelKey: 'about_stat1_label' },
   { icon: 'Compass', valueKey: 'about_stat2_value', labelKey: 'about_stat2_label' },
   { icon: 'Globe', valueKey: 'about_stat3_value', labelKey: 'about_stat3_label' },
@@ -104,13 +100,16 @@ const Contact = () => {
             <span>{t('contact_hero_title_span')}</span>
           </h1>
           <p className="ct-hero__lead">{t('contact_hero_desc')}</p>
+          <a href="#contact" className="ct-hero__cta">
+            {t('contact_form_badge')} <Icon name="ChevronRight" size={16} className="ct-hero__cta-icon" />
+          </a>
         </div>
       </section>
 
       <section className="ct-about">
         <div className="ct-container">
-          <div className="ct-about__grid">
-            <div className="ct-about__story ct-reveal">
+          <div className="ct-about__grid ct-reveal">
+            <div className="ct-about__story">
               <p className="ct-eyebrow">{t('about_badge')}</p>
               <h2>
                 {t('about_title')}{' '}
@@ -118,33 +117,66 @@ const Contact = () => {
               </h2>
               <p>{t('about_p1')}</p>
               <p>{t('about_p2')}</p>
+              <ul className="ct-about__links">
+                <li>
+                  <Link to="/destinations">
+                    {t('nav_destinations')} <Icon name="ArrowRight" size={14} />
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/tours">
+                    {t('nav_tours')} <Icon name="ArrowRight" size={14} />
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/activities">
+                    {t('nav_activities')} <Icon name="ArrowRight" size={14} />
+                  </Link>
+                </li>
+              </ul>
             </div>
-            <ul className="ct-about__stats ct-reveal ct-reveal--delay">
-              {ABOUT_STATS.map(({ icon, valueKey, labelKey }) => (
-                <li key={valueKey}>
-                  <span className="ct-about__stat-icon">
-                    <Icon name={icon} size={20} />
-                  </span>
+            <div className="ct-about__visual">
+              <img
+                src="/images/bejaia-kasbah.jpg"
+                alt=""
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/home/dest-bejaia.jpg';
+                }}
+              />
+              <div className="ct-about__badge">
+                <Icon name="Star" size={16} />
+                <span>{t('about_stat1_value')}</span>
+                <small>{t('about_stat1_label')}</small>
+              </div>
+            </div>
+          </div>
+          <ul className="ct-about__values ct-reveal ct-reveal--delay">
+            {ABOUT_VALUES.map(({ icon, valueKey, labelKey }) => (
+              <li key={valueKey}>
+                <Icon name={icon} size={18} />
+                <div>
                   <strong>{t(valueKey)}</strong>
                   <span>{t(labelKey)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="ct-main">
+      <section className="ct-main" id="contact">
         <div className="ct-container">
+          <header className="ct-contact__head ct-reveal">
+            <p className="ct-eyebrow">{t('contact_form_badge')}</p>
+            <h2>
+              {t('contact_form_title')}{' '}
+              <em>{t('contact_form_title_span')}</em>
+            </h2>
+            <p>{t('contact_form_desc')}</p>
+          </header>
           <div className="ct-layout">
-            <div className="ct-form-panel ct-reveal">
-              <p className="ct-eyebrow">{t('contact_form_badge')}</p>
-              <h2>
-                {t('contact_form_title')}{' '}
-                <em>{t('contact_form_title_span')}</em>
-              </h2>
-              <p className="ct-lead">{t('contact_form_desc')}</p>
-
+            <div className="ct-form-panel ct-card ct-reveal">
               {sent ? (
                 <div className="ct-success" role="status">
                   <div className="ct-success__icon">
@@ -262,7 +294,7 @@ const Contact = () => {
               )}
             </div>
 
-            <aside className="ct-side ct-reveal ct-reveal--delay">
+            <aside className="ct-side ct-card ct-reveal ct-reveal--delay">
               <p className="ct-eyebrow">{t('footer_contact_title')}</p>
               <h2>
                 {t('contact_info_title')}{' '}
@@ -292,7 +324,7 @@ const Contact = () => {
                   <Icon name="Globe" size={18} />
                   <div>
                     <strong>{t('contact_info_email')}</strong>
-                    {EMAILS.map((mail) => (
+                    {CONTACT_EMAILS.map((mail) => (
                       <a key={mail} href={`mailto:${mail}`}>
                         {mail}
                       </a>

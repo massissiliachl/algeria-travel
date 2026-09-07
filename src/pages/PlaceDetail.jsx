@@ -136,97 +136,31 @@ const PlaceDetail = () => {
         />
         <div className="place-hero__overlay" />
         <div className="place-hero__inner" data-reveal="fade">
-          <nav className="acts-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/">{t('nav_home')}</Link>
-            <span>/</span>
-            <Link to="/destinations">{t('nav_destinations')}</Link>
-            <span>/</span>
-            <span>{placeName}</span>
-          </nav>
+          <Link to="/destinations" className="place-back">
+            <Icon name="ChevronLeft" size={18} /> {t('nav_destinations')}
+          </Link>
           <p className="place-hero__tag">
             {pick(place.tagline, place.tagline_en, place.tagline_ar)}
           </p>
           <h1>{placeName}</h1>
           <div className="place-hero__meta">
             <span>
-              <Icon name="Star" size={14} /> {place.rating} ({place.reviews}{' '}
-              {t('place_reviews')})
+              <Icon name="Star" size={14} /> {place.rating} · {place.reviews}{' '}
+              {t('place_reviews')}
             </span>
             <span>
-              <Icon name="Sun" size={14} /> {place.temp} {weather}
+              <Icon name="Sun" size={14} /> {place.temp} · {weather}
             </span>
             <span>
-              <Icon name="Users" size={14} /> {t('place_ideal')} {idealFor}
+              <Icon name="Users" size={14} /> {idealFor}
             </span>
-          </div>
-          <div className="place-hero__price" data-reveal>
-            <Icon name="Tag" size={16} />
-            <span>
-              {priceLabel}{' '}
-              <strong>{place.price.toLocaleString()} DA</strong>
-              {isPerPerson ? ` ${t('per_person')}` : ''}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <section className="place-bookbar acts-container" data-reveal>
-        <div className="place-bookbar__inner">
-          <div className="place-bookbar__left">
-            {place.pkgTitle && (
-              <p className="place-bookbar__pkg">
-                <Icon name={place.pkgIcon || 'Hotel'} size={16} />
-                {t('place_offer')}{' '}
-                <strong>
-                  {pick(place.pkgTitle, place.pkgTitle_en, place.pkgTitle_ar)}
-                </strong>
-              </p>
-            )}
-            <div className="place-bookbar__price">
-              <strong>
-                {place.price.toLocaleString()} DA
-                <small>{isPerPerson ? ` ${t('per_person')}` : ''}</small>
-              </strong>
-              {place.oldPrice && (
-                <s>{place.oldPrice.toLocaleString()} DA</s>
-              )}
-              <em className="place-bookbar__badge">
-                <Icon name="BadgePercent" size={14} /> {t('place_best_price')}
-              </em>
-            </div>
-            <ul className="place-bookbar__trust">
-              {TRUST_ITEMS.map((item) => (
-                <li key={item.key}>
-                  <span className="place-bookbar__trust-icon" aria-hidden="true">
-                    <Icon name={item.icon} size={16} />
-                  </span>
-                  {t(item.key)}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="place-bookbar__right">
-            <div className="place-bookbar__period">
-              <Icon name="Calendar" size={18} />
-              <div>
-                <span>{t('place_dates')}</span>
-                <strong>
-                  {pick(place.bestTime, place.bestTime_en, place.bestTime_ar)}
-                </strong>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="place-bookbar__cta"
-              onClick={() => setBookingOpen(true)}
-            >
-              {t('place_book')} <Icon name="ArrowRight" size={16} />
-            </button>
           </div>
         </div>
       </section>
 
       <section className="place-main acts-container">
+        <div className="place-layout">
+          <div className="place-layout__content">
         <div className="place-why" data-reveal>
           <div className="place-why__copy">
             <h2>
@@ -412,12 +346,62 @@ const PlaceDetail = () => {
             ))}
           </div>
         </div>
+          </div>
+
+          <aside className="place-aside" data-reveal="right">
+            <div className="place-book">
+              {place.pkgTitle && (
+                <p className="place-book__pkg">
+                  <Icon name={place.pkgIcon || 'Hotel'} size={15} />
+                  {pick(place.pkgTitle, place.pkgTitle_en, place.pkgTitle_ar)}
+                </p>
+              )}
+              <div className="place-book__price">
+                <span>{priceLabel}</span>
+                <strong>
+                  {place.price.toLocaleString()} <small>DA</small>
+                </strong>
+                {isPerPerson && <em>{t('per_person')}</em>}
+                {place.oldPrice && (
+                  <s>{place.oldPrice.toLocaleString()} DA</s>
+                )}
+              </div>
+              <div className="place-book__period">
+                <Icon name="Calendar" size={16} />
+                <div>
+                  <span>{t('place_dates')}</span>
+                  <strong>
+                    {pick(place.bestTime, place.bestTime_en, place.bestTime_ar)}
+                  </strong>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="place-book__cta"
+                onClick={() => setBookingOpen(true)}
+              >
+                {t('place_book')} <Icon name="ArrowRight" size={16} />
+              </button>
+              <ul className="place-book__trust">
+                {TRUST_ITEMS.map((item) => (
+                  <li key={item.key}>
+                    <Icon name={item.icon} size={14} />
+                    {t(item.key)}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/contact" className="place-book__link">
+                {t('place_help_cta')} <Icon name="ArrowRight" size={14} />
+              </Link>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <MobileBookingBar
         priceLabel={priceLabel}
         price={`${place.price.toLocaleString()} DA`}
-        ctaLabel={t('place_book')}
+        ctaLabel={t('btn_reserver')}
         onCta={() => setBookingOpen(true)}
         className="place-mobile-bar"
         ariaLabel={t('place_book')}

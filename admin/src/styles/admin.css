@@ -401,6 +401,88 @@ body {
 .stat-card.pending .stat-card-body strong { color: #b45309; }
 .stat-card.confirmed .stat-card-body strong { color: #047857; }
 
+/* ─── Favoris stats (dashboard) ─── */
+
+.fav-stats-panel {
+  margin-bottom: 24px;
+}
+
+.fav-stats-summary {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.fav-stats-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.fav-stats-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--page-alt);
+  border: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.fav-stats-type-chip strong {
+  color: var(--forest);
+}
+
+.fav-stats-block {
+  margin-bottom: 24px;
+}
+
+.fav-stats-block:last-child {
+  margin-bottom: 0;
+}
+
+.fav-stats-block h3 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--forest);
+}
+
+.fav-stats-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.fav-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.fav-stats-link {
+  color: var(--forest);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.fav-stats-link:hover {
+  text-decoration: underline;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  .fav-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ─── Panels ─── */
 
 .panel {

@@ -1,7 +1,5 @@
 import { resolveApiBase } from './utils/apiBase';
 
-const API_BASE = resolveApiBase();
-
 function getKey() {
   return sessionStorage.getItem('admin_key') || '';
 }
@@ -19,13 +17,15 @@ export function isLoggedIn() {
 }
 
 async function request(path, options = {}) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'x-admin-key': getKey(),
-    ...options.headers,
-  };
-
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const { headers: optionHeaders, ...rest } = options;
+  const res = await fetch(`${resolveApiBase()}${path}`, {
+    ...rest,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-key': getKey(),
+      ...optionHeaders,
+    },
+  });
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
@@ -40,6 +40,8 @@ export const api = {
     request('/api/admin/auth/verify', { method: 'POST', body: JSON.stringify({ key }) }),
 
   getStats: () => request('/api/admin/stats'),
+
+  getFavoriteStats: () => request('/api/admin/favorites/stats'),
 
   getReservations: (status = 'all') =>
     request(`/api/admin/reservations${status !== 'all' ? `?status=${status}` : ''}`),
@@ -65,7 +67,7 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${API_BASE}/api/admin/media/upload`, {
+    const res = await fetch(`${resolveApiBase()}/api/admin/media/upload`, {
       method: 'POST',
       headers: { 'x-admin-key': getKey() },
       body: formData,

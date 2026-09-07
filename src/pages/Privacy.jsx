@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SeoHead from '../components/SeoHead';
 import { useLang } from '../hooks/useLangHook';
+import { CONTACT_EMAILS } from '../data/contact';
 import './Contact.css';
 
 export default function Privacy() {
@@ -56,7 +57,12 @@ export default function Privacy() {
           ))}
           <p className="privacy-contact">
             {t('privacy_contact_prefix')}{' '}
-            <a href="mailto:travelalgeriadz@gmail.com">Algeria.travel@gmail.com</a>
+            {CONTACT_EMAILS.map((mail, index) => (
+              <React.Fragment key={mail}>
+                {index > 0 ? ' · ' : null}
+                <a href={`mailto:${mail}`}>{mail}</a>
+              </React.Fragment>
+            ))}
           </p>
         </div>
       </section>

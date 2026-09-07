@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLang } from '../hooks/useLangHook';
+import { useFavorites } from '../hooks/useFavorites';
 import Icon from './ui/Icon';
 import TrackReservationBar from './TrackReservationBar';
 import NotificationBell from './NotificationBell';
@@ -33,10 +34,20 @@ const Navbar = ({ variant = 'default' }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { language, changeLanguage, t } = useLang();
+  const { count: favoritesCount } = useFavorites();
   const langRef = useRef(null);
   const trackRef = useRef(null);
+  const burgerRef = useRef(null);
   const isHome = variant === 'home' || location.pathname === '/';
   const transparent = isHome && !scrolled && !mobileOpen;
+
+  useEffect(() => {
+    if (mobileOpen) return;
+    const drawer = document.querySelector('.nav-mobile-drawer');
+    if (drawer?.contains(document.activeElement)) {
+      burgerRef.current?.focus();
+    }
+  }, [mobileOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -119,6 +130,17 @@ const Navbar = ({ variant = 'default' }) => {
             <Icon name="X" size={20} />
           </button>
         </div>
+        <Link
+          to="/favorites"
+          className="nav-mobile-drawer__fav"
+          onClick={() => setMobileOpen(false)}
+        >
+          <Icon name="Heart" size={18} />
+          <span>{t('nav_favorites')}</span>
+          {favoritesCount > 0 ? (
+            <span className="nav-mobile-drawer__fav-count">{favoritesCount}</span>
+          ) : null}
+        </Link>
         <nav className="nav-mobile-drawer__links">
           {NAV_LINKS.map((link) => (
             <Link
@@ -216,9 +238,16 @@ const Navbar = ({ variant = 'default' }) => {
               )}
             </div>
 
-            <button className="premium-nav__icon-btn premium-nav__heart" type="button" aria-label="Wishlist">
+            <Link
+              to="/favorites"
+              className="premium-nav__icon-btn premium-nav__heart"
+              aria-label={t('nav_favorites')}
+            >
               <Icon name="Heart" size={18} />
-            </button>
+              {favoritesCount > 0 ? (
+                <span className="premium-nav__heart-count">{favoritesCount}</span>
+              ) : null}
+            </Link>
 
             <div className="premium-nav__lang" ref={langRef}>
               <button
@@ -260,6 +289,7 @@ const Navbar = ({ variant = 'default' }) => {
             </div>
 
             <button
+              ref={burgerRef}
               className={`premium-nav__burger ${mobileOpen ? 'open' : ''}`}
               onClick={() => {
                 setLangOpen(false);

@@ -6,7 +6,7 @@ const { validateReservationItem } = require('../lib/validateReservationItem');
 const { isValidPhone } = require('../lib/phone');
 const { calcBookingTotal } = require('../lib/bookingPrice');
 const { checkStayAvailability } = require('../lib/hotelAvailability');
-const { isValidPaymentMethod, normalizePaymentMethod } = require('../lib/paymentMethod');
+const { isValidPaymentMethod, normalizePaymentMethod, CARD_PAYMENT_ENABLED } = require('../lib/paymentMethod');
 const {
   sendReservationClientEmail,
   sendReservationAdminEmail,
@@ -154,7 +154,11 @@ router.post('/', reservationLimiter, async (req, res, next) => {
     }
 
     if (!isValidPaymentMethod(paymentMethod)) {
-      return res.status(400).json({ error: 'Veuillez choisir un moyen de paiement.' });
+      const msg =
+        normalizePaymentMethod(paymentMethod) === 'card' && !CARD_PAYMENT_ENABLED
+          ? 'Le paiement par carte est temporairement indisponible.'
+          : 'Veuillez choisir un moyen de paiement.';
+      return res.status(400).json({ error: msg });
     }
 
     const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);

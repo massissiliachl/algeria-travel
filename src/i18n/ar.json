@@ -761,5 +761,16 @@
   "seo_track_title": "متابعة الحجز",
   "seo_track_desc": "تحقق من حالة طلب حجزك في Algeria Travel باستخدام المرجع ورمز الوصول.",
   "seo_search_title": "بحث",
-  "seo_search_desc": "اعثر على الوجهات والجولات والأنشطة في الجزائر على Algeria Travel."
+  "seo_search_desc": "اعثر على الوجهات والجولات والأنشطة في الجزائر على Algeria Travel.",
+  "nav_favorites": "المفضلة",
+  "favorites_eyebrow": "اختياراتي",
+  "favorites_page_title": "مفضلتي",
+  "favorites_page_desc": "اعثر على فنادقك وأنشطتك وجولاتك المحفوظة.",
+  "favorites_empty_title": "لا توجد مفضلات بعد",
+  "favorites_empty_desc": "أضف فنادق أو أنشطة أو جولات بالنقر على أيقونة القلب.",
+  "favorites_remove": "إزالة من المفضلة",
+  "favorites_add": "إضافة إلى المفضلة",
+  "favorites_type_hotel": "فندق",
+  "favorites_type_activity": "نشاط",
+  "favorites_type_tour": "جولة"
 }

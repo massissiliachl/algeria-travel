@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
+import { useFavorites } from '../hooks/useFavorites';
 import { ACTIVITIES, ACTIVITY_FILTERS } from '../data/activities';
 import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
@@ -28,8 +29,8 @@ const TRUST_ITEMS = [
 const Activities = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [filter, setFilter] = useState('all');
-  const [favorites, setFavorites] = useState(() => new Set());
   const destTrackRef = useRef(null);
 
   const filtered = useMemo(() => {
@@ -41,12 +42,7 @@ const Activities = () => {
 
   const toggleFav = (e, id) => {
     e.stopPropagation();
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    toggleFavorite('activity', id);
   };
 
   const scrollDest = (dir) => {
@@ -142,11 +138,11 @@ const Activities = () => {
                 <img src={act.image} alt="" loading="lazy" />
                 <button
                   type="button"
-                  className={`acts-card__fav ${favorites.has(act.id) ? 'is-on' : ''}`}
+                  className={`acts-card__fav ${isFavorite('activity', act.id) ? 'is-on' : ''}`}
                   aria-label="Favorite"
                   onClick={(e) => toggleFav(e, act.id)}
                 >
-                  <Icon name="Heart" size={16} strokeWidth={2} fill={favorites.has(act.id) ? 'currentColor' : 'none'} />
+                  <Icon name="Heart" size={16} strokeWidth={2} fill={isFavorite('activity', act.id) ? 'currentColor' : 'none'} />
                 </button>
                 <div className="acts-card__body">
                   <h3>{pick(act.name, act.name_en, act.name_ar)}</h3>

@@ -288,45 +288,47 @@ export default function BookingSheet({
               </strong>
             </div>
 
-            <section
-              className="booking-pay-mode"
-              style={{ '--bf-delay': '180ms' }}
-              aria-labelledby="booking-pay-mode-title"
-            >
-              <div className="booking-pay-mode__head">
-                <h3 id="booking-pay-mode-title">{t('booking_pay_mode_title')}</h3>
-                <p>{t('booking_pay_mode_lead')}</p>
-              </div>
+            {PAYMENT_MODES.length > 1 && (
+              <section
+                className="booking-pay-mode"
+                style={{ '--bf-delay': '180ms' }}
+                aria-labelledby="booking-pay-mode-title"
+              >
+                <div className="booking-pay-mode__head">
+                  <h3 id="booking-pay-mode-title">{t('booking_pay_mode_title')}</h3>
+                  <p>{t('booking_pay_mode_lead')}</p>
+                </div>
 
-              <div className="booking-pay-mode__grid" role="radiogroup" aria-label={t('booking_pay_mode_title')}>
-                {PAYMENT_MODES.map((mode) => {
-                  const selected = form.payment === mode.id;
-                  return (
-                    <button
-                      key={mode.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={selected}
-                      className={`booking-pay-mode__card booking-pay-mode__card--${mode.accent} ${selected ? 'is-selected' : ''}`}
-                      onClick={() => setPaymentMode(mode.id)}
-                    >
-                      <span className="booking-pay-mode__glow" aria-hidden="true" />
-                      <span className="booking-pay-mode__icon-wrap" aria-hidden="true">
-                        <Icon name={mode.icon} size={26} strokeWidth={1.6} />
-                      </span>
-                      <span className="booking-pay-mode__content">
-                        <strong>{t(`booking_pay_${mode.id}`)}</strong>
-                        <span>{t(`booking_pay_${mode.id}_desc`)}</span>
-                        <em className="booking-pay-mode__badge">{t(`booking_pay_${mode.id}_badge`)}</em>
-                      </span>
-                      <span className="booking-pay-mode__tick" aria-hidden="true">
-                        {selected && <Icon name="Check" size={14} strokeWidth={3} />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+                <div className="booking-pay-mode__grid" role="radiogroup" aria-label={t('booking_pay_mode_title')}>
+                  {PAYMENT_MODES.map((mode) => {
+                    const selected = form.payment === mode.id;
+                    return (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        className={`booking-pay-mode__card booking-pay-mode__card--${mode.accent} ${selected ? 'is-selected' : ''}`}
+                        onClick={() => setPaymentMode(mode.id)}
+                      >
+                        <span className="booking-pay-mode__glow" aria-hidden="true" />
+                        <span className="booking-pay-mode__icon-wrap" aria-hidden="true">
+                          <Icon name={mode.icon} size={26} strokeWidth={1.6} />
+                        </span>
+                        <span className="booking-pay-mode__content">
+                          <strong>{t(`booking_pay_${mode.id}`)}</strong>
+                          <span>{t(`booking_pay_${mode.id}_desc`)}</span>
+                          <em className="booking-pay-mode__badge">{t(`booking_pay_${mode.id}_badge`)}</em>
+                        </span>
+                        <span className="booking-pay-mode__tick" aria-hidden="true">
+                          {selected && <Icon name="Check" size={14} strokeWidth={3} />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             <form className="booking-sheet__form" onSubmit={onSubmit}>
               <input
@@ -393,7 +395,7 @@ export default function BookingSheet({
                     className="booking-input"
                   />
                 </BookingField>
-                {isHotelBooking ? (
+                {isHotelBooking && (
                   <BookingField icon="Calendar" label={`${t('hotels_checkout')} *`} delay={180}>
                     <input
                       type="date"
@@ -404,32 +406,6 @@ export default function BookingSheet({
                       required
                       className="booking-input"
                     />
-                  </BookingField>
-                ) : (
-                  <BookingField icon="Users" label={t('place_form_travelers')} delay={200}>
-                    <div className="booking-stepper">
-                      <button
-                        type="button"
-                        className="booking-stepper__btn"
-                        onClick={() => setTravelers(travelersCount - 1)}
-                        disabled={travelersCount <= 1}
-                        aria-label="-"
-                      >
-                        <Icon name="Minus" size={16} />
-                      </button>
-                      <span key={travelersCount} className="booking-stepper__value">
-                        {travelersCount}
-                      </span>
-                      <button
-                        type="button"
-                        className="booking-stepper__btn"
-                        onClick={() => setTravelers(travelersCount + 1)}
-                        disabled={travelersCount >= 8}
-                        aria-label="+"
-                      >
-                        <Icon name="Plus" size={16} />
-                      </button>
-                    </div>
                   </BookingField>
                 )}
               </div>

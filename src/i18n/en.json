@@ -761,5 +761,16 @@
   "seo_track_title": "Reservation tracking",
   "seo_track_desc": "Check your Algeria Travel booking status with your reference and access code.",
   "seo_search_title": "Search",
-  "seo_search_desc": "Find destinations, tours and activities in Algeria on Algeria Travel."
+  "seo_search_desc": "Find destinations, tours and activities in Algeria on Algeria Travel.",
+  "nav_favorites": "Favorites",
+  "favorites_eyebrow": "My selection",
+  "favorites_page_title": "My favorites",
+  "favorites_page_desc": "Find your saved hotels, activities and tours.",
+  "favorites_empty_title": "No favorites yet",
+  "favorites_empty_desc": "Save hotels, activities or tours by clicking the heart icon.",
+  "favorites_remove": "Remove from favorites",
+  "favorites_add": "Add to favorites",
+  "favorites_type_hotel": "Hotel",
+  "favorites_type_activity": "Activity",
+  "favorites_type_tour": "Tour"
 }

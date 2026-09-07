@@ -1,0 +1,157 @@
+.fav-page {
+  background: var(--cream, #f7f4ef);
+  min-height: 100vh;
+}
+
+.fav-hero {
+  padding: 120px 24px 40px;
+  background: linear-gradient(135deg, #1a2332 0%, #2d3a4f 100%);
+  color: #fff;
+}
+
+.fav-hero__inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.fav-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.fav-hero h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.fav-hero p {
+  margin: 0;
+  max-width: 560px;
+  opacity: 0.88;
+  line-height: 1.6;
+}
+
+.fav-body {
+  padding: 40px 24px 80px;
+}
+
+.fav-body__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.fav-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted, #6b6560);
+}
+
+.fav-empty h2 {
+  margin: 16px 0 8px;
+  color: var(--forest, #1a2332);
+}
+
+.fav-empty__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.fav-empty__links a {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--forest, #1a2332);
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(26, 35, 50, 0.08);
+}
+
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.fav-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(26, 35, 50, 0.08);
+}
+
+.fav-card__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.fav-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fav-card__body {
+  padding: 16px 18px 20px;
+}
+
+.fav-card__type {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold, #b8935d);
+}
+
+.fav-card__title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--forest, #1a2332);
+  text-decoration: none;
+}
+
+.fav-card__sub {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted, #6b6560);
+}
+
+.fav-card__price {
+  margin: 10px 0 0;
+  font-weight: 700;
+  color: var(--forest, #1a2332);
+}
+
+.fav-card__fav {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--forest, #1a2332);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.fav-card__fav.is-on {
+  color: #c0392b;
+}

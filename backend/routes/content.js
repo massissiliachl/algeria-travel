@@ -1,6 +1,6 @@
 const express = require('express');
 const { makePublicRead } = require('../lib/crudFactory');
-const { mapPlace, mapTour, mapActivity, mapStay, mapBlog, mapGallery } = require('../lib/mappers');
+const { mapPlace, mapTour, mapActivity, mapStay, mapBlog } = require('../lib/mappers');
 const hotelAvailabilityPublic = require('./hotelAvailabilityPublic');
 
 const router = express.Router();
@@ -19,6 +19,6 @@ router.use('/hotels', makePublicRead({
   queryMap: { wilaya: 'wilaya_key' },
 }));
 router.use('/blog', makePublicRead({ table: 'blog_posts', idColumn: 'slug', mapRow: mapBlog, orderBy: 'id desc' }));
-router.use('/gallery', makePublicRead({ table: 'gallery_items', idColumn: 'id', mapRow: mapGallery, orderBy: 'sort_order asc, id asc' }));
+router.use('/gallery', require('./gallery'));
 
 module.exports = router;

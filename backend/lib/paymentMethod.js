@@ -1,4 +1,9 @@
-const VALID_PAYMENT_METHODS = new Set(['pre_request', 'card', 'transfer', 'paypal', 'cash']);
+/** Désactiver temporairement le paiement par carte — remettre à true pour réactiver. */
+const CARD_PAYMENT_ENABLED = process.env.CARD_PAYMENT_ENABLED === 'true';
+
+const VALID_PAYMENT_METHODS = new Set(
+  ['pre_request', 'transfer', 'paypal', 'cash', ...(CARD_PAYMENT_ENABLED ? ['card'] : [])],
+);
 
 const PAYMENT_LABELS = {
   pre_request: 'Demande préalable',
@@ -23,6 +28,7 @@ function paymentMethodLabel(value) {
 }
 
 module.exports = {
+  CARD_PAYMENT_ENABLED,
   VALID_PAYMENT_METHODS,
   PAYMENT_LABELS,
   isValidPaymentMethod,

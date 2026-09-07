@@ -18,8 +18,8 @@ export function resolveApiBase() {
     return origin;
   }
 
-  // Dev CRA (npm start, port 3000) → proxy setupProxy.js vers le backend
-  if (isLocal && port === '3000') {
+  // Dev CRA (npm start, ports 3000+) → proxy setupProxy.js vers le backend
+  if (isLocal && !fromEnv) {
     return '';
   }
 

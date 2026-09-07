@@ -2,6 +2,7 @@ const express = require('express');
 const { query } = require('../../config/db');
 const { adminAuth } = require('../../middleware/adminAuth');
 const { asyncHandler } = require('../../lib/asyncHandler');
+const { getFavoriteStats } = require('../../lib/favoriteStats');
 const { makeAdminCrud } = require('../../lib/crudFactory');
 const {
   mapPlace, mapTour, mapActivity, mapStay, mapBlog, mapGallery,
@@ -10,22 +11,46 @@ const {
 
 const router = express.Router();
 
+async function safeQuery(sql, params = []) {
+  try {
+    return await query(sql, params);
+  } catch (err) {
+    console.error('[admin/stats]', err.message);
+    return null;
+  }
+}
+
 router.get(
   '/stats',
   adminAuth,
   asyncHandler(async (req, res) => {
     const [reservations, tours, activities, stays, hotels, blog, places, gallery] = await Promise.all([
-      query(`select status, count(*)::int as count from public.reservations group by status`),
-      query(`select count(*)::int as count from public.tours`),
-      query(`select count(*)::int as count from public.activities`),
-      query(`select count(*)::int as count from public.stays`),
-      query(`select count(*)::int as count from public.stays where type = 'hotel'`),
-      query(`select count(*)::int as count from public.blog_posts`),
-      query(`select count(*)::int as count from public.places`),
-      query(`select count(*)::int as count from public.gallery_items`),
+      safeQuery(`select status, count(*)::int as count from public.reservations group by status`),
+      safeQuery(`select count(*)::int as count from public.tours`),
+      safeQuery(`select count(*)::int as count from public.activities`),
+      safeQuery(`select count(*)::int as count from public.stays`),
+      safeQuery(`select count(*)::int as count from public.stays where type = 'hotel'`),
+      safeQuery(`select count(*)::int as count from public.blog_posts`),
+      safeQuery(`select count(*)::int as count from public.places`),
+      safeQuery(`select count(*)::int as count from public.gallery_items`),
     ]);
 
-    const byStatus = Object.fromEntries(reservations.rows.map((r) => [r.status, r.count]));
+    const byStatus = Object.fromEntries((reservations?.rows || []).map((r) => [r.status, r.count]));
+    let favorites;
+    try {
+      favorites = await getFavoriteStats();
+    } catch (err) {
+      console.error('[admin/stats] favorites:', err.message);
+      favorites = {
+        ready: false,
+        message: err.message || 'Statistiques favoris indisponibles.',
+        totals: { favorites: 0, uniqueVisitors: 0 },
+        byType: {},
+        topActivities: [],
+        topHotels: [],
+        topTours: [],
+      };
+    }
     res.json({
       reservations: {
         total: Object.values(byStatus).reduce((a, b) => a + b, 0),
@@ -34,13 +59,14 @@ router.get(
         rejected: byStatus.rejected || 0,
         byStatus,
       },
-      tours: tours.rows[0].count,
-      activities: activities.rows[0].count,
-      stays: stays.rows[0].count,
-      hotels: hotels.rows[0].count,
-      blogPosts: blog.rows[0].count,
-      places: places.rows[0].count,
-      gallery: gallery.rows[0].count,
+      tours: tours?.rows?.[0]?.count ?? 0,
+      activities: activities?.rows?.[0]?.count ?? 0,
+      stays: stays?.rows?.[0]?.count ?? 0,
+      hotels: hotels?.rows?.[0]?.count ?? 0,
+      blogPosts: blog?.rows?.[0]?.count ?? 0,
+      places: places?.rows?.[0]?.count ?? 0,
+      gallery: gallery?.rows?.[0]?.count ?? 0,
+      favorites,
     });
   })
 );
