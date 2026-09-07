@@ -400,21 +400,24 @@ const Gallery = () => {
               </button>
             </div>
 
-            {currentImage.fromApi && (
-              <>
-                {!apiOnline && (
-                  <p className="gal-api-hint">{t('gallery_api_offline')}</p>
-                )}
-                <CommentThread
-                  key={currentImage.id}
-                  itemType="gallery"
-                  itemId={currentImage.id}
-                  t={t}
-                  variant="dark"
-                  title={t('gallery_comments_title')}
-                />
-              </>
+            {(!apiOnline || !currentImage.fromApi) && (
+              <p className="gal-api-hint" role="status">
+                {t('gallery_api_offline')}
+              </p>
             )}
+
+            <p className="gal-lb__scroll-hint" aria-hidden="true">
+              {t('gallery_scroll_comments')}
+            </p>
+
+            <CommentThread
+              key={currentImage.id}
+              itemType="gallery"
+              itemId={currentImage.id}
+              t={t}
+              variant="dark"
+              title={t('gallery_comments_title')}
+            />
           </div>
 
           <button
