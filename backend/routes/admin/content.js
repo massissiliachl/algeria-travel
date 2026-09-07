@@ -3,6 +3,7 @@ const { query } = require('../../config/db');
 const { adminAuth } = require('../../middleware/adminAuth');
 const { asyncHandler } = require('../../lib/asyncHandler');
 const { getFavoriteStats } = require('../../lib/favoriteStats');
+const { getPendingCount } = require('../../lib/comments');
 const { makeAdminCrud } = require('../../lib/crudFactory');
 const {
   mapPlace, mapTour, mapActivity, mapStay, mapBlog, mapGallery,
@@ -37,6 +38,7 @@ router.get(
 
     const byStatus = Object.fromEntries((reservations?.rows || []).map((r) => [r.status, r.count]));
     let favorites;
+    let commentsPending = 0;
     try {
       favorites = await getFavoriteStats();
     } catch (err) {
@@ -50,6 +52,11 @@ router.get(
         topHotels: [],
         topTours: [],
       };
+    }
+    try {
+      commentsPending = await getPendingCount();
+    } catch (err) {
+      console.error('[admin/stats] comments:', err.message);
     }
     res.json({
       reservations: {
@@ -67,6 +74,7 @@ router.get(
       places: places?.rows?.[0]?.count ?? 0,
       gallery: gallery?.rows?.[0]?.count ?? 0,
       favorites,
+      commentsPending,
     });
   })
 );

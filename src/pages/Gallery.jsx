@@ -7,6 +7,7 @@ import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
 import { resolveMediaUrl, MEDIA_PLACEHOLDER } from '../utils/mediaUrl';
 import SeoHead from '../components/SeoHead';
+import CommentThread from '../components/comments/CommentThread';
 import './Gallery.css';
 
 const FALLBACK_IMAGES = [
@@ -54,6 +55,7 @@ const Gallery = () => {
   const [burst, setBurst] = useState([]);
   const [pulse, setPulse] = useState({ like: false, dislike: false });
   const [reacting, setReacting] = useState(false);
+  const [apiOnline, setApiOnline] = useState(true);
   const gridRef = useRef(null);
   const heroRef = useRef(null);
   const burstId = useRef(0);
@@ -71,9 +73,11 @@ const Gallery = () => {
           return;
         }
         setImages(items.map(mapGalleryItem));
+        setApiOnline(true);
       })
       .catch(() => {
         setImages(FALLBACK_IMAGES);
+        setApiOnline(false);
       });
 
     return () => cancelAnimationFrame(id);
@@ -165,8 +169,9 @@ const Gallery = () => {
     try {
       const stats = await api.setGalleryReaction(id, reaction);
       updateImageStats(id, stats);
+      setApiOnline(true);
     } catch {
-      /* ignore — compteurs inchangés */
+      setApiOnline(false);
     } finally {
       setReacting(false);
     }
@@ -394,6 +399,22 @@ const Gallery = () => {
                 </span>
               </button>
             </div>
+
+            {currentImage.fromApi && (
+              <>
+                {!apiOnline && (
+                  <p className="gal-api-hint">{t('gallery_api_offline')}</p>
+                )}
+                <CommentThread
+                  key={currentImage.id}
+                  itemType="gallery"
+                  itemId={currentImage.id}
+                  t={t}
+                  variant="dark"
+                  title={t('gallery_comments_title')}
+                />
+              </>
+            )}
           </div>
 
           <button

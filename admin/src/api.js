@@ -43,6 +43,20 @@ export const api = {
 
   getFavoriteStats: () => request('/api/admin/favorites/stats'),
 
+  getCommentStats: () => request('/api/admin/comments/stats'),
+
+  getComments: (status = 'pending') =>
+    request(`/api/admin/comments?status=${encodeURIComponent(status)}`),
+
+  moderateComment: (id, payload) =>
+    request(`/api/admin/comments/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteComment: (id) =>
+    request(`/api/admin/comments/${id}`, { method: 'DELETE' }),
+
   getReservations: (status = 'all') =>
     request(`/api/admin/reservations${status !== 'all' ? `?status=${status}` : ''}`),
 

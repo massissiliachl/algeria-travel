@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -25,27 +25,15 @@ const TrackReservation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const autoTracked = useRef(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const paramRef = searchParams.get('ref');
-    if (paramRef) setRef(paramRef.toUpperCase());
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (location.state?.token) setToken(location.state.token);
-  }, [location.state?.token]);
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const normalizedRef = ref.trim().toUpperCase();
-    const normalizedToken = token.trim();
-
+  const runTrack = useCallback(async (normalizedRef, normalizedToken) => {
     if (!normalizedRef || !normalizedToken) {
       setError(t('track_error_required'));
+      return;
+    }
+    if (normalizedToken === normalizedRef) {
+      setError(t('track_error_token_invalid'));
       return;
     }
 
@@ -61,6 +49,27 @@ const TrackReservation = () => {
     } finally {
       setLoading(false);
     }
+  }, [t]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const paramRef = searchParams.get('ref')?.trim().toUpperCase() || '';
+    const stateToken = location.state?.token?.trim() || '';
+    if (paramRef) setRef(paramRef);
+    if (stateToken) setToken(stateToken);
+
+    if (paramRef && stateToken && !autoTracked.current) {
+      autoTracked.current = true;
+      runTrack(paramRef, stateToken);
+    }
+  }, [searchParams, location.state?.token, runTrack]);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    await runTrack(ref.trim().toUpperCase(), token.trim());
   };
 
   const formatDate = (value) => {

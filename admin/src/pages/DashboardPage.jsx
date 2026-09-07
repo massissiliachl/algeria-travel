@@ -91,6 +91,7 @@ export default function DashboardPage() {
 
   const cards = [
     { label: 'Réservations en attente', value: stats.reservations.pending, className: 'pending', to: '/reservations', icon: 'pending' },
+    { label: 'Commentaires en attente', value: stats.commentsPending || 0, className: 'pending', to: '/comments', icon: 'blog' },
     { label: 'Réservations confirmées', value: stats.reservations.confirmed, className: 'confirmed', to: '/reservations', icon: 'confirmed' },
     { label: 'Circuits', value: stats.tours, to: '/tours', icon: 'tours' },
     { label: 'Activités', value: stats.activities, to: '/activities', icon: 'activities' },

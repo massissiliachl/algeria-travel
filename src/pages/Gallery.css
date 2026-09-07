@@ -415,12 +415,34 @@
 .gal-lb__stage {
   position: relative;
   width: min(920px, 100%);
+  max-height: min(92vh, 900px);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 18px;
   transform-style: preserve-3d;
   animation: gal-stage-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.gal-lb__stage .cmt-thread {
+  width: 100%;
+  max-width: 520px;
+  flex-shrink: 0;
+}
+
+.gal-api-hint {
+  width: 100%;
+  max-width: 520px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 107, 122, 0.15);
+  color: #ffd6db;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 @keyframes gal-stage-in {

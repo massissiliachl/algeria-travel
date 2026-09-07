@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
@@ -8,11 +8,10 @@ import SeoHead from '../components/SeoHead';
 import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
 import { WILAYAS } from '../data/wilayas';
-import { HOTELS, countHotelsByWilaya } from '../data/hotels';
+import { HOTELS } from '../data/hotels';
 import { AMENITY_FILTERS, PRICE_MAX, PRICE_MIN } from '../data/hotelFilters';
 import { api } from '../services/api';
 import { normalizeHotels } from '../utils/normalizeHotel';
-import HotelsValueBar from '../components/hotels/HotelsValueBar';
 import PopularDestinations from '../components/hotels/PopularDestinations';
 import HotelPopularCard from '../components/hotels/HotelPopularCard';
 import HotelFiltersPanel from '../components/hotels/HotelFiltersPanel';
@@ -25,6 +24,13 @@ const SORT_OPTIONS = [
   { key: 'price_asc', labelKey: 'hotels_sort_price_asc' },
   { key: 'price_desc', labelKey: 'hotels_sort_price_desc' },
   { key: 'rating', labelKey: 'hotels_sort_rating' },
+];
+
+const HERO_FEATURES = [
+  { icon: 'ShieldCheck', titleKey: 'hotels_feat_selected', descKey: 'hotels_feat_selected_desc' },
+  { icon: 'Zap', titleKey: 'hotels_feat_avail', descKey: 'hotels_feat_avail_desc' },
+  { icon: 'Tag', titleKey: 'hotels_feat_price', descKey: 'hotels_feat_price_desc' },
+  { icon: 'MapPin', titleKey: 'hotels_feat_wilaya', descKey: 'hotels_feat_wilaya_desc' },
 ];
 
 function hotelHasAmenity(hotel, filterKey, lang) {
@@ -47,11 +53,28 @@ const Hotels = () => {
   const [amenityFilters, setAmenityFilters] = useState([]);
   const [checkIn, setCheckIn] = useState(searchParams.get('checkIn') || '');
   const [checkOut, setCheckOut] = useState(searchParams.get('checkOut') || '');
-  const [guests, setGuests] = useState({
+  const [guests] = useState({
     adults: Math.max(1, Number(searchParams.get('rooms')) || 2),
     children: 0,
   });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const resultsRef = useRef(null);
+
+  const scrollToResults = () => {
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const setWilaya = (key) => {
+    const next = new URLSearchParams(searchParams);
+    if (key === 'all') next.delete('wilaya');
+    else next.set('wilaya', key);
+    setSearchParams(next);
+  };
+
+  const selectWilaya = (key) => {
+    setWilaya(key);
+    window.setTimeout(scrollToResults, 120);
+  };
 
   const wilayaParam = searchParams.get('wilaya') || 'all';
   const wilaya =
@@ -97,15 +120,6 @@ const Hotels = () => {
       cancelled = true;
     };
   }, []);
-
-  const counts = useMemo(() => countHotelsByWilaya(hotels), [hotels]);
-
-  const setWilaya = (key) => {
-    const next = new URLSearchParams(searchParams);
-    if (key === 'all') next.delete('wilaya');
-    else next.set('wilaya', key);
-    setSearchParams(next);
-  };
 
   const filtered = useMemo(() => {
     let list = [...hotels];
@@ -179,24 +193,7 @@ const Hotels = () => {
   };
 
   const openHotel = (hotel) => {
-    const qs = new URLSearchParams();
-    if (checkIn) qs.set('checkIn', checkIn);
-    if (checkOut) qs.set('checkOut', checkOut);
-    if (guests.adults) qs.set('rooms', String(guests.adults));
-    const q = qs.toString();
-    navigate(`/hotels/${hotel.id}${q ? `?${q}` : ''}`);
-  };
-
-  const onSearch = (e) => {
-    e.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (checkIn) params.set('checkIn', checkIn);
-    else params.delete('checkIn');
-    if (checkOut) params.set('checkOut', checkOut);
-    else params.delete('checkOut');
-    params.set('rooms', String(guests.adults));
-    setSearchParams(params);
-    document.getElementById('hotels-results')?.scrollIntoView({ behavior: 'smooth' });
+    navigate(`/hotels/${hotel.id}`);
   };
 
   const wilayaLabel =
@@ -225,116 +222,50 @@ const Hotels = () => {
         title={t('seo_hotels_title')}
         description={t('seo_hotels_desc')}
         path={wilaya !== 'all' ? `/hotels?wilaya=${wilaya}` : '/hotels'}
-        image="/images/home/hero-coast.jpg"
+        image="/images/hotels/hero-hotel.png"
       />
       <Navbar />
 
-      <section className="htl-hero htl-hero--v3">
+      <section className="htl-hero">
         <ResponsiveImage
           className="htl-hero__bg"
-          src="/images/home/hero-coast.jpg"
+          src="/images/hotels/hero-hotel.png"
           alt=""
           priority
           sizes="100vw"
         />
-        <div className="htl-hero__overlay htl-hero__overlay--v3" />
-        <div className="htl-container htl-hero__inner">
-          <p className="htl-hero__eyebrow htl-hero__eyebrow--v3">{t('hotels_hero_eyebrow')}</p>
-          <h1 className="htl-hero__title htl-hero__title--v3">
+        <div className="htl-hero__overlay" />
+        <div className="htl-container htl-hero__inner" data-reveal="fade">
+          <nav className="htl-breadcrumb" aria-label="Breadcrumb">
+            <Link to="/">{t('nav_home')}</Link>
+            <span>/</span>
+            <span>{t('hotels_nav')}</span>
+          </nav>
+          <h1 className="htl-hero__title">
             {t('hotels_hero_v2_title_before')}
-            <em>{t('hotels_hero_v2_title_em')}</em>
+            <em> {t('hotels_hero_v2_title_em')}</em>
           </h1>
-          <p className="htl-hero__subtitle htl-hero__subtitle--v3">{t('hotels_hero_v2_subtitle')}</p>
-          <ul className="htl-hero__perks" aria-label={t('hotels_trust_title')}>
-            <li>
-              <Icon name="ShieldCheck" size={16} />
-              {t('hotels_feat_selected')}
-            </li>
-            <li>
-              <Icon name="Zap" size={16} />
-              {t('hotels_feat_avail')}
-            </li>
-            <li>
-              <Icon name="Tag" size={16} />
-              {t('hotels_feat_price')}
-            </li>
-          </ul>
+          <p className="htl-hero__subtitle">{t('hotels_hero_v2_subtitle')}</p>
+          <div className="htl-hero__features">
+            {HERO_FEATURES.map((f) => (
+              <div key={f.titleKey} className="htl-hero__feat">
+                <Icon name={f.icon} size={22} strokeWidth={1.5} />
+                <strong>{t(f.titleKey)}</strong>
+                <span>{t(f.descKey)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <div className="htl-container htl-search-wrap">
-        <form className="htl-search htl-search--v3" onSubmit={onSearch}>
-          <div className="htl-search__inner">
-            <div className="htl-search__field">
-              <Icon name="MapPin" size={18} />
-              <div>
-                <span>{t('hotels_search_destination')}</span>
-                <select
-                  value={wilaya}
-                  onChange={(e) => setWilaya(e.target.value)}
-                  aria-label={t('hotels_search_destination')}
-                >
-                  <option value="all">{t('hotels_search_destination_ph')}</option>
-                  {WILAYAS.filter((w) => (counts[w.key] || 0) > 0 || w.key === wilaya).map((w) => (
-                    <option key={w.key} value={w.key}>
-                      {pick(w.fr, w.en, w.ar)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="htl-search__field">
-              <Icon name="Calendar" size={18} />
-              <div>
-                <span>{t('hotels_checkin')}</span>
-                <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
-              </div>
-            </div>
-            <div className="htl-search__field">
-              <Icon name="Calendar" size={18} />
-              <div>
-                <span>{t('hotels_checkout')}</span>
-                <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
-              </div>
-            </div>
-            <div className="htl-search__field">
-              <Icon name="Users" size={18} />
-              <div>
-                <span>{t('hotels_search_guests')}</span>
-                <select
-                  value={`${guests.adults}-${guests.children}`}
-                  onChange={(e) => {
-                    const [a, c] = e.target.value.split('-').map(Number);
-                    setGuests({ adults: a, children: c });
-                  }}
-                >
-                  <option value="1-0">1 {t('hotels_guests_adults')}</option>
-                  <option value="2-0">2 {t('hotels_guests_adults')}</option>
-                  <option value="2-1">2 {t('hotels_guests_adults')} — 1 {t('hotels_guests_children')}</option>
-                  <option value="2-2">2 {t('hotels_guests_adults')} — 2 {t('hotels_guests_children')}</option>
-                  <option value="3-0">3 {t('hotels_guests_adults')}</option>
-                  <option value="4-0">4 {t('hotels_guests_adults')}</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <button type="submit" className="htl-btn htl-btn--search">
-            <Icon name="Search" size={18} />
-            {t('hotels_search_btn')}
-          </button>
-        </form>
-      </div>
-
-      <HotelsValueBar t={t} />
-
       <PopularDestinations
         activeWilaya={wilaya === 'all' ? null : wilaya}
-        onSelect={setWilaya}
+        onSelect={selectWilaya}
         t={t}
         pick={pick}
       />
 
-      <section className="htl-results htl-results--v3" id="hotels-results">
+      <section className="htl-results htl-results--v3" id="hotels-results" ref={resultsRef}>
         {mobileFiltersOpen && (
           <div className="htl-filters-drawer" role="dialog" aria-modal="true" aria-label={t('hotels_filters')}>
             <div className="htl-filters-drawer__backdrop" onClick={() => setMobileFiltersOpen(false)} />

@@ -95,21 +95,23 @@ export function NotificationProvider({ children }) {
       }
       return true;
     } catch (err) {
-      console.warn('[notify] API feed indisponible:', err.message);
+      if (process.env.NODE_ENV === 'development') {
+        /* API feed optionnel en local si le backend n'est pas démarré */
+      } else {
+        console.warn('[notify] API feed indisponible:', err.message);
+      }
       return false;
     }
   }, [enabled, language, showBrowserNotification]);
 
   const registerFirebaseMessaging = useCallback(async () => {
     if (!isSecureContextForPush() || !('serviceWorker' in navigator)) {
-      console.warn('[notify] Contexte non sécurisé ou service worker indisponible.');
       return false;
     }
 
     if (typeof Notification === 'undefined') return false;
 
     if (isIosSafariBrowser()) {
-      console.warn('[notify] iPhone : ouvrez le site depuis l’icône écran d’accueil.');
       return { pushOk: false, apiOk: true, error: 'ios_standalone_required' };
     }
 
@@ -120,7 +122,6 @@ export function NotificationProvider({ children }) {
     if (Notification.permission === 'default') {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        console.warn('[notify] Permission notifications refusée.');
         return false;
       }
     }
@@ -132,7 +133,6 @@ export function NotificationProvider({ children }) {
 
       const messaging = await getFirebaseMessaging();
       if (!messaging) {
-        console.warn('[notify] Firebase Messaging non supporté sur ce navigateur.');
         return false;
       }
 
@@ -142,7 +142,6 @@ export function NotificationProvider({ children }) {
       });
 
       if (!token) {
-        console.warn('[notify] Token FCM non obtenu.');
         return false;
       }
 
@@ -170,11 +169,7 @@ export function NotificationProvider({ children }) {
       }
 
       return { pushOk: true, apiOk: true };
-    } catch (err) {
-      console.error('[notify] Échec abonnement FCM:', err);
-      if (err.message?.includes('404') || err.message?.includes('Erreur API')) {
-        return { pushOk: false, apiOk: false, error: 'api_offline' };
-      }
+    } catch {
       return { pushOk: false, apiOk: true, error: 'push_failed' };
     }
   }, [fetchFeed, language, showBrowserNotification]);
@@ -213,7 +208,18 @@ export function NotificationProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (typeof Notification === 'undefined') return undefined;
+    if (Notification.permission === 'denied' && enabled) {
+      declineNotifications();
+    }
+    return undefined;
+  }, [enabled, declineNotifications]);
+
+  useEffect(() => {
     if (!enabled) return undefined;
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+      return undefined;
+    }
     fetchFeed();
     const id = setInterval(fetchFeed, POLL_MS);
     return () => clearInterval(id);
@@ -221,12 +227,18 @@ export function NotificationProvider({ children }) {
 
   useEffect(() => {
     if (!enabled) return undefined;
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+      return undefined;
+    }
     registerFirebaseMessaging().catch(() => {});
     return undefined;
   }, [enabled, registerFirebaseMessaging]);
 
   useEffect(() => {
     if (!enabled) return undefined;
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+      return undefined;
+    }
     const refresh = () => {
       if (document.visibilityState === 'visible') {
         registerFirebaseMessaging().catch(() => {});

@@ -18,6 +18,7 @@ import HotelGalleryGrid from '../components/hotels/HotelGalleryGrid';
 import HotelBookingWidget from '../components/hotels/HotelBookingWidget';
 import HotelScoreBadge from '../components/hotels/HotelScoreBadge';
 import HotelReviewsSummary from '../components/hotels/HotelReviewsSummary';
+import CommentThread from '../components/comments/CommentThread';
 import {
   buildFallbackAvailability,
   calcStayTotal,
@@ -48,7 +49,7 @@ const HotelDetail = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const [hotel, setHotel] = useState(null);
+  const [hotel, setHotel] = useState(() => getHotelById(id) || null);
   const [allHotels, setAllHotels] = useState(HOTELS);
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -62,12 +63,15 @@ const HotelDetail = () => {
     let cancelled = false;
     const staticHotel = getHotelById(id);
 
-    const load = async () => {
-      if (staticHotel) {
-        if (!cancelled) setHotel(staticHotel);
-        return;
-      }
+    if (staticHotel) {
+      setHotel(staticHotel);
+      window.scrollTo(0, 0);
+      return () => {
+        cancelled = true;
+      };
+    }
 
+    const load = async () => {
       try {
         const row = await api.getHotel(id);
         if (!cancelled) setHotel(normalizeHotel(row));
@@ -79,6 +83,15 @@ const HotelDetail = () => {
     load();
     window.scrollTo(0, 0);
 
+    return () => {
+      cancelled = true;
+    };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (getHotelById(id)) return undefined;
+
+    let cancelled = false;
     api
       .getHotels()
       .then((rows) => {
@@ -92,7 +105,7 @@ const HotelDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, navigate]);
+  }, [id]);
 
   useEffect(() => {
     if (!hotel) return undefined;
@@ -276,6 +289,15 @@ const HotelDetail = () => {
                 reviews={hotel.reviews}
                 bars={reviewBars}
                 t={t}
+              />
+            </section>
+
+            <section className="htl-detail__section">
+              <CommentThread
+                itemType="hotel"
+                itemId={hotel.id}
+                t={t}
+                title={t('comments_title')}
               />
             </section>
 

@@ -3,9 +3,10 @@ import React from 'react';
 export function StatusBadge({ status }) {
   const label = {
     pending: 'En attente',
+    approved: 'Approuvé',
     reviewed: 'Examinée',
     confirmed: 'Confirmée',
-    rejected: 'Refusée',
+    rejected: 'Refusé',
     cancelled: 'Annulée',
   }[status] || status;
 

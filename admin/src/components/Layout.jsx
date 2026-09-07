@@ -19,6 +19,7 @@ import {
 const NAV = [
   { to: '/', label: 'Tableau de bord', end: true, icon: DashboardIcon },
   { to: '/reservations', label: 'Réservations', icon: ReservationsIcon },
+  { to: '/comments', label: 'Commentaires', icon: BlogIcon },
   { to: '/places', label: 'Destinations', icon: PlacesIcon },
   { to: '/tours', label: 'Circuits', icon: ToursIcon },
   { to: '/activities', label: 'Activités', icon: ActivitiesIcon },

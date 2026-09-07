@@ -13,6 +13,12 @@
   color: #b8935d;
 }
 
+.track-bar-widget__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #c0392b;
+}
+
 .track-bar-widget__row {
   display: grid;
   grid-template-columns: 1fr 1.2fr auto;

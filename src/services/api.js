@@ -2,7 +2,7 @@ import { resolveApiBase } from '../utils/apiBase';
 import { getFavoriteClientId } from '../utils/favoriteClientId';
 
 async function request(path, options = {}) {
-  const { headers: optionHeaders, ...rest } = options;
+  const { headers: optionHeaders, expectStatuses = [], ...rest } = options;
   const res = await fetch(`${resolveApiBase()}${path}`, {
     ...rest,
     headers: {
@@ -14,6 +14,11 @@ async function request(path, options = {}) {
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
+    if (expectStatuses.includes(res.status)) {
+      const err = new Error(data.error || `Erreur API (${res.status})`);
+      err.status = res.status;
+      throw err;
+    }
     throw new Error(data.error || `Erreur API (${res.status})`);
   }
 
@@ -42,6 +47,32 @@ export const api = {
       method: 'POST',
       headers: { 'x-favorite-client': getFavoriteClientId() },
       body: JSON.stringify({ reaction }),
+    }),
+  getComments: (itemType, itemId) => {
+    const qs = new URLSearchParams({
+      item_type: itemType,
+      item_id: String(itemId),
+    }).toString();
+    return request(`/api/comments?${qs}`, {
+      headers: { 'x-favorite-client': getFavoriteClientId() },
+    });
+  },
+  postComment: ({ itemType, itemId, body, authorName, parentId }) =>
+    request('/api/comments', {
+      method: 'POST',
+      headers: { 'x-favorite-client': getFavoriteClientId() },
+      body: JSON.stringify({
+        item_type: itemType,
+        item_id: String(itemId),
+        body,
+        author_name: authorName,
+        parent_id: parentId || null,
+      }),
+    }),
+  likeComment: (commentId) =>
+    request(`/api/comments/${commentId}/like`, {
+      method: 'POST',
+      headers: { 'x-favorite-client': getFavoriteClientId() },
     }),
   getStays: (params = {}) => {
     const qs = new URLSearchParams(params).toString();

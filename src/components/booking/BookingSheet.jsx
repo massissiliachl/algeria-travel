@@ -244,6 +244,7 @@ export default function BookingSheet({
                 </details>
                 <Link
                   to={`/suivi?ref=${encodeURIComponent(bookingRef.referenceCode)}`}
+                  state={{ token: bookingRef.accessToken }}
                   className="booking-sheet__track-link"
                 >
                   {t('place_form_track_link')}

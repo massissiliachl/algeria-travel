@@ -85,10 +85,12 @@ app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 app.use('/api/reservations', reservationsRoutes);
 app.use('/api/favorites', require('./routes/favorites'));
+app.use('/api/comments', require('./routes/comments'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin/favorites', require('./routes/admin/favorites'));
+app.use('/api/admin/comments', require('./routes/admin/comments'));
 app.use('/api/admin', require('./routes/admin/media'));
 app.use('/api/admin', require('./routes/admin/content'));
 app.use('/api/admin/hotel-users', require('./routes/admin/hotelUsers'));

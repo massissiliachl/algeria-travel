@@ -9,13 +9,22 @@ export default function TrackReservationBar({ variant = 'inline', onDone, classN
   const navigate = useNavigate();
   const [ref, setRef] = useState('');
   const [token, setToken] = useState('');
+  const [error, setError] = useState('');
 
   const onSubmit = (e) => {
     e.preventDefault();
     const normalizedRef = ref.trim().toUpperCase();
     const normalizedToken = token.trim();
-    if (!normalizedRef || !normalizedToken) return;
+    if (!normalizedRef || !normalizedToken) {
+      setError(t('track_error_required'));
+      return;
+    }
+    if (normalizedToken === normalizedRef) {
+      setError(t('track_error_token_invalid'));
+      return;
+    }
 
+    setError('');
     navigate(`/suivi?ref=${encodeURIComponent(normalizedRef)}`, {
       state: { token: normalizedToken },
     });
@@ -28,6 +37,7 @@ export default function TrackReservationBar({ variant = 'inline', onDone, classN
       onSubmit={onSubmit}
     >
       <p className="track-bar-widget__title">{t('track_nav_title')}</p>
+      {error ? <p className="track-bar-widget__error" role="alert">{error}</p> : null}
       <div className="track-bar-widget__row">
         <input
           type="text"

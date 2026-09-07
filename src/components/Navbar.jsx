@@ -38,13 +38,29 @@ const Navbar = ({ variant = 'default' }) => {
   const langRef = useRef(null);
   const trackRef = useRef(null);
   const burgerRef = useRef(null);
+  const drawerRef = useRef(null);
   const isHome = variant === 'home' || location.pathname === '/';
   const transparent = isHome && !scrolled && !mobileOpen;
 
+  const closeMobileMenu = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    setMobileOpen(false);
+  };
+
+  useEffect(() => {
+    if (!drawerRef.current) return;
+    if (mobileOpen) {
+      drawerRef.current.removeAttribute('inert');
+    } else {
+      drawerRef.current.setAttribute('inert', '');
+    }
+  }, [mobileOpen]);
+
   useEffect(() => {
     if (mobileOpen) return;
-    const drawer = document.querySelector('.nav-mobile-drawer');
-    if (drawer?.contains(document.activeElement)) {
+    if (drawerRef.current?.contains(document.activeElement)) {
       burgerRef.current?.focus();
     }
   }, [mobileOpen]);
@@ -56,6 +72,9 @@ const Navbar = ({ variant = 'default' }) => {
   }, []);
 
   useEffect(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setMobileOpen(false);
     setLangOpen(false);
     setTrackOpen(false);
@@ -86,7 +105,7 @@ const Navbar = ({ variant = 'default' }) => {
       e.preventDefault();
       navigate('/' + link.hash);
     }
-    setMobileOpen(false);
+    closeMobileMenu();
   };
 
   const isActive = (link) => {
@@ -113,12 +132,12 @@ const Navbar = ({ variant = 'default' }) => {
     <>
       <div
         className={`nav-mobile-overlay ${mobileOpen ? 'is-open' : ''}`}
-        onClick={() => setMobileOpen(false)}
+        onClick={closeMobileMenu}
         aria-hidden={!mobileOpen}
       />
       <aside
+        ref={drawerRef}
         className={`nav-mobile-drawer ${mobileOpen ? 'is-open' : ''}`}
-        aria-hidden={!mobileOpen}
         aria-label="Menu"
       >
         <div className="nav-mobile-drawer__head">
@@ -126,14 +145,14 @@ const Navbar = ({ variant = 'default' }) => {
             <img src="/logo.png" alt="" width={36} height={36} />
             ALGERIA <em>TRAVEL</em>
           </span>
-          <button type="button" onClick={() => setMobileOpen(false)} aria-label="Fermer">
+          <button type="button" onClick={closeMobileMenu} aria-label="Fermer">
             <Icon name="X" size={20} />
           </button>
         </div>
         <Link
           to="/favorites"
           className="nav-mobile-drawer__fav"
-          onClick={() => setMobileOpen(false)}
+          onClick={closeMobileMenu}
         >
           <Icon name="Heart" size={18} />
           <span>{t('nav_favorites')}</span>
@@ -154,7 +173,7 @@ const Navbar = ({ variant = 'default' }) => {
           ))}
         </nav>
         <div className="nav-mobile-drawer__track">
-          <TrackReservationBar variant="drawer" onDone={() => setMobileOpen(false)} />
+          <TrackReservationBar variant="drawer" onDone={closeMobileMenu} />
         </div>
         <div className="nav-mobile-drawer__langs">
           <p>{t('nav_language')}</p>
@@ -188,7 +207,7 @@ const Navbar = ({ variant = 'default' }) => {
         ].filter(Boolean).join(' ')}
       >
         <div className="premium-nav__inner">
-          <Link to="/" className="premium-nav__logo" onClick={() => setMobileOpen(false)}>
+          <Link to="/" className="premium-nav__logo" onClick={closeMobileMenu}>
             <img
               className="premium-nav__emblem"
               src="/logo.png"

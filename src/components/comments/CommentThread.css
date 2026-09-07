@@ -1,0 +1,271 @@
+.cmt-thread {
+  margin-top: 20px;
+}
+
+.cmt-thread__title {
+  margin: 0 0 14px;
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.15rem;
+  color: var(--htl-navy, #001a3f);
+}
+
+.cmt-author-hint {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  color: var(--htl-muted, #64748b);
+}
+
+.cmt-author-hint strong {
+  color: inherit;
+  font-weight: 700;
+}
+
+.cmt-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.cmt-form__field {
+  display: grid;
+  gap: 6px;
+}
+
+.cmt-form__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cmt-form__error {
+  font-size: 0.78rem;
+  color: #b42318;
+}
+
+.cmt-form input,
+.cmt-form textarea {
+  width: 100%;
+  border: 1px solid rgba(0, 26, 63, 0.14);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 0.9rem;
+  background: #fff;
+  color: inherit;
+  resize: vertical;
+}
+
+.cmt-form button {
+  justify-self: start;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  background: var(--gold, #b8935d);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cmt-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cmt-notice {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(184, 147, 93, 0.12);
+  color: #6b5430;
+  font-size: 0.88rem;
+}
+
+.cmt-error {
+  margin: 0 0 12px;
+  color: #b42318;
+  font-size: 0.88rem;
+}
+
+.cmt-empty {
+  margin: 0;
+  color: var(--htl-muted, #64748b);
+  font-size: 0.9rem;
+}
+
+.cmt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cmt-item {
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 26, 63, 0.08);
+  border-radius: 14px;
+  background: #faf9f6;
+}
+
+.cmt-item--reply {
+  background: #fff;
+  margin-top: 10px;
+}
+
+.cmt-item__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cmt-item__avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4ad2e, #b8921f);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.cmt-item__avatar--sm {
+  width: 28px;
+  height: 28px;
+  font-size: 0.75rem;
+}
+
+.cmt-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cmt-item__meta strong {
+  font-size: 0.88rem;
+}
+
+.cmt-item__meta time {
+  font-size: 0.75rem;
+  color: var(--htl-muted, #64748b);
+}
+
+.cmt-item__head strong {
+  font-size: 0.88rem;
+}
+
+.cmt-item__head time {
+  font-size: 0.75rem;
+  color: var(--htl-muted, #64748b);
+}
+
+.cmt-item__body {
+  margin: 0 0 10px;
+  line-height: 1.5;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+}
+
+.cmt-item__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.cmt-like,
+.cmt-reply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  color: var(--htl-muted, #64748b);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cmt-like.is-on {
+  color: #e2556a;
+}
+
+.cmt-reply-form {
+  margin-top: 12px;
+}
+
+.cmt-reply-as {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  color: var(--htl-muted, #64748b);
+}
+
+.cmt-replies {
+  margin-top: 12px;
+  padding-left: 12px;
+  border-left: 2px solid rgba(184, 147, 93, 0.35);
+}
+
+.cmt-thread--dark .cmt-thread__title {
+  color: #fff;
+}
+
+.cmt-thread--dark .cmt-form input,
+.cmt-thread--dark .cmt-form textarea {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.cmt-thread--dark .cmt-form input::placeholder,
+.cmt-thread--dark .cmt-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.cmt-thread--dark .cmt-item {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.cmt-thread--dark .cmt-item--reply {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cmt-thread--dark .cmt-author-hint {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.cmt-thread--dark .cmt-form__label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cmt-thread--dark .cmt-form__error {
+  color: #ffb4ab;
+}
+
+.cmt-thread--dark .cmt-reply-as {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cmt-thread--dark .cmt-item__meta time,
+.cmt-thread--dark .cmt-empty {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cmt-thread--dark .cmt-like,
+.cmt-thread--dark .cmt-reply-btn {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.cmt-thread--dark .cmt-notice {
+  background: rgba(184, 147, 93, 0.2);
+  color: #f0dfc0;
+}
+
+.cmt-thread--dark .cmt-error {
+  color: #ffb4ab;
+}
