@@ -87,6 +87,7 @@ app.use('/api/reservations', reservationsRoutes);
 app.use('/api/favorites', require('./routes/favorites'));
 app.use('/api/comments', require('./routes/comments'));
 app.use('/api/contact', require('./routes/contact'));
+app.use('/api/chat', require('./routes/chat'));
 app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin/favorites', require('./routes/admin/favorites'));

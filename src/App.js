@@ -23,6 +23,7 @@ import TrackReservation from './pages/TrackReservation';
 import Privacy from './pages/Privacy';
 import Favorites from './pages/Favorites';
 import WhatsAppButton from './components/WhatsAppButton';
+import Chatbot from './components/chat/Chatbot';
 import CookieBanner from './components/CookieBanner';
 import NotificationOptIn from './components/NotificationOptIn';
 import { FavoritesProvider } from './hooks/useFavorites';
@@ -57,6 +58,7 @@ function AppRoutes() {
         <Route path="/suivi" element={<TrackReservation />} />
       </Routes>
       <WhatsAppButton />
+      <Chatbot />
       <CookieBanner />
       <NotificationOptIn />
     </>

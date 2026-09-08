@@ -8,8 +8,16 @@ module.exports = function proxy(app) {
     createProxyMiddleware({
       target,
       changeOrigin: true,
-      proxyTimeout: 60_000,
-      timeout: 60_000,
+      proxyTimeout: 15_000,
+      timeout: 15_000,
+      onError(err, req, res) {
+        console.warn('[proxy]', req.method, req.url, err.code || err.message);
+        if (!res.headersSent) {
+          res.status(503).json({
+            error: 'API backend indisponible. Lancez le serveur : cd backend && npm start',
+          });
+        }
+      },
     })
   );
 

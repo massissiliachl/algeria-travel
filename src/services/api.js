@@ -2,14 +2,28 @@ import { resolveApiBase } from '../utils/apiBase';
 import { getFavoriteClientId } from '../utils/favoriteClientId';
 
 async function request(path, options = {}) {
-  const { headers: optionHeaders, expectStatuses = [], ...rest } = options;
-  const res = await fetch(`${resolveApiBase()}${path}`, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      ...optionHeaders,
-    },
-  });
+  const { headers: optionHeaders, expectStatuses = [], timeoutMs = 12_000, ...rest } = options;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res;
+  try {
+    res = await fetch(`${resolveApiBase()}${path}`, {
+      ...rest,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...optionHeaders,
+      },
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('API timeout — vérifiez que le backend tourne (cd backend && npm start).');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 
   const data = await res.json().catch(() => ({}));
 
@@ -94,6 +108,12 @@ export const api = {
   },
   sendContact: (payload) =>
     request('/api/contact', { method: 'POST', body: JSON.stringify(payload) }),
+  getChatWelcome: (lang) => request(`/api/chat/welcome?lang=${encodeURIComponent(lang)}`),
+  sendChatMessage: ({ message, lang, history, session }) =>
+    request('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, lang, history, session }),
+    }),
   createReservation: (payload) =>
     request('/api/reservations', { method: 'POST', body: JSON.stringify(payload) }),
   trackReservation: (ref, token) =>
