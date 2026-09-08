@@ -51,16 +51,16 @@ const ROUTES = {
     fr: {
       title: 'Alger → Taghit',
       options: [
-        '✈️ Vol Alger – Béchar : inclus offre Taghit (23–28 oct.)',
+        '✈️ Vol aller-retour Alger ➤ Béchar · ✈️ Béchar ➤ Alger (inclus offre Taghit 23–28 oct.)',
         '🚌 Bus Mercedes Béchar – Taghit inclus',
         '🚗 Voiture : ~750 km, 8h+ (déconseillé en 1 jour)',
       ],
-      tip: 'Formule Taghit : vol A/R + navette. Voir /place/taghit?pkg=hotel',
+      tip: 'Formule Taghit : vol aller-retour + navette. Voir /place/taghit?pkg=hotel',
     },
     en: {
       title: 'Algiers → Taghit',
       options: [
-        '✈️ Algiers – Béchar flight: included in Taghit offer',
+        '✈️ Round-trip flight Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers (included Taghit offer Oct 23–28)',
         '🚌 Mercedes bus Béchar – Taghit included',
         '🚗 Car: ~750 km, 8h+ (not recommended in one day)',
       ],

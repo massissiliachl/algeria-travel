@@ -383,9 +383,9 @@ exports.PLACES = [
     "stay": "Hôtel 4 étoiles · pension complète",
     "stay_en": "4-star hotel · full board",
     "stay_ar": "فندق 4 نجوم · إقامة كاملة",
-    "transport": "Vol aller-retour Alger – Béchar – Alger (23 au 28 oct.) + navette aéroport",
-    "transport_en": "Round-trip flight Algiers – Béchar – Algiers (Oct 23–28) + airport shuttle",
-    "transport_ar": "رحلة ذهاب وإياب الجزائر – بشار – الجزائر (23–28 أكتوبر) + نقل المطار",
+    "transport": "✈️ Vol aller-retour : Alger ➤ Béchar · ✈️ Béchar ➤ Alger (23 au 28 oct.) + navette aéroport",
+    "transport_en": "✈️ Round-trip flight: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers (Oct 23–28) + airport shuttle",
+    "transport_ar": "✈️ ذهاب وإياب: الجزائر ➤ بشار · ✈️ بشار ➤ الجزائر (23–28 أكتوبر) + نقل المطار",
     "duration": "Pension complète",
     "duration_en": "Full board",
     "duration_ar": "إقامة كاملة",
@@ -406,9 +406,9 @@ exports.PLACES = [
         "ar": "نقل المطار بالمكوك"
       },
       {
-        "fr": "Vol aller-retour Alger – Béchar – Alger, du 23 au 28 octobre",
-        "en": "Round-trip flight Algiers – Béchar – Algiers, Oct 23–28",
-        "ar": "رحلة ذهاب وإياب الجزائر – بشار – الجزائر، من 23 إلى 28 أكتوبر"
+        "fr": "✈️ Vol aller-retour : Alger ➤ Béchar · ✈️ Béchar ➤ Alger, du 23 au 28 octobre",
+        "en": "✈️ Round-trip flight: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers, Oct 23–28",
+        "ar": "✈️ رحلة ذهاب وإياب: الجزائر ➤ بشار · ✈️ بشار ➤ الجزائر، من 23 إلى 28 أكتوبر"
       },
       {
         "fr": "Extras : buggy et quad",

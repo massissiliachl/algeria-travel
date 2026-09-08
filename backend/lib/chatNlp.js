@@ -94,7 +94,96 @@ const TOKEN_EXPANSIONS = {
   partir: ['voyage'], vacances: ['sejour'], sejour: ['sejour'],
   bientot: ['prochainement'], prochainement: ['bientot'],
   octobre: ['oct'], novembre: ['nov'], decembre: ['dec'],
+  // SMS / réseaux
+  jv: ['je veux'], jveux: ['je veux'],
+  tkt: ['ok'], b1sur: ['bien sur'], bcp: ['beaucoup'], vrmt: ['vraiment'],
+  jsp: ['je sais pas'], stp: ['sil te plait'], svp: ['sil vous plait'],
+  pr: ['pour'], pc: ['parce que'], tt: ['tout'], qq: ['quoi'], qqn: ['quelqu un'],
+  rdv: ['rendez vous'], pkg: ['formule'], frm: ['formule'], off: ['offre'],
+  // Darija / Arabizi
+  ndir: ['faire', 'organiser'], ndiro: ['organiser'], ndirha: ['organiser'],
+  nbdaw: ['commencer'], nbdawha: ['commencer'], nroh: ['je vais'], nrouh: ['je vais'],
+  nzid: ['ajouter'], nchalah: ['inchaallah'], inchalah: ['inchaallah'],
+  kifach: ['comment'], kifash: ['comment'], besh: ['pour'], bach: ['pour'],
+  fih: ['il y a'], fiha: ['il y a'], bla: ['sans'], maa: ['avec'], m3ak: ['avec toi'],
+  wahda: ['1'], wahed: ['1'], zouj: ['2'], tlata: ['3'], rb3a: ['4'], khamsa: ['5'],
+  setti: ['6'], sebaa: ['7'], tmanya: ['8'], ts3oud: ['9'], achra: ['10'],
+  ghodwa: ['demain'], lyom: ['aujourdhui'], lyoum: ['aujourdhui'],
+  sahbi: ['ami'], drari: ['enfants'], khoya: ['frere'], okhti: ['soeur'],
+  labas: ['ca va'], labes: ['ca va'], hamdoulah: ['merci'],
+  // Voyages compacts
+  aller: ['aller'], retour: ['retour'], ar: ['aller retour'], 'a/r': ['aller retour'],
+  dep: ['depart'], arr: ['arrivee'], desti: ['destination'],
+  htl: ['hotel'], ht: ['hotel'], chbr: ['chambre'], chamb: ['chambre'],
+  app: ['appartement'], appt: ['appartement'], log: ['logement'],
+  circ: ['circuit'], circu: ['circuit'], voy: ['voyage'], sej: ['sejour'],
+  prog: ['programme'], itin: ['itineraire'], org: ['organiser'],
+  resa: ['reservation'], reserv: ['reservation'], rez: ['reservation'],
+  dispo: ['disponibilite'], disp: ['disponibilite'],
+  px: ['prix'], cmb: ['combien'], ch7al: ['combien'], chhal: ['combien'],
+  comb: ['combien'], tarif: ['prix'], budget: ['budget'],
+  av: ['avion'], vol: ['vol'], avi: ['avion'], aero: ['aeroport'],
+  bjr: ['bonjour'], bj: ['bonjour'], slt: ['salut'], slm: ['salam'], bsr: ['bonsoir'],
+  mrc: ['merci'], thx: ['merci'], ok: ['daccord'], dac: ['daccord'],
+  plages: ['plage'], plage: ['plage'], mer: ['mer'], sah: ['sahara'],
+  activ: ['activite'], act: ['activite'], exc: ['excursion'], rando: ['randonnee'],
+  quad: ['quad'], '4x4': ['4x4'], chev: ['cheval'], drom: ['dromadaire'],
+  wpp: ['whatsapp'], wa: ['whatsapp'], tel: ['telephone'], mail: ['email'],
+  pascher: ['pas cher'], psch: ['pas cher'], eco: ['economique'],
+  lux: ['luxe'], luxe: ['luxe'],
 };
+
+/** Phrases collées sans espace → avec espaces */
+const COMPACT_GLUE = [
+  ['n7ebnroh', 'n7eb nroh'], ['n7ebnzour', 'n7eb nzour'], ['n7eballer', 'n7eb aller'],
+  ['n7ebnrouh', 'n7eb nrouh'], ['nhebnroh', 'nheb nroh'], ['bghitnroh', 'bghit nroh'],
+  ['n7ebtaghit', 'n7eb taghit'], ['n7ebbejaia', 'n7eb bejaia'], ['n7eboran', 'n7eb oran'],
+  ['n7ebalger', 'n7eb alger'], ['n7ebdjanet', 'n7eb djanet'], ['n7ebghardaia', 'n7eb ghardaia'],
+  ['bghittaghit', 'bghit taghit'], ['bghitbejaia', 'bghit bejaia'], ['bghitbejaia', 'bghit bejaia'],
+  ['sltn7eb', 'slt n7eb'], ['slmn7eb', 'slm n7eb'], ['bjrn7eb', 'bjr n7eb'],
+  ['sltn7ebbejaia', 'slt n7eb bejaia'], ['n7ebbejaia', 'n7eb bejaia'],
+  ['ch7altaghit', 'ch7al taghit'], ['ch7alhotel', 'ch7al hotel'], ['ch7albejaia', 'ch7al bejaia'],
+  ['ch7alpx', 'ch7al prix'], ['cmbpx', 'combien prix'], ['cmbhotel', 'combien hotel'],
+  ['ch7alhtl', 'ch7al hotel'], ['ch7altgh', 'ch7al taghit'], ['ch7alhoteltgh', 'ch7al hotel taghit'],
+  ['cmbpxtaghit', 'combien prix taghit'], ['cmbtaghit', 'combien taghit'],
+  ['hoteltaghit', 'hotel taghit'], ['hotelbejaia', 'hotel bejaia'], ['hoteloran', 'hotel oran'],
+  ['htltaghit', 'hotel taghit'], ['htlbejaia', 'hotel bejaia'], ['htlbja', 'hotel bja'],
+  ['resataghit', 'resa taghit'], ['resabejaia', 'resa bejaia'], ['booktaghit', 'book taghit'],
+  ['voytaghit', 'voy taghit'], ['voybejaia', 'voy bejaia'], ['circsahara', 'circ sahara'],
+  ['progbejaia', 'prog bejaia'], ['prog taghit', 'prog taghit'],
+  ['bghitndiroghodwabja', 'bghit ndiro ghodwa bja'], ['bghitndiro', 'bghit ndiro'], ['ndiroghodwa', 'ndiro ghodwa'], ['ndirolyoum', 'ndiro lyoum'],
+  ['m3a3', 'm3a 3'], ['m3a4', 'm3a 4'], ['pr3', 'pr 3'], ['pr4', 'pr 4'],
+  ['pour3', 'pour 3'], ['pour4', 'pour 4'],
+  ['alleralger', 'aller alger'], ['allerbejaia', 'aller bejaia'], ['alleroran', 'aller oran'],
+  ['algeroran', 'alger oran'], ['algerbejaia', 'alger bejaia'], ['algerbja', 'alger bja'],
+  ['de alger', 'de alger'], ['dalger', 'd alger'], ['dbejaia', 'd bejaia'],
+  ['jveuxaller', 'je veux aller'], ['jveux', 'je veux'], ['jvoudrais', 'je voudrais'],
+  ['winhotel', 'win hotel'], ['kaynhotel', 'kayn hotel'], ['kayndispo', 'kayn dispo'],
+  ['pascherhotel', 'pas cher hotel'], ['hotelpascher', 'hotel pas cher'],
+  ['4j2p', '4j 2p'], ['3j2p', '3j 2p'], ['5j4p', '5j 4p'], ['4j2pers', '4j 2 pers'],
+  ['taghit23', 'taghit 23'], ['taghit28', 'taghit 28'], ['vol23', 'vol 23'], ['vol28', 'vol 28'],
+];
+
+const GREETING_ONLY_TOKENS = new Set([
+  'bj', 'bjr', 'slt', 'slm', 'salam', 'bsr', 'cc', 'coucou', 'yo', 'hello', 'hi',
+  'bonjour', 'salut', 'bonsoir', 'marhaba', 'ahlan',
+]);
+
+const SPLIT_ABBREVS = [
+  'ch7al', 'chhal', 'n7eb', 'nheb', 'n7ab', 'bghit', 'win', 'wach', 'wesh', 'kayn', 'makanch',
+  'kifach', 'kifash', 'ndir', 'ndiro', 'nroh', 'nrouh', 'nzour', 'nzourou',
+  'slt', 'bjr', 'bsr', 'slm', 'salam', 'marhaba', 'ahlan', 'coucou', 'cc', 'yo',
+  'resa', 'reserv', 'reservation', 'dispo', 'disp', 'book', 'booking', 'hajz', 'rez',
+  'hotel', 'htl', 'apt', 'appart', 'apprt', 'appt', 'logt', 'heberg', 'villa', 'camp', 'mh',
+  'voy', 'circ', 'circu', 'sej', 'safar', 'siyaha', 'vol', 'avion', 'aero', 'ferry', 'train', 'bus', 'taxi',
+  'plage', 'plages', 'beach', 'sahara', 'desert', 'resto', 'restau', 'activ', 'quad', 'rando', 'exc',
+  'cmb', 'combien', 'prix', 'tarif', 'px', 'budget', 'ch7al',
+  'bejaia', 'bejaïa', 'bejaya', 'bougie', 'bja', 'oran', 'alger', 'taghit', 'djanet',
+  'ghardaia', 'timimoun', 'jijel', 'constantine', 'annaba', 'tipaza', 'tlemcen', 'setif', 'blida', 'kabylie',
+  'pascher', 'pas cher', 'm3a', 'pour', 'lyali', 'ghodwa', 'lyoum', 'lyom',
+  'prog', 'itin', 'org', 'aller', 'retour', 'dep', 'oct', 'nov', 'dec',
+  'jveux', 'jv', 'wpp', 'wa', 'svp', 'stp', 'merci', 'mrc', 'thx',
+].sort((a, b) => b.length - a.length);
 
 const EMOJI_HINTS = {
   '🏨': 'hotel', '🏡': 'logement', '🏖️': 'plage', '🌊': 'mer', '🏜️': 'sahara',
@@ -135,43 +224,72 @@ function preprocessMessage(raw) {
 
 /** Découpe les messages compacts : sltn7ebbejaia4j, ch7alhotel3n2p, etc. */
 function splitCompactMessage(text) {
-  let s = text;
-  const abbrevs = [
-    'ch7al', 'chhal', 'ch7al', 'n7eb', 'nheb', 'n7ab', 'bghit', 'win', 'wach', 'wesh', 'kayn', 'makanch',
-    'slt', 'bjr', 'bsr', 'slm', 'salam', 'marhaba', 'ahlan', 'coucou', 'cc', 'yo',
-    'resa', 'reserv', 'résa', 'dispo', 'disp', 'book', 'booking',
-    'hotel', 'ht', 'hot', 'apt', 'appart', 'apprt', 'logt', 'heberg', 'villa', 'camp',
-    'voy', 'circ', 'circu', 'sej', 'safar', 'siyaha', 'vol', 'avion', 'aero', 'ferry', 'train', 'bus', 'taxi',
-    'plage', 'beach', 'sahara', 'desert', 'resto', 'restau', 'activ', 'quad', 'rando',
-    'cmb', 'combien', 'prix', 'tarif', 'px', 'budget', 'dispo',
-    'bejaia', 'bejaïa', 'bougie', 'oran', 'alger', 'taghit', 'djanet', 'ghardaia', 'timimoun', 'jijel',
-    'constantine', 'annaba', 'tipaza', 'tlemcen', 'setif', 'blida', 'kabylie',
-    'pas cher', 'm3a', 'pr', 'pour', 'lyali', 'ghodwa', 'lyoum',
-  ].sort((a, b) => b.length - a.length);
+  let s = String(text || '').trim().toLowerCase();
+  if (!s) return s;
 
-  for (const ab of abbrevs) {
+  for (const [from, to] of COMPACT_GLUE.sort((a, b) => b[0].length - a[0].length)) {
+    s = s.replace(new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), to);
+  }
+
+  const PROTECTED = ['n7eb', 'nheb', 'n7ab', 'ch7al', 'chhal', 'bghit', 'm3a', '3and', '3andi', '3andna', '3lyali', 'combien', 'ghodwa'];
+  const placeholders = {};
+  PROTECTED.forEach((tok, i) => {
+    const ph = `__p${i}__`;
+    placeholders[ph] = tok;
+    s = s.replace(new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), ph);
+  });
+
+  for (const ab of SPLIT_ABBREVS) {
     const esc = ab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    s = s.replace(new RegExp(`(${esc})(?=[a-z0-9\u0600-\u06ff])`, 'gi'), '$1 ');
+    s = s.replace(new RegExp(`(${esc})(?=[a-z0-9\u0600-\u06ff_])`, 'gi'), '$1 ');
     s = s.replace(new RegExp(`(?<=[a-z0-9\u0600-\u06ff])(${esc})`, 'gi'), ' $1');
   }
 
   s = s
-    .replace(/(\d+)lyali/gi, '$1 lyali')
+    .replace(/(\d{1,2})[-/–](\d{1,2})/g, '$1 $2')
+    .replace(/(\d+)([a-z\u0600-\u06ff]{2,})/gi, '$1 $2')
+    .replace(/([a-z\u0600-\u06ff]{2,})(\d+)/gi, '$1 $2')
     .replace(/(\d+)([jnp])(?=\s|$|[^a-z0-9])/gi, '$1$2 ')
-    .replace(/(\d+)\s*p(?=\s|$)/gi, '$1 p')
+    .replace(/(\d+)lyali/gi, '$1 lyali')
+    .replace(/(\d+)pers\b/gi, '$1 pers')
+    .replace(/(\d+)p(?=\s|$|[^a-z0-9])/gi, '$1 p')
     .replace(/pr(\d+)/gi, 'pr $1')
-    .replace(/(\d+)\s*(pers|perso|personnes?|pax)/gi, '$1 $2')
-    .replace(/\s+/g, ' ')
-    .trim();
+    .replace(/m3a(\d+)/gi, 'm3a $1')
+    .replace(/pour(\d+)/gi, 'pour $1')
+    .replace(/(\d+)\s*(pers|perso|personnes?|pax|lyali|nuits?)/gi, '$1 $2')
+    .replace(/(\d+)\s*(j|jr|jrs|jours?|days?|n|nuits?)/gi, '$1 $2');
+
+  for (const [ph, tok] of Object.entries(placeholders)) {
+    s = s.split(ph).join(` ${tok} `);
+  }
+
+  s = s.replace(/\s+/g, ' ').trim();
 
   return s;
 }
 
 function expandTokens(tokens) {
   const expanded = new Set(tokens);
-  for (const token of tokens) {
-    if (TOKEN_EXPANSIONS[token]) {
-      TOKEN_EXPANSIONS[token].forEach((t) => expanded.add(normalizeQuery(t)));
+  let changed = true;
+  // Expansion en cascade (ex: jv → je veux)
+  while (changed) {
+    changed = false;
+    for (const token of [...expanded]) {
+      if (TOKEN_EXPANSIONS[token]) {
+        for (const t of TOKEN_EXPANSIONS[token]) {
+          const norm = normalizeQuery(t);
+          if (!expanded.has(norm)) {
+            expanded.add(norm);
+            changed = true;
+          }
+          norm.split(' ').filter(Boolean).forEach((part) => {
+            if (!expanded.has(part)) {
+              expanded.add(part);
+              changed = true;
+            }
+          });
+        }
+      }
     }
   }
   return [...expanded];
@@ -209,11 +327,26 @@ function detectLanguage(text) {
 
 function findDestination(text, tokens) {
   const n = normalizeQuery(text);
+  const tokenSet = new Set(tokens);
+  const travelCtx = /hotel|ht|voyage|voy|n7eb|nheb|bghit|resa|prix|ch7al|jours?|nuits?|lyali|pers|circuit|sejour|prog|vol|aller|nzour|visiter|taghit|bejaia|oran|sahara/.test(n);
+
   for (const [cityId, aliases] of Object.entries(CITY_ALIASES)) {
     const all = [cityId, ...aliases].map(normalizeQuery);
     for (const a of all) {
-      if (a.length < 3) continue;
-      if (n.includes(a) || tokens.includes(a)) return cityId;
+      if (!a) continue;
+
+      // Alias très court (bj, th, dj…) : token exact + contexte voyage
+      if (a.length <= 3) {
+        if (GREETING_ONLY_TOKENS.has(a) && tokens.length <= 2 && !travelCtx) continue;
+        if (tokenSet.has(a) && (travelCtx || tokens.length > 1)) return cityId;
+        continue;
+      }
+
+      if (tokenSet.has(a)) return cityId;
+      // Mot entier dans la phrase (évite oran ⊂ hote)
+      const wordRe = new RegExp(`(?:^|\\s)${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\s|$)`, 'i');
+      if (wordRe.test(n)) return cityId;
+      if (a.length >= 5 && n.includes(a)) return cityId;
     }
   }
   return null;
@@ -227,9 +360,13 @@ function parsePersons(text) {
   const patterns = [
     /(\d+)\s*(?:pers(?:onnes?)?|p(?:ers)?|personnes?|persons?|people|pax|ashkhas|adultes?|voyageurs?)/i,
     /(?:pr|pour)\s*(\d+)/i,
-    /(\d+)p(?=\s|$|[^a-z])/i,
+    /(\d+)p(?=\s|$|[^a-z0-9])/i,
     /(\d+)pers\b/i,
+    /(\d+)perso\b/i,
     /m3a\s*(\d+)/i,
+    /zouj\s*(?:pers|personnes?|nass)?/i,
+    /tlata\s*(?:pers|personnes?|nass)?/i,
+    /rb3a\s*(?:pers|personnes?|nass)?/i,
     /(?:on est|nous sommes|nous serons|we are)\s*(\d+)/i,
     /(?:deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s*(?:pers(?:onnes?)?|personnes?|adultes?|voyageurs?)/i,
     /couple|en couple|ma femme|mon mari|lune de miel/i,
@@ -238,8 +375,11 @@ function parsePersons(text) {
   for (const re of patterns) {
     const m = text.match(re);
     if (m) {
-      if (/couple|femme|mari|lune/i.test(m[0])) return { travelers: 2, type: 'couple' };
-      if (/famille|enfants/i.test(m[0])) return { travelers: null, type: 'family' };
+      if (/couple|femme|mari|lune|zouj/i.test(m[0])) return { travelers: 2, type: 'couple' };
+      if (/famille|enfants|drari/i.test(m[0])) return { travelers: null, type: 'family' };
+      if (/zouj/i.test(m[0])) return { travelers: 2, type: 'couple' };
+      if (/tlata/i.test(m[0])) return { travelers: 3, type: 'group' };
+      if (/rb3a/i.test(m[0])) return { travelers: 4, type: 'group' };
       if (m[1] && wordNums[m[1].toLowerCase()]) return { travelers: wordNums[m[1].toLowerCase()], type: 'group' };
       if (/deux|trois|quatre|cinq|six|sept|huit|neuf|dix/i.test(m[0])) {
         const w = m[0].match(/deux|trois|quatre|cinq|six|sept|huit|neuf|dix/i)[0].toLowerCase();
@@ -329,16 +469,17 @@ function parseBudget(text) {
 function detectIntent(text, entities) {
   const n = normalizeQuery(text);
   const trimmed = n.trim();
-  const greetingOnly = /^(bjr|bj|slt|salut|cc|coucou|bonjour|bonsoir|slm|salam|marhaba|ahlan|hello|hi)(\s*[!?.…]*)$/;
+  const greetingOnly = /^(bjr|bj|slt|salut|cc|coucou|bonjour|bonsoir|slm|salam|marhaba|ahlan|hello|hi|labas|labes|salam\s*alkom)(\s*[!?.…]*)$/;
   if (greetingOnly.test(trimmed)) return 'GREETING';
   if (/humain|agent|conseiller|appelez|appeler|parler a quelqu/.test(n)) return 'CONTACT';
   const ackOnly = /^(merci|thx|mrc|ok|okk|oki|dac|dacc|parfait|c bon|c est bon)(\s*[!?.…]*)$/;
   if (ackOnly.test(trimmed)) return 'ACK';
   if (/^(prix|tarif|cmb|ch7al|combien|px|budget|coute|coûte)\??$/.test(n)) return 'FOLLOWUP_PRICE';
   if (/^(dispo|disp|disponible)\??$/.test(n)) return 'FOLLOWUP_AVAILABILITY';
+  if (entities.wantsPrice && entities.destination) return 'FOLLOWUP_PRICE';
 
-  // Langage naturel — voyage / projet
-  const naturalTrip = /je\s+(?:veux|voudrais|aimerais|souhaite|cherche)|i\s+(?:want|would like|am looking)|bghit|n7eb|nheb|propose|organise|planifie|aide\s+moi|prepare|preparer|partir\s+(?:en|a|à)|envie\s+de\s+(?:partir|visiter)/.test(n);
+  // Langage naturel — voyage / projet (incl. abréviations)
+  const naturalTrip = /je\s+(?:veux|voudrais|aimerais|souhaite|cherche)|i\s+(?:want|would like|am looking)|bghit|n7eb|nheb|n7ab|jv|jveux|propose|organise|planifie|aide\s+moi|prepare|preparer|partir\s+(?:en|a|à)|envie\s+de\s+(?:partir|visiter)|ndir|ndiro|nroh|nrouh|nzour/.test(n);
   if (naturalTrip && (entities.destination || entities.days || entities.travelers || entities.accommodation)) {
     return 'TRIP_PLANNING';
   }
@@ -374,8 +515,9 @@ function extractEntities(raw) {
 
   let accommodation = null;
   const n = normalizeQuery(text);
-  if (/hotel|ht|hot\b/.test(n)) accommodation = 'hotel';
-  else if (/apt|appart|appartement/.test(n)) accommodation = 'appartement';
+  if (/hotel|htl|ht|hot\b|mh\b/.test(n)) accommodation = 'hotel';
+  else if (/apt|appart|appt|app\b/.test(n)) accommodation = 'appartement';
+  else if (/maison|guesthouse|hote|heberg|logement|log\b|dormir/.test(n)) accommodation = 'guesthouse';
   else if (/maison|mh|guesthouse|hote|hôte/.test(n)) accommodation = 'guesthouse';
   else if (/villa/.test(n)) accommodation = 'villa';
   else if (/camping|camp/.test(n)) accommodation = 'camping';
@@ -409,8 +551,8 @@ function extractEntities(raw) {
     departureDay: dates.departureDay,
     budgetLevel: budget.budgetLevel,
     budgetAmount: budget.budgetAmount,
-    wantsPrice: /ch7al|cmb|combien|prix|tarif|px|budget|price|how much|كم/.test(n),
-    wantsAvailability: /dispo|disponib|available/.test(n),
+    wantsPrice: /ch7al|chhal|cmb|combien|prix|tarif|px|budget|price|how much|كم|comb\b/.test(n),
+    wantsAvailability: /dispo|disp|disponib|available|kayn|makanch/.test(n),
   };
 
   if (entities.arrivalDay && entities.departureDay) {

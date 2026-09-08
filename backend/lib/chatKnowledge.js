@@ -661,7 +661,7 @@ function buildCatalogAppendix(lang = 'fr') {
   const actSummary = ACTIVITIES.map((a) => `- ${a.name}: ${a.desc?.slice(0, 80)}`).join('\n');
 
   return `
-TAGHIT HÔTEL: ${hotel.price} DA/pers, ${hotel.transport}, vol 23-28 oct.
+TAGHIT HÔTEL: ${hotel.price} DA/pers, ${hotel.transport}
 TAGHIT MAISON D'HÔTE: ${guest.price} DA/pers, ${guest.transport}.
 
 FAQ: ${FAQ[lang]?.map((f) => `${f.q} → ${f.a}`).join(' | ')}

@@ -1,8 +1,8 @@
 const WHATSAPP = '213557664089';
 
 const BASE = {
-  fr: ['Voyage / circuits', 'Tarif Taghit', 'Vol 23-28 oct.', 'Réserver', 'Sahara', 'Activités quad'],
-  en: ['Trips / tours', 'Taghit price', 'Flight Oct 23–28', 'Book', 'Sahara', 'Quad activities'],
+  fr: ['Voyage / circuits', 'Tarif Taghit', '✈️ Vol aller-retour Taghit', 'Réserver', 'Sahara', 'Activités quad'],
+  en: ['Trips / tours', 'Taghit price', '✈️ Round-trip flight Taghit', 'Book', 'Sahara', 'Quad activities'],
   ar: ['الرحلات', 'سعر تاغيت', 'رحلة 23-28', 'حجز', 'الصحراء', 'أنشطة'],
 };
 
@@ -12,7 +12,7 @@ const CONTEXT = {
     missingDates: ['3 jours', '5 nuits', 'Du 10 au 15'],
     missingTravelers: ['2 personnes', '4 personnes', 'Couple'],
     missingAccommodation: ['Hôtel', 'Appartement', 'Programme complet'],
-    taghit: ['Tarif Taghit', 'Vol 23-28 oct.', 'Programme Taghit'],
+    taghit: ['Tarif Taghit', '✈️ Vol aller-retour Taghit', 'Programme Taghit'],
     bejaia: ['Plages Béjaïa', 'Programme 3 jours', 'Hôtel Béjaïa'],
     sahara: ['Djanet', 'Ghardaïa', 'Taghit'],
     itinerary: ['Programme complet', 'Réserver', 'Contact'],
@@ -23,7 +23,7 @@ const CONTEXT = {
     missingDates: ['3 days', '5 nights', 'Oct 10–15'],
     missingTravelers: ['2 people', '4 people', 'Couple'],
     missingAccommodation: ['Hotel', 'Apartment', 'Full program'],
-    taghit: ['Taghit price', 'Flight Oct 23–28', 'Taghit program'],
+    taghit: ['Taghit price', '✈️ Round-trip flight Taghit', 'Taghit program'],
     bejaia: ['Bejaia beaches', '3-day plan', 'Bejaia hotel'],
     sahara: ['Djanet', 'Ghardaïa', 'Taghit'],
     itinerary: ['Full program', 'Book', 'Contact'],
@@ -34,7 +34,7 @@ const CONTEXT = {
     missingDates: ['3 أيام', '5 ليالي'],
     missingTravelers: ['شخصان', '4 أشخاص'],
     missingAccommodation: ['فندق', 'شقة', 'برنامج كامل'],
-    taghit: ['سعر تاغيت', 'رحلة 23-28', 'برنامج تاغيت'],
+    taghit: ['سعر تاغيت', '✈️ الجزائر→بشار', 'برنامج تاغيت'],
     bejaia: ['شواطئ بجاية', 'برنامج 3 أيام'],
     sahara: ['جانت', 'غرداية', 'تاغيت'],
     itinerary: ['برنامج كامل', 'حجز', 'اتصل'],

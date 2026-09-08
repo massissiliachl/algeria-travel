@@ -31,14 +31,14 @@ const ITINERARIES = {
   },
   taghit: {
     fr: [
-      { day: 1, title: 'Arrivée & dunes', items: ['✈️ Vol Alger – Béchar', '🏜️ Dunes de Taghit', '🌅 Coucher de soleil'] },
+      { day: 1, title: 'Arrivée & dunes', items: ['✈️ Alger → Béchar (vol aller inclus)', '🏜️ Dunes de Taghit', '🌅 Coucher de soleil'] },
       { day: 2, title: 'Aventure', items: ['🛻 4×4 dunes', '🏂 Ski sur sable', '🐪 Dromadaire'] },
-      { day: 3, title: 'Patrimoine', items: ['🏛️ Ksars & oasis', '🚶 Balade village', '⭐ Ciel étoilé'] },
+      { day: 3, title: 'Patrimoine', items: ['🏛️ Ksars & oasis', '🚶 Balade village', '✈️ Béchar → Alger (vol retour inclus)'] },
     ],
     en: [
-      { day: 1, title: 'Arrival', items: ['✈️ Algiers – Béchar flight', '🏜️ Taghit dunes', '🌅 Sunset'] },
+      { day: 1, title: 'Arrival', items: ['✈️ Algiers → Béchar (outbound flight included)', '🏜️ Taghit dunes', '🌅 Sunset'] },
       { day: 2, title: 'Adventure', items: ['🛻 4×4', '🏂 Sandboarding', '🐪 Camel ride'] },
-      { day: 3, title: 'Heritage', items: ['🏛️ Ksars & oasis', '🚶 Village walk', '⭐ Stargazing'] },
+      { day: 3, title: 'Heritage', items: ['🏛️ Ksars & oasis', '🚶 Village walk', '✈️ Béchar → Algiers (return flight included)'] },
     ],
   },
   oran: {
