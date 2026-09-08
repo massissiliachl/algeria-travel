@@ -13,12 +13,13 @@ const savedState = loadChatState();
 const Chatbot = () => {
   const { language, t, isRTL } = useLang();
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState(() => savedState?.messages ?? []);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState(() => savedState?.suggestions ?? []);
   const [session, setSession] = useState(() => savedState?.session ?? {});
-  const [hidden, setHidden] = useState(false);
+  const [hasMobileBar, setHasMobileBar] = useState(false);
   const listRef = useRef(null);
   const inputRef = useRef(null);
   const booted = useRef((savedState?.messages?.length ?? 0) > 0);
@@ -65,34 +66,53 @@ const Chatbot = () => {
   }, [open, messages.length, scrollToBottom]);
 
   useEffect(() => {
-    if (open) {
-      document.body.classList.add('chat-open');
-      setTimeout(() => inputRef.current?.focus(), 200);
-    } else {
-      document.body.classList.remove('chat-open');
-    }
-    return () => document.body.classList.remove('chat-open');
-  }, [open]);
+    const mq = window.matchMedia('(max-width: 960px)');
+    const syncMobile = () => setIsMobile(mq.matches);
+    syncMobile();
+    mq.addEventListener('change', syncMobile);
+    return () => mq.removeEventListener('change', syncMobile);
+  }, []);
 
   useEffect(() => {
+    if (open) {
+      document.body.classList.add('chat-open');
+      const prevOverflow = document.body.style.overflow;
+      if (isMobile) {
+        document.body.style.overflow = 'hidden';
+      }
+      setTimeout(() => inputRef.current?.focus(), 200);
+      return () => {
+        document.body.classList.remove('chat-open');
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+    document.body.classList.remove('chat-open');
+    return undefined;
+  }, [open, isMobile]);
+
+  useEffect(() => {
+    let frame = 0;
     const check = () => {
-      const mobile = window.matchMedia('(max-width: 960px)').matches;
-      const hasBar = document.querySelector(
-        '.mobile-booking-bar, .place-mobile-bar, .stays-mobile-bar'
-      );
-      const modalOpen = document.querySelector('.bottom-sheet:not(.chatbot-panel), .stays-detail.is-open');
-      setHidden(mobile && (!!hasBar || !!modalOpen) && !open);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const mobile = window.matchMedia('(max-width: 960px)').matches;
+        const hasBar = !!document.querySelector(
+          '.mobile-booking-bar, .place-mobile-bar, .stays-mobile-bar'
+        );
+        setHasMobileBar(mobile && hasBar);
+      });
     };
 
     check();
-    const mo = new MutationObserver(check);
-    mo.observe(document.body, { childList: true, subtree: true, attributes: true });
     window.addEventListener('resize', check);
+    const mo = new MutationObserver(check);
+    mo.observe(document.body, { childList: true, subtree: true });
     return () => {
+      cancelAnimationFrame(frame);
       mo.disconnect();
       window.removeEventListener('resize', check);
     };
-  }, [open]);
+  }, []);
 
   const resetConversation = () => {
     clearChatState();
@@ -157,13 +177,20 @@ const Chatbot = () => {
       .finally(() => setLoading(false));
   };
 
-  if (hidden && !open) return null;
-
   return (
     <>
+      {open && isMobile && (
+        <button
+          type="button"
+          className="chatbot-backdrop"
+          aria-label={t('chat_close')}
+          onClick={() => setOpen(false)}
+        />
+      )}
+
       {open && (
         <div
-          className="chatbot-panel"
+          className={`chatbot-panel${isMobile ? ' chatbot-panel--mobile' : ''}`}
           role="dialog"
           aria-modal="true"
           aria-label={t('chat_title')}
@@ -209,15 +236,15 @@ const Chatbot = () => {
                 className={`chatbot-msg chatbot-msg--${msg.role}`}
               >
                 <div className="chatbot-msg__bubble">
-                  {msg.content.split('\n').map((line, i) => (
+                  {String(msg.content || '').split('\n').map((line, i) => (
                     <p key={i}>{line || '\u00A0'}</p>
                   ))}
                   {msg.links?.length > 0 && (
                     <div className="chatbot-msg__links">
-                      {msg.links.map((link) =>
+                      {msg.links.filter((link) => link?.url).map((link) =>
                         link.url.startsWith('http') ? (
                           <a
-                            key={link.url}
+                            key={`${link.url}-${link.label}`}
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -227,7 +254,7 @@ const Chatbot = () => {
                           </a>
                         ) : (
                           <Link
-                            key={link.url}
+                            key={`${link.url}-${link.label}`}
                             to={link.url}
                             className="chatbot-link"
                             onClick={() => setOpen(false)}
@@ -275,6 +302,8 @@ const Chatbot = () => {
               maxLength={2000}
               disabled={loading}
               aria-label={t('chat_placeholder')}
+              enterKeyHint="send"
+              autoComplete="off"
             />
             <button type="submit" disabled={loading || !input.trim()} aria-label={t('chat_send')}>
               <Icon name="Send" size={18} />
@@ -283,17 +312,46 @@ const Chatbot = () => {
         </div>
       )}
 
-      <button
-        type="button"
-        className={`chatbot-fab${open ? ' is-open' : ''}`}
-        onClick={() => setOpen((v) => !v)}
-        aria-label={open ? t('chat_close') : t('chat_open')}
-        aria-expanded={open}
-      >
-        <Icon name={open ? 'X' : 'MessageCircle'} size={24} />
-      </button>
+      {!(open && isMobile) && (
+        <button
+          type="button"
+          className={`chatbot-fab${open ? ' is-open' : ''}${hasMobileBar ? ' chatbot-fab--above-bar' : ''}`}
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? t('chat_close') : t('chat_open')}
+          aria-expanded={open}
+        >
+          <Icon name={open ? 'X' : 'MessageCircle'} size={24} />
+        </button>
+      )}
     </>
   );
 };
 
-export default Chatbot;
+class ChatErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.warn('[Chatbot] erreur isolée :', error);
+    clearChatState();
+  }
+
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
+export default function ChatbotWithBoundary() {
+  return (
+    <ChatErrorBoundary>
+      <Chatbot />
+    </ChatErrorBoundary>
+  );
+}

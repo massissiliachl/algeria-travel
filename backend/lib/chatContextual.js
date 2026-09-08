@@ -230,6 +230,49 @@ function tryContextualReply(message, lang, session) {
     return { ...knowledge().buildCatalogOverview(replyLang), session: merged };
   }
 
+  // Réponse intelligente même pour messages courts / abréviations
+  const { hits } = knowledge().searchKnowledge(message, replyLang);
+  const goodHit = hits.find(
+    (h) => h.score >= 14 && !h.text.startsWith('__') && !['contact', 'payment', 'reservation'].includes(h.id)
+  );
+  if (goodHit) {
+    let reply = goodHit.text;
+    if (merged.destination && !reply.includes(formatDestinationLabel(merged.destination, replyLang))) {
+      const recap = buildRecap(merged, replyLang);
+      if (recap) reply = `${recap}\n\n${reply}`;
+    }
+    return {
+      reply,
+      session: merged,
+      suggestions: getSuggestions(replyLang),
+      links: goodHit.links?.length ? goodHit.links : linksFor(merged, replyLang),
+    };
+  }
+
+  if (merged.destination) {
+    const dest = formatDestinationLabel(merged.destination, replyLang);
+    return {
+      reply: replyLang === 'en'
+        ? `Got it 😊 ${dest}! 🏨 Hotel, 🏖️ beaches, 🎯 activities or 🗺️ full trip?`
+        : replyLang === 'ar'
+          ? `فهمت 😊 ${dest}! 🏨 فندق، 🏖️ شواطئ، 🎯 أنشطة أو 🗺️ برنامج كامل؟`
+          : `Compris 😊 ${dest} ! 🏨 Hôtel, 🏖️ plages, 🎯 activités ou 🗺️ programme complet ?`,
+      session: merged,
+      suggestions: getSuggestions(replyLang),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (entities.wantsPrice || entities.wantsAvailability || entities.accommodation || entities.activity) {
+    const recap = buildRecap(merged, replyLang);
+    return {
+      reply: `${recap ? `${recap}\n\n` : ''}${replyLang === 'en' ? 'Tell me the destination and dates so I can help 😊' : 'Indiquez la destination et les dates pour que je vous aide 😊'}`,
+      session: merged,
+      suggestions: getSuggestions(replyLang),
+      links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }, { label: 'Circuits', url: '/tours' }],
+    };
+  }
+
   return null;
 }
 

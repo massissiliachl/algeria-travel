@@ -70,6 +70,20 @@ const TOKEN_EXPANSIONS = {
   mh: ['maison hote'], av: ['avion'], wpp: ['whatsapp'], wa: ['whatsapp'],
   resto: ['restaurant'], restau: ['restaurant'], maps: ['carte', 'localisation'],
   agent: ['humain', 'conseiller'], humain: ['humain'], conseiller: ['conseiller'],
+  keske: ['qu est ce'], koi: ['quoi'], cmb: ['combien'], cb: ['combien'],
+  pcq: ['parce que'], pck: ['parce que'], pk: ['pourquoi'], pq: ['pourquoi'],
+  ajd: ['aujourdhui'], auj: ['aujourdhui'], mtn: ['maintenant'], dem: ['demain'],
+  we: ['weekend'], wk: ['weekend'], mat: ['matin'], aprem: ['apres midi'],
+  ch: ['chambre'], chbre: ['chambre'], loc: ['location'], auto: ['voiture'],
+  exc: ['excursion'], excurs: ['excursion'], rand: ['randonnee'], plong: ['plongee'],
+  pascher: ['pas cher', 'economique'], pscher: ['pas cher'], pch: ['pas cher'],
+  ndir: ['faire', 'organiser'], ndiro: ['organiser'], ndirha: ['organiser'],
+  nzour: ['visiter'], nzourou: ['visiter'], nzourha: ['visiter'],
+  fi: ['a', 'dans'], f: ['a'], l: ['le'], d: ['de'],
+  '3and': ['avec'], '3andi': ['j ai'], '3andna': ['nous avons'],
+  wahdi: ['seul'], drari: ['enfants'], s7abi: ['amis'],
+  prog: ['programme'], itin: ['itineraire'], org: ['organiser'],
+  hajz: ['reservation'], htl: ['hotel'], htlm: ['hotel'],
 };
 
 const EMOJI_HINTS = {
@@ -91,11 +105,45 @@ function normalizeQuery(value = '') {
 }
 
 function preprocessMessage(raw) {
-  let text = String(raw || '').trim();
+  let text = splitCompactMessage(String(raw || '').trim());
   for (const [emoji, hint] of Object.entries(EMOJI_HINTS)) {
     if (text.includes(emoji)) text += ` ${hint}`;
   }
   return text;
+}
+
+/** Découpe les messages compacts : sltn7ebbejaia4j, ch7alhotel3n2p, etc. */
+function splitCompactMessage(text) {
+  let s = text;
+  const abbrevs = [
+    'ch7al', 'chhal', 'ch7al', 'n7eb', 'nheb', 'n7ab', 'bghit', 'win', 'wach', 'wesh', 'kayn', 'makanch',
+    'slt', 'bjr', 'bsr', 'slm', 'salam', 'marhaba', 'ahlan', 'coucou', 'cc', 'yo',
+    'resa', 'reserv', 'résa', 'dispo', 'disp', 'book', 'booking',
+    'hotel', 'ht', 'hot', 'apt', 'appart', 'apprt', 'logt', 'heberg', 'villa', 'camp',
+    'voy', 'circ', 'circu', 'sej', 'safar', 'siyaha', 'vol', 'avion', 'aero', 'ferry', 'train', 'bus', 'taxi',
+    'plage', 'beach', 'sahara', 'desert', 'resto', 'restau', 'activ', 'quad', 'rando',
+    'cmb', 'combien', 'prix', 'tarif', 'px', 'budget', 'dispo',
+    'bejaia', 'bejaïa', 'bougie', 'oran', 'alger', 'taghit', 'djanet', 'ghardaia', 'timimoun', 'jijel',
+    'constantine', 'annaba', 'tipaza', 'tlemcen', 'setif', 'blida', 'kabylie',
+    'pas cher', 'm3a', 'pr', 'pour', 'lyali', 'ghodwa', 'lyoum',
+  ].sort((a, b) => b.length - a.length);
+
+  for (const ab of abbrevs) {
+    const esc = ab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    s = s.replace(new RegExp(`(${esc})(?=[a-z0-9\u0600-\u06ff])`, 'gi'), '$1 ');
+    s = s.replace(new RegExp(`(?<=[a-z0-9\u0600-\u06ff])(${esc})`, 'gi'), ' $1');
+  }
+
+  s = s
+    .replace(/(\d+)lyali/gi, '$1 lyali')
+    .replace(/(\d+)([jnp])(?=\s|$|[^a-z0-9])/gi, '$1$2 ')
+    .replace(/(\d+)\s*p(?=\s|$)/gi, '$1 p')
+    .replace(/pr(\d+)/gi, 'pr $1')
+    .replace(/(\d+)\s*(pers|perso|personnes?|pax)/gi, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return s;
 }
 
 function expandTokens(tokens) {
@@ -154,7 +202,8 @@ function parsePersons(text) {
   const patterns = [
     /(\d+)\s*(?:pers(?:onnes?)?|p(?:ers)?|personnes?|persons?|people|pax|ashkhas|أشخاص)/i,
     /(?:pr|pour)\s*(\d+)/i,
-    /(\d+)\s*p\b/i,
+    /(\d+)p(?=\s|$|[^a-z])/i,
+    /(\d+)pers\b/i,
     /m3a\s*(\d+)/i,
     /(\d+)\s*(?:voyageurs?|travelers?)/i,
     /couple/i,
@@ -242,7 +291,8 @@ function detectIntent(text, entities) {
   if (/^(dispo|disp|disponible)\??$/.test(n)) return 'FOLLOWUP_AVAILABILITY';
   if (entities.destination && !entities.accommodation && !entities.activity && n.length < 20) return 'DESTINATION_SEARCH';
   if (/hotel|ht|apt|appart|heberg|logement|villa|camping/.test(n)) return 'ACCOMMODATION_SEARCH';
-  if (/resto|restaurant|manger|cuisine/.test(n)) return 'RESTAURANT_SEARCH';
+  if (/resto|restaurant|restau|manger|cuisine/.test(n)) return 'RESTAURANT_SEARCH';
+  if (/quoi faire|qqch|qq chose|truc a faire|visiter|nzour|decouvrir|découvrir/.test(n)) return 'ACTIVITY_SEARCH';
   if (/plage|beach|mer|bord de mer/.test(n)) return 'BEACH_SEARCH';
   if (/activ|quad|4x4|rando|excursion|cheval|kayak|bateau/.test(n)) return 'ACTIVITY_SEARCH';
   if (/vol|avion|aero|ferry|train|bus|taxi|loc voiture|location voiture|transport|comment aller|trajet/.test(n)) return 'TRANSPORT';
@@ -320,6 +370,7 @@ module.exports = {
   normalizeQuery,
   expandQuery,
   preprocessMessage,
+  splitCompactMessage,
   detectLanguage,
   extractEntities,
   detectIntent,

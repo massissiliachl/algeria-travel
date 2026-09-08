@@ -1,5 +1,5 @@
 const { buildSystemPrompt } = require('./systemPromptLoader');
-const { mergeSession, buildRecap } = require('./chatSession');
+const { mergeSession, buildRecap, formatDestinationLabel } = require('./chatSession');
 const { extractEntities } = require('./chatNlp');
 const { WHATSAPP, getSuggestions } = require('./chatUi');
 const { TAGHIT_PACKAGES } = require('../scripts/data/taghitPackages.cjs');
@@ -810,13 +810,36 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
     }
   }
 
-  if (hits.length > 0 && hits[0].score >= 18) {
+  if (hits.length > 0 && hits[0].score >= 14) {
     const top = hits[0];
+    if (!top.text.startsWith('__') && top.id !== 'contact') {
+      return {
+        reply: top.text,
+        suggestions: getSuggestions(lang),
+        links: top.links || [],
+        session: mergedSession,
+      };
+    }
+  }
+
+  const recap = buildRecap(mergedSession, lang);
+  if (recap || entities.destination) {
+    const destLine = entities.destination
+      ? `\n📍 ${formatDestinationLabel(entities.destination, lang)}`
+      : '';
     return {
-      reply: top.text,
+      reply: lang === 'en'
+        ? `I understand your request${destLine} 😊 Could you specify dates and number of travelers? Or try: Taghit price, Sahara trip, book.`
+        : lang === 'ar'
+          ? `فهمت طلبك${destLine} 😊 حدّد التواريخ وعدد الأشخاص. أو جرّب: سعر تاغيت، رحلة صحراء، حجز.`
+          : `J'ai bien compris${destLine} 😊 Précisez dates et nombre de personnes. Ou essayez : tarif Taghit, voyage Sahara, réserver.`,
       suggestions: getSuggestions(lang),
-      links: top.links || [],
-      session: mergedSession,
+      links: [
+        { label: ui.seeTaghit, url: '/place/taghit?pkg=hotel' },
+        { label: ui.seeTours, url: '/tours' },
+        { label: ui.whatsapp, url: `https://wa.me/${WHATSAPP}` },
+      ],
+      session: mergeSession(mergedSession, entities),
     };
   }
 
