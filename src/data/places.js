@@ -219,7 +219,7 @@ export const PLACES = [
       { icon: 'Tent', fr: 'Immersion touareg', en: 'Tuareg immersion', ar: 'انغماس طوارقي' },
     ],
   },
-  /** Défaut = formule Hôtel 4★ (99 990 DA). Maison d’hôte → /guesthouses */
+  /** Défaut = formule Hôtel 4★ (75 000 DA). Maison d’hôte → /guesthouses */
   resolveTaghitPlace('hotel'),
   {
     id: 'timimoun',
