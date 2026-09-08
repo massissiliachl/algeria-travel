@@ -474,7 +474,7 @@ function buildStaticChunks(lang) {
   ];
 }
 
-function buildCatalogOverview(lang) {
+function buildCatalogOverview(lang, session = {}) {
   const ui = pickLang(lang, UI);
   const nameKey = lang === 'en' ? 'name_en' : lang === 'ar' ? 'name_ar' : 'name';
 
@@ -523,11 +523,11 @@ function buildCatalogOverview(lang) {
       { label: ui.seeTaghit, url: '/place/taghit?pkg=hotel' },
       { label: ui.seeActivities, url: '/activities' },
     ],
-    suggestions: getSuggestions(lang),
+    suggestions: getSuggestions(lang, session),
   };
 }
 
-function buildSaharaOverview(lang) {
+function buildSaharaOverview(lang, session = {}) {
   const ui = pickLang(lang, UI);
   const nameKey = lang === 'en' ? 'name_en' : lang === 'ar' ? 'name_ar' : 'name';
 
@@ -555,7 +555,7 @@ function buildSaharaOverview(lang) {
       { label: ui.seeTaghit, url: '/place/taghit?pkg=hotel' },
       { label: ui.seeDestinations, url: '/destinations' },
     ],
-    suggestions: getSuggestions(lang),
+    suggestions: getSuggestions(lang, session),
   };
 }
 
@@ -702,7 +702,7 @@ function matchesAny(query, terms) {
   });
 }
 
-function combineHits(hits, lang) {
+function combineHits(hits, lang, session = {}) {
   const ui = pickLang(lang, UI);
   const unique = [];
   const seen = new Set();
@@ -734,7 +734,7 @@ function combineHits(hits, lang) {
     if (!linkUrls.has('/destinations')) links.push({ label: ui.seeDestinations, url: '/destinations' });
   }
 
-  return { reply, links: links.slice(0, 6), suggestions: getSuggestions(lang) };
+  return { reply, links: links.slice(0, 6), suggestions: getSuggestions(lang, session) };
 }
 
 function generateLocalReply(message, lang = 'fr', session = {}) {
@@ -757,11 +757,11 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
   const q = queryExp.original;
 
   if (!q || q.length < 1) {
-    return { reply: ui.greeting, suggestions: getSuggestions(lang), links: [], session: mergedSession };
+    return { reply: ui.greeting, suggestions: getSuggestions(lang, mergedSession), links: [], session: mergedSession };
   }
 
   if (matchesAny(q, ['bonjour', 'salut', 'hello', 'bonsoir', 'coucou', 'cc', 'bjr', 'bsr', 'slm', 'salam', 'مرحب', 'السلام', 'ahlan', 'marhaba'])) {
-    return { reply: ui.greeting, suggestions: getSuggestions(lang), links: [{ label: ui.seeTours, url: '/tours' }], session: mergedSession };
+    return { reply: ui.greeting, suggestions: getSuggestions(lang, mergedSession), links: [{ label: ui.seeTours, url: '/tours' }], session: mergedSession };
   }
 
   if (matchesAny(q, ['merci', 'thanks', 'thank you', 'thx', 'mrc', 'ok', 'okk', 'oki', 'dac', 'dacc', 'daccord', 'شكر'])) {
@@ -770,16 +770,16 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
       en: 'You\'re welcome! Try « trip », « Taghit », « book » or any destination for more info.',
       ar: 'على الرحب والسعة! جرّب « رحلة »، « تاغيت »، « حجز » أو أي وجهة.',
     };
-    return { reply: thanks[lang] || thanks.fr, suggestions: getSuggestions(lang), links: [], session: mergedSession };
+    return { reply: thanks[lang] || thanks.fr, suggestions: getSuggestions(lang, mergedSession), links: [], session: mergedSession };
   }
 
   if (isBroadCatalogQuery(queryExp)) {
-    const cat = buildCatalogOverview(lang);
+    const cat = buildCatalogOverview(lang, mergedSession);
     return { ...cat, session: mergedSession };
   }
 
   if (isBroadSaharaQuery(queryExp)) {
-    const sah = buildSaharaOverview(lang);
+    const sah = buildSaharaOverview(lang, mergedSession);
     return { ...sah, session: mergedSession };
   }
 
@@ -796,16 +796,16 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
     const top = hits[0];
 
     if (top.id === 'catalog-voyage' || top.text === '__CATALOG__') {
-      const cat = buildCatalogOverview(lang);
+      const cat = buildCatalogOverview(lang, mergedSession);
       return { ...cat, session: mergedSession };
     }
     if (top.id === 'sahara-theme' || top.text === '__SAHARA_CATALOG__') {
-      const sah = buildSaharaOverview(lang);
+      const sah = buildSaharaOverview(lang, mergedSession);
       return { ...sah, session: mergedSession };
     }
 
     if (top.score >= 22) {
-      const combined = combineHits(hits.filter((h) => h.score >= top.score - 15), lang);
+      const combined = combineHits(hits.filter((h) => h.score >= top.score - 15), lang, mergedSession);
       if (combined) return { ...combined, session: mergedSession };
     }
   }
@@ -815,7 +815,7 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
     if (!top.text.startsWith('__') && top.id !== 'contact') {
       return {
         reply: top.text,
-        suggestions: getSuggestions(lang),
+        suggestions: getSuggestions(lang, mergedSession),
         links: top.links || [],
         session: mergedSession,
       };
@@ -833,7 +833,7 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
         : lang === 'ar'
           ? `فهمت طلبك${destLine} 😊 حدّد التواريخ وعدد الأشخاص. أو جرّب: سعر تاغيت، رحلة صحراء، حجز.`
           : `J'ai bien compris${destLine} 😊 Précisez dates et nombre de personnes. Ou essayez : tarif Taghit, voyage Sahara, réserver.`,
-      suggestions: getSuggestions(lang),
+      suggestions: getSuggestions(lang, mergedSession),
       links: [
         { label: ui.seeTaghit, url: '/place/taghit?pkg=hotel' },
         { label: ui.seeTours, url: '/tours' },
@@ -845,7 +845,7 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
 
   return {
     reply: ui.fallback,
-    suggestions: getSuggestions(lang),
+    suggestions: getSuggestions(lang, mergedSession),
     links: [
       { label: ui.whatsapp, url: `https://wa.me/${WHATSAPP}` },
       { label: ui.contactPage, url: '/contact' },

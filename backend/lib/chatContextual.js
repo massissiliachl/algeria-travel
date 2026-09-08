@@ -7,6 +7,12 @@ const {
   checkDateContradiction,
 } = require('./chatSession');
 const { getSuggestions, WHATSAPP } = require('./chatUi');
+const { buildItinerary } = require('./chatItinerary');
+const { getTransportInfo, buildTransportReply } = require('./chatTransport');
+
+function suggest(lang, session, intent) {
+  return getSuggestions(lang, session, intent);
+}
 
 const PLACE_PATHS = {
   bejaia: '/place/bejaia',
@@ -46,6 +52,9 @@ function linksFor(session, lang) {
 function tryContextualReply(message, lang, session) {
   const { entities, intent } = extractEntities(message);
   const merged = mergeSession(session, entities);
+  if (intent === 'TRANSPORT' && session.destination) {
+    merged.destination = session.destination;
+  }
   const detectedLang = detectLanguage(message);
   const replyLang = lang || detectedLang;
 
@@ -58,7 +67,7 @@ function tryContextualReply(message, lang, session) {
           ? `تأكيد سريع 😊 من ${contradiction.arrivalDay} إلى ${contradiction.departureDay} = ${contradiction.computedNights} ليالي وليس ${contradiction.statedNights}.`
           : `Petite vérification 😊 Du ${contradiction.arrivalDay} au ${contradiction.departureDay} = ${contradiction.computedNights} nuits, pas ${contradiction.statedNights}. Quelles dates souhaitez-vous ?`,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: linksFor(merged, replyLang),
     };
   }
@@ -72,7 +81,7 @@ function tryContextualReply(message, lang, session) {
     return {
       reply: greetings[replyLang] || greetings.fr,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Circuits', url: '/tours' }],
     };
   }
@@ -85,14 +94,14 @@ function tryContextualReply(message, lang, session) {
       return {
         reply: `${replyLang === 'en' ? 'Great 😊 Still need' : replyLang === 'ar' ? 'ما ينقص' : 'Parfait 😊 Il me manque'} : ${missing.map((m) => L[m]).join(', ')}.`,
         session: merged,
-        suggestions: getSuggestions(replyLang),
+        suggestions: suggest(replyLang, merged, intent),
         links: linksFor(merged, replyLang),
       };
     }
     return {
       reply: replyLang === 'en' ? 'Perfect 😊 Shall I help you book?' : replyLang === 'ar' ? 'ممتاز 😊 نكمل الحجز؟' : 'Parfait 😊 On continue vers la réservation ?',
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: linksFor(merged, replyLang),
     };
   }
@@ -103,7 +112,7 @@ function tryContextualReply(message, lang, session) {
         ? `Reach us:\n• WhatsApp: +${WHATSAPP}\n• /contact\n• travelalgeriadz@gmail.com`
         : `Contactez-nous :\n• WhatsApp : +${WHATSAPP}\n• /contact\n• travelalgeriadz@gmail.com`,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }, { label: 'Contact', url: '/contact' }],
     };
   }
@@ -112,7 +121,7 @@ function tryContextualReply(message, lang, session) {
     return {
       reply: replyLang === 'en' ? '🇩🇿 The capital of Algeria is Algiers.' : replyLang === 'ar' ? '🇩🇿 عاصمة الجزائر هي الجزائر.' : '🇩🇿 La capitale de l\'Algérie est Alger.',
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Alger', url: '/place/alger' }],
     };
   }
@@ -123,7 +132,7 @@ function tryContextualReply(message, lang, session) {
         ? 'For live weather use a real-time source. Generally: coast mild Mar–Nov; Sahara best Oct–Apr.'
         : 'Pour la météo actuelle, consultez une source temps réel. Côte : mars–nov ; Sahara : oct–avr.',
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Destinations', url: '/destinations' }],
     };
   }
@@ -135,7 +144,7 @@ function tryContextualReply(message, lang, session) {
         return {
           reply: `${replyLang === 'en' ? 'For' : 'Pour'} ${formatDestinationLabel(merged.destination, replyLang)} :\n\n${hits[0].text}`,
           session: merged,
-          suggestions: getSuggestions(replyLang),
+          suggestions: suggest(replyLang, merged, intent),
           links: hits[0].links || linksFor(merged, replyLang),
         };
       }
@@ -147,7 +156,7 @@ function tryContextualReply(message, lang, session) {
             ? `For ${formatDestinationLabel(merged.destination, replyLang)}, hotel rates depend on dates and availability. I prefer to verify rather than give wrong prices — share your dates and I can help check.`
             : `Pour ${formatDestinationLabel(merged.destination, replyLang)}, le tarif dépend de la date et de la prestation. Je préfère vérifier plutôt que de vous donner un mauvais prix — indiquez vos dates 😊`,
           session: merged,
-          suggestions: getSuggestions(replyLang),
+          suggestions: suggest(replyLang, merged, intent),
           links: linksFor(merged, replyLang),
         };
       }
@@ -155,7 +164,7 @@ function tryContextualReply(message, lang, session) {
     return {
       reply: replyLang === 'en' ? 'Price for which destination? (Taghit, Béjaïa, Oran…)' : 'Le prix de quelle destination ? (Taghit, Béjaïa, Oran…)',
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }],
     };
   }
@@ -165,13 +174,84 @@ function tryContextualReply(message, lang, session) {
     return {
       reply: `${recap ? `${recap}\n\n` : ''}Je peux vous aider à vérifier la disponibilité via /contact ou WhatsApp — je ne confirme pas sans vérification.`,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Contact', url: '/contact' }, { label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }],
     };
   }
 
+  if (intent === 'TRANSPORT') {
+    let transportText = buildTransportReply(message, replyLang, merged);
+    if (!transportText && merged.destination) {
+      transportText = getTransportInfo('alger', merged.destination, replyLang);
+    }
+    if (transportText) {
+      return {
+        reply: transportText,
+        session: merged,
+        suggestions: suggest(replyLang, merged, 'TRANSPORT'),
+        links: [{ label: 'Circuits', url: '/tours' }, { label: 'Contact', url: '/contact' }],
+      };
+    }
+  }
+
+  if (intent === 'ITINERARY' || (merged.destination && merged.days && /programme|plan|itineraire|organiser|prog/.test(normalizeQuery(message)))) {
+    const days = merged.days || merged.nights || 3;
+    const itin = buildItinerary(merged.destination, days, replyLang, merged.interests);
+    if (itin) {
+      const recap = buildRecap(merged, replyLang);
+      return {
+        reply: `${recap ? `${recap}\n\n` : ''}${itin}`,
+        session: merged,
+        suggestions: suggest(replyLang, merged, 'ITINERARY'),
+        links: linksFor(merged, replyLang),
+      };
+    }
+  }
+
+  if (intent === 'BOOKING') {
+    const recap = buildRecap(merged, replyLang);
+    const missing = getMissingForBooking(merged);
+    const bookingReply = replyLang === 'en'
+      ? `${recap ? `${recap}\n\n` : ''}To book:\n1. Open the destination page\n2. Click « Book »\n3. Or contact us on WhatsApp`
+      : `${recap ? `${recap}\n\n` : ''}Pour réserver :\n1. Ouvrez la fiche destination\n2. Cliquez « Réserver »\n3. Ou contactez-nous sur WhatsApp`;
+    return {
+      reply: missing.length ? `${bookingReply}\n\nIl me manque : ${missing.join(', ')}.` : bookingReply,
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }, { label: 'Contact', url: '/contact' }, { label: 'Suivi', url: '/suivi' }],
+    };
+  }
+
+  // Mise à jour partielle du contexte (ex: "4 jours", "2 pers", "hotel")
+  const isPartialUpdate = !merged.destination ? false : (
+    (merged.days || merged.nights || merged.travelers || merged.accommodation || merged.budgetLevel)
+    && message.trim().length < 35
+  );
+  if (isPartialUpdate && intent !== 'GREETING') {
+    const recap = buildRecap(merged, replyLang);
+    const missing = getMissingForBooking(merged);
+    let reply = recap ? `${recap}\n\n` : '';
+    if (missing.length > 0) {
+      reply += replyLang === 'en'
+        ? `Noted 😊 Still need: ${missing.join(', ')}.`
+        : `Bien noté 😊 Il me manque : ${missing.join(', ')}.`;
+    } else {
+      reply += replyLang === 'en'
+        ? 'Perfect 😊 I have everything. Shall I suggest a program or help you book?'
+        : 'Parfait 😊 J\'ai toutes les infos. Je vous propose un programme ou on passe à la réservation ?';
+      const itin = buildItinerary(merged.destination, merged.days || merged.nights || 3, replyLang, merged.interests);
+      if (itin && (merged.days || merged.nights)) reply += `\n\n${itin}`;
+    }
+    return {
+      reply,
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
   if (merged.destination === 'sahara' && intent === 'TRIP_PLANNING') {
-    return { ...knowledge().buildSaharaOverview(replyLang), session: merged };
+    return { ...knowledge().buildSaharaOverview(replyLang, merged), session: merged };
   }
 
   if (merged.destination && intent === 'DESTINATION_SEARCH' && !merged.accommodation && !merged.activity && !merged.days && !merged.travelers) {
@@ -179,7 +259,7 @@ function tryContextualReply(message, lang, session) {
     return {
       reply: `Excellent choix 😊 ${dest} ! 🏨 Hébergement, 🏖️ plages, 🎯 activités ou 🗺️ programme complet ?`,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: linksFor(merged, replyLang),
     };
   }
@@ -221,13 +301,13 @@ function tryContextualReply(message, lang, session) {
     return {
       reply,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: goodHit?.links?.length ? goodHit.links : linksFor(merged, replyLang),
     };
   }
 
   if (intent === 'TRIP_PLANNING' && !merged.destination) {
-    return { ...knowledge().buildCatalogOverview(replyLang), session: merged };
+    return { ...knowledge().buildCatalogOverview(replyLang, merged), session: merged };
   }
 
   // Réponse intelligente même pour messages courts / abréviations
@@ -244,7 +324,7 @@ function tryContextualReply(message, lang, session) {
     return {
       reply,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: goodHit.links?.length ? goodHit.links : linksFor(merged, replyLang),
     };
   }
@@ -258,7 +338,7 @@ function tryContextualReply(message, lang, session) {
           ? `فهمت 😊 ${dest}! 🏨 فندق، 🏖️ شواطئ، 🎯 أنشطة أو 🗺️ برنامج كامل؟`
           : `Compris 😊 ${dest} ! 🏨 Hôtel, 🏖️ plages, 🎯 activités ou 🗺️ programme complet ?`,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: linksFor(merged, replyLang),
     };
   }
@@ -268,7 +348,7 @@ function tryContextualReply(message, lang, session) {
     return {
       reply: `${recap ? `${recap}\n\n` : ''}${replyLang === 'en' ? 'Tell me the destination and dates so I can help 😊' : 'Indiquez la destination et les dates pour que je vous aide 😊'}`,
       session: merged,
-      suggestions: getSuggestions(replyLang),
+      suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }, { label: 'Circuits', url: '/tours' }],
     };
   }

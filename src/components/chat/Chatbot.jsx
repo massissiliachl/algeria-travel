@@ -8,6 +8,39 @@ import './Chatbot.css';
 
 const makeId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
+const DEST_LABELS = {
+  fr: {
+    bejaia: 'Béjaïa', alger: 'Alger', oran: 'Oran', taghit: 'Taghit', djanet: 'Djanet',
+    ghardaia: 'Ghardaïa', timimoun: 'Timimoun', constantine: 'Constantine', annaba: 'Annaba',
+    jijel: 'Jijel', hoggar: 'Hoggar', sahara: 'Sahara', kabylie: 'Kabylie',
+  },
+  en: {
+    bejaia: 'Bejaia', alger: 'Algiers', oran: 'Oran', taghit: 'Taghit', djanet: 'Djanet',
+    ghardaia: 'Ghardaia', timimoun: 'Timimoun', constantine: 'Constantine', annaba: 'Annaba',
+    jijel: 'Jijel', hoggar: 'Hoggar', sahara: 'Sahara', kabylie: 'Kabylia',
+  },
+  ar: {
+    bejaia: 'بجاية', alger: 'الجزائر', oran: 'وهران', taghit: 'تاغيت', djanet: 'جانت',
+    ghardaia: 'غرداية', timimoun: 'تيميمون', constantine: 'قسنطينة', annaba: 'عنابة',
+    jijel: 'جijel', hoggar: 'الhoggar', sahara: 'الصحراء', kabylie: 'القبail',
+  },
+};
+
+function formatSessionChip(session, lang = 'fr') {
+  if (!session?.destination) return null;
+  const labels = DEST_LABELS[lang] || DEST_LABELS.fr;
+  const parts = [labels[session.destination] || session.destination];
+  if (session.days) parts.push(lang === 'en' ? `${session.days} days` : lang === 'ar' ? `${session.days} أيام` : `${session.days} jours`);
+  else if (session.nights) parts.push(lang === 'en' ? `${session.nights} nights` : lang === 'ar' ? `${session.nights} ليالي` : `${session.nights} nuits`);
+  if (session.travelers) parts.push(lang === 'en' ? `${session.travelers} ppl` : lang === 'ar' ? `${session.travelers} أشخاص` : `${session.travelers} pers.`);
+  if (session.accommodation) parts.push(session.accommodation);
+  return parts.join(' · ');
+}
+
+function hasSessionContext(session) {
+  return !!(session?.destination || session?.days || session?.nights || session?.travelers || session?.accommodation);
+}
+
 const savedState = loadChatState();
 
 const Chatbot = () => {
@@ -177,6 +210,9 @@ const Chatbot = () => {
       .finally(() => setLoading(false));
   };
 
+  const sessionChip = formatSessionChip(session, language);
+  const showSessionBadge = hasSessionContext(session) && !open;
+
   return (
     <>
       {open && isMobile && (
@@ -228,6 +264,13 @@ const Chatbot = () => {
               </button>
             </div>
           </header>
+
+          {sessionChip && (
+            <div className="chatbot-panel__recap" aria-live="polite">
+              <Icon name="MapPin" size={14} />
+              <span>{sessionChip}</span>
+            </div>
+          )}
 
           <div className="chatbot-panel__messages" ref={listRef}>
             {messages.map((msg) => (
@@ -321,6 +364,7 @@ const Chatbot = () => {
           aria-expanded={open}
         >
           <Icon name={open ? 'X' : 'MessageCircle'} size={24} />
+          {showSessionBadge && <span className="chatbot-fab__badge" aria-hidden />}
         </button>
       )}
     </>
