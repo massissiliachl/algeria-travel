@@ -53,14 +53,16 @@ async function chat(message, lang = 'fr', history = [], session = {}) {
   const safeLang = VALID_LANGS.has(lang) ? lang : (VALID_LANGS.has(detected) ? detected : 'fr');
   const safeSession = { ...emptySession(), ...session, language: safeLang };
 
+  const local = generateLocalReply(message, safeLang, safeSession);
+
   try {
     const ai = await callOpenAI(message, safeLang, history, safeSession);
-    if (ai?.reply) {
-      const local = generateLocalReply(message, safeLang, safeSession);
+    const aiReply = ai?.reply?.trim();
+    if (aiReply) {
       return {
-        reply: ai.reply,
+        reply: aiReply,
         suggestions: local.suggestions,
-        links: local.links,
+        links: local.links?.length ? local.links : [],
         session: local.session || safeSession,
         source: 'openai',
       };
@@ -69,8 +71,17 @@ async function chat(message, lang = 'fr', history = [], session = {}) {
     console.warn('[Chat] OpenAI fallback:', err.message);
   }
 
-  const local = generateLocalReply(message, safeLang, safeSession);
-  return { ...local, source: 'local' };
+  return {
+    reply: local.reply || (safeLang === 'en'
+      ? 'How can I help with your trip to Algeria?'
+      : safeLang === 'ar'
+        ? 'كيف يمكنني مساعدتك في رحلتك؟'
+        : 'Comment puis-je vous aider pour votre voyage en Algérie ?'),
+    suggestions: local.suggestions,
+    links: local.links || [],
+    session: local.session || safeSession,
+    source: 'local',
+  };
 }
 
 module.exports = { chat };

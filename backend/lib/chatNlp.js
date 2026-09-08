@@ -84,6 +84,16 @@ const TOKEN_EXPANSIONS = {
   wahdi: ['seul'], drari: ['enfants'], s7abi: ['amis'],
   prog: ['programme'], itin: ['itineraire'], org: ['organiser'],
   hajz: ['reservation'], htl: ['hotel'], htlm: ['hotel'],
+  voudrais: ['je veux'], aimerais: ['je veux'], souhaite: ['je veux'],
+  cherche: ['recherche'], recherche: ['recherche'],
+  semaine: ['7 jours'], weekend: ['2 jours'],
+  deux: ['2'], trois: ['3'], quatre: ['4'], cinq: ['5'], six: ['6'],
+  sept: ['7'], huit: ['8'], neuf: ['9'], dix: ['10'],
+  propose: ['organiser'], organise: ['organiser'], planifie: ['organiser'],
+  dormir: ['hebergement'], loger: ['hebergement'], hebergement: ['hebergement'],
+  partir: ['voyage'], vacances: ['sejour'], sejour: ['sejour'],
+  bientot: ['prochainement'], prochainement: ['bientot'],
+  octobre: ['oct'], novembre: ['nov'], decembre: ['dec'],
 };
 
 const EMOJI_HINTS = {
@@ -106,6 +116,17 @@ function normalizeQuery(value = '') {
 
 function preprocessMessage(raw) {
   let text = splitCompactMessage(String(raw || '').trim());
+  // Normalisation langage naturel parlé
+  text = text
+    .replace(/\b(je\s+voudrais|j'aimerais|j aimerais|je\s+souhaite|je\s+cherche|est ce que|est-ce que|svp|s'il vous plait|sil vous plait)\b/gi, ' ')
+    .replace(/\b(on\s+est|nous\s+sommes|nous\s+serons)\b/gi, ' ')
+    .replace(/\b(ou\s+dormir|where\s+to\s+stay|comment\s+faire)\b/gi, ' hebergement ')
+    .replace(/\b(propose\s+moi|aide\s+moi|organise\s+moi|planifie\s+moi)\b/gi, ' organiser ')
+    .replace(/\b(pas\s+trop\s+cher|pas\s+cher|budget\s+serre)\b/gi, ' economique ')
+    .replace(/\b(lune\s+de\s+miel|en\s+couple|avec\s+ma\s+femme|avec\s+mon\s+mari)\b/gi, ' couple ')
+    .replace(/\b(avec\s+mes\s+enfants|en\s+famille)\b/gi, ' famille ')
+    .replace(/\s+/g, ' ')
+    .trim();
   for (const [emoji, hint] of Object.entries(EMOJI_HINTS)) {
     if (text.includes(emoji)) text += ` ${hint}`;
   }
@@ -199,21 +220,31 @@ function findDestination(text, tokens) {
 }
 
 function parsePersons(text) {
+  const wordNums = {
+    un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5,
+    six: 6, sept: 7, huit: 8, neuf: 9, dix: 10,
+  };
   const patterns = [
-    /(\d+)\s*(?:pers(?:onnes?)?|p(?:ers)?|personnes?|persons?|people|pax|ashkhas|أشخاص)/i,
+    /(\d+)\s*(?:pers(?:onnes?)?|p(?:ers)?|personnes?|persons?|people|pax|ashkhas|adultes?|voyageurs?)/i,
     /(?:pr|pour)\s*(\d+)/i,
     /(\d+)p(?=\s|$|[^a-z])/i,
     /(\d+)pers\b/i,
     /m3a\s*(\d+)/i,
-    /(\d+)\s*(?:voyageurs?|travelers?)/i,
-    /couple/i,
-    /famille/i,
+    /(?:on est|nous sommes|nous serons|we are)\s*(\d+)/i,
+    /(?:deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s*(?:pers(?:onnes?)?|personnes?|adultes?|voyageurs?)/i,
+    /couple|en couple|ma femme|mon mari|lune de miel/i,
+    /famille|en famille|avec mes enfants|avec les enfants/i,
   ];
   for (const re of patterns) {
     const m = text.match(re);
     if (m) {
-      if (/couple/i.test(m[0])) return { travelers: 2, type: 'couple' };
-      if (/famille/i.test(m[0])) return { travelers: null, type: 'family' };
+      if (/couple|femme|mari|lune/i.test(m[0])) return { travelers: 2, type: 'couple' };
+      if (/famille|enfants/i.test(m[0])) return { travelers: null, type: 'family' };
+      if (m[1] && wordNums[m[1].toLowerCase()]) return { travelers: wordNums[m[1].toLowerCase()], type: 'group' };
+      if (/deux|trois|quatre|cinq|six|sept|huit|neuf|dix/i.test(m[0])) {
+        const w = m[0].match(/deux|trois|quatre|cinq|six|sept|huit|neuf|dix/i)[0].toLowerCase();
+        return { travelers: wordNums[w], type: 'group' };
+      }
       return { travelers: parseInt(m[1], 10), type: 'group' };
     }
   }
@@ -225,11 +256,20 @@ function parseDuration(text) {
   let days = null;
   let nights = null;
 
+  if (/\bune?\s*semaine\b|\b1\s*semaine\b|\bweek\b/.test(n)) days = 7;
+  if (/\bweekend\b|\bwe\b|\bfin\s*de\s*semaine\b/.test(n)) days = 2;
+
   const dayMatch = n.match(/(\d+)\s*(?:j|jr|jrs|jours?|days?|lyali?)/);
   if (dayMatch) {
     const val = parseInt(dayMatch[1], 10);
     if (/lyali|nuits?|n\b/.test(dayMatch[0])) nights = val;
     else days = val;
+  }
+
+  const wordDayMatch = n.match(/\b(deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s*(?:jours?|days?)\b/);
+  if (wordDayMatch) {
+    const map = { deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10 };
+    days = map[wordDayMatch[1]];
   }
 
   const nightMatch = n.match(/(\d+)\s*(?:nuits?|nights?|lyali|3lyali)/);
@@ -243,6 +283,13 @@ function parseDuration(text) {
 
   const lyaliMatch = n.match(/(\d+)lyali/);
   if (lyaliMatch) nights = parseInt(lyaliMatch[1], 10);
+
+  const pourMatch = n.match(/(?:pendant|pour)\s*(\d+)\s*(?:jours?|days?|nuits?|nights?)/);
+  if (pourMatch) {
+    const val = parseInt(pourMatch[1], 10);
+    if (/nuits?|nights?/.test(pourMatch[0])) nights = val;
+    else days = val;
+  }
 
   return { days, nights };
 }
@@ -287,23 +334,30 @@ function detectIntent(text, entities) {
   if (/humain|agent|conseiller|appelez|appeler|parler a quelqu/.test(n)) return 'CONTACT';
   const ackOnly = /^(merci|thx|mrc|ok|okk|oki|dac|dacc|parfait|c bon|c est bon)(\s*[!?.…]*)$/;
   if (ackOnly.test(trimmed)) return 'ACK';
-  if (/^(prix|tarif|cmb|ch7al|combien|px|budget)\??$/.test(n)) return 'FOLLOWUP_PRICE';
+  if (/^(prix|tarif|cmb|ch7al|combien|px|budget|coute|coûte)\??$/.test(n)) return 'FOLLOWUP_PRICE';
   if (/^(dispo|disp|disponible)\??$/.test(n)) return 'FOLLOWUP_AVAILABILITY';
-  if (entities.destination && !entities.accommodation && !entities.activity && n.length < 20) return 'DESTINATION_SEARCH';
-  if (/hotel|ht|apt|appart|heberg|logement|villa|camping/.test(n)) return 'ACCOMMODATION_SEARCH';
-  if (/resto|restaurant|restau|manger|cuisine/.test(n)) return 'RESTAURANT_SEARCH';
-  if (/quoi faire|qqch|qq chose|truc a faire|visiter|nzour|decouvrir|découvrir/.test(n)) return 'ACTIVITY_SEARCH';
+
+  // Langage naturel — voyage / projet
+  const naturalTrip = /je\s+(?:veux|voudrais|aimerais|souhaite|cherche)|i\s+(?:want|would like|am looking)|bghit|n7eb|nheb|propose|organise|planifie|aide\s+moi|prepare|preparer|partir\s+(?:en|a|à)|envie\s+de\s+(?:partir|visiter)/.test(n);
+  if (naturalTrip && (entities.destination || entities.days || entities.travelers || entities.accommodation)) {
+    return 'TRIP_PLANNING';
+  }
+
+  if (/vol|avion|aero|ferry|train|bus|taxi|loc voiture|location voiture|transport|comment aller|trajet|comment se rendre|comment faire pour aller/.test(n)) return 'TRANSPORT';
+  if (/reserv|resa|book|hajz|حجز|je veux reserver|prendre une reservation/.test(n)) return 'BOOKING';
+  if (/programme|itineraire|itinéraire|plan|organiser|que faire|quoi faire/.test(n)) return 'ITINERARY';
+  if (/hotel|ht|apt|appart|heberg|logement|villa|camping|ou dormir|where to stay/.test(n)) return 'ACCOMMODATION_SEARCH';
+  if (/resto|restaurant|restau|manger|cuisine|ou manger/.test(n)) return 'RESTAURANT_SEARCH';
+  if (/quoi faire|qqch|qq chose|truc a faire|visiter|nzour|decouvrir|découvrir|activites|activités/.test(n)) return 'ACTIVITY_SEARCH';
   if (/plage|beach|mer|bord de mer/.test(n)) return 'BEACH_SEARCH';
   if (/activ|quad|4x4|rando|excursion|cheval|kayak|bateau/.test(n)) return 'ACTIVITY_SEARCH';
-  if (/vol|avion|aero|ferry|train|bus|taxi|loc voiture|location voiture|transport|comment aller|trajet/.test(n)) return 'TRANSPORT';
-  if (/reserv|resa|book|hajz|حجز/.test(n)) return 'BOOKING';
-  if (/programme|itineraire|itinéraire|plan|organiser/.test(n)) return 'ITINERARY';
-  if (/voyage|voy|circuit|sejour|safar|siyaha|trip|travel/.test(n)) return 'TRIP_PLANNING';
+  if (/voyage|voy|circuit|sejour|safar|siyaha|trip|travel|vacances|partir/.test(n)) return 'TRIP_PLANNING';
   if (/capitale|capital/.test(n) && /alger|algerie|dz/.test(n)) return 'GENERAL_INFORMATION';
   if (/meteo|météo|weather|climat/.test(n)) return 'WEATHER';
   if (/annul/.test(n)) return 'CANCELLATION';
   if (/paiement|payer|carte|paypal/.test(n)) return 'PAYMENT';
-  if (entities.destination) return 'DESTINATION_SEARCH';
+  if (entities.destination && !entities.accommodation && !entities.activity && n.length < 28) return 'DESTINATION_SEARCH';
+  if (entities.destination) return 'TRIP_PLANNING';
   return 'GENERAL_QUESTION';
 }
 

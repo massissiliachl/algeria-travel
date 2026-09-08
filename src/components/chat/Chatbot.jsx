@@ -4,6 +4,7 @@ import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
 import { clearChatState, loadChatState, saveChatState } from '../../utils/chatStorage';
 import Icon from '../ui/Icon';
+import ChatMessageContent from './ChatMessageContent';
 import './Chatbot.css';
 
 const makeId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -64,18 +65,19 @@ const Chatbot = () => {
   }, []);
 
   const pushAssistant = useCallback((payload) => {
+    const reply = String(payload?.reply ?? payload?.message ?? '').trim();
     setMessages((prev) => [
       ...prev,
       {
         id: makeId(),
         role: 'assistant',
-        content: payload.reply,
-        links: payload.links || [],
+        content: reply || t('chat_error'),
+        links: payload?.links || [],
       },
     ]);
-    if (payload.suggestions?.length) setSuggestions(payload.suggestions);
+    if (payload?.suggestions?.length) setSuggestions(payload.suggestions);
     scrollToBottom();
-  }, [scrollToBottom]);
+  }, [scrollToBottom, t]);
 
   useEffect(() => {
     saveChatState({ messages, session, suggestions });
@@ -279,9 +281,7 @@ const Chatbot = () => {
                 className={`chatbot-msg chatbot-msg--${msg.role}`}
               >
                 <div className="chatbot-msg__bubble">
-                  {String(msg.content || '').split('\n').map((line, i) => (
-                    <p key={i}>{line || '\u00A0'}</p>
-                  ))}
+                  <ChatMessageContent content={msg.content} role={msg.role} />
                   {msg.links?.length > 0 && (
                     <div className="chatbot-msg__links">
                       {msg.links.filter((link) => link?.url).map((link) =>
