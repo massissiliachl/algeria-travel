@@ -7,7 +7,7 @@ services:
     runtime: node
     buildCommand: npm install && npm run build:render && npm run migrate:render
     startCommand: npm start
-    healthCheckPath: /api/health
+    healthCheckPath: /api/live
     envVars:
       - key: NODE_ENV
         value: production

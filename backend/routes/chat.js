@@ -12,12 +12,17 @@ const chatLimiter = createRateLimiter({
 });
 
 router.get('/welcome', (req, res) => {
-  const lang = ['fr', 'en', 'ar'].includes(req.query.lang) ? req.query.lang : 'fr';
-  res.json({
-    reply: getWelcome(lang),
-    suggestions: getSuggestions(lang),
-    links: [{ label: lang === 'en' ? 'Taghit offer' : lang === 'ar' ? 'عرض تاغيت' : 'Offre Taghit', url: '/place/taghit?pkg=hotel' }],
-  });
+  try {
+    const lang = ['fr', 'en', 'ar'].includes(req.query.lang) ? req.query.lang : 'fr';
+    res.json({
+      reply: getWelcome(lang),
+      suggestions: getSuggestions(lang),
+      links: [{ label: lang === 'en' ? 'Taghit offer' : lang === 'ar' ? 'عرض تاغيت' : 'Offre Taghit', url: '/place/taghit?pkg=hotel' }],
+    });
+  } catch (err) {
+    console.error('[Chat] welcome error:', err.message);
+    res.status(500).json({ error: 'Chat indisponible temporairement.' });
+  }
 });
 
 router.post('/', chatLimiter, async (req, res, next) => {
@@ -42,7 +47,20 @@ router.post('/', chatLimiter, async (req, res, next) => {
     const result = await chat(message.trim(), lang, safeHistory, session);
     res.json(result);
   } catch (err) {
-    next(err);
+    console.error('[Chat] message error:', err.message);
+    const lang = ['fr', 'en', 'ar'].includes(req.body?.lang) ? req.body.lang : 'fr';
+    const fallback = lang === 'en'
+      ? 'The assistant is temporarily unavailable. Please try again in a moment or contact us on WhatsApp.'
+      : lang === 'ar'
+        ? 'المساعد غير متاح مؤقتاً. أعد المحاولة أو تواصل معنا عبر WhatsApp.'
+        : 'L\'assistant est momentanément indisponible. Réessayez dans un instant ou contactez-nous sur WhatsApp.';
+    res.status(200).json({
+      reply: fallback,
+      suggestions: getSuggestions(lang),
+      links: [{ label: 'WhatsApp', url: 'https://wa.me/213557664089' }],
+      session: req.body?.session || {},
+      source: 'fallback',
+    });
   }
 });
 

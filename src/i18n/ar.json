@@ -183,6 +183,7 @@
   "chat_send": "إرسال",
   "chat_welcome": "مرحباً! أنا مساعد Algeria Travel. كيف يمكنني مساعدتك؟",
   "chat_error": "حدث خطأ. تواصل معنا عبر WhatsApp أو نموذج الاتصال.",
+  "chat_error_backend": "الخادم يستيقظ أو غير متاح. أعد المحاولة بعد 30 ثانية أو تواصل عبر WhatsApp 😊",
   "chat_whatsapp": "WhatsApp",
   "chat_new": "محادثة جديدة",
   "faq_q1": "ما أفضل وقت للسفر؟",

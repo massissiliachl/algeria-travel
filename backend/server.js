@@ -99,15 +99,28 @@ app.use('/api/admin/hotels/:hotelId/availability', require('./routes/admin/hotel
 app.use('/api/partner', require('./routes/partner'));
 app.use('/api', require('./routes/content'));
 
+app.get('/api/live', (req, res) => {
+  res.json({ status: 'ok', service: 'algeria-travel-api' });
+});
+
 app.get('/api/health', async (req, res) => {
+  const payload = { status: 'ok', service: 'algeria-travel-api' };
   if (!process.env.DATABASE_URL) {
-    return res.status(503).json({ status: 'error', message: 'DATABASE_URL non configuré' });
+    return res.json({ ...payload, database: 'not_configured' });
   }
   try {
     const db = await testConnection();
-    res.json({ status: 'ok', database: db.database, server_time: db.server_time });
+    return res.json({
+      ...payload,
+      database: db.database,
+      server_time: db.server_time,
+    });
   } catch (err) {
-    res.status(503).json({ status: 'error', message: err.message });
+    return res.json({
+      ...payload,
+      database: 'error',
+      database_message: err.message,
+    });
   }
 });
 
@@ -143,6 +156,10 @@ if (serveAdmin) {
 }
 
 if (serveFrontend) {
+  app.get('/favicon.ico', (req, res) => {
+    res.type('png');
+    res.sendFile(path.join(__dirname, '../public/logo192.png'));
+  });
   app.use(express.static(buildPath));
   app.get(/^(?!\/api\/|\/admin|\/partner).*/, (req, res, next) => {
     if (req.path.startsWith('/uploads/') || req.path.startsWith('/images/')) return next();

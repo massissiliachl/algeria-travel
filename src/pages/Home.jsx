@@ -19,7 +19,8 @@ const Home = () => {
         title={t('seo_home_title')}
         description={t('seo_home_desc')}
         path="/"
-        image="/images/hero.jpeg"
+        image="/logo.png"
+        home
       />
       <Navbar variant="home" />
       <main>

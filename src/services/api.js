@@ -108,10 +108,11 @@ export const api = {
   },
   sendContact: (payload) =>
     request('/api/contact', { method: 'POST', body: JSON.stringify(payload) }),
-  getChatWelcome: (lang) => request(`/api/chat/welcome?lang=${encodeURIComponent(lang)}`),
+  getChatWelcome: (lang) => request(`/api/chat/welcome?lang=${encodeURIComponent(lang)}`, { timeoutMs: 45_000 }),
   sendChatMessage: ({ message, lang, history, session }) =>
     request('/api/chat', {
       method: 'POST',
+      timeoutMs: 45_000,
       body: JSON.stringify({ message, lang, history, session }),
     }),
   createReservation: (payload) =>

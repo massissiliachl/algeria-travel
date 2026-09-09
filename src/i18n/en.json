@@ -183,6 +183,7 @@
   "chat_send": "Send",
   "chat_welcome": "Hello! I'm the Algeria Travel assistant. How can I help you?",
   "chat_error": "Something went wrong. Contact us on WhatsApp or via the contact form.",
+  "chat_error_backend": "The server is waking up or unreachable. Try again in 30 s, or contact us on WhatsApp 😊",
   "chat_whatsapp": "WhatsApp",
   "chat_new": "New conversation",
   "faq_q1": "What is the best time to travel?",

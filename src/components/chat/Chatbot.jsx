@@ -87,13 +87,27 @@ const Chatbot = () => {
     if (!open || booted.current) return;
     booted.current = true;
     setLoading(true);
-    api
-      .getChatWelcome(language)
-      .then((data) => pushAssistant(data))
-      .catch(() => {
-        pushAssistant({ reply: t('chat_welcome'), suggestions: [], links: [] });
-      })
-      .finally(() => setLoading(false));
+    const loadWelcome = async () => {
+      try {
+        const data = await api.getChatWelcome(language);
+        pushAssistant(data);
+      } catch (firstErr) {
+        try {
+          await new Promise((r) => setTimeout(r, 1500));
+          const data = await api.getChatWelcome(language);
+          pushAssistant(data);
+        } catch {
+          pushAssistant({
+            reply: t('chat_error_backend'),
+            suggestions: [],
+            links: [{ label: t('chat_whatsapp'), url: 'https://wa.me/213557664089' }],
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadWelcome();
   }, [open, language, pushAssistant, t]);
 
   useEffect(() => {
@@ -157,6 +171,14 @@ const Chatbot = () => {
     booted.current = false;
   };
 
+  const chatErrorReply = (err) => {
+    const msg = String(err?.message || '');
+    if (/timeout|indisponible|503|502|504|failed to fetch|network/i.test(msg)) {
+      return t('chat_error_backend');
+    }
+    return t('chat_error');
+  };
+
   const sendMessage = async (text) => {
     const trimmed = text?.trim();
     if (!trimmed || loading) return;
@@ -172,18 +194,24 @@ const Chatbot = () => {
       .filter((m) => m.role === 'user' || m.role === 'assistant')
       .map((m) => ({ role: m.role, content: m.content }));
 
+    const payload = { message: trimmed, lang: language, history, session };
+
     try {
-      const data = await api.sendChatMessage({
-        message: trimmed,
-        lang: language,
-        history,
-        session,
-      });
+      let data;
+      try {
+        data = await api.sendChatMessage(payload);
+      } catch (firstErr) {
+        if (!/timeout|503|502|504|failed to fetch|network/i.test(String(firstErr?.message || ''))) {
+          throw firstErr;
+        }
+        await new Promise((r) => setTimeout(r, 1500));
+        data = await api.sendChatMessage(payload);
+      }
       if (data.session) setSession(data.session);
       pushAssistant(data);
     } catch (err) {
       pushAssistant({
-        reply: t('chat_error'),
+        reply: chatErrorReply(err),
         links: [{ label: t('chat_whatsapp'), url: 'https://wa.me/213557664089' }],
       });
     } finally {
@@ -207,7 +235,10 @@ const Chatbot = () => {
       })
       .catch(() => {
         booted.current = true;
-        pushAssistant({ reply: t('chat_welcome'), suggestions: [], links: [] });
+        pushAssistant({
+          reply: t('chat_error_backend'),
+          links: [{ label: t('chat_whatsapp'), url: 'https://wa.me/213557664089' }],
+        });
       })
       .finally(() => setLoading(false));
   };
