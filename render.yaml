@@ -1,10 +1,12 @@
-# Render — 1 service Web : API + site React + admin
-# Dashboard → New → Blueprint → connecter le repo GitHub
+# Render — 1 service Web Node (PAS de Static Site, PAS de "Publish Directory")
+# Le chat et l'API nécessitent : startCommand npm start → backend/server.js
+# Dashboard Render : supprimer "Publish Directory" si défini sur build/
 
 services:
   - type: web
     name: algeria-travel
     runtime: node
+    plan: free
     buildCommand: npm install && npm run build:render && npm run migrate:render
     startCommand: npm start
     healthCheckPath: /api/live
@@ -17,6 +19,16 @@ services:
         value: true
       - key: REACT_APP_API_URL
         value: ""
+      - key: SITE_URL
+        fromService:
+          type: web
+          name: algeria-travel
+          property: host
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: algeria-travel
+          property: host
       - key: DATABASE_URL
         sync: false
       - key: ADMIN_API_KEY

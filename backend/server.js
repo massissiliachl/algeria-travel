@@ -183,6 +183,7 @@ app.use((err, req, res, next) => {
 
 const server = app.listen(PORT, async () => {
   console.log(`Algeria Travel API → port ${PORT}`);
+  console.log('[API] Routes chat: GET /api/chat/welcome · POST /api/chat · GET /api/live');
   if (process.env.DATABASE_URL) {
     try {
       const db = await testConnection();

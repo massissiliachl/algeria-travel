@@ -25,7 +25,15 @@ async function request(path, options = {}) {
     clearTimeout(timer);
   }
 
-  const data = await res.json().catch(() => ({}));
+  const raw = await res.text();
+  let data = {};
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      data = {};
+    }
+  }
 
   if (!res.ok) {
     if (expectStatuses.includes(res.status)) {
@@ -34,6 +42,12 @@ async function request(path, options = {}) {
       throw err;
     }
     throw new Error(data.error || `Erreur API (${res.status})`);
+  }
+
+  if (path.startsWith('/api/chat') && (!data.reply || !String(data.reply).trim())) {
+    const err = new Error('API chat indisponible (réponse vide).');
+    err.status = res.status;
+    throw err;
   }
 
   return data;

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
+import { getOfflineReply, getOfflineWelcome } from '../../services/chatOffline';
 import { clearChatState, loadChatState, saveChatState } from '../../utils/chatStorage';
 import Icon from '../ui/Icon';
 import ChatMessageContent from './ChatMessageContent';
@@ -97,11 +98,7 @@ const Chatbot = () => {
           const data = await api.getChatWelcome(language);
           pushAssistant(data);
         } catch {
-          pushAssistant({
-            reply: t('chat_error_backend'),
-            suggestions: [],
-            links: [{ label: t('chat_whatsapp'), url: 'https://wa.me/213557664089' }],
-          });
+          pushAssistant(getOfflineWelcome(language));
         }
       } finally {
         setLoading(false);
@@ -171,14 +168,6 @@ const Chatbot = () => {
     booted.current = false;
   };
 
-  const chatErrorReply = (err) => {
-    const msg = String(err?.message || '');
-    if (/timeout|indisponible|503|502|504|failed to fetch|network/i.test(msg)) {
-      return t('chat_error_backend');
-    }
-    return t('chat_error');
-  };
-
   const sendMessage = async (text) => {
     const trimmed = text?.trim();
     if (!trimmed || loading) return;
@@ -210,10 +199,9 @@ const Chatbot = () => {
       if (data.session) setSession(data.session);
       pushAssistant(data);
     } catch (err) {
-      pushAssistant({
-        reply: chatErrorReply(err),
-        links: [{ label: t('chat_whatsapp'), url: 'https://wa.me/213557664089' }],
-      });
+      const offline = getOfflineReply(trimmed, language, session);
+      if (offline.session) setSession(offline.session);
+      pushAssistant(offline);
     } finally {
       setLoading(false);
     }
@@ -235,10 +223,7 @@ const Chatbot = () => {
       })
       .catch(() => {
         booted.current = true;
-        pushAssistant({
-          reply: t('chat_error_backend'),
-          links: [{ label: t('chat_whatsapp'), url: 'https://wa.me/213557664089' }],
-        });
+        pushAssistant(getOfflineWelcome(language));
       })
       .finally(() => setLoading(false));
   };
