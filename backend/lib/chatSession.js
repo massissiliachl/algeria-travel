@@ -25,6 +25,7 @@ function mergeSession(session = {}, entities = {}) {
   const scalarKeys = [
     'destination', 'accommodation', 'activity', 'travelers', 'travelerType',
     'days', 'nights', 'arrivalDay', 'departureDay', 'budgetLevel', 'budgetAmount',
+    'lastIntent',
   ];
 
   for (const key of scalarKeys) {

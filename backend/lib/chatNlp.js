@@ -41,7 +41,7 @@ const TOKEN_EXPANSIONS = {
   wk: ['weekend'], mat: ['matin'], aprem: ['apres midi'], soir: ['soir'],
   res: ['reservation', 'reserver'], resa: ['reservation', 'reserver'], résa: ['reservation'],
   réserv: ['reservation'], reserv: ['reservation'], book: ['reserver'], booking: ['reservation'],
-  conf: ['confirmation'], dispo: ['disponibilite'], disp: ['disponibilite'],
+  conf: ['confirmation'], dispo: ['disponibilite'], disp: ['disponible', 'disponibilite'],
   apt: ['appartement'], appart: ['appartement'], apprt: ['appartement'], app: ['appartement'],
   logt: ['logement'], heberg: ['hebergement'], héb: ['hebergement'], hotel: ['hotel'],
   hot: ['hotel'], ch: ['chambre'], chbre: ['chambre'], villa: ['villa'], camp: ['camping'],
@@ -67,7 +67,7 @@ const TOKEN_EXPANSIONS = {
   m3a: ['avec'], bla: ['sans'], wahdi: ['seul'], ana: ['moi'], hna: ['nous'],
   voy: ['voyage'], circ: ['circuit'], circu: ['circuit'], dest: ['destination'],
   sej: ['sejour'], tt: ['tout'], px: ['prix'], comb: ['combien'], ht: ['hotel'],
-  mh: ['maison hote'], av: ['avion'], wpp: ['whatsapp'], wa: ['whatsapp'],
+  mh: ['maison hote'], wpp: ['whatsapp'], wa: ['whatsapp'],
   resto: ['restaurant'], restau: ['restaurant'], maps: ['carte', 'localisation'],
   agent: ['humain', 'conseiller'], humain: ['humain'], conseiller: ['conseiller'],
   keske: ['qu est ce'], koi: ['quoi'], cmb: ['combien'], cb: ['combien'],
@@ -119,10 +119,10 @@ const TOKEN_EXPANSIONS = {
   circ: ['circuit'], circu: ['circuit'], voy: ['voyage'], sej: ['sejour'],
   prog: ['programme'], itin: ['itineraire'], org: ['organiser'],
   resa: ['reservation'], reserv: ['reservation'], rez: ['reservation'],
-  dispo: ['disponibilite'], disp: ['disponibilite'],
+  dispo: ['disponibilite'], disp: ['disponible', 'disponibilite'],
   px: ['prix'], cmb: ['combien'], ch7al: ['combien'], chhal: ['combien'],
   comb: ['combien'], tarif: ['prix'], budget: ['budget'],
-  av: ['avion'], vol: ['vol'], avi: ['avion'], aero: ['aeroport'],
+  vol: ['vol'], aero: ['aeroport'],
   bjr: ['bonjour'], bj: ['bonjour'], slt: ['salut'], slm: ['salam'], bsr: ['bonsoir'],
   mrc: ['merci'], thx: ['merci'], ok: ['daccord'], dac: ['daccord'],
   plages: ['plage'], plage: ['plage'], mer: ['mer'], sah: ['sahara'],
@@ -131,6 +131,43 @@ const TOKEN_EXPANSIONS = {
   wpp: ['whatsapp'], wa: ['whatsapp'], tel: ['telephone'], mail: ['email'],
   pascher: ['pas cher'], psch: ['pas cher'], eco: ['economique'],
   lux: ['luxe'], luxe: ['luxe'],
+  // Salutations & renseignements
+  bs: ['bonsoir'], hey: ['salut'], hii: ['salut'], hlo: ['bonjour'],
+  renseign: ['renseigner'], reinsign: ['renseigner'], renseignement: ['renseigner'],
+  renseignements: ['renseigner'], renseigne: ['renseigner'], renseignes: ['renseigner'],
+  infos: ['informations'], savoir: ['savoir'], decouvrir: ['decouvrir'],
+  offres: ['offres'], proposition: ['proposition'], propositions: ['propositions'],
+  catalogue: ['catalogue'], doc: ['documentation'], docs: ['documentation'],
+  question: ['question'], questions: ['questions'], besoin: ['besoin'],
+  jaimerai: ['je veux'], jaimerais: ['je veux'], jvoudrais: ['je voudrais'],
+  jvsavoir: ['je veux savoir'], jvsavoirplus: ['je veux savoir plus'],
+  jvinfo: ['je veux info'], jvinfos: ['je veux infos'], jvdesinfos: ['je veux des infos'],
+  jvrenseigner: ['je veux renseigner'], jvmerenseigner: ['je veux me renseigner'],
+  jveuxinfo: ['je veux info'], jveuxinfos: ['je veux infos'],
+  jveuxrenseigner: ['je veux renseigner'], jveuxmerenseigner: ['je veux me renseigner'],
+  bjrjv: ['bonjour je veux'], bsrjv: ['bonsoir je veux'], sltjv: ['salut je veux'],
+  bjrjvsavoir: ['bonjour je veux savoir'], bsrjvsavoir: ['bonsoir je veux savoir'],
+  // Lexique client SMS — table agence (source unique)
+  saha: ['salut', 'bonjour'],
+  pers: ['personnes'], perss: ['personnes'],
+  nb: ['nombre'], nbr: ['nombre'],
+  incl: ['inclus'], inclus: ['inclus', 'compris'], compris: ['inclus'],
+  ttc: ['toutes taxes comprises'],
+  heberg: ['hebergement'], hebergement: ['hebergement'],
+  chb: ['chambre'], chambre: ['chambre'],
+  transf: ['transfert'], transp: ['transport'],
+  aer: ['aerien'], avi: ['avion'],
+  ap: ['apres'], pm: ['apres midi'],
+  cmt: ['comment'], qd: ['quand'], quoi: ['quoi'],
+  sv: ['service'], max: ['maximum'], min: ['minimum'],
+  daccord: ['daccord'], non: ['non'],
+  reserver: ['reserver'], réserver: ['reserver'], reserv: ['reservation'],
+  ccmb: ['c est combien'], cestcombien: ['c est combien'], ccombien: ['c est combien'],
+  activites: ['activites'], nuitees: ['nuits'], nuitee: ['nuit'],
+  arrivee: ['arrivee'], depart: ['depart'],
+  nom: ['nom'], prenom: ['prenom'], msg: ['message'],
+  // av = avant ; avion si contexte vol (resolveContextualTokens)
+  av: ['avant'],
 };
 
 /** Phrases collées sans espace → avec espaces */
@@ -162,12 +199,48 @@ const COMPACT_GLUE = [
   ['pascherhotel', 'pas cher hotel'], ['hotelpascher', 'hotel pas cher'],
   ['4j2p', '4j 2p'], ['3j2p', '3j 2p'], ['5j4p', '5j 4p'], ['4j2pers', '4j 2 pers'],
   ['taghit23', 'taghit 23'], ['taghit28', 'taghit 28'], ['vol23', 'vol 23'], ['vol28', 'vol 28'],
+  ['bjrjv', 'bjr je veux'], ['bsrjv', 'bsr je veux'], ['sltjv', 'slt je veux'],
+  ['bjrjvrenseigner', 'bjr je veux renseigner'], ['bsrjvrenseigner', 'bsr je veux renseigner'],
+  ['bjrjvmerenseigner', 'bjr je veux me renseigner'], ['bsrjvmerenseigner', 'bsr je veux me renseigner'],
+  ['jvrenseigner', 'je veux renseigner'], ['jvmerenseigner', 'je veux me renseigner'],
+  ['jveuxrenseigner', 'je veux renseigner'], ['jveuxmerenseigner', 'je veux me renseigner'],
+  ['jvdesinfos', 'je veux des infos'], ['jvinfos', 'je veux infos'], ['jvsavoir', 'je veux savoir'],
+  ['besoininfos', 'besoin infos'], ['besoindinfos', 'besoin d infos'], ['besoinrenseignements', 'besoin renseignements'],
+  ['jaibesoin', 'j ai besoin'], ['jvaibesoin', 'jv ai besoin'], ['jvaibesoininfos', 'jv ai besoin infos'],
+  ['bonjourjv', 'bonjour je veux'], ['bonsoirjv', 'bonsoir je veux'],
+  ['bonjourjveux', 'bonjour je veux'], ['bonsoirjveux', 'bonsoir je veux'],
+  ['bonjourjerenseigne', 'bonjour je renseigne'], ['bonjourjerenseigner', 'bonjour je renseigner'],
+  ['jerenseigne', 'je renseigne'], ['jerenseigner', 'je renseigner'], ['jemerenseigne', 'je me renseigne'],
+  ['jemerenseigner', 'je me renseigner'], ['veuxmerenseigner', 'veux me renseigner'],
+  ['veuxrenseigner', 'veux renseigner'],   ['reinsigner', 'renseigner'], ['reinsign', 'renseigner'],
+  ['destinationsdates', 'destinations dates'], ['destinationsdispo', 'destinations dispo'],
+  ['datesdispo', 'dates dispo'], ['vosdestinations', 'vos destinations'],
+  ['vosdates', 'vos dates'], ['datesdisponibles', 'dates disponibles'],
+  ['quellessontvosdestinations', 'quelles sont vos destinations'],
+  ['quessontvosdestinations', 'que sont vos destinations'],
+  ['destinationsetdates', 'destinations et dates'], ['datesetdestinations', 'dates et destinations'],
+  ['ccmb', 'c cmb'], ['ccombien', 'c combien'], ['cestcombien', 'c est combien'],
+  ['datearr', 'date arr'], ['datedep', 'date dep'], ['datearrivee', 'date arrivee'],
+  ['datedepart', 'date depart'], ['perss', 'pers'],
+  ['pr2pers', 'pr 2 pers'], ['pr3pers', 'pr 3 pers'], ['pr4pers', 'pr 4 pers'],
+  ['cmbtaghit', 'cmb taghit'], ['cmbttc', 'cmb ttc'], ['ch7alttc', 'ch7al ttc'],
+  ['resataghit', 'resa taghit'], ['dispotaghit', 'dispo taghit'],
+  ['bjrcmb', 'bjr cmb'], ['sltcmb', 'slt cmb'], ['bjrresa', 'bjr resa'],
+  ['hotelttc', 'hotel ttc'], ['tarifttc', 'tarif ttc'],
 ];
 
 const GREETING_ONLY_TOKENS = new Set([
-  'bj', 'bjr', 'slt', 'slm', 'salam', 'bsr', 'cc', 'coucou', 'yo', 'hello', 'hi',
-  'bonjour', 'salut', 'bonsoir', 'marhaba', 'ahlan',
+  'bj', 'bjr', 'slt', 'slm', 'salam', 'saha', 'bsr', 'bs', 'cc', 'coucou', 'yo', 'hello', 'hi', 'hey',
+  'bonjour', 'salut', 'bonsoir', 'marhaba', 'ahlan', 'hii', 'hlo',
 ]);
+
+const GREETING_PREFIX_RE = /^(bjr|bj|bsr|bs|slt|salut|cc|coucou|bonjour|bonsoir|slm|salam|saha|marhaba|ahlan|hello|hi|hey|labas|labes|bonne soiree|good morning|good evening|salam alkom|salam alikom)\b/;
+
+const GREETING_ONLY_RE = /^(bjr|bj|bsr|bs|slt|salut|cc|coucou|bonjour|bonsoir|slm|salam|saha|marhaba|ahlan|hello|hi|hey|labas|labes|bonne soiree|good morning|good evening|salam alkom|salam alikom|hii|hlo)(\s*[!?.…]*)$/;
+
+const INFO_REQUEST_RE = /(?:renseign|reinsign|info|infos|informations|documentation|question|questions|besoin|savoir plus|plus d info|plus d infos|demande|offres|propositions|catalogue|comment ca marche|what do you offer|tell me about|learn more|je veux savoir|jv savoir|jveux savoir|besoin d|j ai besoin|jaibesoin|pouvez vous|pourriez vous|aide moi|aidez moi|guide moi|orienter|orientation|conseil|conseils|renseignement|renseignements)/;
+
+const DEST_AVAIL_RE = /(?:destinations?.*(?:dates?|dispo|disponib|creneaux?|periodes?)|(?:dates?|dispo|disponib|creneaux?|periodes?).*destinations?|destinations? et (?:vos )?dates|dates et destinations|destinations disponibles|dates disponibles|quelles sont vos|quels sont vos|que sont vos|vos destinations|nos destinations|liste destinations|catalogue destinations|where do you travel|available dates|dates available)/;
 
 const SPLIT_ABBREVS = [
   'ch7al', 'chhal', 'n7eb', 'nheb', 'n7ab', 'bghit', 'win', 'wach', 'wesh', 'kayn', 'makanch',
@@ -183,6 +256,12 @@ const SPLIT_ABBREVS = [
   'pascher', 'pas cher', 'm3a', 'pour', 'lyali', 'ghodwa', 'lyoum', 'lyom',
   'prog', 'itin', 'org', 'aller', 'retour', 'dep', 'oct', 'nov', 'dec',
   'jveux', 'jv', 'wpp', 'wa', 'svp', 'stp', 'merci', 'mrc', 'thx',
+  'renseign', 'reinsign', 'renseignement', 'renseignements', 'infos', 'info', 'besoin',
+  'bonjour', 'bonsoir', 'salut', 'coucou', 'hey', 'bonne', 'soiree', 'saha',
+  'pers', 'perss', 'nb', 'nbr', 'incl', 'ttc', 'transf', 'transp', 'aer', 'chb',
+  'cmt', 'qd', 'arr', 'dep', 'ccmb', 'cestcombien', 'ccombien', 'datearr', 'datedep',
+  'inclus', 'compris', 'incl', 'ttc', 'transf', 'transp', 'reserver', 'réserver',
+  'nuitees', 'nuitee', 'activites', 'nom', 'prenom', 'quoi', 'koi',
 ].sort((a, b) => b.length - a.length);
 
 const EMOJI_HINTS = {
@@ -203,11 +282,65 @@ function normalizeQuery(value = '') {
     .trim();
 }
 
+function hasWholeToken(text, token) {
+  if (!token) return false;
+  if (text === token) return true;
+  const re = new RegExp(`(^|\\s)${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|\\s)`);
+  return re.test(text);
+}
+
+function stripGreetingPrefix(text) {
+  return normalizeQuery(text).replace(GREETING_PREFIX_RE, '').trim();
+}
+
+function isGreetingOnly(text) {
+  return GREETING_ONLY_RE.test(normalizeQuery(text).trim());
+}
+
+function isEveningGreeting(text) {
+  return /^(bonsoir|bsr|bs|bonne soiree|good evening)\b/.test(normalizeQuery(text));
+}
+
+function isInfoRequest(text) {
+  const n = normalizeQuery(text);
+  const core = stripGreetingPrefix(n) || n;
+  if (isDestinationsAvailabilityQuery(n)) return false;
+  if (INFO_REQUEST_RE.test(core)) return true;
+  if (/^(jv|jveux|je veux)\s+(des\s+)?(infos?|renseign)/.test(core)) return true;
+  if (/^(jv|jveux|je veux)\s+me\s+renseign/.test(core)) return true;
+  return false;
+}
+
+function isDestinationsAvailabilityQuery(text) {
+  const n = normalizeQuery(text);
+  const core = stripGreetingPrefix(n) || n;
+  if (DEST_AVAIL_RE.test(core)) return true;
+  const asksDest = /(?:quelles?|quels?|que|vos|nos|liste|catalogue|proposez|offrez|destinations?|desti|ou partez|ou allez)/.test(core);
+  const asksDates = /(?:dates?|dispo|disponib|creneaux?|periodes?|quand partez|semaines?|octobre|oct|23|28)/.test(core);
+  if (asksDest && asksDates) return true;
+  if (/^(dates? dispo|dates? disp(?:\s+o)?|dispo dates?|dates disponibles|creneaux disponibles)(\s*[!?.…]*)$/.test(core)) return true;
+  if (/^(vos|quelles?|quels?|que|nos)\s+destinations?(\s*[!?.…]*)$/.test(core)) return true;
+  return false;
+}
+
 function preprocessMessage(raw) {
   let text = splitCompactMessage(String(raw || '').trim());
+  // Fautes fréquentes & variantes « renseigner »
+  text = text
+    .replace(/\breinsign(er|e|ement|ements|e|es)?\b/gi, 'renseign$1')
+    .replace(/\b(je\s+veux|jveux|jv)\s+me\s+reinsign(er)?\b/gi, 'je veux me renseigner')
+    .replace(/\b(je\s+veux|jveux|jv)\s+me\s+renseign(er|e|es)?\b/gi, 'je veux me renseigner')
+    .replace(/\b(je\s+veux|jveux|jv)\s+renseign(er|e|es|ement|ements)?\b/gi, 'je veux renseigner')
+    .replace(/\b(je\s+veux|jveux|jv)\s+(des\s+)?infos?\b/gi, 'je veux des infos')
+    .replace(/\b(je\s+veux|jveux|jv)\s+savoir\b/gi, 'je veux savoir')
+    .replace(/\bbonjour\s+bonsoir\b/gi, 'bonsoir')
+    .replace(/\bbonsoir\s+bonjour\b/gi, 'bonsoir')
+    .replace(/\bc\s+cmb\b/gi, 'c est combien')
+    .replace(/\bc\s+combien\b/gi, 'c est combien')
+    .replace(/\bquel est le prix\b/gi, 'combien prix');
   // Normalisation langage naturel parlé
   text = text
-    .replace(/\b(je\s+voudrais|j'aimerais|j aimerais|je\s+souhaite|je\s+cherche|est ce que|est-ce que|svp|s'il vous plait|sil vous plait)\b/gi, ' ')
+    .replace(/\b(je\s+voudrais|j'aimerais|j aimerais|je\s+souhaite|est ce que|est-ce que|svp|s'il vous plait|sil vous plait)\b/gi, ' ')
     .replace(/\b(on\s+est|nous\s+sommes|nous\s+serons)\b/gi, ' ')
     .replace(/\b(ou\s+dormir|where\s+to\s+stay|comment\s+faire)\b/gi, ' hebergement ')
     .replace(/\b(propose\s+moi|aide\s+moi|organise\s+moi|planifie\s+moi)\b/gi, ' organiser ')
@@ -231,7 +364,7 @@ function splitCompactMessage(text) {
     s = s.replace(new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), to);
   }
 
-  const PROTECTED = ['n7eb', 'nheb', 'n7ab', 'ch7al', 'chhal', 'bghit', 'm3a', '3and', '3andi', '3andna', '3lyali', 'combien', 'ghodwa'];
+  const PROTECTED = ['n7eb', 'nheb', 'n7ab', 'ch7al', 'chhal', 'bghit', 'm3a', '3and', '3andi', '3andna', '3lyali', 'combien', 'ghodwa', 'dispo', 'disponible', 'disponibilite', 'saha'];
   const placeholders = {};
   PROTECTED.forEach((tok, i) => {
     const ph = `__p${i}__`;
@@ -268,6 +401,44 @@ function splitCompactMessage(text) {
   return s;
 }
 
+function resolveContextualTokens(text, tokens) {
+  const n = normalizeQuery(text);
+  const resolved = [...tokens];
+
+  if (resolved.includes('av')) {
+    const flightCtx = /vol|avion|aer|aero|transp|flight|aller retour|aerien/.test(n);
+    resolved.push(flightCtx ? 'avion' : 'avant');
+  }
+  if (resolved.includes('aer')) {
+    resolved.push('avion', 'aerien');
+  }
+  if (resolved.includes('pm')) {
+    const eveningCtx = /soir|18h|19h|20h|21h|22h|ce soir|demain soir/.test(n);
+    const morningCtx = /matin|mat\b|8h|9h|10h/.test(n);
+    if (eveningCtx && !morningCtx) resolved.push('soir');
+    else if (morningCtx) resolved.push('matin');
+    else resolved.push('apres midi');
+  }
+
+  for (let i = 0; i < resolved.length; i += 1) {
+    if (resolved[i] === 'p' && resolved[i + 1] && /^\d+$/.test(resolved[i + 1])) {
+      resolved[i] = 'pour';
+    }
+    if (resolved[i] === 'p' && resolved[i - 1] && /^\d+$/.test(resolved[i - 1])) {
+      resolved.push('personnes');
+    }
+  }
+
+  if (/c est combien|cest combien|c combien/.test(n)) {
+    resolved.push('combien', 'prix');
+  }
+  if (/quel est le prix/.test(n)) {
+    resolved.push('combien', 'prix', 'tarif');
+  }
+
+  return [...new Set(resolved)];
+}
+
 function expandTokens(tokens) {
   const expanded = new Set(tokens);
   let changed = true;
@@ -298,12 +469,18 @@ function expandTokens(tokens) {
 function expandQuery(raw) {
   const preprocessed = preprocessMessage(raw);
   const original = normalizeQuery(preprocessed);
-  const tokens = original.split(' ').filter(Boolean);
+  const tokens = resolveContextualTokens(original, original.split(' ').filter(Boolean));
   const expanded = expandTokens(tokens);
 
   for (const [cityId, aliases] of Object.entries(CITY_ALIASES)) {
     const all = [cityId, ...aliases].map(normalizeQuery);
-    if (all.some((a) => tokens.includes(a) || original.includes(a))) {
+    const matched = all.some((a) => {
+      if (!a) return false;
+      if (tokens.includes(a)) return true;
+      if (a.length <= 3) return hasWholeToken(original, a);
+      return original.includes(a);
+    });
+    if (matched) {
       all.forEach((a) => expanded.push(a));
       expanded.push(cityId);
     }
@@ -358,7 +535,8 @@ function parsePersons(text) {
     six: 6, sept: 7, huit: 8, neuf: 9, dix: 10,
   };
   const patterns = [
-    /(\d+)\s*(?:pers(?:onnes?)?|p(?:ers)?|personnes?|persons?|people|pax|ashkhas|adultes?|voyageurs?)/i,
+    /(\d+)\s*(?:pers(?:onnes?)?|perss|p(?:ers)?|personnes?|persons?|people|pax|ashkhas|adultes?|voyageurs?)/i,
+    /(?:nb|nbr)\s*(\d+)\s*(?:pers(?:onnes?)?|perss|p(?:ers)?|personnes?)/i,
     /(?:pr|pour)\s*(\d+)/i,
     /(\d+)p(?=\s|$|[^a-z0-9])/i,
     /(\d+)pers\b/i,
@@ -418,8 +596,14 @@ function parseDuration(text) {
   const shortNightMatch = n.match(/(\d+)n\b/);
   if (shortNightMatch) nights = parseInt(shortNightMatch[1], 10);
 
+  const spacedNightMatch = n.match(/(\d+)\s+n\b/);
+  if (spacedNightMatch) nights = parseInt(spacedNightMatch[1], 10);
+
   const shortDayMatch = n.match(/(\d+)j\b/);
   if (shortDayMatch) days = parseInt(shortDayMatch[1], 10);
+
+  const spacedDayMatch = n.match(/(\d+)\s+j\b/);
+  if (spacedDayMatch) days = parseInt(spacedDayMatch[1], 10);
 
   const lyaliMatch = n.match(/(\d+)lyali/);
   if (lyaliMatch) nights = parseInt(lyaliMatch[1], 10);
@@ -466,16 +650,33 @@ function parseBudget(text) {
   return {};
 }
 
-function detectIntent(text, entities) {
+function detectIntent(text, entities, rawText = text) {
   const n = normalizeQuery(text);
   const trimmed = n.trim();
-  const greetingOnly = /^(bjr|bj|slt|salut|cc|coucou|bonjour|bonsoir|slm|salam|marhaba|ahlan|hello|hi|labas|labes|salam\s*alkom)(\s*[!?.…]*)$/;
-  if (greetingOnly.test(trimmed)) return 'GREETING';
+  const rawNorm = normalizeQuery(rawText).trim();
+  if (isGreetingOnly(trimmed) || isGreetingOnly(rawNorm)) return 'GREETING';
+  const greetingParts = trimmed.split(/\s+/).filter(Boolean);
+  if (greetingParts.length > 1 && greetingParts.every((t) => GREETING_ONLY_TOKENS.has(t))) return 'GREETING';
+  if (isDestinationsAvailabilityQuery(rawNorm) || isDestinationsAvailabilityQuery(n)) return 'DESTINATIONS_AVAILABILITY';
+  if (isInfoRequest(n)) return 'INFO_REQUEST';
   if (/humain|agent|conseiller|appelez|appeler|parler a quelqu/.test(n)) return 'CONTACT';
-  const ackOnly = /^(merci|thx|mrc|ok|okk|oki|dac|dacc|parfait|c bon|c est bon)(\s*[!?.…]*)$/;
+  if (/reflech|reflechi|voir avec|famille d abord|je vais voir/.test(n)) return 'THINKING';
+  if (/devis|quote\b/.test(n)) return 'DEVIS';
+  if (/acompte/.test(n)) return 'DEPOSIT';
+  if (/modif|changer.*date|change.*date|changer la date/.test(n)) return 'MODIFICATION';
+  if (/remise|reduction|promo|rabais|prix special|vous faites un prix/.test(n)) return 'DISCOUNT';
+  if (/circuit complet/.test(n)) return 'CIRCUIT_COMPLETE';
+  if (/^(detail|details|donne details|plus d infos|explique|inclus quoi)\??$/.test(trimmed) || /inclus quoi|cnclu/.test(n)) return 'DETAIL_REQUEST';
+  if (/prix par personne|tarif par personne|par pers\b/.test(n) && /prix|tarif|cmb|combien|ch7al/.test(n)) return 'PRICE_PER_PERSON';
+  if (/voyage famille|avec les enfants|on vient avec les enfants/.test(n)) return 'FAMILY_TRIP';
+  if (/voyage en couple|en couple/.test(n) && !/lune de miel/.test(n)) return 'COUPLE_TRIP';
+  if (/transfert aeroport|transfert aero|transfer airport/.test(n)) return 'AIRPORT_TRANSFER';
+  if (/^(quad|bateau|boat|kayak|dromadaire|drom|chameau|camel|cheval|equitation)\??$/.test(trimmed)) return 'ACTIVITY_INQUIRY';
+  const ackOnly = /^(merci|thx|mrc|ok|okk|oki|dac|dacc|daccord|parfait|c bon|c est bon|oui)(\s*[!?.…]*)$/;
   if (ackOnly.test(trimmed)) return 'ACK';
-  if (/^(prix|tarif|cmb|ch7al|combien|px|budget|coute|coûte)\??$/.test(n)) return 'FOLLOWUP_PRICE';
-  if (/^(dispo|disp|disponible)\??$/.test(n)) return 'FOLLOWUP_AVAILABILITY';
+  if (/^(prix|tarif|cmb|ch7al|combien|px|budget|coute|coûte|c est combien|quel est le prix)\??$/.test(n)) return 'FOLLOWUP_PRICE';
+  if (/c est combien|quel est le prix/.test(n) && entities.destination) return 'FOLLOWUP_PRICE';
+  if (/^(dispo|disp|disponible)\??$/.test(n) || /^(dispo|disp|disponible)\??$/.test(rawNorm)) return 'FOLLOWUP_AVAILABILITY';
   if (entities.wantsPrice && entities.destination) return 'FOLLOWUP_PRICE';
 
   // Langage naturel — voyage / projet (incl. abréviations)
@@ -503,7 +704,8 @@ function detectIntent(text, entities) {
 }
 
 function extractEntities(raw) {
-  const text = preprocessMessage(raw);
+  const rawText = String(raw || '').trim();
+  const text = preprocessMessage(rawText);
   const queryExp = expandQuery(text);
   const { tokens } = queryExp;
 
@@ -515,12 +717,12 @@ function extractEntities(raw) {
 
   let accommodation = null;
   const n = normalizeQuery(text);
-  if (/hotel|htl|ht|hot\b|mh\b/.test(n)) accommodation = 'hotel';
-  else if (/apt|appart|appt|app\b/.test(n)) accommodation = 'appartement';
-  else if (/maison|guesthouse|hote|heberg|logement|log\b|dormir/.test(n)) accommodation = 'guesthouse';
-  else if (/maison|mh|guesthouse|hote|hôte/.test(n)) accommodation = 'guesthouse';
-  else if (/villa/.test(n)) accommodation = 'villa';
-  else if (/camping|camp/.test(n)) accommodation = 'camping';
+  if (/\bmaison\s*d['']?\s*hote\b|\bguesthouse\b|\bmh\b/.test(n)) accommodation = 'guesthouse';
+  else if (/\bhotel\b|\bhtl\b|\bht\b|\bhot\b|\bhote\b/.test(n)) accommodation = 'hotel';
+  else if (/\bapt\b|\bappart\b|\bappt\b|\bapp\b/.test(n)) accommodation = 'appartement';
+  else if (/\bheberg\b|\blogement\b|\blog\b|\bdormir\b/.test(n)) accommodation = 'guesthouse';
+  else if (/\bvilla\b/.test(n)) accommodation = 'villa';
+  else if (/\bcamping\b|\bcamp\b/.test(n)) accommodation = 'camping';
 
   let activity = null;
   if (/quad/.test(n)) activity = 'quad';
@@ -551,15 +753,15 @@ function extractEntities(raw) {
     departureDay: dates.departureDay,
     budgetLevel: budget.budgetLevel,
     budgetAmount: budget.budgetAmount,
-    wantsPrice: /ch7al|chhal|cmb|combien|prix|tarif|px|budget|price|how much|كم|comb\b/.test(n),
-    wantsAvailability: /dispo|disp|disponib|available|kayn|makanch/.test(n),
+    wantsPrice: /ch7al|chhal|cmb|combien|prix|tarif|px|budget|price|how much|كم|comb\b|c est combien|quel est le prix|ttc\b/.test(n),
+    wantsAvailability: /dispo|disp|disponib|disponible|available|kayn|makanch/.test(n),
   };
 
   if (entities.arrivalDay && entities.departureDay) {
     entities.nights = Math.max(0, entities.departureDay - entities.arrivalDay);
   }
 
-  return { entities, queryExp, intent: detectIntent(text, entities) };
+  return { entities, queryExp, intent: detectIntent(text, entities, rawText) };
 }
 
 module.exports = {
@@ -571,6 +773,11 @@ module.exports = {
   extractEntities,
   detectIntent,
   findDestination,
+  isGreetingOnly,
+  isEveningGreeting,
+  isInfoRequest,
+  isDestinationsAvailabilityQuery,
+  stripGreetingPrefix,
   CITY_ALIASES,
   TOKEN_EXPANSIONS,
 };

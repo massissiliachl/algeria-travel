@@ -518,7 +518,7 @@ exports.FEATURED_TOURS = [
     "subtitle_en": "Must-do escape · flight included",
     "subtitle_ar": "رحلة مفضلة · رحلة مشمولة",
     "description": "Pension complète, Activités : 4×4, ski sur sable, dromadaire, visite des ksars incluse, Transport navette aéroport, ✈️ Vol aller-retour : Alger ➤ Béchar · ✈️ Béchar ➤ Alger, du 23 au 28 octobre. Extras : buggy et quad. 75 000 DA / personne.",
-    "description_en": "Full board, Activities: 4×4, sand skiing, camel, ksar visits included, Airport shuttle transfer, ✈️ Round-trip: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers, Oct 23–28. Extras: buggy and quad. 75 000 DZD / person.",
+    "description_en": "Full board, Activities: 4×4, sand skiing, camel, ksar visits included, Airport shuttle transfer, ✈️ Round-trip flight: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers, Oct 23–28. Extras: buggy and quad. 75 000 DZD / person.",
     "fullDescription": "Formule Hôtel 4 étoiles Taghit — Voyage coup de cœur.\n• Pension complète\n• Activités : 4×4, ski sur sable, dromadaire, visite des ksars incluse\n• Transport navette aéroport\n• ✈️ Vol aller-retour : Alger ➤ Béchar · ✈️ Béchar ➤ Alger, du 23 au 28 octobre\n• Extras : buggy et quad\n75 000 DA par personne",
     "fullDescription_en": "Taghit 4-star hotel package — must-do escape.\n• Full board\n• Activities: 4×4, sand skiing, camel, ksar visits included\n• Airport shuttle transfer\n• ✈️ Round-trip flight: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers, Oct 23–28\n• Extras: buggy and quad\n75 000 DZD per person",
     "location": "Taghit, Béchar",

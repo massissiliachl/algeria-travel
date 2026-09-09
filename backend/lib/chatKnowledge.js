@@ -19,6 +19,11 @@ const ABBREVIATIONS = {
   res: ['reservation', 'reserver', 'réserver'],
   resa: ['reservation', 'réserver', 'reserver'],
   résa: ['reservation', 'réserver'],
+  cmb: ['combien'], disp: ['disponible', 'disponibilite'], dispo: ['disponibilite'],
+  pers: ['personnes'], perss: ['personnes'], pr: ['pour'],
+  ttc: ['toutes taxes comprises'], incl: ['inclus'], inclus: ['compris'],
+  arr: ['arrivee'], dep: ['depart'], transp: ['transport'], transf: ['transfert'],
+  bjr: ['bonjour'], slt: ['salut'], slm: ['salam'], saha: ['salut'], cc: ['coucou'],
   sah: ['sahara', 'desert'],
   des: ['desert', 'désert', 'destination'],
   dz: ['algerie', 'algérie', 'algeria'],
@@ -248,15 +253,24 @@ function expandQuery(raw) {
 
   for (const aliases of Object.values(THEME_SYNONYMS)) {
     const normalizedAliases = aliases.map(normalizeQuery);
-    const hit = normalizedAliases.some(
-      (a) => tokens.includes(a) || original === a
-    );
+    const hit = normalizedAliases.some((a) => {
+      if (!a) return false;
+      if (tokens.includes(a) || original === a) return true;
+      if (a.length <= 3) return hasWholeToken(original, a);
+      return false;
+    });
     if (hit) normalizedAliases.forEach((a) => expanded.add(a));
   }
 
   for (const [placeId, aliases] of Object.entries(PLACE_ALIASES)) {
     const all = [placeId, ...aliases].map(normalizeQuery);
-    if (all.some((a) => original.includes(a) || tokens.includes(a))) {
+    const matched = all.some((a) => {
+      if (!a) return false;
+      if (tokens.includes(a)) return true;
+      if (a.length <= 3) return hasWholeToken(original, a);
+      return original.includes(a);
+    });
+    if (matched) {
       all.forEach((a) => expanded.add(a));
       expanded.add(placeId);
     }
@@ -270,18 +284,32 @@ function expandQuery(raw) {
   };
 }
 
+function hasWholeToken(text, token) {
+  if (!token) return false;
+  if (text === token) return true;
+  const re = new RegExp(`(^|\\s)${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|\\s)`);
+  return re.test(text);
+}
+
 function scoreText(haystack, needle) {
   if (!needle) return 0;
   const h = normalizeQuery(haystack);
   const n = normalizeQuery(needle);
   if (!h || !n) return 0;
   if (h === n) return 100;
-  if (h.startsWith(n)) return 85;
-  if (n.startsWith(h) && h.length >= 3) return 75;
-  if (h.includes(n)) return 65;
-  if (n.includes(h) && h.length >= 4) return 55;
+  if (h.startsWith(`${n} `) || h === n) return 85;
+  if (n.startsWith(`${h} `) && h.length >= 3) return 75;
+  if (n.length <= 3) {
+    if (hasWholeToken(h, n)) return 65;
+    return 0;
+  }
+  if (hasWholeToken(h, n)) return 65;
+  if (n.includes(h) && h.length >= 4 && hasWholeToken(n, h)) return 55;
   const parts = n.split(' ').filter(Boolean);
-  const hit = parts.filter((p) => p.length >= 2 && h.includes(p)).length;
+  const hit = parts.filter((p) => {
+    if (p.length <= 3) return hasWholeToken(h, p);
+    return h.includes(p);
+  }).length;
   if (hit === 0) return 0;
   return Math.round((hit / parts.length) * 50);
 }
@@ -527,6 +555,74 @@ function buildCatalogOverview(lang, session = {}) {
   };
 }
 
+function buildDestinationsAvailabilityReply(lang = 'fr', session = {}, options = {}) {
+  const ui = pickLang(lang, UI);
+  const hotel = TAGHIT_PACKAGES.hotel;
+  const nameKey = lang === 'en' ? 'name_en' : lang === 'ar' ? 'name_ar' : 'name';
+  const transport = lang === 'en' ? hotel.transport_en : lang === 'ar' ? hotel.transport_ar : hotel.transport;
+  const includes = hotel.includes.map((i) => i[lang] || i.fr).slice(0, 3).join('\n• ');
+
+  const destList = PLACES
+    .filter((p) => p.id !== 'taghit')
+    .slice(0, 9)
+    .map((p) => p[nameKey] || p.name)
+    .join(', ');
+
+  const taghitBlock = lang === 'en'
+    ? [
+      '★ Confirmed dates — Taghit offer',
+      '📅 October 23–28',
+      transport,
+      `💰 ${formatPrice(hotel.price, lang)} — 4★ hotel, full board`,
+      `• ${includes}`,
+    ]
+    : lang === 'ar'
+      ? [
+        '★ تواريخ مؤكدة — عرض تاغيت',
+        '📅 من 23 إلى 28 أكتوبر',
+        transport,
+        `💰 ${formatPrice(hotel.price, lang)} — فندق 4★، إقامة كاملة`,
+        `• ${includes}`,
+      ]
+      : [
+        '★ Offre datée confirmée — Taghit',
+        '📅 Du 23 au 28 octobre',
+        transport,
+        `💰 ${formatPrice(hotel.price, lang)} — Hôtel 4★, pension complète`,
+        `• ${includes}`,
+      ];
+
+  if (options.datesOnly) {
+    return {
+      reply: taghitBlock.join('\n'),
+      links: [{ label: ui.seeTaghit, url: '/place/taghit?pkg=hotel' }],
+      suggestions: getSuggestions(lang, session, 'DESTINATIONS_AVAILABILITY'),
+    };
+  }
+
+  const intro = lang === 'en'
+    ? '🗺️ Our destinations:'
+    : lang === 'ar'
+      ? '🗺️ وجهاتنا:'
+      : '🗺️ Nos destinations :';
+
+  const footer = lang === 'en'
+    ? 'Taghit Oct 23–28 is our package with confirmed dates. For other destinations, contact us to check availability 😊'
+    : lang === 'ar'
+      ? 'تاغيت 23–28 أكتوبر هو عرضنا بتواريخ مؤكدة. للوجهات الأخرى، تواصل معنا للتحقق من التوفر 😊'
+      : 'Taghit du 23 au 28 octobre est notre formule avec dates confirmées. Pour les autres destinations, contactez-nous pour vérifier les créneaux 😊';
+
+  return {
+    reply: [intro, destList, 'Taghit', '', ...taghitBlock, '', footer].join('\n'),
+    links: [
+      { label: ui.seeTaghit, url: '/place/taghit?pkg=hotel' },
+      { label: ui.seeDestinations, url: '/destinations' },
+      { label: ui.seeTours, url: '/tours' },
+    ],
+    suggestions: getSuggestions(lang, session, 'DESTINATIONS_AVAILABILITY'),
+  };
+}
+
 function buildSaharaOverview(lang, session = {}) {
   const ui = pickLang(lang, UI);
   const nameKey = lang === 'en' ? 'name_en' : lang === 'ar' ? 'name_ar' : 'name';
@@ -576,7 +672,8 @@ function getAllChunks(lang) {
   return cachedChunks[lang];
 }
 
-function scoreChunk(queryExp, chunk) {
+function scoreChunk(queryExp, chunk, options = {}) {
+  const destination = options.destination || null;
   const isBroadChunk = chunk.id === 'sahara-theme' || chunk.id === 'catalog-voyage';
   const probes = isBroadChunk
     ? [queryExp.original, ...userTokens(queryExp)]
@@ -596,20 +693,39 @@ function scoreChunk(queryExp, chunk) {
     if (chunk.id === `place-${token}`) best += 35;
     if (chunk.id === `tour-${token}`) best += 30;
     for (const kw of chunk.keywords) {
-      if (normalizeQuery(kw) === token || normalizeQuery(kw).startsWith(token)) {
+      const nkw = normalizeQuery(kw);
+      if (nkw === token || (token.length >= 4 && nkw.startsWith(token))) {
         best = Math.max(best, 70);
       }
     }
   }
 
+  if (destination) {
+    if (chunk.id === `place-${destination}`) best += 55;
+    if (chunk.id.startsWith('taghit') && destination !== 'taghit' && destination !== 'bechar') {
+      best -= 30;
+    }
+    if (chunk.id.startsWith('tour-') || chunk.id.startsWith('activity-')) {
+      const linked = (chunk.keywords || []).some((kw) => normalizeQuery(String(kw)) === destination);
+      if (linked) best += 20;
+    }
+  }
+
+  const taghitTokens = new Set(['taghit', 'th', 'tag', 'tgh', 'bechar', 'bechar', '75000', '75', 'oct', '23', '28']);
+  const asksTaghit = queryExp.tokens.some((t) => taghitTokens.has(t));
+  if (chunk.id.startsWith('taghit') && !asksTaghit && !destination) {
+    const genericHotel = queryExp.tokens.length <= 2 && queryExp.tokens.some((t) => ['hotel', 'htl', 'ht', 'hot'].includes(t));
+    if (genericHotel) best -= 25;
+  }
+
   return best + (chunk.scoreBoost || 0);
 }
 
-function searchKnowledge(query, lang = 'fr') {
+function searchKnowledge(query, lang = 'fr', options = {}) {
   const queryExp = expandQuery(query);
   const chunks = getAllChunks(lang);
   const scored = chunks
-    .map((chunk) => ({ ...chunk, score: scoreChunk(queryExp, chunk) }))
+    .map((chunk) => ({ ...chunk, score: scoreChunk(queryExp, chunk, options) }))
     .filter((c) => c.score > 0)
     .sort((a, b) => b.score - a.score);
 
@@ -764,13 +880,9 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
     return { reply: ui.greeting, suggestions: getSuggestions(lang, mergedSession), links: [{ label: ui.seeTours, url: '/tours' }], session: mergedSession };
   }
 
-  if (matchesAny(q, ['merci', 'thanks', 'thank you', 'thx', 'mrc', 'ok', 'okk', 'oki', 'dac', 'dacc', 'daccord', 'شكر'])) {
-    const thanks = {
-      fr: 'Avec plaisir ! Demandez « voyage », « Taghit », « réserver » ou une destination pour en savoir plus.',
-      en: 'You\'re welcome! Try « trip », « Taghit », « book » or any destination for more info.',
-      ar: 'على الرحب والسعة! جرّب « رحلة »، « تاغيت »، « حجز » أو أي وجهة.',
-    };
-    return { reply: thanks[lang] || thanks.fr, suggestions: getSuggestions(lang, mergedSession), links: [], session: mergedSession };
+  if (matchesAny(q, ['merci', 'thanks', 'thank you', 'thx', 'mrc', 'شكر'])) {
+    const { buildThanksReply } = require('./chatScenarios');
+    return { reply: buildThanksReply(lang), suggestions: getSuggestions(lang, mergedSession), links: [], session: mergedSession };
   }
 
   if (isBroadCatalogQuery(queryExp)) {
@@ -783,7 +895,9 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
     return { ...sah, session: mergedSession };
   }
 
-  const { hits: rawHits } = searchKnowledge(message, lang);
+  const { hits: rawHits } = searchKnowledge(message, lang, {
+    destination: entities.destination || mergedSession.destination,
+  });
   let hits = rawHits;
 
   const user = userTokens(queryExp);
@@ -843,8 +957,9 @@ function generateLocalReply(message, lang = 'fr', session = {}) {
     };
   }
 
+  const { buildDefaultMenu } = require('./chatScenarios');
   return {
-    reply: ui.fallback,
+    reply: buildDefaultMenu(lang),
     suggestions: getSuggestions(lang, mergedSession),
     links: [
       { label: ui.whatsapp, url: `https://wa.me/${WHATSAPP}` },
@@ -865,5 +980,6 @@ module.exports = {
   generateLocalReply,
   buildCatalogOverview,
   buildSaharaOverview,
+  buildDestinationsAvailabilityReply,
   WHATSAPP,
 };

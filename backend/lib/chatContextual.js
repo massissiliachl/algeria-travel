@@ -1,4 +1,6 @@
-const { extractEntities, detectLanguage, normalizeQuery } = require('./chatNlp');
+const {
+  extractEntities, detectLanguage, normalizeQuery, isEveningGreeting, isInfoRequest,
+} = require('./chatNlp');
 const {
   mergeSession,
   formatDestinationLabel,
@@ -9,6 +11,7 @@ const {
 const { getSuggestions, WHATSAPP } = require('./chatUi');
 const { buildItinerary } = require('./chatItinerary');
 const { getTransportInfo, buildTransportReply } = require('./chatTransport');
+const scenarios = require('./chatScenarios');
 
 function suggest(lang, session, intent) {
   return getSuggestions(lang, session, intent);
@@ -36,6 +39,36 @@ function knowledge() {
   return require('./chatKnowledge');
 }
 
+const COASTAL_DESTINATIONS = new Set(['bejaia', 'jijel', 'oran', 'annaba', 'tipaza', 'mostaganem', 'skikda']);
+const SAHARA_DESTINATIONS = new Set(['taghit', 'bechar', 'djanet', 'ghardaia', 'timimoun', 'hoggar', 'tamanrasset', 'adrar', 'touggourt', 'sahara']);
+
+function normalizeDestId(destId) {
+  return destId === 'bechar' ? 'taghit' : destId;
+}
+
+function buildDestinationOptionsPrompt(destId, destLabel, lang, tone = 'excellent') {
+  const id = normalizeDestId(destId);
+  const intro = tone === 'excellent'
+    ? (lang === 'en' ? `Excellent choice 😊 ${destLabel}!` : lang === 'ar' ? `اختيار ممتاز 😊 ${destLabel}!` : `Excellent choix 😊 ${destLabel} !`)
+    : (lang === 'en' ? `Got it 😊 ${destLabel}!` : lang === 'ar' ? `فهمت 😊 ${destLabel}!` : `Compris 😊 ${destLabel} !`);
+
+  if (SAHARA_DESTINATIONS.has(id)) {
+    if (lang === 'en') return `${intro} 🏨 Stay, 🏜️ dunes & Sahara, 🎯 activities (4×4, camel…) or 🗺️ full program?`;
+    if (lang === 'ar') return `${intro} 🏨 إقامة، 🏜️ كثبان وصحراء، 🎯 أنشطة (دفع رباعي، جمل…) أو 🗺️ برنامج كامل؟`;
+    return `${intro} 🏨 Hébergement, 🏜️ dunes & Sahara, 🎯 activités (4×4, dromadaire…) ou 🗺️ programme complet ?`;
+  }
+
+  if (COASTAL_DESTINATIONS.has(id)) {
+    if (lang === 'en') return `${intro} 🏨 Stay, 🏖️ beaches, 🎯 activities or 🗺️ full program?`;
+    if (lang === 'ar') return `${intro} 🏨 إقامة، 🏖️ شواطئ، 🎯 أنشطة أو 🗺️ برنامج كامل؟`;
+    return `${intro} 🏨 Hébergement, 🏖️ plages, 🎯 activités ou 🗺️ programme complet ?`;
+  }
+
+  if (lang === 'en') return `${intro} 🏨 Stay, 🏛️ heritage, 🎯 activities or 🗺️ full program?`;
+  if (lang === 'ar') return `${intro} 🏨 إقامة، 🏛️ تراث، 🎯 أنشطة أو 🗺️ برنامج كامل؟`;
+  return `${intro} 🏨 Hébergement, 🏛️ patrimoine, 🎯 activités ou 🗺️ programme complet ?`;
+}
+
 function linksFor(session, lang) {
   const links = [];
   if (session.destination && PLACE_PATHS[session.destination]) {
@@ -51,7 +84,7 @@ function linksFor(session, lang) {
 
 function tryContextualReply(message, lang, session) {
   const { entities, intent } = extractEntities(message);
-  const merged = mergeSession(session, entities);
+  const merged = mergeSession(session, { ...entities, lastIntent: intent });
   if (intent === 'TRANSPORT' && session.destination) {
     merged.destination = session.destination;
   }
@@ -73,10 +106,17 @@ function tryContextualReply(message, lang, session) {
   }
 
   if (intent === 'GREETING') {
+    const evening = isEveningGreeting(message);
     const greetings = {
-      fr: 'Bonjour 😊 Comment puis-je vous aider pour votre voyage en Algérie ? Destinations, hôtels, activités, circuits, Taghit…',
-      en: 'Hello 😊 How can I help with your trip to Algeria? Destinations, hotels, activities, tours, Taghit…',
-      ar: 'مرحباً 😊 كيف يمكنني مساعدتك في رحلتك إلى الجزائر؟',
+      fr: evening
+        ? 'Bonsoir 😊 Comment puis-je vous aider pour votre voyage en Algérie ? Destinations, hôtels, activités, circuits, Taghit…'
+        : 'Bonjour 😊 Comment puis-je vous aider pour votre voyage en Algérie ? Destinations, hôtels, activités, circuits, Taghit…',
+      en: evening
+        ? 'Good evening 😊 How can I help with your trip to Algeria? Destinations, hotels, activities, tours, Taghit…'
+        : 'Hello 😊 How can I help with your trip to Algeria? Destinations, hotels, activities, tours, Taghit…',
+      ar: evening
+        ? 'مساء الخير 😊 كيف يمكنني مساعدتك في رحلتك إلى الجزائر؟'
+        : 'مرحباً 😊 كيف يمكنني مساعدتك في رحلتك إلى الجزائر؟',
     };
     return {
       reply: greetings[replyLang] || greetings.fr,
@@ -86,7 +126,73 @@ function tryContextualReply(message, lang, session) {
     };
   }
 
+  if (intent === 'INFO_REQUEST') {
+    const evening = isEveningGreeting(message);
+    const hasGreeting = isInfoRequest(message) && /^(bjr|bj|bsr|bs|slt|salut|cc|coucou|bonjour|bonsoir|slm|salam|marhaba|ahlan|hello|hi|hey)/.test(normalizeQuery(message));
+    const hello = replyLang === 'en'
+      ? (evening ? 'Good evening' : hasGreeting ? 'Hello' : '')
+      : replyLang === 'ar'
+        ? (evening ? 'مساء الخير' : hasGreeting ? 'مرحباً' : '')
+        : (evening ? 'Bonsoir' : hasGreeting ? 'Bonjour' : '');
+
+    if (merged.destination) {
+      const { hits } = knowledge().searchKnowledge(
+        merged.destination,
+        replyLang,
+        { destination: merged.destination },
+      );
+      const placeHit = hits.find((h) => h.id === `place-${merged.destination}`);
+      if (placeHit) {
+        const dest = formatDestinationLabel(merged.destination, replyLang);
+        const intro = hello
+          ? `${hello} 😊 ${replyLang === 'en' ? 'Here is what I know about' : replyLang === 'ar' ? 'إليك ما أعرفه عن' : 'Voici ce que je peux vous dire sur'} ${dest} :\n\n`
+          : '';
+        return {
+          reply: `${intro}${placeHit.text}`,
+          session: merged,
+          suggestions: suggest(replyLang, merged, intent),
+          links: placeHit.links?.length ? placeHit.links : linksFor(merged, replyLang),
+        };
+      }
+    }
+
+    const menu = replyLang === 'en'
+      ? `${hello ? `${hello} 😊 ` : ''}Happy to help! I can tell you about:\n• 🗺️ Destinations (Bejaia, Taghit, Oran, Sahara…)\n• 🏨 Hotels & stays\n• 🎯 Activities (quad, 4×4, kayak…)\n• ✈️ Tours & offers (Taghit from 75,000 DZD…)\n• 📅 Booking\n\nWhat would you like to explore?`
+      : replyLang === 'ar'
+        ? `${hello ? `${hello} 😊 ` : ''}بكل سرور! يمكنني إطلاعك على:\n• 🗺️ الوجهات (بجاية، تاغيت، وهران، الصحراء…)\n• 🏨 الفنادق والإقامات\n• 🎯 الأنشطة (كواد، دفع رباعي…)\n• ✈️ الجولات والعروض\n• 📅 الحجز\n\nماذا تريد أن تكتشف؟`
+        : `${hello ? `${hello} 😊 ` : ''}Avec plaisir ! Je peux vous renseigner sur :\n• 🗺️ Destinations (Béjaïa, Taghit, Oran, Sahara…)\n• 🏨 Hôtels & séjours\n• 🎯 Activités (quad, 4×4, kayak…)\n• ✈️ Circuits & offres (Taghit 75 000 DA…)\n• 📅 Réservation\n\nQue souhaitez-vous découvrir ?`;
+
+    return {
+      reply: menu,
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [
+        { label: replyLang === 'en' ? 'Destinations' : 'Destinations', url: '/destinations' },
+        { label: 'Taghit', url: '/place/taghit?pkg=hotel' },
+        { label: replyLang === 'en' ? 'Tours' : 'Circuits', url: '/tours' },
+      ],
+    };
+  }
+
   if (intent === 'ACK') {
+    const trimmedAck = normalizeQuery(message).trim();
+    if (/^(merci|thx|mrc|thanks)(\s*[!?.…]*)$/.test(trimmedAck)) {
+      return {
+        reply: scenarios.buildThanksReply(replyLang),
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: linksFor(merged, replyLang),
+      };
+    }
+    const isOkOnly = /^(ok|okk|oki|dac|dacc|daccord|parfait|c bon|c est bon)(\s*[!?.…]*)$/.test(trimmedAck);
+    if (isOkOnly && getMissingForBooking(merged).length === 0) {
+      return {
+        reply: scenarios.buildOkReply(replyLang),
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: linksFor(merged, replyLang),
+      };
+    }
     const missing = getMissingForBooking(merged);
     if (missing.length > 0) {
       const labels = { fr: { destination: 'la destination', travelers: 'le nombre de personnes', dates: 'les dates' }, en: { destination: 'destination', travelers: 'travelers', dates: 'dates' }, ar: { destination: 'الوجهة', travelers: 'عدد الأشخاص', dates: 'التواريخ' } };
@@ -107,13 +213,163 @@ function tryContextualReply(message, lang, session) {
   }
 
   if (intent === 'CONTACT') {
+    const wantsHuman = /humain|agent|conseiller|parler a quelqu|quelqu un/.test(normalizeQuery(message));
     return {
-      reply: replyLang === 'en'
-        ? `Reach us:\n• WhatsApp: +${WHATSAPP}\n• /contact\n• travelalgeriadz@gmail.com`
-        : `Contactez-nous :\n• WhatsApp : +${WHATSAPP}\n• /contact\n• travelalgeriadz@gmail.com`,
+      reply: wantsHuman
+        ? scenarios.buildHumanAgentPrompt(replyLang)
+        : (replyLang === 'en'
+          ? `📞 Reach us:\n• WhatsApp: +${WHATSAPP}\n• /contact\n• travelalgeriadz@gmail.com`
+          : replyLang === 'ar'
+            ? `📞 تواصل:\n• WhatsApp: +${WHATSAPP}\n• /contact`
+            : `📞 Contactez-nous :\n• WhatsApp : +${WHATSAPP}\n• /contact\n• travelalgeriadz@gmail.com`),
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }, { label: 'Contact', url: '/contact' }],
+    };
+  }
+
+  if (intent === 'DEVIS') {
+    return {
+      reply: scenarios.buildDevisPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Contact', url: '/contact' }, { label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }],
+    };
+  }
+
+  if (intent === 'DEPOSIT') {
+    return {
+      reply: scenarios.buildDepositPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'MODIFICATION') {
+    return {
+      reply: scenarios.buildModificationPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Suivi', url: '/suivi' }, { label: 'Contact', url: '/contact' }],
+    };
+  }
+
+  if (intent === 'DISCOUNT') {
+    return {
+      reply: scenarios.buildDiscountPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'THINKING') {
+    return {
+      reply: scenarios.buildThinkingPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [],
+    };
+  }
+
+  if (intent === 'CIRCUIT_COMPLETE') {
+    return {
+      reply: scenarios.buildCircuitCompletePrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Circuits', url: '/tours' }],
+    };
+  }
+
+  if (intent === 'DETAIL_REQUEST') {
+    return {
+      reply: scenarios.buildDetailPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'PRICE_PER_PERSON') {
+    return {
+      reply: scenarios.buildPricePerPersonPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'FAMILY_TRIP') {
+    return {
+      reply: scenarios.buildFamilyPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'COUPLE_TRIP') {
+    return {
+      reply: scenarios.buildCouplePrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'AIRPORT_TRANSFER') {
+    return {
+      reply: scenarios.buildAirportTransferPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Contact', url: '/contact' }],
+    };
+  }
+
+  if (intent === 'ACTIVITY_INQUIRY') {
+    const act = entities.activity || scenarios.detectActivityFromMessage(message) || 'quad';
+    return {
+      reply: scenarios.buildActivityInquiry(act, replyLang, merged),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (merged.travelers >= 6 && intent === 'TRIP_PLANNING') {
+    return {
+      reply: scenarios.buildGroupPrompt(merged.travelers, replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (entities.budgetAmount && !entities.destination) {
+    return {
+      reply: scenarios.buildBudgetAck(entities.budgetAmount, replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: linksFor(merged, replyLang),
+    };
+  }
+
+  if (intent === 'PAYMENT') {
+    return {
+      reply: scenarios.buildPaymentPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Contact', url: '/contact' }],
+    };
+  }
+
+  if (intent === 'CANCELLATION') {
+    return {
+      reply: scenarios.buildCancellationPrompt(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Contact', url: '/contact' }, { label: 'Suivi', url: '/suivi' }],
     };
   }
 
@@ -162,24 +418,99 @@ function tryContextualReply(message, lang, session) {
       }
     }
     return {
-      reply: replyLang === 'en' ? 'Price for which destination? (Taghit, Béjaïa, Oran…)' : 'Le prix de quelle destination ? (Taghit, Béjaïa, Oran…)',
+      reply: scenarios.buildPricePrompt(replyLang, merged),
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }],
     };
   }
 
+  if (intent === 'DESTINATIONS_AVAILABILITY') {
+    return { ...knowledge().buildDestinationsAvailabilityReply(replyLang, merged), session: merged };
+  }
+
   if (intent === 'FOLLOWUP_AVAILABILITY') {
     const recap = buildRecap(merged, replyLang);
+    if (!merged.destination) {
+      const dispo = scenarios.buildDispoInquiry(replyLang);
+      return {
+        reply: recap ? `${recap}\n\n${dispo}` : dispo,
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }, { label: 'Contact', url: '/contact' }],
+      };
+    }
     return {
-      reply: `${recap ? `${recap}\n\n` : ''}Je peux vous aider à vérifier la disponibilité via /contact ou WhatsApp — je ne confirme pas sans vérification.`,
+      reply: `${recap ? `${recap}\n\n` : ''}${replyLang === 'en'
+        ? 'I can check availability via /contact or WhatsApp. Our confirmed dated offer is Taghit Oct 23–28.'
+        : replyLang === 'ar'
+          ? 'يمكنني التحقق من التوفر عبر /contact أو WhatsApp. عرضنا المؤكد: تاغيت 23–28 أكتوبر.'
+          : 'Je peux vérifier la disponibilité via /contact ou WhatsApp. Notre offre datée confirmée : Taghit du 23 au 28 octobre.'}`,
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
-      links: [{ label: 'Contact', url: '/contact' }, { label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }],
+      links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }, { label: 'Contact', url: '/contact' }, { label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }],
+    };
+  }
+
+  if (intent === 'ACCOMMODATION_SEARCH') {
+    if (/appart|apt\b|appt/.test(normalizeQuery(message)) && !merged.destination) {
+      return {
+        reply: scenarios.buildApartmentPrompt(replyLang),
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: [{ label: 'Séjours', url: '/stays' }],
+      };
+    }
+    if (!merged.destination && /^(hotel|ht|htl|heberg|logement)\??$/.test(normalizeQuery(message).trim())) {
+      return {
+        reply: scenarios.buildAccommodationPrompt(replyLang),
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: [{ label: 'Hôtels', url: '/hotels' }, { label: 'Séjours', url: '/stays' }],
+      };
+    }
+    if (merged.destination) {
+      const { hits } = knowledge().searchKnowledge(
+        `${merged.destination} ${merged.accommodation || 'hotel'}`,
+        replyLang,
+        { destination: merged.destination },
+      );
+      const placeHit = hits.find((h) => h.id === `place-${merged.destination}`);
+      if (placeHit) {
+        const dest = formatDestinationLabel(merged.destination, replyLang);
+        return {
+          reply: replyLang === 'en'
+            ? `Hotels in ${dest}:\n\n${placeHit.text}`
+            : replyLang === 'ar'
+              ? `فنادق في ${dest}:\n\n${placeHit.text}`
+              : `Hôtels à ${dest} :\n\n${placeHit.text}`,
+          session: merged,
+          suggestions: suggest(replyLang, merged, intent),
+          links: placeHit.links?.length ? placeHit.links : linksFor(merged, replyLang),
+        };
+      }
+    }
+    return {
+      reply: replyLang === 'en'
+        ? 'Which destination are you looking for a hotel in? (Bejaia, Oran, Taghit, Algiers…)'
+        : replyLang === 'ar'
+          ? 'في أي وجهة تبحث عن فندق؟ (بجاية، وهران، تاغيت، الجزائر…)'
+          : 'Pour quelle destination cherchez-vous un hôtel ? (Béjaïa, Oran, Taghit, Alger…)',
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Hôtels', url: '/hotels' }, { label: 'Séjours', url: '/stays' }],
     };
   }
 
   if (intent === 'TRANSPORT') {
+    if (/^(transport|transp|trajet)\??$/.test(normalizeQuery(message).trim()) && !merged.destination) {
+      return {
+        reply: scenarios.buildTransportPrompt(replyLang),
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: [{ label: 'Circuits', url: '/tours' }, { label: 'Contact', url: '/contact' }],
+      };
+    }
     let transportText = buildTransportReply(message, replyLang, merged);
     if (!transportText && merged.destination) {
       transportText = getTransportInfo('alger', merged.destination, replyLang);
@@ -211,11 +542,11 @@ function tryContextualReply(message, lang, session) {
   if (intent === 'BOOKING') {
     const recap = buildRecap(merged, replyLang);
     const missing = getMissingForBooking(merged);
-    const bookingReply = replyLang === 'en'
-      ? `${recap ? `${recap}\n\n` : ''}To book:\n1. Open the destination page\n2. Click « Book »\n3. Or contact us on WhatsApp`
-      : `${recap ? `${recap}\n\n` : ''}Pour réserver :\n1. Ouvrez la fiche destination\n2. Cliquez « Réserver »\n3. Ou contactez-nous sur WhatsApp`;
+    const bookingReply = scenarios.buildBookingPrompt(replyLang, recap);
     return {
-      reply: missing.length ? `${bookingReply}\n\nIl me manque : ${missing.join(', ')}.` : bookingReply,
+      reply: missing.length
+        ? `${bookingReply}\n\n${replyLang === 'en' ? 'Still missing' : replyLang === 'ar' ? 'ما ينقص' : 'Il me manque'} : ${missing.join(', ')}.`
+        : bookingReply,
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'WhatsApp', url: `https://wa.me/${WHATSAPP}` }, { label: 'Contact', url: '/contact' }, { label: 'Suivi', url: '/suivi' }],
@@ -255,9 +586,18 @@ function tryContextualReply(message, lang, session) {
   }
 
   if (merged.destination && intent === 'DESTINATION_SEARCH' && !merged.accommodation && !merged.activity && !merged.days && !merged.travelers) {
+    const destId = normalizeDestId(merged.destination);
+    if (destId === 'taghit') {
+      return {
+        reply: scenarios.buildTaghitIntro(replyLang),
+        session: merged,
+        suggestions: suggest(replyLang, merged, intent),
+        links: linksFor(merged, replyLang),
+      };
+    }
     const dest = formatDestinationLabel(merged.destination, replyLang);
     return {
-      reply: `Excellent choix 😊 ${dest} ! 🏨 Hébergement, 🏖️ plages, 🎯 activités ou 🗺️ programme complet ?`,
+      reply: buildDestinationOptionsPrompt(merged.destination, dest, replyLang, 'excellent'),
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
       links: linksFor(merged, replyLang),
@@ -269,7 +609,8 @@ function tryContextualReply(message, lang, session) {
     const missing = getMissingForBooking(merged);
     const { hits } = knowledge().searchKnowledge(
       [merged.destination, merged.accommodation, merged.activity].filter(Boolean).join(' '),
-      replyLang
+      replyLang,
+      { destination: merged.destination },
     );
 
     let reply = '';
@@ -311,7 +652,9 @@ function tryContextualReply(message, lang, session) {
   }
 
   // Réponse intelligente même pour messages courts / abréviations
-  const { hits } = knowledge().searchKnowledge(message, replyLang);
+  const { hits } = knowledge().searchKnowledge(message, replyLang, {
+    destination: merged.destination || entities.destination,
+  });
   const goodHit = hits.find(
     (h) => h.score >= 14 && !h.text.startsWith('__') && !['contact', 'payment', 'reservation'].includes(h.id)
   );
@@ -332,11 +675,7 @@ function tryContextualReply(message, lang, session) {
   if (merged.destination) {
     const dest = formatDestinationLabel(merged.destination, replyLang);
     return {
-      reply: replyLang === 'en'
-        ? `Got it 😊 ${dest}! 🏨 Hotel, 🏖️ beaches, 🎯 activities or 🗺️ full trip?`
-        : replyLang === 'ar'
-          ? `فهمت 😊 ${dest}! 🏨 فندق، 🏖️ شواطئ، 🎯 أنشطة أو 🗺️ برنامج كامل؟`
-          : `Compris 😊 ${dest} ! 🏨 Hôtel, 🏖️ plages, 🎯 activités ou 🗺️ programme complet ?`,
+      reply: buildDestinationOptionsPrompt(merged.destination, dest, replyLang, 'gotit'),
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
       links: linksFor(merged, replyLang),
@@ -350,6 +689,28 @@ function tryContextualReply(message, lang, session) {
       session: merged,
       suggestions: suggest(replyLang, merged, intent),
       links: [{ label: 'Taghit', url: '/place/taghit?pkg=hotel' }, { label: 'Circuits', url: '/tours' }],
+    };
+  }
+
+  if (intent === 'ACTIVITY_SEARCH' && /quelles activ|quoi faire|qqch|activites\b|activités\b|activities\b/.test(normalizeQuery(message)) && !merged.destination) {
+    return {
+      reply: scenarios.buildActivitiesOverview(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [{ label: 'Destinations', url: '/destinations' }],
+    };
+  }
+
+  if (intent === 'GENERAL_QUESTION') {
+    return {
+      reply: scenarios.buildDefaultMenu(replyLang),
+      session: merged,
+      suggestions: suggest(replyLang, merged, intent),
+      links: [
+        { label: 'Circuits', url: '/tours' },
+        { label: 'Taghit', url: '/place/taghit?pkg=hotel' },
+        { label: 'Contact', url: '/contact' },
+      ],
     };
   }
 

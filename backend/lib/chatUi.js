@@ -47,6 +47,20 @@ function getSuggestions(lang = 'fr', session = {}, intent = null) {
   const ctx = CONTEXT[lang] || CONTEXT.fr;
   const chips = [];
 
+  if (intent === 'DESTINATIONS_AVAILABILITY') {
+    chips.push(
+      lang === 'en' ? 'Taghit Oct 23–28' : lang === 'ar' ? 'تاغيت 23–28' : 'Taghit 23–28 oct.',
+      lang === 'en' ? 'Taghit price' : lang === 'ar' ? 'سعر تاغيت' : 'Tarif Taghit',
+      lang === 'en' ? 'Book' : lang === 'ar' ? 'حجز' : 'Réserver',
+    );
+  }
+  if (intent === 'INFO_REQUEST' || intent === 'GREETING') {
+    chips.push(
+      lang === 'en' ? 'Destinations' : lang === 'ar' ? 'الوجهات' : 'Destinations',
+      lang === 'en' ? 'Taghit price' : lang === 'ar' ? 'سعر تاغيت' : 'Tarif Taghit',
+      lang === 'en' ? 'Book' : lang === 'ar' ? 'حجز' : 'Réserver',
+    );
+  }
   if (intent === 'TRANSPORT') chips.push(...ctx.transport);
   else if (intent === 'ITINERARY') chips.push(...ctx.itinerary);
 
