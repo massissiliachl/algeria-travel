@@ -1,0 +1,141 @@
+.chat-assistant-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.chat-assistant-avatar--hero {
+  filter: drop-shadow(0 10px 24px rgba(15, 44, 58, 0.4));
+}
+
+.chatbot-fab__avatar {
+  transform: scale(1.05);
+}
+
+.chat-assistant-avatar__svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.chat-assistant-avatar__glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 132, 74, 0.45) 0%, transparent 70%);
+  z-index: 0;
+  animation: chat-assistant-glow 1.6s ease-in-out infinite alternate;
+}
+
+.chat-assistant-avatar__mouth {
+  opacity: 0;
+  transform-origin: center;
+  transition: opacity 0.25s ease;
+}
+
+.chat-assistant-avatar__smile {
+  transition: opacity 0.25s ease;
+}
+
+.chat-assistant-avatar--speaking .chat-assistant-avatar__mouth {
+  opacity: 1;
+  animation: chat-assistant-talk 0.38s ease-in-out infinite alternate;
+}
+
+.chat-assistant-avatar--speaking .chat-assistant-avatar__smile {
+  opacity: 0;
+}
+
+.chat-assistant-avatar__waves {
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.chat-assistant-avatar__waves span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(232, 184, 138, 0.55);
+  animation: chat-assistant-wave 2s ease-out infinite;
+}
+
+.chat-assistant-avatar__waves span:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.chat-assistant-avatar__waves span:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.chat-assistant-avatar__bars {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.chat-assistant-avatar--speaking .chat-assistant-avatar__bars {
+  opacity: 1;
+}
+
+.chat-assistant-avatar__bars span {
+  display: block;
+  width: 3px;
+  height: 6px;
+  border-radius: 2px;
+  background: linear-gradient(to top, #d4844a, #e8b88a);
+  animation: chat-assistant-bar 0.55s ease-in-out infinite alternate;
+}
+
+@keyframes chat-assistant-glow {
+  from { opacity: 0.5; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes chat-assistant-talk {
+  from { transform: scaleY(0.45); }
+  to { transform: scaleY(1.25); }
+}
+
+@keyframes chat-assistant-wave {
+  0% { transform: scale(0.88); opacity: 0.75; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes chat-assistant-bar {
+  from { height: 4px; opacity: 0.5; }
+  to { height: 13px; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-assistant-avatar__mouth,
+  .chat-assistant-avatar__waves span,
+  .chat-assistant-avatar__bars span,
+  .chat-assistant-avatar__glow {
+    animation: none;
+  }
+
+  .chat-assistant-avatar--speaking .chat-assistant-avatar__mouth {
+    opacity: 1;
+    transform: none;
+  }
+
+  .chat-assistant-avatar--speaking .chat-assistant-avatar__bars {
+    opacity: 1;
+  }
+}

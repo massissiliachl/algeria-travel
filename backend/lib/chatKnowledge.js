@@ -267,8 +267,7 @@ function expandQuery(raw) {
     const matched = all.some((a) => {
       if (!a) return false;
       if (tokens.includes(a)) return true;
-      if (a.length <= 3) return hasWholeToken(original, a);
-      return original.includes(a);
+      return hasWholeToken(original, a);
     });
     if (matched) {
       all.forEach((a) => expanded.add(a));
@@ -306,10 +305,7 @@ function scoreText(haystack, needle) {
   if (hasWholeToken(h, n)) return 65;
   if (n.includes(h) && h.length >= 4 && hasWholeToken(n, h)) return 55;
   const parts = n.split(' ').filter(Boolean);
-  const hit = parts.filter((p) => {
-    if (p.length <= 3) return hasWholeToken(h, p);
-    return h.includes(p);
-  }).length;
+  const hit = parts.filter((p) => hasWholeToken(h, p)).length;
   if (hit === 0) return 0;
   return Math.round((hit / parts.length) * 50);
 }

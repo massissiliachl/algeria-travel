@@ -365,17 +365,22 @@ function splitCompactMessage(text) {
   }
 
   const PROTECTED = ['n7eb', 'nheb', 'n7ab', 'ch7al', 'chhal', 'bghit', 'm3a', '3and', '3andi', '3andna', '3lyali', 'combien', 'ghodwa', 'dispo', 'disponible', 'disponibilite', 'saha'];
+  /** Mots courants contenant une abréviation ville (évite oran ⊂ orange) */
+  const PROTECTED_WORDS = ['orange', 'oranges', 'orage', 'orages'];
   const placeholders = {};
-  PROTECTED.forEach((tok, i) => {
+  [...PROTECTED, ...PROTECTED_WORDS].forEach((tok, i) => {
     const ph = `__p${i}__`;
     placeholders[ph] = tok;
     s = s.replace(new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), ph);
   });
 
-  for (const ab of SPLIT_ABBREVS) {
-    const esc = ab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    s = s.replace(new RegExp(`(${esc})(?=[a-z0-9\u0600-\u06ff_])`, 'gi'), '$1 ');
-    s = s.replace(new RegExp(`(?<=[a-z0-9\u0600-\u06ff])(${esc})`, 'gi'), ' $1');
+  // Découpe abréviations seulement dans les SMS compacts sans espaces (ex. hoteloran3j)
+  if (!/\s/.test(s)) {
+    for (const ab of SPLIT_ABBREVS) {
+      const esc = ab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      s = s.replace(new RegExp(`(${esc})(?=[a-z0-9\u0600-\u06ff_])`, 'gi'), '$1 ');
+      s = s.replace(new RegExp(`(?<=[a-z0-9\u0600-\u06ff])(${esc})`, 'gi'), ' $1');
+    }
   }
 
   s = s
@@ -477,8 +482,7 @@ function expandQuery(raw) {
     const matched = all.some((a) => {
       if (!a) return false;
       if (tokens.includes(a)) return true;
-      if (a.length <= 3) return hasWholeToken(original, a);
-      return original.includes(a);
+      return hasWholeToken(original, a);
     });
     if (matched) {
       all.forEach((a) => expanded.push(a));
@@ -520,10 +524,8 @@ function findDestination(text, tokens) {
       }
 
       if (tokenSet.has(a)) return cityId;
-      // Mot entier dans la phrase (évite oran ⊂ hote)
-      const wordRe = new RegExp(`(?:^|\\s)${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\s|$)`, 'i');
-      if (wordRe.test(n)) return cityId;
-      if (a.length >= 5 && n.includes(a)) return cityId;
+      // Mot entier uniquement (évite oran ⊂ orange, oran ⊂ hote)
+      if (hasWholeToken(n, a)) return cityId;
     }
   }
   return null;

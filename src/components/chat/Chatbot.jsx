@@ -3,8 +3,18 @@ import { Link } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
 import { getOfflineReply, getOfflineWelcome } from '../../services/chatOffline';
+import {
+  isSpeechSupported,
+  loadVoiceEnabled,
+  saveVoiceEnabled,
+  speakText,
+  stopSpeech,
+  warmUpVoices,
+} from '../../services/chatSpeech';
+import { resolveApiBase } from '../../utils/apiBase';
 import { clearChatState, loadChatState, saveChatState } from '../../utils/chatStorage';
 import Icon from '../ui/Icon';
+import ChatAssistantAvatar from './ChatAssistantAvatar';
 import ChatMessageContent from './ChatMessageContent';
 import './Chatbot.css';
 
@@ -55,9 +65,78 @@ const Chatbot = () => {
   const [suggestions, setSuggestions] = useState(() => savedState?.suggestions ?? []);
   const [session, setSession] = useState(() => savedState?.session ?? {});
   const [hasMobileBar, setHasMobileBar] = useState(false);
+  const [apiAvailable, setApiAvailable] = useState(null);
+  const [isUserTyping, setIsUserTyping] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(() => loadVoiceEnabled());
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const listRef = useRef(null);
   const inputRef = useRef(null);
+  const typingTimerRef = useRef(null);
   const booted = useRef((savedState?.messages?.length ?? 0) > 0);
+  const speechSupported = isSpeechSupported();
+
+  const speakReply = useCallback((reply) => {
+    if (!voiceEnabled || !speechSupported) return;
+    const text = String(reply || '').trim();
+    if (!text) return;
+    speakText(text, language, {
+      onStart: () => setIsSpeaking(true),
+      onEnd: () => setIsSpeaking(false),
+    });
+  }, [voiceEnabled, speechSupported, language]);
+
+  const toggleVoice = () => {
+    setVoiceEnabled((prev) => {
+      const next = !prev;
+      saveVoiceEnabled(next);
+      if (!next) {
+        stopSpeech();
+        setIsSpeaking(false);
+      }
+      return next;
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInput(value);
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    if (!value.trim()) {
+      setIsUserTyping(false);
+      return;
+    }
+    setIsUserTyping(true);
+    typingTimerRef.current = setTimeout(() => setIsUserTyping(false), 700);
+  };
+
+  useEffect(() => () => {
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    stopSpeech();
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      stopSpeech();
+      setIsSpeaking(false);
+      return;
+    }
+    warmUpVoices();
+  }, [open]);
+
+  const checkApiAvailable = useCallback(async () => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${resolveApiBase()}/api/live`, { signal: controller.signal });
+      clearTimeout(timer);
+      const ok = res.ok;
+      setApiAvailable(ok);
+      return ok;
+    } catch {
+      setApiAvailable(false);
+      return false;
+    }
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -67,18 +146,20 @@ const Chatbot = () => {
 
   const pushAssistant = useCallback((payload) => {
     const reply = String(payload?.reply ?? payload?.message ?? '').trim();
+    const content = reply || t('chat_error');
     setMessages((prev) => [
       ...prev,
       {
         id: makeId(),
         role: 'assistant',
-        content: reply || t('chat_error'),
+        content,
         links: payload?.links || [],
       },
     ]);
     if (payload?.suggestions?.length) setSuggestions(payload.suggestions);
     scrollToBottom();
-  }, [scrollToBottom, t]);
+    speakReply(content);
+  }, [scrollToBottom, t, speakReply]);
 
   useEffect(() => {
     saveChatState({ messages, session, suggestions });
@@ -89,6 +170,12 @@ const Chatbot = () => {
     booted.current = true;
     setLoading(true);
     const loadWelcome = async () => {
+      const online = await checkApiAvailable();
+      if (!online) {
+        pushAssistant(getOfflineWelcome(language));
+        setLoading(false);
+        return;
+      }
       try {
         const data = await api.getChatWelcome(language);
         pushAssistant(data);
@@ -98,6 +185,7 @@ const Chatbot = () => {
           const data = await api.getChatWelcome(language);
           pushAssistant(data);
         } catch {
+          setApiAvailable(false);
           pushAssistant(getOfflineWelcome(language));
         }
       } finally {
@@ -105,7 +193,7 @@ const Chatbot = () => {
       }
     };
     loadWelcome();
-  }, [open, language, pushAssistant, t]);
+  }, [open, language, pushAssistant, checkApiAvailable, t]);
 
   useEffect(() => {
     if (open && messages.length > 0) scrollToBottom();
@@ -161,6 +249,8 @@ const Chatbot = () => {
   }, []);
 
   const resetConversation = () => {
+    stopSpeech();
+    setIsSpeaking(false);
     clearChatState();
     setMessages([]);
     setSuggestions([]);
@@ -175,6 +265,8 @@ const Chatbot = () => {
     const userMsg = { id: makeId(), role: 'user', content: trimmed };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
+    setIsUserTyping(false);
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     setSuggestions([]);
     setLoading(true);
     scrollToBottom();
@@ -185,23 +277,39 @@ const Chatbot = () => {
 
     const payload = { message: trimmed, lang: language, history, session };
 
+    const replyOffline = () => {
+      const offline = getOfflineReply(trimmed, language, session);
+      if (offline.session) setSession(offline.session);
+      pushAssistant(offline);
+    };
+
+    if (apiAvailable === false) {
+      replyOffline();
+      setLoading(false);
+      return;
+    }
+
     try {
       let data;
       try {
         data = await api.sendChatMessage(payload);
       } catch (firstErr) {
-        if (!/timeout|503|502|504|failed to fetch|network/i.test(String(firstErr?.message || ''))) {
+        if (!/timeout|503|502|504|404|failed to fetch|network|indisponible|invalide|statique/i.test(String(firstErr?.message || ''))) {
           throw firstErr;
         }
         await new Promise((r) => setTimeout(r, 1500));
         data = await api.sendChatMessage(payload);
       }
+      if (!data?.reply?.trim()) {
+        setApiAvailable(false);
+        replyOffline();
+        return;
+      }
       if (data.session) setSession(data.session);
       pushAssistant(data);
     } catch (err) {
-      const offline = getOfflineReply(trimmed, language, session);
-      if (offline.session) setSession(offline.session);
-      pushAssistant(offline);
+      setApiAvailable(false);
+      replyOffline();
     } finally {
       setLoading(false);
     }
@@ -250,17 +358,34 @@ const Chatbot = () => {
           aria-label={t('chat_title')}
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <header className="chatbot-panel__head">
-            <div className="chatbot-panel__brand">
-              <span className="chatbot-panel__avatar" aria-hidden>
-                <Icon name="Bot" size={20} />
-              </span>
-              <div>
-                <strong>{t('chat_title')}</strong>
-                <span>{t('chat_subtitle')}</span>
+          <header className={`chatbot-panel__head${isSpeaking ? ' chatbot-panel__head--speaking' : ''}`}>
+            <div className="chatbot-panel__hero">
+              <div className="chatbot-panel__avatar">
+                <ChatAssistantAvatar speaking={isSpeaking} size={72} variant="hero" />
+              </div>
+              <div className="chatbot-panel__identity">
+                <strong>
+                  {t('chat_assistant_name')}
+                  <span className="chatbot-panel__online" aria-hidden />
+                </strong>
+                <span className="chatbot-panel__role">{t('chat_assistant_role')}</span>
+                <span className={`chatbot-panel__status${isSpeaking ? ' is-speaking' : ''}`}>
+                  {isSpeaking ? t('chat_assistant_speaking') : t('chat_subtitle')}
+                </span>
               </div>
             </div>
             <div className="chatbot-panel__actions">
+              {speechSupported && (
+                <button
+                  type="button"
+                  className={`chatbot-panel__voice${voiceEnabled ? ' is-on' : ''}`}
+                  onClick={toggleVoice}
+                  aria-label={voiceEnabled ? t('chat_voice_off') : t('chat_voice_on')}
+                  title={voiceEnabled ? t('chat_voice_off') : t('chat_voice_on')}
+                >
+                  <Icon name={voiceEnabled ? 'Volume2' : 'VolumeX'} size={16} />
+                </button>
+              )}
               {messages.length > 0 && (
                 <button
                   type="button"
@@ -296,6 +421,11 @@ const Chatbot = () => {
                 key={msg.id}
                 className={`chatbot-msg chatbot-msg--${msg.role}`}
               >
+                {msg.role === 'assistant' && (
+                  <div className="chatbot-msg__avatar" aria-hidden>
+                    <ChatAssistantAvatar speaking={false} size={34} />
+                  </div>
+                )}
                 <div className="chatbot-msg__bubble">
                   <ChatMessageContent content={msg.content} role={msg.role} />
                   {msg.links?.length > 0 && (
@@ -329,6 +459,9 @@ const Chatbot = () => {
             ))}
             {loading && (
               <div className="chatbot-msg chatbot-msg--assistant">
+                <div className="chatbot-msg__avatar" aria-hidden>
+                  <ChatAssistantAvatar speaking size={34} />
+                </div>
                 <div className="chatbot-msg__bubble chatbot-msg__typing">
                   <span /><span /><span />
                 </div>
@@ -351,19 +484,42 @@ const Chatbot = () => {
             </div>
           )}
 
+          {isUserTyping && !loading && (
+            <div className="chatbot-watcher" aria-hidden>
+              <div className="chatbot-watcher__bubble">
+                <div className="chatbot-watcher__eyes">
+                  {[0, 1].map((i) => (
+                    <span key={i} className="chatbot-watcher__eye" style={{ animationDelay: `${i * 0.08}s` }}>
+                      <span className="chatbot-watcher__sclera">
+                        <span className="chatbot-watcher__iris">
+                          <span className="chatbot-watcher__pupil" />
+                          <span className="chatbot-watcher__shine" />
+                        </span>
+                      </span>
+                      <span className="chatbot-watcher__lid" />
+                    </span>
+                  ))}
+                </div>
+                <span className="chatbot-watcher__label">{t('chat_typing_watch')}</span>
+              </div>
+            </div>
+          )}
+
           <form className="chatbot-panel__form" onSubmit={handleSubmit}>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={t('chat_placeholder')}
-              maxLength={2000}
-              disabled={loading}
-              aria-label={t('chat_placeholder')}
-              enterKeyHint="send"
-              autoComplete="off"
-            />
+            <div className="chatbot-panel__input-wrap">
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={handleInputChange}
+                placeholder={t('chat_placeholder')}
+                maxLength={2000}
+                disabled={loading}
+                aria-label={t('chat_placeholder')}
+                enterKeyHint="send"
+                autoComplete="off"
+              />
+            </div>
             <button type="submit" disabled={loading || !input.trim()} aria-label={t('chat_send')}>
               <Icon name="Send" size={18} />
             </button>
@@ -379,7 +535,11 @@ const Chatbot = () => {
           aria-label={open ? t('chat_close') : t('chat_open')}
           aria-expanded={open}
         >
-          <Icon name={open ? 'X' : 'MessageCircle'} size={24} />
+          {open ? (
+            <Icon name="X" size={24} />
+          ) : (
+            <ChatAssistantAvatar size={36} className="chatbot-fab__avatar" />
+          )}
           {showSessionBadge && <span className="chatbot-fab__badge" aria-hidden />}
         </button>
       )}

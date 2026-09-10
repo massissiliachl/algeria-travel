@@ -31,6 +31,8 @@ const cases = [
   { q: 'stp cmb taghit ttc', expectPrice: true, expectDest: 'taghit', label: 'stp cmb ttc' },
   { q: 'resa taghit pr 2 perss', expectDest: 'taghit', expectTravelers: 2, label: 'resa perss' },
   { q: 'slt saha', expectGreeting: true, label: 'slt saha' },
+  { q: 'je veux manger une orange', notDest: 'oran', label: 'orange pas oran' },
+  { q: 'je veux aller a bejaia', expectDest: 'bejaia', label: 'bejaia mot entier' },
 ];
 
 let failed = 0;
@@ -47,6 +49,10 @@ for (const c of cases) {
   }
   if (c.expectDest && entities.destination !== c.expectDest) {
     console.log(`FAIL [${c.label}] destination: got ${entities.destination}, want ${c.expectDest}`);
+    failed += 1;
+  }
+  if (c.notDest && entities.destination === c.notDest) {
+    console.log(`FAIL [${c.label}] destination: should not be ${c.notDest}`);
     failed += 1;
   }
   if (c.expectPlace && !out.reply.toLowerCase().includes(c.expectPlace)) {

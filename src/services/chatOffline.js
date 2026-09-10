@@ -19,10 +19,18 @@ function normalize(text) {
     .trim();
 }
 
+/** Mot entier (évite oran ⊂ orange) */
+function hasWholeWord(text, word) {
+  if (!word) return false;
+  if (text === word) return true;
+  const re = new RegExp(`(^|\\s)${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|\\s)`);
+  return re.test(text);
+}
+
 function findDestination(text) {
   const n = normalize(text);
   for (const [id, aliases] of Object.entries(DESTINATIONS)) {
-    if (aliases.some((a) => n.includes(a))) return id;
+    if (aliases.some((a) => hasWholeWord(n, a))) return id;
   }
   return null;
 }

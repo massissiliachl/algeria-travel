@@ -28,10 +28,18 @@ async function request(path, options = {}) {
   const raw = await res.text();
   let data = {};
   if (raw) {
+    const trimmed = raw.trim();
+    if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html')) {
+      const err = new Error('API indisponible (site statique sans backend Node).');
+      err.status = res.status;
+      throw err;
+    }
     try {
       data = JSON.parse(raw);
     } catch {
-      data = {};
+      const err = new Error(`Réponse API invalide (${res.status}).`);
+      err.status = res.status;
+      throw err;
     }
   }
 
