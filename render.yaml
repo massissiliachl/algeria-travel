@@ -1,34 +1,27 @@
-# Render — 1 service Web Node (PAS de Static Site, PAS de "Publish Directory")
-# Le chat et l'API nécessitent : startCommand npm start → backend/server.js
-# Dashboard Render : supprimer "Publish Directory" si défini sur build/
+# Render — déploiement split (2 services)
+# Backend API : https://algeria-travel-7i7y.onrender.com
+# Frontend     : https://algeria-travel-1.onrender.com
 
 services:
+  # ── Backend Node (API + admin optionnel) ──
   - type: web
-    name: algeria-travel
+    name: algeria-travel-api
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build:render && npm run migrate:render
+    buildCommand: npm install && npm run migrate:render
     startCommand: npm start
     healthCheckPath: /api/live
     envVars:
       - key: NODE_ENV
         value: production
       - key: SERVE_FRONTEND
-        value: true
+        value: false
       - key: SERVE_ADMIN
         value: true
-      - key: REACT_APP_API_URL
-        value: ""
-      - key: SITE_URL
-        fromService:
-          type: web
-          name: algeria-travel
-          property: host
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: algeria-travel
-          property: host
+        value: https://algeria-travel-1.onrender.com
+      - key: SITE_URL
+        value: https://algeria-travel-1.onrender.com
       - key: DATABASE_URL
         sync: false
       - key: ADMIN_API_KEY
@@ -47,3 +40,20 @@ services:
         sync: false
       - key: VAPID_SUBJECT
         value: mailto:Algeria.travel@gmail.com
+
+  # ── Frontend React (Static Site) ──
+  - type: web
+    name: algeria-travel-front
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://algeria-travel-7i7y.onrender.com
+      - key: REACT_APP_SITE_URL
+        value: https://algeria-travel-1.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

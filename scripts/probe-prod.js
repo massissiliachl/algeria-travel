@@ -1,4 +1,4 @@
-const base = (process.argv[2] || 'https://algeria-travel.onrender.com').replace(/\/$/, '');
+const base = (process.argv[2] || 'https://algeria-travel-7i7y.onrender.com').replace(/\/$/, '');
 
 async function main() {
   console.log('Probe', base, '\n');
