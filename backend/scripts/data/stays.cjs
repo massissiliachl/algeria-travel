@@ -1,1 +1,600 @@
-exports.STAYS = [...HOTELS.map(hotelToStay), ...GUESTHOUSES];
+exports.STAYS = [
+  {
+    "id": "hotel-royal-bejaia",
+    "type": "hotel",
+    "placeId": "bejaia",
+    "wilaya": "06",
+    "wilayaKey": "bejaia",
+    "stars": 4,
+    "availability": "available",
+    "roomsAvailable": 12,
+    "name": "Hôtel Royal Béjaïa",
+    "name_en": "Royal Bejaia Hotel",
+    "name_ar": "فندق رويال بجاية",
+    "address": "Route de la Corniche, Béjaïa 06000",
+    "address_en": "Corniche Road, Bejaia 06000",
+    "address_ar": "طريق الكورniche، بجاية 06000",
+    "location": "Béjaïa",
+    "location_en": "Bejaia",
+    "location_ar": "بجاية",
+    "lat": 36.7525,
+    "lng": 5.0553,
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "phone": "+213 34 21 00 00",
+    "desc": "Hôtel au cœur de Béjaïa : piscine, restaurant méditerranéen et base idéale pour Cap Carbon et Gouraya.",
+    "desc_en": "Hotel in the heart of Bejaia: pool, Mediterranean restaurant and ideal base for Cap Carbon and Gouraya.",
+    "desc_ar": "فندق في قلب بجاية: مسبح ومطعم متوسطي وقاعدة مثالية لكاب كاربون وغوراية.",
+    "image": "/images/hotels/royal-bejaia-1.jpg",
+    "gallery": [
+      "/images/hotels/royal-bejaia-1.jpg",
+      "/images/hotels/royal-bejaia-2.jpg",
+      "/images/hotels/royal-bejaia-3.jpg"
+    ],
+    "price": 14500,
+    "oldPrice": 17000,
+    "pricePerPerson": false,
+    "rating": 4.6,
+    "reviews": 128,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Piscine",
+        "Restaurant",
+        "Parking",
+        "Climatisation"
+      ],
+      "en": [
+        "Wifi",
+        "Pool",
+        "Restaurant",
+        "Parking",
+        "AC"
+      ],
+      "ar": [
+        "واي فاي",
+        "مسبح",
+        "مطعم",
+        "موقف",
+        "تكييف"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-sheraton-oran",
+    "type": "hotel",
+    "placeId": "oran",
+    "wilaya": "31",
+    "wilayaKey": "oran",
+    "stars": 5,
+    "availability": "available",
+    "roomsAvailable": 8,
+    "name": "Sheraton Oran",
+    "name_en": "Sheraton Oran",
+    "name_ar": "شيراتون وهران",
+    "address": "Boulevard du Front de Mer, Oran",
+    "address_en": "Seafront Boulevard, Oran",
+    "address_ar": "شارع الواجهة البحرية، وهران",
+    "location": "Oran",
+    "location_en": "Oran",
+    "location_ar": "وهران",
+    "lat": 35.6969,
+    "lng": -0.6331,
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "phone": "+213 41 00 00 00",
+    "desc": "Hôtel 5 étoiles face à la Méditerranée : piscine, spa et vue panoramique sur le port d'Oran.",
+    "desc_en": "Five-star hotel facing the Mediterranean: pool, spa and panoramic views of Oran harbour.",
+    "desc_ar": "فندق 5 نجوم مطل على المتوسط: مسبح، سبا وإطلالة بانورامية على ميناء وهران.",
+    "image": "/images/hotels/sheraton-oran.jpg",
+    "gallery": [
+      "/images/hotels/sheraton-oran.jpg",
+      "/images/hotels/sheraton-oran-pool.jpg",
+      "/images/hotels/royal-oran.jpg"
+    ],
+    "price": 22000,
+    "oldPrice": 26000,
+    "pricePerPerson": false,
+    "rating": 4.8,
+    "reviews": 214,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Piscine",
+        "Spa",
+        "Restaurant",
+        "Parking",
+        "Vue mer"
+      ],
+      "en": [
+        "Wifi",
+        "Pool",
+        "Spa",
+        "Restaurant",
+        "Parking",
+        "Sea view"
+      ],
+      "ar": [
+        "واي فاي",
+        "مسبح",
+        "سبا",
+        "مطعم",
+        "موقف",
+        "إطلالة بحر"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-el-aurassi-alger",
+    "type": "hotel",
+    "placeId": "alger",
+    "wilaya": "16",
+    "wilayaKey": "alger",
+    "stars": 5,
+    "availability": "available",
+    "roomsAvailable": 15,
+    "name": "Hôtel El Aurassi",
+    "name_en": "El Aurassi Hotel",
+    "name_ar": "فندق الأوراسي",
+    "address": "2 Avenue du Dr Frantz Fanon, Les Tagarins, Alger Centre 16000",
+    "address_en": "2 Dr Frantz Fanon Avenue, Les Tagarins, Algiers Centre 16000",
+    "address_ar": "2 شارع د. فرantz فانون، ليس تاغارين، وسط الجزائر 16000",
+    "location": "Alger",
+    "location_en": "Algiers",
+    "location_ar": "الجزائر",
+    "lat": 36.778091,
+    "lng": 3.052558,
+    "checkIn": "15:00",
+    "checkOut": "12:00",
+    "phone": "+213 21 74 82 52",
+    "desc": "Hôtel 5 étoiles emblématique sur les hauteurs d'Alger : vue sur la baie, restaurants, salles de réunion et accès direct au centre-ville.",
+    "desc_en": "Landmark 5-star hotel overlooking Algiers bay: restaurants, meeting rooms and direct access to the city centre.",
+    "desc_ar": "فندق 5 نجوم أيقوني مطل على خليج الجزائر: مطاعم وقاعات اجتماعات ووصول مباشر إلى وسط المدينة.",
+    "image": "/images/hotels/alger/el-aurassi.jpg",
+    "gallery": [
+      "/images/hotels/alger/el-aurassi.jpg",
+      "/images/hotels/alger/el-aurassi-2.jpg",
+      "/images/hotels/casbah.webp"
+    ],
+    "price": 28500,
+    "oldPrice": 32000,
+    "pricePerPerson": false,
+    "rating": 4.5,
+    "reviews": 312,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "Climatisation",
+        "Salle de réunion",
+        "Vue baie"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "AC",
+        "Meeting room",
+        "Bay view"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "موقف",
+        "تكييف",
+        "قاعة اجتماعات",
+        "إطلالة على الخليج"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-el-djazair-alger",
+    "type": "hotel",
+    "placeId": "alger",
+    "wilaya": "16",
+    "wilayaKey": "alger",
+    "stars": 5,
+    "availability": "available",
+    "roomsAvailable": 9,
+    "name": "Hôtel El-Djazair (St George)",
+    "name_en": "El-Djazair Hotel (St George)",
+    "name_ar": "فندق الجزائر (سان جورج)",
+    "address": "Chemin du Sidi Yahia, El Biar, Alger 16030",
+    "address_en": "Chemin du Sidi Yahia, El Biar, Algiers 16030",
+    "address_ar": "شارع سيدي يحيى، البيار، الجزائر 16030",
+    "location": "Alger — El Biar",
+    "location_en": "Algiers — El Biar",
+    "location_ar": "الجزائر — البيار",
+    "lat": 36.752222,
+    "lng": 3.031944,
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "phone": "+213 21 23 17 71",
+    "desc": "Palace historique dans un parc à El Biar : architecture coloniale, jardins et vue panoramique sur la Méditerranée.",
+    "desc_en": "Historic palace in an El Biar park: colonial architecture, gardens and panoramic Mediterranean views.",
+    "desc_ar": "قصر تاريخي في حديقة بالبيار: عمارة استعمارية وحدائق وإطلالة بانورامية على المتوسط.",
+    "image": "/images/hotels/alger/el-djazair.jpg",
+    "gallery": [
+      "/images/hotels/alger/el-djazair.jpg",
+      "/images/hotels/alger/el-djazair-2.jpg",
+      "/images/alger.jpeg"
+    ],
+    "price": 32000,
+    "oldPrice": 36000,
+    "pricePerPerson": false,
+    "rating": 4.7,
+    "reviews": 189,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "Piscine",
+        "Jardin",
+        "Vue mer"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "Pool",
+        "Garden",
+        "Sea view"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "موقف",
+        "مسبح",
+        "حديقة",
+        "إطلالة بحر"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-le-rym-ghardaia",
+    "type": "hotel",
+    "placeId": "ghardaia",
+    "wilaya": "47",
+    "wilayaKey": "ghardaia",
+    "stars": 3,
+    "availability": "available",
+    "roomsAvailable": 10,
+    "name": "Le Rym Ghardaïa",
+    "name_en": "Le Rym Ghardaia",
+    "name_ar": "لو ريم غرداية",
+    "address": "Centre-ville, Ghardaïa",
+    "address_en": "Downtown, Ghardaia",
+    "address_ar": "وسط المدينة، غرداية",
+    "location": "Ghardaïa",
+    "location_en": "Ghardaia",
+    "location_ar": "غرداية",
+    "lat": 32.4833,
+    "lng": 3.6667,
+    "checkIn": "13:00",
+    "checkOut": "11:00",
+    "phone": "+213 29 00 00 00",
+    "desc": "Hôtel au cœur de la vallée du M'Zab, idéal pour découvrir l'architecture mozabite.",
+    "desc_en": "Hotel in the heart of the M'Zab valley, ideal for discovering Mozabite architecture.",
+    "desc_ar": "فندق في قلب وادي mzab، مثالي لاكتشاف العمارة المزابية.",
+    "image": "/images/hotels/le-rym-ghardaia.jpg",
+    "gallery": [
+      "/images/hotels/le-rym-ghardaia.jpg",
+      "/images/hotels/belvedere-ghardaia.jpg"
+    ],
+    "price": 11000,
+    "pricePerPerson": false,
+    "rating": 4.2,
+    "reviews": 67,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Climatisation",
+        "Terrasse"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "AC",
+        "Terrace"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "تكييف",
+        "تراس"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-belvedere-ghardaia",
+    "type": "hotel",
+    "placeId": "ghardaia",
+    "wilaya": "47",
+    "wilayaKey": "ghardaia",
+    "stars": 4,
+    "availability": "available",
+    "roomsAvailable": 6,
+    "name": "Hôtel Belvédère Ghardaïa",
+    "name_en": "Belvedere Ghardaia Hotel",
+    "name_ar": "فندق بيلفيدير غرداية",
+    "address": "Colline du Belvédère, Ghardaïa",
+    "address_en": "Belvedere Hill, Ghardaia",
+    "address_ar": "تل بيلفيدير، غرداية",
+    "location": "Ghardaïa",
+    "location_en": "Ghardaia",
+    "location_ar": "غرداية",
+    "lat": 32.49,
+    "lng": 3.67,
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "phone": "+213 29 00 00 01",
+    "desc": "Vue imprenable sur les ksour de Ghardaïa et le panorama du M'Zab.",
+    "desc_en": "Stunning views over Ghardaia ksour and the M'Zab panorama.",
+    "desc_ar": "إطلالة خلابة على قصور غرداية وpanorama وادي mzab.",
+    "image": "/images/hotels/belvedere-ghardaia.jpg",
+    "gallery": [
+      "/images/hotels/belvedere-ghardaia.jpg",
+      "/images/hotels/le-rym-ghardaia.jpg"
+    ],
+    "price": 13500,
+    "oldPrice": 15000,
+    "pricePerPerson": false,
+    "rating": 4.5,
+    "reviews": 82,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "Vue panoramique"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "Panoramic view"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "موقف",
+        "إطلالة بانورامية"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-zeriba-djanet",
+    "type": "hotel",
+    "placeId": "illizi",
+    "wilaya": "33",
+    "wilayaKey": "illizi",
+    "stars": 4,
+    "availability": "available",
+    "roomsAvailable": 5,
+    "name": "Zeriba Djanet",
+    "name_en": "Zeriba Djanet",
+    "name_ar": "زريبة جانت",
+    "address": "Djanet, Illizi",
+    "address_en": "Djanet, Illizi",
+    "address_ar": "جانت، إليزي",
+    "location": "Djanet",
+    "location_en": "Djanet",
+    "location_ar": "جانت",
+    "lat": 24.5542,
+    "lng": 9.4847,
+    "checkIn": "12:00",
+    "checkOut": "10:00",
+    "phone": "+213 37 00 00 00",
+    "desc": "Hébergement de charme aux portes du Tassili n'Ajjer et du désert du Sahara.",
+    "desc_en": "Charming stay at the gateway to Tassili n'Ajjer and the Sahara desert.",
+    "desc_ar": "إقامة ساحرة عند بوابة طاسيلي ناجر والصحراء.",
+    "image": "/images/hotels/zeriba-djanet-1.jpg",
+    "gallery": [
+      "/images/hotels/zeriba-djanet-1.jpg",
+      "/images/hotels/zeriba-djanet-2.jpg"
+    ],
+    "price": 24000,
+    "pricePerPerson": false,
+    "rating": 4.9,
+    "reviews": 156,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Excursions",
+        "Terrasse"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "Excursions",
+        "Terrace"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "رحلات",
+        "تراس"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-novotel-constantine",
+    "type": "hotel",
+    "placeId": "constantine",
+    "wilaya": "25",
+    "wilayaKey": "constantine",
+    "stars": 4,
+    "availability": "available",
+    "roomsAvailable": 11,
+    "name": "Novotel Constantine",
+    "name_en": "Novotel Constantine",
+    "name_ar": "نوفوتيل قسنطينة",
+    "address": "1 Square Hadj Ali, Constantine 25000",
+    "address_en": "1 Hadj Ali Square, Constantine 25000",
+    "address_ar": "1 ساحة حاج علي، قسنطينة 25000",
+    "location": "Constantine",
+    "location_en": "Constantine",
+    "location_ar": "قسنطينة",
+    "lat": 36.365219,
+    "lng": 6.606903,
+    "checkIn": "14:00",
+    "checkOut": "12:00",
+    "phone": "+213 31 99 20 00",
+    "desc": "Hôtel 4 étoiles en centre-ville, à quelques minutes du pont Sidi M'Cid, du musée de Cirta et de la mosquée Emir Abdelkader.",
+    "desc_en": "4-star downtown hotel minutes from Sidi M'Cid bridge, Cirta Museum and Emir Abdelkader Mosque.",
+    "desc_ar": "فندق 4 نجوم في وسط المدينة على بعد دقائق من جسر سيدي مسيد ومتحف قيرطا ومسجد الأمير عبد القادر.",
+    "image": "/images/hotels/constantine/novotel.jpg",
+    "gallery": [
+      "/images/hotels/constantine/novotel.jpg",
+      "/images/hotels/constantine/constantine-city.jpg",
+      "/images/hotels/constantine-bridge.png"
+    ],
+    "price": 16800,
+    "oldPrice": 19500,
+    "pricePerPerson": false,
+    "rating": 4.3,
+    "reviews": 142,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "Climatisation",
+        "Salle de réunion"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "Parking",
+        "AC",
+        "Meeting room"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "موقف",
+        "تكييف",
+        "قاعة اجتماعات"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "hotel-ibis-constantine",
+    "type": "hotel",
+    "placeId": "constantine",
+    "wilaya": "25",
+    "wilayaKey": "constantine",
+    "stars": 3,
+    "availability": "available",
+    "roomsAvailable": 18,
+    "name": "ibis Constantine",
+    "name_en": "ibis Constantine",
+    "name_ar": "إيبيس قسنطينة",
+    "address": "2 Square Hadj Ali, Constantine 25000",
+    "address_en": "2 Hadj Ali Square, Constantine 25000",
+    "address_ar": "2 ساحة حاج علي، قسنطينة 25000",
+    "location": "Constantine",
+    "location_en": "Constantine",
+    "location_ar": "قسنطينة",
+    "lat": 36.365423,
+    "lng": 6.606941,
+    "checkIn": "12:00",
+    "checkOut": "12:00",
+    "phone": "+213 31 87 20 00",
+    "desc": "Hôtel économique au cœur de Constantine : accès piéton aux ponts suspendus, théâtre et musées.",
+    "desc_en": "Budget hotel in the heart of Constantine: walking distance to suspension bridges, theatre and museums.",
+    "desc_ar": "فندق اقتصادي في قلب قسنطينة: مسافة مشي من الجسور المعلقة والمسرح والمتاحف.",
+    "image": "/images/hotels/constantine/ibis.jpg",
+    "gallery": [
+      "/images/hotels/constantine/ibis.jpg",
+      "/images/hotels/constantine-bridge.png",
+      "/images/hotels/constantine/constantine-city.jpg"
+    ],
+    "price": 12500,
+    "pricePerPerson": false,
+    "rating": 4.1,
+    "reviews": 98,
+    "amenities": {
+      "fr": [
+        "Wifi",
+        "Restaurant",
+        "Climatisation",
+        "Petit-déjeuner"
+      ],
+      "en": [
+        "Wifi",
+        "Restaurant",
+        "AC",
+        "Breakfast"
+      ],
+      "ar": [
+        "واي فاي",
+        "مطعم",
+        "تكييف",
+        "فطور"
+      ]
+    },
+    "published": true
+  },
+  {
+    "id": "gh-taghit",
+    "type": "guesthouse",
+    "placeId": "taghit",
+    "name": "Maison d’hôte authentique",
+    "name_en": "Authentic guesthouse",
+    "name_ar": "بيت ضيافة أصيل",
+    "location": "Taghit, Béchar",
+    "location_en": "Taghit, Béchar",
+    "location_ar": "تاغيت، بشار",
+    "desc": "Pension complète. Activités : 4×4, snowboard sur sable, dromadaire, visite des ksars, qaada en pleine dune, déjeuner ou dîner en palmeraie. Bus Mercedes confortable Alger – Taghit – Alger. Assistance 24h/24.",
+    "desc_en": "Full board. Activities: 4×4, sand snowboarding, camel, ksar visits, dune qaada, palm grove lunch or dinner. Comfortable Mercedes bus Algiers – Taghit – Algiers. 24/7 assistance.",
+    "desc_ar": "إقامة كاملة. أنشطة: دفع رباعي، تزلج على الرمال، جمل، زيارة القصور، قعدة في الكثبان، غداء أو عشاء في الواحة. حافلة مرسيدس مريحة الجزائر – تاغيت – الجزائر. مساعدة على مدار الساعة.",
+    "image": "/images/maison-hote-sud-1.png",
+    "gallery": [
+      "/images/maison-hote-sud-1.png",
+      "/images/maison-hote-sud-2.png",
+      "/images/maison-hote-sud-3.png.jpeg",
+      "/images/maison-hote-sud-4.png.jpeg",
+      "/images/maison-hote-sud-5.png.jpeg",
+      "/images/maison-hote-sud-6.png.jpeg",
+      "/images/maison-hote-sud-7.png.jpeg"
+    ],
+    "price": 60000,
+    "pricePerPerson": true,
+    "rating": 4.9,
+    "reviews": 142,
+    "amenities": {
+      "fr": [
+        "Pension complète",
+        "Activités : 4×4, snowboard sur sable, dromadaire, visite des ksars, qaada en pleine dune, déjeuner ou dîner en palmeraie",
+        "Bus Mercedes confortable Alger – Taghit – Alger",
+        "Assistance 24h/24"
+      ],
+      "en": [
+        "Full board",
+        "Activities: 4×4, sand snowboarding, camel, ksar visits, dune qaada, palm grove lunch or dinner",
+        "Comfortable Mercedes bus Algiers – Taghit – Algiers",
+        "24/7 assistance"
+      ],
+      "ar": [
+        "إقامة كاملة",
+        "أنشطة: دفع رباعي، تزلج على الرمال، جمل، زيارة القصور، قعدة في الكثبان، غداء أو عشاء في الواحة",
+        "حافلة مرسيدس مريحة الجزائر – تاغيت – الجزائر",
+        "مساعدة على مدار الساعة"
+      ]
+    },
+    "published": true
+  }
+];

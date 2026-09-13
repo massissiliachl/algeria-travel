@@ -51,15 +51,37 @@ function mapDayRow(row, fallback) {
   };
 }
 
+function getStaticHotelBase(hotelId) {
+  try {
+    const { STAYS } = require('../scripts/data/stays.cjs');
+    const stay = STAYS.find((s) => s.id === hotelId && s.type === 'hotel');
+    if (!stay || stay.published === false) return null;
+    return {
+      id: stay.id,
+      price: stay.price,
+      rooms_available: Math.max(1, Number(stay.roomsAvailable) || 10),
+      availability: stay.availability || 'available',
+    };
+  } catch (err) {
+    console.warn('[hotelAvailability] catalogue statique:', err.message);
+    return null;
+  }
+}
+
 async function getHotelBase(hotelId, { partner = false } = {}) {
   const publishedClause = partner ? '' : " and coalesce(published, true) = true";
-  const result = await query(
-    `select id, price, rooms_available, availability
-     from public.stays
-     where id = $1 and type = 'hotel'${publishedClause}`,
-    [hotelId]
-  );
-  return result.rows[0] || null;
+  try {
+    const result = await query(
+      `select id, price, rooms_available, availability
+       from public.stays
+       where id = $1 and type = 'hotel'${publishedClause}`,
+      [hotelId]
+    );
+    if (result.rows[0]) return result.rows[0];
+  } catch (err) {
+    console.warn('[hotelAvailability] DB:', err.message);
+  }
+  return partner ? null : getStaticHotelBase(hotelId);
 }
 
 async function getAvailabilityRange(hotelId, fromDate, toDate, options = {}) {
