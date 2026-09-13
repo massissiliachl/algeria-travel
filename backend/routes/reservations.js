@@ -245,6 +245,19 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Date de voyage invalide.' });
     }
 
+    if (itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place') {
+      const { TAGHIT_BOOKING_WINDOW } = require('../scripts/data/taghitPackages.cjs');
+      const travelDay = String(effectiveTravelDate).slice(0, 10);
+      if (travelDay !== TAGHIT_BOOKING_WINDOW.start) {
+        return res.status(400).json({
+          error: 'Formule Taghit : séjour complet du 23 au 28 octobre uniquement (vol inclus).',
+        });
+      }
+      effectiveCheckIn = TAGHIT_BOOKING_WINDOW.start;
+      effectiveCheckOut = TAGHIT_BOOKING_WINDOW.end;
+      effectiveTravelDate = TAGHIT_BOOKING_WINDOW.start;
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (parsedDate < today) {
@@ -260,6 +273,9 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Prix estimé invalide.' });
     }
     computedTotal = Math.round(computedTotal);
+
+    const isTaghitFixedStay =
+      itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place';
 
     const referenceCode = await createUniqueReference();
     const accessToken = generateAccessToken();
@@ -284,8 +300,8 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         email.trim().toLowerCase(),
         phone.trim(),
         effectiveTravelDate,
-        isHotelStay ? effectiveCheckIn : null,
-        isHotelStay ? effectiveCheckOut : null,
+        isHotelStay || isTaghitFixedStay ? effectiveCheckIn : null,
+        isHotelStay || isTaghitFixedStay ? effectiveCheckOut : null,
         isHotelStay ? roomsCount : null,
         travelersCount,
         normalizedStayType,

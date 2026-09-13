@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BottomSheet from '../ui/BottomSheet';
 import HoneypotField from '../ui/HoneypotField';
+import BookingWindowCalendar from './BookingWindowCalendar';
 import Icon from '../ui/Icon';
 import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
@@ -65,6 +66,9 @@ export default function BookingSheet({
   defaultCheckOut = '',
   defaultRooms = 1,
   stayTotalPrice = null,
+  dateMin = '',
+  dateMax = '',
+  fixedDateWindow = false,
 }) {
   const { t } = useLang();
   const hpRef = useRef(null);
@@ -80,7 +84,24 @@ export default function BookingSheet({
   const [pricePulse, setPricePulse] = useState(false);
 
   const isHotelBooking = bookingMode === 'hotel';
+  const hasDateWindow = Boolean(dateMin && dateMax);
+  const isFixedStay = hasDateWindow && fixedDateWindow;
   const travelersCount = Number(form.travelers) || 1;
+
+  const isDateInWindow = (iso) => {
+    if (!iso) return false;
+    if (dateMin && iso < dateMin) return false;
+    if (dateMax && iso > dateMax) return false;
+    return true;
+  };
+
+  const formatWindowDate = (iso) => {
+    if (!iso) return '';
+    return new Date(`${iso}T12:00:00`).toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'long',
+    });
+  };
   const roomsCount = Math.max(1, Number(form.rooms) || 1);
   const totalPrice = useMemo(() => {
     if (isHotelBooking && stayTotalPrice != null) return stayTotalPrice;
@@ -92,8 +113,9 @@ export default function BookingSheet({
       setForm({
         ...EMPTY_FORM,
         stay: defaultStay,
-        checkIn: defaultCheckIn || '',
-        checkOut: defaultCheckOut || '',
+        date: dateMin || '',
+        checkIn: defaultCheckIn || dateMin || '',
+        checkOut: defaultCheckOut || dateMax || '',
         rooms: String(defaultRooms || 1),
       });
       setCard(EMPTY_CARD);
@@ -108,7 +130,7 @@ export default function BookingSheet({
     }
     setEntered(false);
     return undefined;
-  }, [open, defaultStay, defaultCheckIn, defaultCheckOut, defaultRooms, itemId]);
+  }, [open, defaultStay, defaultCheckIn, defaultCheckOut, defaultRooms, itemId, dateMin, dateMax]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -166,6 +188,13 @@ export default function BookingSheet({
         setFormError(t('hotels_booking_dates_invalid'));
         return;
       }
+      if (hasDateWindow && (!isDateInWindow(form.checkIn) || !isDateInWindow(form.checkOut))) {
+        setFormError(t('booking_date_outside_window'));
+        return;
+      }
+    } else if (hasDateWindow && !isFixedStay && !isDateInWindow(form.date)) {
+      setFormError(t('booking_date_outside_window'));
+      return;
     }
 
     setSubmitting(true);
@@ -179,9 +208,9 @@ export default function BookingSheet({
         name: form.name,
         email: form.email,
         phone: form.phone,
-        travel_date: isHotelBooking ? form.checkIn : form.date,
-        check_in_date: isHotelBooking ? form.checkIn : undefined,
-        check_out_date: isHotelBooking ? form.checkOut : undefined,
+        travel_date: isFixedStay ? dateMin : isHotelBooking ? form.checkIn : form.date,
+        check_in_date: isFixedStay || isHotelBooking ? dateMin || form.checkIn : undefined,
+        check_out_date: isFixedStay || isHotelBooking ? dateMax || form.checkOut : undefined,
         rooms_requested: isHotelBooking ? roomsCount : undefined,
         travelers: travelersCount,
         stay_type: form.stay || null,
@@ -381,28 +410,68 @@ export default function BookingSheet({
                     className="booking-input"
                   />
                 </BookingField>
-                <BookingField icon="Calendar" label={`${t('hotels_checkin')} *`} delay={160}>
-                  <input
-                    type="date"
-                    name={isHotelBooking ? 'checkIn' : 'date'}
-                    value={isHotelBooking ? form.checkIn : form.date}
-                    onChange={onChange}
-                    required
-                    className="booking-input"
-                  />
-                </BookingField>
-                {isHotelBooking && (
-                  <BookingField icon="Calendar" label={`${t('hotels_checkout')} *`} delay={180}>
-                    <input
-                      type="date"
-                      name="checkOut"
-                      value={form.checkOut}
-                      onChange={onChange}
-                      min={form.checkIn || undefined}
-                      required
-                      className="booking-input"
+                {hasDateWindow ? (
+                  <BookingField
+                    icon="Calendar"
+                    label={isFixedStay ? t('booking_fixed_stay_label') : `${isHotelBooking ? t('hotels_checkin') : t('place_form_date')} *`}
+                    delay={160}
+                    className="booking-sheet__field--full"
+                  >
+                    <BookingWindowCalendar
+                      dateMin={dateMin}
+                      dateMax={dateMax}
+                      value={dateMin}
+                      rangeEnd={dateMax}
+                      mode="range"
+                      fixedRange={isFixedStay}
+                      onChange={(iso) => setForm((prev) => ({ ...prev, date: iso }))}
+                      onRangeChange={({ checkIn, checkOut }) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          checkIn: checkIn || prev.checkIn,
+                          checkOut: checkOut ?? prev.checkOut,
+                        }))
+                      }
                     />
+                    <p className="booking-sheet__date-window">
+                      {(isFixedStay ? t('booking_fixed_stay') : t('booking_date_window'))
+                        .replace('{{start}}', formatWindowDate(dateMin))
+                        .replace('{{end}}', formatWindowDate(dateMax))}
+                    </p>
+                    <input type="hidden" name="date" value={dateMin} readOnly required />
+                    <input type="hidden" name="checkIn" value={dateMin} readOnly />
+                    <input type="hidden" name="checkOut" value={dateMax} readOnly />
                   </BookingField>
+                ) : (
+                  <>
+                    <BookingField
+                      icon="Calendar"
+                      label={`${isHotelBooking ? t('hotels_checkin') : t('place_form_date')} *`}
+                      delay={160}
+                    >
+                      <input
+                        type="date"
+                        name={isHotelBooking ? 'checkIn' : 'date'}
+                        value={isHotelBooking ? form.checkIn : form.date}
+                        onChange={onChange}
+                        required
+                        className="booking-input"
+                      />
+                    </BookingField>
+                    {isHotelBooking && (
+                      <BookingField icon="Calendar" label={`${t('hotels_checkout')} *`} delay={180}>
+                        <input
+                          type="date"
+                          name="checkOut"
+                          value={form.checkOut}
+                          onChange={onChange}
+                          min={form.checkIn || undefined}
+                          required
+                          className="booking-input"
+                        />
+                      </BookingField>
+                    )}
+                  </>
                 )}
               </div>
 

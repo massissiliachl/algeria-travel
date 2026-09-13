@@ -57,6 +57,12 @@ export const TAGHIT_PLACE = {
   ],
 };
 
+/** Fenêtre de réservation formule hôtel Taghit (vol Alger ↔ Béchar inclus). */
+export const TAGHIT_BOOKING_WINDOW = {
+  start: '2026-10-23',
+  end: '2026-10-28',
+};
+
 export const TAGHIT_PACKAGES = {
   hotel: {
     id: 'hotel',

@@ -57,6 +57,11 @@ exports.TAGHIT_PLACE = {
   ],
 };
 
+exports.TAGHIT_BOOKING_WINDOW = {
+  start: '2026-10-23',
+  end: '2026-10-28',
+};
+
 exports.TAGHIT_PACKAGES = {
   hotel: {
     id: 'hotel',

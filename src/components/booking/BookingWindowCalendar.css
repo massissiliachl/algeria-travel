@@ -1,0 +1,90 @@
+.bk-win-cal {
+  width: 100%;
+  background: #fff;
+  border: 1px solid rgba(0, 26, 63, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.bk-win-cal__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+  font-size: 0.92rem;
+  color: #001a3f;
+}
+
+.bk-win-cal__weekdays,
+.bk-win-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.bk-win-cal__weekdays {
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.bk-win-cal__cell {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #eceff3;
+  color: #9ca3af;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  cursor: not-allowed;
+  padding: 0;
+  opacity: 0.55;
+}
+
+.bk-win-cal__cell.is-empty {
+  background: transparent;
+  opacity: 1;
+  cursor: default;
+}
+
+.bk-win-cal__cell.is-open {
+  background: rgba(196, 149, 84, 0.14);
+  color: #001a3f;
+  opacity: 1;
+  cursor: pointer;
+}
+
+.bk-win-cal__cell.is-open:hover {
+  background: rgba(196, 149, 84, 0.28);
+}
+
+.bk-win-cal__cell.is-open.is-selected {
+  background: #001a3f;
+  color: #fff;
+  border-color: #001a3f;
+}
+
+.bk-win-cal__cell.is-in-stay {
+  background: rgba(196, 149, 84, 0.32);
+  color: #001a3f;
+  opacity: 1;
+  font-weight: 700;
+  cursor: default;
+}
+
+.bk-win-cal__cell.is-in-stay.is-closed {
+  background: rgba(196, 149, 84, 0.32);
+  color: #001a3f;
+  opacity: 1;
+}
+
+.bk-win-cal__cell.is-closed:disabled {
+  background: #f3f4f6;
+  color: #cbd5e1;
+}

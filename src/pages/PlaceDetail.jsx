@@ -9,6 +9,7 @@ import ImageLightbox from '../components/ui/ImageLightbox';
 import BookingSheet from '../components/booking/BookingSheet';
 import { useLang } from '../hooks/useLangHook';
 import { getPlaceById, PLACES } from '../data/places';
+import { TAGHIT_BOOKING_WINDOW } from '../data/taghitPackages';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
@@ -426,6 +427,9 @@ const PlaceDetail = () => {
         stayField={stayField}
         defaultStay={defaultStay}
         titleEm={placeName}
+        dateMin={id === 'taghit' ? TAGHIT_BOOKING_WINDOW.start : ''}
+        dateMax={id === 'taghit' ? TAGHIT_BOOKING_WINDOW.end : ''}
+        fixedDateWindow={id === 'taghit'}
       />
 
       <Footer />
