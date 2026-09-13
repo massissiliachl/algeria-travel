@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { api, clearAdminKey, isLoggedIn, setAdminKey, setUnauthorizedHandler } from '../api';
+import { api, clearAdminKey, setAdminKey, setUnauthorizedHandler, verifyKey } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -18,16 +18,17 @@ export function AuthProvider({ children }) {
       setAuthenticated(false);
     });
 
-    const key = sessionStorage.getItem('admin_key');
+    const devKey = import.meta.env.VITE_DEV_ADMIN_KEY?.trim();
+    const storedKey = sessionStorage.getItem('admin_key')?.trim();
+    const key = storedKey || (import.meta.env.DEV && devKey ? devKey : '');
     if (!key) {
       setBooting(false);
       return;
     }
 
-    api
-      .verifyKey(key)
+    verifyKey(key)
       .then(() => {
-        setAdminKey(key);
+        setAdminKey(key.trim());
         setAuthenticated(true);
       })
       .catch(() => {
@@ -38,8 +39,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (key) => {
-    await api.verifyKey(key);
-    setAdminKey(key);
+    const trimmed = String(key || '').trim();
+    await verifyKey(trimmed);
+    setAdminKey(trimmed);
     setAuthenticated(true);
   };
 

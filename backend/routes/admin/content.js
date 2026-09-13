@@ -95,8 +95,10 @@ router.post(
     const adminKey = process.env.ADMIN_API_KEY;
     if (!adminKey) return res.status(503).json({ valid: false, error: 'Admin non configuré.' });
 
-    const key = req.body?.key || req.headers['x-admin-key'];
-    if (!key || key !== adminKey) return res.status(401).json({ valid: false });
+    const key = (req.body?.key || req.headers['x-admin-key'] || '').trim();
+    if (!key || key !== adminKey.trim()) {
+      return res.status(401).json({ valid: false, error: 'Clé admin incorrecte.' });
+    }
 
     res.json({ valid: true });
   })

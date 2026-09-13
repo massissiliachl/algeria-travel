@@ -58,7 +58,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { reservations, comments } = usePendingCounts();
+  const { reservations, comments, apiOffline } = usePendingCounts();
 
   const publicSiteUrl = resolvePublicSiteUrl();
   const partnerUrl = resolvePartnerPortalUrl();
@@ -151,6 +151,13 @@ export default function Layout() {
         </div>
 
         <div className={`admin-main-inner${location.pathname.includes('/hotels/') ? ' admin-main-inner--wide' : ''}`}>
+          {apiOffline && (
+            <div className="alert alert-error" style={{ marginBottom: 16 }}>
+              Backend injoignable — à la racine du projet lancez <code>npm run dev:local</code>{' '}
+              (backend + site + admin), ou démarrez le backend avec{' '}
+              <code>cd backend; npm run dev</code> puis rechargez.
+            </div>
+          )}
           <Outlet />
         </div>
       </main>

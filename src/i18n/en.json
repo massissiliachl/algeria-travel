@@ -537,6 +537,7 @@
   "booking_gdpr_prefix": "I agree that my data may be used to process my request, in accordance with the",
   "booking_gdpr_required": "You must accept the privacy policy.",
   "booking_error_generic": "Something went wrong. Please try again or contact us.",
+  "booking_error_incomplete": "Your request was not saved. Please try again or contact us by phone.",
   "booking_pay_mode_title": "How would you like to book?",
   "booking_pay_mode_lead": "Pick the option that suits you — no commitment.",
   "booking_pay_pre_request": "Pre-request",

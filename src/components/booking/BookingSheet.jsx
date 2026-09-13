@@ -22,7 +22,7 @@ const EMPTY_FORM = {
   stay: '',
   payment: 'pre_request',
   message: '',
-  website: '',
+  _hp: '',
 };
 
 const EMPTY_CARD = {
@@ -190,7 +190,7 @@ export default function BookingSheet({
         price_estimate: totalPrice,
         payment_method: form.payment,
         gdpr_consent: true,
-        website: form.website,
+        _hp: form._hp,
       };
 
       if (isCardMode) {
@@ -198,6 +198,9 @@ export default function BookingSheet({
       }
 
       const result = await api.createReservation(payload);
+      if (!result.referenceCode || !result.accessToken) {
+        throw new Error(t('booking_error_incomplete'));
+      }
       setPaidWithCard(isCardMode);
       setBookingRef({
         referenceCode: result.referenceCode,
@@ -334,8 +337,8 @@ export default function BookingSheet({
             <form className="booking-sheet__form" onSubmit={onSubmit}>
               <input
                 type="text"
-                name="website"
-                value={form.website}
+                name="_hp"
+                value={form._hp}
                 onChange={onChange}
                 tabIndex={-1}
                 autoComplete="off"

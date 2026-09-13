@@ -16,6 +16,8 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "react-scripts start",
+    "dev:local": "node scripts/dev-local.js",
+    "setup:admin": "node scripts/setup-local-admin.js",
     "start:api": "node backend/server.js",
     "build": "node scripts/sync-brand-icons.js && node scripts/generate-sitemap.js && react-scripts build",
     "sync:icons": "node scripts/sync-brand-icons.js",

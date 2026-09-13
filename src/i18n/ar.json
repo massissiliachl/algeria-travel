@@ -538,6 +538,7 @@
   "booking_gdpr_prefix": "أوافق على استخدام بياناتي لمعالجة طلبي، وفقًا لـ",
   "booking_gdpr_required": "يجب قبول سياسة الخصوصية.",
   "booking_error_generic": "حدث خطأ. حاول مرة أخرى أو اتصل بنا.",
+  "booking_error_incomplete": "لم يتم حفظ طلبك. حاول مرة أخرى أو اتصل بنا هاتفياً.",
   "booking_pay_mode_title": "كيف تريد الحجز؟",
   "booking_pay_mode_lead": "اختر الطريقة المناسبة — بدون التزام.",
   "booking_pay_pre_request": "طلب مسبق",

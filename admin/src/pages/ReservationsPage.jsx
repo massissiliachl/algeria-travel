@@ -18,7 +18,7 @@ const PAYMENT_LABELS = {
 };
 
 export default function ReservationsPage() {
-  const [filter, setFilter] = useState('pending');
+  const [filter, setFilter] = useState('all');
   const [data, setData] = useState([]);
   const [selected, setSelected] = useState(null);
   const [notes, setNotes] = useState('');
@@ -32,7 +32,12 @@ export default function ReservationsPage() {
       const res = await api.getReservations(filter);
       setData(res.reservations || []);
     } catch (e) {
-      setError(e.message);
+      const msg = e.message || '';
+      if (msg.includes('401') || /refusé|invalide/i.test(msg)) {
+        setError('Accès refusé — déconnectez-vous et reconnectez-vous avec ADMIN_API_KEY (backend/.env).');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -40,6 +45,12 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     load();
+    const id = setInterval(load, 30000);
+    window.addEventListener('focus', load);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('focus', load);
+    };
   }, [load]);
 
   const openDetail = (r) => {
@@ -86,7 +97,17 @@ export default function ReservationsPage() {
         {loading ? (
           <p className="empty">Chargement…</p>
         ) : data.length === 0 ? (
-          <p className="empty">Aucune réservation.</p>
+          <div className="empty">
+            <p>Aucune réservation{filter !== 'all' ? ` (${FILTERS.find((f) => f.key === filter)?.label?.toLowerCase()})` : ''}.</p>
+            {import.meta.env.DEV && (
+              <p className="panel-note" style={{ marginTop: 12, maxWidth: 560 }}>
+                Vérifiez que le backend tourne (<code>cd backend; npm run dev</code>), que vous êtes
+                connecté avec la bonne clé admin, et testez une réservation sur{' '}
+                <a href="http://localhost:3000" target="_blank" rel="noreferrer">localhost:3000</a>{' '}
+                — vous devez obtenir un code <strong>AT-XXXXXX</strong>.
+              </p>
+            )}
+          </div>
         ) : (
           <table className="data-table">
             <thead>

@@ -24,7 +24,7 @@ const Contact = () => {
     phone: '',
     subject: '',
     message: '',
-    website: '',
+    _hp: '',
   });
   const [gdpr, setGdpr] = useState(false);
   const [sending, setSending] = useState(false);
@@ -64,7 +64,7 @@ const Contact = () => {
     try {
       await api.sendContact({ ...form, gdpr_consent: true });
       setSent(true);
-      setForm({ name: '', email: '', phone: '', subject: '', message: '', website: '' });
+      setForm({ name: '', email: '', phone: '', subject: '', message: '', _hp: '' });
       setGdpr(false);
     } catch (err) {
       setError(err.message || 'Une erreur est survenue.');
@@ -191,8 +191,8 @@ const Contact = () => {
                 <form className="ct-form" onSubmit={onSubmit}>
                   <input
                     type="text"
-                    name="website"
-                    value={form.website}
+                    name="_hp"
+                    value={form._hp}
                     onChange={onChange}
                     tabIndex={-1}
                     autoComplete="off"

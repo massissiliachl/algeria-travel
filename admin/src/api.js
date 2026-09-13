@@ -36,6 +36,7 @@ async function request(path, options = {}) {
 
   if (res.status === 401) {
     unauthorizedHandler?.();
+    throw new Error(data.error || 'Accès admin refusé — vérifiez ADMIN_API_KEY dans backend/.env');
   }
 
   if (!res.ok) {
@@ -45,9 +46,25 @@ async function request(path, options = {}) {
   return data;
 }
 
+export async function verifyKey(key) {
+  const trimmed = String(key || '').trim();
+  const res = await fetch(`${resolveApiBase()}/api/admin/auth/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-key': trimmed,
+    },
+    body: JSON.stringify({ key: trimmed }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || 'Clé admin incorrecte.');
+  }
+  return data;
+}
+
 export const api = {
-  verifyKey: (key) =>
-    request('/api/admin/auth/verify', { method: 'POST', body: JSON.stringify({ key }) }),
+  verifyKey,
 
   getStats: () => request('/api/admin/stats'),
 

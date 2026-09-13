@@ -538,6 +538,7 @@
   "booking_gdpr_prefix": "J'accepte que mes données soient utilisées pour traiter ma demande, conformément à la",
   "booking_gdpr_required": "Vous devez accepter la politique de confidentialité.",
   "booking_error_generic": "Une erreur est survenue. Réessayez ou contactez-nous.",
+  "booking_error_incomplete": "La demande n'a pas été enregistrée. Réessayez ou contactez-nous par téléphone.",
   "booking_pay_mode_title": "Comment réserver ?",
   "booking_pay_mode_lead": "Choisissez la formule qui vous convient — sans engagement.",
   "booking_pay_pre_request": "Demande préalable",

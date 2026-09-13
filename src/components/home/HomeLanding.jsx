@@ -46,7 +46,7 @@ const HomeLanding = () => {
     email: '',
     phone: '',
     message: '',
-    website: '',
+    _hp: '',
   });
   const [proposalGdpr, setProposalGdpr] = useState(false);
   const [proposalSending, setProposalSending] = useState(false);
@@ -112,7 +112,7 @@ const HomeLanding = () => {
         gdpr_consent: true,
       });
       setProposalSent(true);
-      setProposal({ name: '', email: '', phone: '', message: '', website: '' });
+      setProposal({ name: '', email: '', phone: '', message: '', _hp: '' });
       setProposalGdpr(false);
     } catch (err) {
       setProposalError(err.message || 'Une erreur est survenue.');
@@ -639,8 +639,8 @@ const HomeLanding = () => {
                 <form className="hv-news__form" onSubmit={handleProposal}>
                   <input
                     type="text"
-                    name="website"
-                    value={proposal.website}
+                    name="_hp"
+                    value={proposal._hp}
                     onChange={handleProposalChange}
                     tabIndex={-1}
                     autoComplete="off"

@@ -8,9 +8,10 @@ function adminAuth(req, res, next) {
   }
 
   const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : req.headers['x-admin-key'];
+  const rawToken = header.startsWith('Bearer ') ? header.slice(7) : req.headers['x-admin-key'];
+  const token = rawToken?.trim();
 
-  if (!token || token !== adminKey) {
+  if (!token || token !== adminKey.trim()) {
     return res.status(401).json({ error: 'Accès admin refusé.' });
   }
 

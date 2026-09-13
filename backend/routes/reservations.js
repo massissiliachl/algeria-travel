@@ -105,9 +105,10 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       card_brand: cardBrand,
       card_expiry: cardExpiry,
       website,
+      _hp: honeypot,
     } = req.body;
 
-    if (website?.trim()) {
+    if (website?.trim() || honeypot?.trim()) {
       return res.status(201).json({
         success: true,
         message: 'Demande de réservation envoyée. Notre équipe vous recontacte sous 24h.',

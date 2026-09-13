@@ -17,9 +17,9 @@ const contactLimiter = createRateLimiter({
 
 router.post('/', contactLimiter, async (req, res, next) => {
   try {
-    const { name, email, phone, subject, message, gdpr_consent: gdprConsent, website } = req.body;
+    const { name, email, phone, subject, message, gdpr_consent: gdprConsent, website, _hp: honeypot } = req.body;
 
-    if (website?.trim()) {
+    if (website?.trim() || honeypot?.trim()) {
       return res.status(201).json({
         success: true,
         message: 'Message envoyé. Nous vous répondrons sous 24h.',

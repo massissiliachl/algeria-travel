@@ -3,6 +3,7 @@ import { api } from '../api';
 
 export function usePendingCounts(pollMs = 30000) {
   const [counts, setCounts] = useState({ reservations: 0, comments: 0 });
+  const [apiOffline, setApiOffline] = useState(false);
 
   const refresh = useCallback(async () => {
     const [reservationsResult, commentsResult] = await Promise.allSettled([
@@ -10,15 +11,15 @@ export function usePendingCounts(pollMs = 30000) {
       api.getCommentStats(),
     ]);
 
+    const reservationsOk = reservationsResult.status === 'fulfilled';
+    const commentsOk = commentsResult.status === 'fulfilled';
+    setApiOffline(!reservationsOk && !commentsOk);
+
     setCounts({
-      reservations:
-        reservationsResult.status === 'fulfilled'
-          ? (reservationsResult.value.reservations || []).length
-          : 0,
-      comments:
-        commentsResult.status === 'fulfilled'
-          ? commentsResult.value.pending || 0
-          : 0,
+      reservations: reservationsOk
+        ? (reservationsResult.value.reservations || []).length
+        : 0,
+      comments: commentsOk ? commentsResult.value.pending || 0 : 0,
     });
   }, []);
 
@@ -32,5 +33,5 @@ export function usePendingCounts(pollMs = 30000) {
     };
   }, [refresh, pollMs]);
 
-  return { ...counts, refresh };
+  return { ...counts, apiOffline, refresh };
 }
