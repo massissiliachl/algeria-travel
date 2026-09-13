@@ -92,6 +92,7 @@ app.use('/api/admin/reservations', adminReservationsRoutes);
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin/favorites', require('./routes/admin/favorites'));
 app.use('/api/admin/comments', require('./routes/admin/comments'));
+app.use('/api/admin/contact-messages', require('./routes/admin/contactMessages'));
 app.use('/api/admin', require('./routes/admin/media'));
 app.use('/api/admin', require('./routes/admin/content'));
 app.use('/api/admin/hotel-users', require('./routes/admin/hotelUsers'));

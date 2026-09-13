@@ -40,6 +40,12 @@ export default function CommentsPage() {
 
   useEffect(() => {
     load();
+    const id = setInterval(load, 30000);
+    window.addEventListener('focus', load);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('focus', load);
+    };
   }, [load]);
 
   const moderate = async (id, status) => {

@@ -92,6 +92,7 @@ export default function DashboardPage() {
   const cards = [
     { label: 'Réservations en attente', value: stats.reservations.pending, className: 'pending', to: '/reservations', icon: 'pending' },
     { label: 'Commentaires en attente', value: stats.commentsPending || 0, className: 'pending', to: '/comments', icon: 'blog' },
+    { label: 'Messages contact non lus', value: stats.contactMessages?.unread || 0, className: 'pending', to: '/contact', icon: 'blog' },
     { label: 'Réservations confirmées', value: stats.reservations.confirmed, className: 'confirmed', to: '/reservations', icon: 'confirmed' },
     { label: 'Circuits', value: stats.tours, to: '/tours', icon: 'tours' },
     { label: 'Activités', value: stats.activities, to: '/activities', icon: 'activities' },
@@ -115,8 +116,8 @@ export default function DashboardPage() {
         <div className="dashboard-welcome-content">
           <h2>Bienvenue dans l'espace admin</h2>
           <p>
-            Gérez vos réservations, contenus et médias depuis un seul endroit.
-            Les modifications sont visibles immédiatement sur le site public.
+            Gérez réservations, messages contact, contenus et médias depuis un seul endroit.
+            Les hôtels, la galerie et les réservations se synchronisent avec le site public.
           </p>
           <div className="dashboard-welcome-stats">
             <div className="dashboard-welcome-stat">
@@ -208,6 +209,8 @@ export default function DashboardPage() {
         <div className="panel-body">
           <div className="quick-actions">
             <Link to="/reservations" className="btn btn-primary">Voir les réservations</Link>
+            <Link to="/contact" className="btn btn-secondary">Messages contact</Link>
+            <Link to="/media" className="btn btn-secondary">Bibliothèque médias</Link>
             <Link to="/tours/new" className="btn btn-secondary">Nouveau circuit</Link>
             <Link to="/activities/new" className="btn btn-secondary">Nouvelle activité</Link>
             <Link to="/hotels/new" className="btn btn-secondary">Nouvel hôtel</Link>

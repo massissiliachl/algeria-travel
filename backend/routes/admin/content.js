@@ -25,7 +25,7 @@ router.get(
   '/stats',
   adminAuth,
   asyncHandler(async (req, res) => {
-    const [reservations, tours, activities, stays, hotels, blog, places, gallery] = await Promise.all([
+    const [reservations, tours, activities, stays, hotels, blog, places, gallery, contactMessages] = await Promise.all([
       safeQuery(`select status, count(*)::int as count from public.reservations group by status`),
       safeQuery(`select count(*)::int as count from public.tours`),
       safeQuery(`select count(*)::int as count from public.activities`),
@@ -34,6 +34,12 @@ router.get(
       safeQuery(`select count(*)::int as count from public.blog_posts`),
       safeQuery(`select count(*)::int as count from public.places`),
       safeQuery(`select count(*)::int as count from public.gallery_items`),
+      safeQuery(
+        `select
+           count(*)::int as total,
+           count(*) filter (where read_at is null)::int as unread
+         from public.contact_messages`
+      ),
     ]);
 
     const byStatus = Object.fromEntries((reservations?.rows || []).map((r) => [r.status, r.count]));
@@ -73,6 +79,10 @@ router.get(
       blogPosts: blog?.rows?.[0]?.count ?? 0,
       places: places?.rows?.[0]?.count ?? 0,
       gallery: gallery?.rows?.[0]?.count ?? 0,
+      contactMessages: {
+        total: contactMessages?.rows?.[0]?.total ?? 0,
+        unread: contactMessages?.rows?.[0]?.unread ?? 0,
+      },
       favorites,
       commentsPending,
     });

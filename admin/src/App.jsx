@@ -9,11 +9,18 @@ import ReservationsPage from './pages/ReservationsPage';
 import EntityListPage from './pages/EntityListPage';
 import EntityEditPage from './pages/EntityEditPage';
 import CommentsPage from './pages/CommentsPage';
+import ContactPage from './pages/ContactPage';
+import MediaPage from './pages/MediaPage';
 import HotelEditPage from './pages/HotelEditPage';
+import { LoadingState } from './components/ui';
 import './styles/admin.css';
 
 function AppRoutes() {
-  const { authenticated } = useAuth();
+  const { authenticated, booting } = useAuth();
+
+  if (booting) {
+    return <LoadingState label="Chargement de l'administration…" />;
+  }
 
   return (
     <Routes>
@@ -31,6 +38,8 @@ function AppRoutes() {
         <Route index element={<DashboardPage />} />
         <Route path="reservations" element={<ReservationsPage />} />
         <Route path="comments" element={<CommentsPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="media" element={<MediaPage />} />
         <Route path=":entityKey" element={<EntityListPage />} />
         <Route path="hotels/:id" element={<HotelEditPage />} />
         <Route path=":entityKey/:id" element={<EntityEditPage />} />

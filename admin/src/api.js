@@ -1,5 +1,11 @@
 import { resolveApiBase } from './utils/apiBase';
 
+let unauthorizedHandler = null;
+
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler;
+}
+
 function getKey() {
   return sessionStorage.getItem('admin_key') || '';
 }
@@ -27,6 +33,10 @@ async function request(path, options = {}) {
     },
   });
   const data = await res.json().catch(() => ({}));
+
+  if (res.status === 401) {
+    unauthorizedHandler?.();
+  }
 
   if (!res.ok) {
     throw new Error(data.error || `Erreur (${res.status})`);
@@ -88,6 +98,7 @@ export const api = {
     });
 
     const data = await res.json().catch(() => ({}));
+    if (res.status === 401) unauthorizedHandler?.();
     if (!res.ok) throw new Error(data.error || `Erreur upload (${res.status})`);
     return data;
   },
@@ -126,4 +137,20 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify({ ...payload, roomIndex }),
     }),
+
+  getContactMessageStats: () => request('/api/admin/contact-messages/stats'),
+
+  getContactMessages: (status = 'all') =>
+    request(`/api/admin/contact-messages?status=${encodeURIComponent(status)}`),
+
+  getContactMessage: (id) => request(`/api/admin/contact-messages/${id}`),
+
+  updateContactMessage: (id, payload) =>
+    request(`/api/admin/contact-messages/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteContactMessage: (id) =>
+    request(`/api/admin/contact-messages/${id}`, { method: 'DELETE' }),
 };
