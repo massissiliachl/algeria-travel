@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import HoneypotField from '../components/ui/HoneypotField';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { api } from '../services/api';
@@ -18,13 +19,13 @@ const ABOUT_VALUES = [
 
 const Contact = () => {
   const { t } = useLang();
+  const hpRef = useRef(null);
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
     subject: '',
     message: '',
-    _hp: '',
   });
   const [gdpr, setGdpr] = useState(false);
   const [sending, setSending] = useState(false);
@@ -62,9 +63,14 @@ const Contact = () => {
     setError('');
 
     try {
-      await api.sendContact({ ...form, gdpr_consent: true });
+      await api.sendContact({
+        ...form,
+        gdpr_consent: true,
+        _hp: hpRef.current?.value?.trim() || '',
+      });
       setSent(true);
-      setForm({ name: '', email: '', phone: '', subject: '', message: '', _hp: '' });
+      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+      if (hpRef.current) hpRef.current.value = '';
       setGdpr(false);
     } catch (err) {
       setError(err.message || 'Une erreur est survenue.');
@@ -188,17 +194,8 @@ const Contact = () => {
                   </button>
                 </div>
               ) : (
-                <form className="ct-form" onSubmit={onSubmit}>
-                  <input
-                    type="text"
-                    name="_hp"
-                    value={form._hp}
-                    onChange={onChange}
-                    tabIndex={-1}
-                    autoComplete="off"
-                    aria-hidden="true"
-                    className="place-form__honeypot"
-                  />
+                <form className="ct-form" onSubmit={onSubmit} autoComplete="off">
+                  <HoneypotField ref={hpRef} className="place-form__honeypot" />
                   <div className="ct-form__row">
                     <label>
                       {t('contact_label_name')}

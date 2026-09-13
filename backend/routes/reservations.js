@@ -109,6 +109,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
     } = req.body;
 
     if (website?.trim() || honeypot?.trim()) {
+      console.warn('[Reservation] Honeypot déclenché — demande ignorée (spam/autofill).');
       return res.status(201).json({
         success: true,
         message: 'Demande de réservation envoyée. Notre équipe vous recontacte sous 24h.',

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
 import Icon from '../ui/Icon';
+import HoneypotField from '../ui/HoneypotField';
 import ResponsiveImage from '../ui/ResponsiveImage';
 import {
   HOME_CIRCUITS_BANNER,
@@ -41,12 +42,12 @@ const HomeLanding = () => {
     activity: '',
   });
   const [openSuggest, setOpenSuggest] = useState(null); // 'destination' | 'activity' | null
+  const proposalHpRef = useRef(null);
   const [proposal, setProposal] = useState({
     name: '',
     email: '',
     phone: '',
     message: '',
-    _hp: '',
   });
   const [proposalGdpr, setProposalGdpr] = useState(false);
   const [proposalSending, setProposalSending] = useState(false);
@@ -110,9 +111,11 @@ const HomeLanding = () => {
         ...proposal,
         subject: 'proposition',
         gdpr_consent: true,
+        _hp: proposalHpRef.current?.value?.trim() || '',
       });
       setProposalSent(true);
-      setProposal({ name: '', email: '', phone: '', message: '', _hp: '' });
+      setProposal({ name: '', email: '', phone: '', message: '' });
+      if (proposalHpRef.current) proposalHpRef.current.value = '';
       setProposalGdpr(false);
     } catch (err) {
       setProposalError(err.message || 'Une erreur est survenue.');
@@ -636,17 +639,8 @@ const HomeLanding = () => {
                   </button>
                 </div>
               ) : (
-                <form className="hv-news__form" onSubmit={handleProposal}>
-                  <input
-                    type="text"
-                    name="_hp"
-                    value={proposal._hp}
-                    onChange={handleProposalChange}
-                    tabIndex={-1}
-                    autoComplete="off"
-                    aria-hidden="true"
-                    className="hv-news__honeypot"
-                  />
+                <form className="hv-news__form" onSubmit={handleProposal} autoComplete="off">
+                  <HoneypotField ref={proposalHpRef} className="hv-news__honeypot" />
                   <div className="hv-news__fields">
                     <input
                       type="text"

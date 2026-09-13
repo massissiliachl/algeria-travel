@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BottomSheet from '../ui/BottomSheet';
+import HoneypotField from '../ui/HoneypotField';
 import Icon from '../ui/Icon';
 import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
@@ -22,7 +23,6 @@ const EMPTY_FORM = {
   stay: '',
   payment: 'pre_request',
   message: '',
-  _hp: '',
 };
 
 const EMPTY_CARD = {
@@ -67,6 +67,7 @@ export default function BookingSheet({
   stayTotalPrice = null,
 }) {
   const { t } = useLang();
+  const hpRef = useRef(null);
   const [form, setForm] = useState({ ...EMPTY_FORM, stay: defaultStay });
   const [card, setCard] = useState(EMPTY_CARD);
   const [paidWithCard, setPaidWithCard] = useState(false);
@@ -190,7 +191,7 @@ export default function BookingSheet({
         price_estimate: totalPrice,
         payment_method: form.payment,
         gdpr_consent: true,
-        _hp: form._hp,
+        _hp: hpRef.current?.value?.trim() || '',
       };
 
       if (isCardMode) {
@@ -334,17 +335,8 @@ export default function BookingSheet({
               </section>
             )}
 
-            <form className="booking-sheet__form" onSubmit={onSubmit}>
-              <input
-                type="text"
-                name="_hp"
-                value={form._hp}
-                onChange={onChange}
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                className="booking-sheet__honeypot"
-              />
+            <form className="booking-sheet__form" onSubmit={onSubmit} autoComplete="off">
+              <HoneypotField ref={hpRef} className="booking-sheet__honeypot" />
 
               {formError && (
                 <p className="booking-sheet__error" role="alert">
