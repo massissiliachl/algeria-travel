@@ -24,14 +24,21 @@ export function isLoggedIn() {
 
 async function request(path, options = {}) {
   const { headers: optionHeaders, ...rest } = options;
-  const res = await fetch(`${resolveApiBase()}${path}`, {
-    ...rest,
-    headers: {
-      'Content-Type': 'application/json',
-      'x-admin-key': getKey(),
-      ...optionHeaders,
-    },
-  });
+  let res;
+  try {
+    res = await fetch(`${resolveApiBase()}${path}`, {
+      ...rest,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-key': getKey(),
+        ...optionHeaders,
+      },
+    });
+  } catch {
+    throw new Error(
+      'Backend injoignable — lancez le backend (cd backend && npm run dev) ou npm run dev:local à la racine.'
+    );
+  }
   const data = await res.json().catch(() => ({}));
 
   if (res.status === 401) {

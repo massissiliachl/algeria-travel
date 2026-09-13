@@ -347,6 +347,7 @@ const Stays = () => {
           unitPrice={selected.price}
           pricePerPerson={Boolean(selected.pricePerPerson)}
           defaultStay={selected.type === 'guesthouse' ? 'guesthouse' : 'hotel'}
+          bookingMode={selected.type === 'hotel' ? 'hotel' : 'default'}
           titleEm={pick(selected.name, selected.name_en, selected.name_ar)}
         />
       )}

@@ -134,6 +134,14 @@ router.post('/', reservationLimiter, async (req, res, next) => {
     const roomsCount = Math.max(1, Number(roomsRequested) || 1);
 
     if (isHotelStay) {
+      if (!effectiveCheckIn && effectiveTravelDate) {
+        effectiveCheckIn = String(effectiveTravelDate).trim().slice(0, 10);
+      }
+      if (effectiveCheckIn && !effectiveCheckOut) {
+        const checkout = new Date(`${effectiveCheckIn}T12:00:00`);
+        checkout.setDate(checkout.getDate() + 1);
+        effectiveCheckOut = checkout.toISOString().slice(0, 10);
+      }
       if (!effectiveCheckIn || !effectiveCheckOut) {
         return res.status(400).json({ error: 'Dates d’arrivée et de départ requises.' });
       }
