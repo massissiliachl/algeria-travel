@@ -711,11 +711,7 @@
 /* ── Responsive ── */
 @media (max-width: 960px) {
   .chatbot-fab {
-    width: 52px;
-    height: 52px;
-    bottom: calc(20px + env(safe-area-inset-bottom, 0));
-    right: calc(68px + env(safe-area-inset-right, 0));
-    z-index: 10001;
+    display: none;
   }
 
   .chatbot-fab--above-bar {

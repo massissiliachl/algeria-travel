@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Icon from '../ui/Icon';
 import { useLang } from '../../hooks/useLangHook';
 import { api } from '../../services/api';
@@ -6,6 +7,100 @@ import './InboxWidget.css';
 
 const POLL_OPEN_MS = 8000;
 const POLL_CLOSED_MS = 30000;
+
+function InboxPanel({
+  t,
+  loading,
+  messages,
+  conversation,
+  name,
+  setName,
+  email,
+  setEmail,
+  error,
+  draft,
+  setDraft,
+  sending,
+  onSubmit,
+  onClose,
+  listRef,
+}) {
+  return (
+    <div className="inbox-widget__panel" role="dialog" aria-modal="true" aria-labelledby="inbox-sheet-title">
+      <div className="inbox-widget__head">
+        <div>
+          <strong id="inbox-sheet-title">{t('inbox_title')}</strong>
+          <p>{t('inbox_subtitle')}</p>
+        </div>
+        <button type="button" className="inbox-widget__close" onClick={onClose} aria-label={t('inbox_close')}>
+          <Icon name="X" size={18} />
+        </button>
+      </div>
+
+      {!conversation?.visitorName && (
+        <div className="inbox-widget__profile">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t('inbox_name_placeholder')}
+            maxLength={80}
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t('inbox_email_placeholder')}
+            maxLength={120}
+          />
+        </div>
+      )}
+
+      <div className="inbox-widget__messages" ref={listRef}>
+        {loading && messages.length === 0 ? (
+          <p className="inbox-widget__empty">{t('inbox_loading')}</p>
+        ) : messages.length === 0 ? (
+          <p className="inbox-widget__empty">{t('inbox_empty')}</p>
+        ) : (
+          messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`inbox-widget__msg ${msg.senderType === 'admin' ? 'is-admin' : 'is-visitor'}`}
+            >
+              <p>{msg.body}</p>
+              <time>{formatTime(msg.createdAt)}</time>
+            </div>
+          ))
+        )}
+      </div>
+
+      {error && <p className="inbox-widget__error">{error}</p>}
+
+      <form className="inbox-widget__form" onSubmit={onSubmit}>
+        <textarea
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder={t('inbox_placeholder')}
+          rows={2}
+          maxLength={2000}
+        />
+        <button type="submit" className="inbox-widget__send" disabled={sending || !draft.trim()}>
+          {sending ? t('inbox_sending') : t('inbox_send')}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function formatTime(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function InboxWidget() {
   const { t } = useLang();
@@ -19,7 +114,8 @@ export default function InboxWidget() {
   const [draft, setDraft] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const ref = useRef(null);
+  const btnRef = useRef(null);
+  const panelRef = useRef(null);
   const listRef = useRef(null);
   const pollPausedUntilRef = useRef(0);
 
@@ -69,19 +165,25 @@ export default function InboxWidget() {
   }, [loadInbox, open]);
 
   useEffect(() => {
+    if (!open) return undefined;
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (btnRef.current?.contains(e.target)) return;
+      if (panelRef.current?.contains(e.target)) return;
+      setOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, []);
+  }, [open]);
 
   useEffect(() => {
-    if (open) {
-      setLoading(true);
-      loadInbox(true).finally(() => setLoading(false));
-      scrollToBottom();
-    }
+    if (!open) return undefined;
+    document.body.style.overflow = 'hidden';
+    setLoading(true);
+    loadInbox(true).finally(() => setLoading(false));
+    scrollToBottom();
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open, loadInbox]);
 
   useEffect(() => {
@@ -117,19 +219,44 @@ export default function InboxWidget() {
     }
   };
 
-  const formatTime = (value) => {
-    if (!value) return '';
-    return new Date(value).toLocaleString(undefined, {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const portal =
+    open && typeof document !== 'undefined'
+      ? createPortal(
+          <>
+            <button
+              type="button"
+              className="inbox-widget__backdrop"
+              aria-label={t('inbox_close')}
+              onClick={() => setOpen(false)}
+            />
+            <div ref={panelRef}>
+              <InboxPanel
+                t={t}
+                loading={loading}
+                messages={messages}
+                conversation={conversation}
+                name={name}
+                setName={setName}
+                email={email}
+                setEmail={setEmail}
+                error={error}
+                draft={draft}
+                setDraft={setDraft}
+                sending={sending}
+                onSubmit={onSubmit}
+                onClose={() => setOpen(false)}
+                listRef={listRef}
+              />
+            </div>
+          </>,
+          document.body
+        )
+      : null;
 
   return (
-    <div className="inbox-widget" ref={ref}>
+    <div className="inbox-widget">
       <button
+        ref={btnRef}
         type="button"
         className="premium-nav__icon-btn inbox-widget__btn"
         aria-label={t('inbox_label')}
@@ -141,72 +268,7 @@ export default function InboxWidget() {
           <span className="inbox-widget__badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
         )}
       </button>
-
-      {open && (
-        <div className="inbox-widget__panel">
-          <div className="inbox-widget__head">
-            <div>
-              <strong>{t('inbox_title')}</strong>
-              <p>{t('inbox_subtitle')}</p>
-            </div>
-            <button type="button" className="inbox-widget__close" onClick={() => setOpen(false)} aria-label={t('inbox_close')}>
-              <Icon name="X" size={18} />
-            </button>
-          </div>
-
-          {!conversation?.visitorName && (
-            <div className="inbox-widget__profile">
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t('inbox_name_placeholder')}
-                maxLength={80}
-              />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('inbox_email_placeholder')}
-                maxLength={120}
-              />
-            </div>
-          )}
-
-          <div className="inbox-widget__messages" ref={listRef}>
-            {loading && messages.length === 0 ? (
-              <p className="inbox-widget__empty">{t('inbox_loading')}</p>
-            ) : messages.length === 0 ? (
-              <p className="inbox-widget__empty">{t('inbox_empty')}</p>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`inbox-widget__msg ${msg.senderType === 'admin' ? 'is-admin' : 'is-visitor'}`}
-                >
-                  <p>{msg.body}</p>
-                  <time>{formatTime(msg.createdAt)}</time>
-                </div>
-              ))
-            )}
-          </div>
-
-          {error && <p className="inbox-widget__error">{error}</p>}
-
-          <form className="inbox-widget__form" onSubmit={onSubmit}>
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder={t('inbox_placeholder')}
-              rows={2}
-              maxLength={2000}
-            />
-            <button type="submit" className="inbox-widget__send" disabled={sending || !draft.trim()}>
-              {sending ? t('inbox_sending') : t('inbox_send')}
-            </button>
-          </form>
-        </div>
-      )}
+      {portal}
     </div>
   );
 }
