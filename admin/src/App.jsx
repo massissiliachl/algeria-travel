@@ -10,6 +10,7 @@ import EntityListPage from './pages/EntityListPage';
 import EntityEditPage from './pages/EntityEditPage';
 import CommentsPage from './pages/CommentsPage';
 import ContactPage from './pages/ContactPage';
+import InboxPage from './pages/InboxPage';
 import MediaPage from './pages/MediaPage';
 import HotelEditPage from './pages/HotelEditPage';
 import { LoadingState } from './components/ui';
@@ -39,6 +40,7 @@ function AppRoutes() {
         <Route path="reservations" element={<ReservationsPage />} />
         <Route path="comments" element={<CommentsPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="inbox" element={<InboxPage />} />
         <Route path="media" element={<MediaPage />} />
         <Route path=":entityKey" element={<EntityListPage />} />
         <Route path="hotels/:id" element={<HotelEditPage />} />

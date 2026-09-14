@@ -27,6 +27,7 @@ const NAV_SECTIONS = [
       { to: '/', label: 'Tableau de bord', end: true, icon: DashboardIcon },
       { to: '/reservations', label: 'Réservations', icon: ReservationsIcon },
       { to: '/comments', label: 'Commentaires', icon: BlogIcon },
+      { to: '/inbox', label: 'Messagerie', icon: ContactIcon },
       { to: '/contact', label: 'Messages contact', icon: ContactIcon },
     ],
   },
@@ -58,7 +59,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { reservations, comments, apiOffline } = usePendingCounts();
+  const { reservations, comments, inbox, apiOffline } = usePendingCounts();
 
   const publicSiteUrl = resolvePublicSiteUrl();
   const partnerUrl = resolvePartnerPortalUrl();
@@ -102,7 +103,9 @@ export default function Layout() {
                     ? reservations
                     : item.to === '/comments'
                       ? comments
-                      : 0;
+                      : item.to === '/inbox'
+                        ? inbox
+                        : 0;
                 return (
                   <NavLink key={item.to} to={item.to} end={item.end} onClick={closeSidebar}>
                     <Icon />

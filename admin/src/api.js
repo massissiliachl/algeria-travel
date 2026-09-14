@@ -177,4 +177,23 @@ export const api = {
 
   deleteContactMessage: (id) =>
     request(`/api/admin/contact-messages/${id}`, { method: 'DELETE' }),
+
+  getInboxStats: () => request('/api/admin/inbox/stats'),
+
+  getInboxConversations: (status = 'open') =>
+    request(`/api/admin/inbox?status=${encodeURIComponent(status)}`),
+
+  getInboxConversation: (id) => request(`/api/admin/inbox/${id}`),
+
+  sendInboxReply: (id, body) =>
+    request(`/api/admin/inbox/${id}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ body }),
+    }),
+
+  updateInboxConversation: (id, payload) =>
+    request(`/api/admin/inbox/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
 };

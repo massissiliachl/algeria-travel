@@ -2,24 +2,27 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api';
 
 export function usePendingCounts(pollMs = 30000) {
-  const [counts, setCounts] = useState({ reservations: 0, comments: 0 });
+  const [counts, setCounts] = useState({ reservations: 0, comments: 0, inbox: 0 });
   const [apiOffline, setApiOffline] = useState(false);
 
   const refresh = useCallback(async () => {
-    const [reservationsResult, commentsResult] = await Promise.allSettled([
+    const [reservationsResult, commentsResult, inboxResult] = await Promise.allSettled([
       api.getReservations('pending'),
       api.getCommentStats(),
+      api.getInboxStats(),
     ]);
 
     const reservationsOk = reservationsResult.status === 'fulfilled';
     const commentsOk = commentsResult.status === 'fulfilled';
-    setApiOffline(!reservationsOk && !commentsOk);
+    const inboxOk = inboxResult.status === 'fulfilled';
+    setApiOffline(!reservationsOk && !commentsOk && !inboxOk);
 
     setCounts({
       reservations: reservationsOk
         ? (reservationsResult.value.reservations || []).length
         : 0,
       comments: commentsOk ? commentsResult.value.pending || 0 : 0,
+      inbox: inboxOk ? inboxResult.value.unreadConversations || 0 : 0,
     });
   }, []);
 

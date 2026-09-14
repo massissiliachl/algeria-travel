@@ -161,9 +161,11 @@ export default function CommentsPage() {
                   Refuser
                 </button>
               )}
-              <button type="button" className="btn btn-danger" onClick={() => remove(selected.id)}>
-                Supprimer
-              </button>
+              {selected.status === 'approved' && (
+                <button type="button" className="btn btn-danger" onClick={() => remove(selected.id)}>
+                  Supprimer
+                </button>
+              )}
               <button type="button" className="btn btn-secondary" onClick={() => setSelected(null)}>
                 Fermer
               </button>

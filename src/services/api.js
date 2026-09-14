@@ -1,5 +1,6 @@
 import { resolveApiBase } from '../utils/apiBase';
 import { getFavoriteClientId } from '../utils/favoriteClientId';
+import { getInboxClientId } from '../utils/inboxClientId';
 
 async function request(path, options = {}) {
   const { headers: optionHeaders, expectStatuses = [], timeoutMs = 12_000, ...rest } = options;
@@ -49,7 +50,9 @@ async function request(path, options = {}) {
       err.status = res.status;
       throw err;
     }
-    throw new Error(data.error || `Erreur API (${res.status})`);
+    const err = new Error(data.error || `Erreur API (${res.status})`);
+    err.status = res.status;
+    throw err;
   }
 
   if (path.startsWith('/api/chat') && (!data.reply || !String(data.reply).trim())) {
@@ -170,5 +173,20 @@ export const api = {
     request(`/api/favorites/${encodeURIComponent(itemType)}/${encodeURIComponent(String(itemId))}`, {
       method: 'DELETE',
       headers: { 'x-favorite-client': getFavoriteClientId() },
+    }),
+  getInbox: () =>
+    request('/api/inbox', {
+      headers: { 'x-inbox-client': getInboxClientId() },
+    }),
+  markInboxRead: () =>
+    request('/api/inbox/read', {
+      method: 'POST',
+      headers: { 'x-inbox-client': getInboxClientId() },
+    }),
+  sendInboxMessage: ({ body, name, email }) =>
+    request('/api/inbox/messages', {
+      method: 'POST',
+      headers: { 'x-inbox-client': getInboxClientId() },
+      body: JSON.stringify({ body, name, email }),
     }),
 };

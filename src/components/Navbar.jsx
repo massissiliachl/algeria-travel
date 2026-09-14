@@ -6,6 +6,7 @@ import { useFavorites } from '../hooks/useFavorites';
 import Icon from './ui/Icon';
 import TrackReservationBar from './TrackReservationBar';
 import NotificationBell from './NotificationBell';
+import InboxWidget from './inbox/InboxWidget';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -234,6 +235,7 @@ const Navbar = ({ variant = 'default' }) => {
           </nav>
 
           <div className="premium-nav__actions">
+            <InboxWidget />
             <NotificationBell />
 
             <div className="premium-nav__track" ref={trackRef}>
