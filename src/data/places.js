@@ -664,6 +664,10 @@ export const PLACES = [
 
 export const getPlaceById = (id, pkg) => {
   // Page destination Taghit = formule Hôtel 4★ uniquement
-  if (id === 'taghit') return resolveTaghitPlace('hotel');
-  return PLACES.find((p) => p.id === id);
+  if (id === 'taghit') {
+    return { ...resolveTaghitPlace('hotel'), bookingOpen: true };
+  }
+  const place = PLACES.find((p) => p.id === id);
+  if (!place) return undefined;
+  return { ...place, bookingOpen: place.bookingOpen ?? false };
 };

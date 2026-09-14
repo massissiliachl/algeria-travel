@@ -10,6 +10,7 @@ import BookingSheet from '../components/booking/BookingSheet';
 import { useLang } from '../hooks/useLangHook';
 import { getPlaceById, PLACES } from '../data/places';
 import { TAGHIT_BOOKING_WINDOW } from '../data/taghitPackages';
+import { api } from '../services/api';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
@@ -32,7 +33,25 @@ const PlaceDetail = () => {
   const placeActivities = place ? getActivitiesForPlace(place.id) : [];
 
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [canBook, setCanBook] = useState(Boolean(place?.bookingOpen));
   const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  useEffect(() => {
+    if (!place?.id) return undefined;
+    setCanBook(Boolean(place.bookingOpen));
+    let cancelled = false;
+    api
+      .getPlace(place.id)
+      .then((data) => {
+        if (!cancelled) setCanBook(Boolean(data.bookingOpen));
+      })
+      .catch(() => {
+        if (!cancelled) setCanBook(Boolean(place.bookingOpen));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [place?.id, place?.bookingOpen]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -376,12 +395,23 @@ const PlaceDetail = () => {
                   </strong>
                 </div>
               </div>
+              {!canBook && (
+                <div className="place-book__closed" role="status">
+                  <Icon name="AlertCircle" size={18} />
+                  <div>
+                    <strong>{t('place_booking_closed')}</strong>
+                    <span>{t('place_booking_closed_hint')}</span>
+                  </div>
+                </div>
+              )}
               <button
                 type="button"
                 className="place-book__cta"
                 onClick={() => setBookingOpen(true)}
+                disabled={!canBook}
               >
-                {t('place_book')} <Icon name="ArrowRight" size={16} />
+                {canBook ? t('place_book') : t('place_booking_closed')}{' '}
+                {canBook && <Icon name="ArrowRight" size={16} />}
               </button>
               <ul className="place-book__trust">
                 {TRUST_ITEMS.map((item) => (
@@ -402,10 +432,11 @@ const PlaceDetail = () => {
       <MobileBookingBar
         priceLabel={priceLabel}
         price={`${place.price.toLocaleString()} DA`}
-        ctaLabel={t('btn_reserver')}
-        onCta={() => setBookingOpen(true)}
+        ctaLabel={canBook ? t('btn_reserver') : t('place_booking_closed')}
+        onCta={() => canBook && setBookingOpen(true)}
+        disabled={!canBook}
         className="place-mobile-bar"
-        ariaLabel={t('place_book')}
+        ariaLabel={canBook ? t('place_book') : t('place_booking_closed')}
       />
 
       {lightboxIndex != null && (

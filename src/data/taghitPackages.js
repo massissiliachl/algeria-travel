@@ -156,6 +156,7 @@ export const resolveTaghitPlace = (pkgId = 'hotel') => {
   const pkg = getTaghitPackage(pkgId);
   return {
     ...TAGHIT_PLACE,
+    bookingOpen: true,
     price: pkg.price,
     pricePerPerson: true,
     pkgTitle: pkg.title,

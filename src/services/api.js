@@ -70,6 +70,7 @@ async function request(path, options = {}) {
 export const api = {
   getTours: () => request('/api/tours'),
   getTour: (id) => request(`/api/tours/${id}`),
+  getPlace: (id) => request(`/api/places/${id}`),
   getActivities: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
     return request(`/api/activities${qs ? `?${qs}` : ''}`);

@@ -92,8 +92,8 @@ async function seed() {
         rating, reviews, temp, image, gallery, description, description_en, description_ar,
         best_time, best_time_en, best_time_ar, duration, duration_en, duration_ar,
         price, old_price, stay, stay_en, stay_ar, transport, transport_en, transport_ar,
-        includes, highlights
-      ) values (${Array.from({ length: 31 }, (_, i) => `$${i + 1}`).join(', ')})`,
+        includes, highlights, booking_open
+      ) values (${Array.from({ length: 32 }, (_, i) => `$${i + 1}`).join(', ')})`,
       placeRow(p)
     );
   }

@@ -2,7 +2,7 @@ const express = require('express');
 const { query } = require('../config/db');
 const { createRateLimiter } = require('../middleware/rateLimit');
 const { generateReferenceCode, generateAccessToken, hashAccessToken } = require('../lib/reservationTokens');
-const { validateReservationItem } = require('../lib/validateReservationItem');
+const { validateReservationItem, placeReservationAllowed } = require('../lib/validateReservationItem');
 const { isValidPhone } = require('../lib/phone');
 const { calcBookingTotal } = require('../lib/bookingPrice');
 const { checkStayAvailability } = require('../lib/hotelAvailability');
@@ -222,9 +222,21 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Type d’hébergement invalide.' });
     }
 
-    const itemValid = await validateReservationItem(normalizedItemTypeEarly, itemId.trim());
-    if (!itemValid) {
-      return res.status(400).json({ error: 'Destination ou circuit invalide.' });
+    if (normalizedItemTypeEarly === 'place') {
+      const placeAllowed = await placeReservationAllowed(itemId.trim());
+      if (placeAllowed === null) {
+        return res.status(400).json({ error: 'Destination ou circuit invalide.' });
+      }
+      if (!placeAllowed) {
+        return res.status(400).json({
+          error: 'Réservation non disponible à cette période pour cette destination.',
+        });
+      }
+    } else {
+      const itemValid = await validateReservationItem(normalizedItemTypeEarly, itemId.trim());
+      if (!itemValid) {
+        return res.status(400).json({ error: 'Destination ou circuit invalide.' });
+      }
     }
 
     let hotelStayPricing = null;

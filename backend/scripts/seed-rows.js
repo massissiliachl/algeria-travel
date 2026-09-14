@@ -63,6 +63,7 @@ function placeRow(p) {
     p.stay, p.stay_en, p.stay_ar,
     p.transport, p.transport_en, p.transport_ar,
     j(p.includes), j(p.highlights),
+    p.bookingOpen ?? p.id === 'taghit',
   ];
 }
 

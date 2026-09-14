@@ -37,7 +37,7 @@ const placeFields = [
   ['stay', 'stay'], ['stay_en', 'stayEn'], ['stay_ar', 'stayAr'],
   ['transport', 'transport'], ['transport_en', 'transportEn'], ['transport_ar', 'transportAr'],
   ['includes', 'includes', (v) => jsonStr(v, [])], ['highlights', 'highlights', (v) => jsonStr(v, [])],
-  ['published', 'published', bool],
+  ['published', 'published', bool], ['booking_open', 'bookingOpen', bool],
 ];
 
 function mapPlace(row) {
@@ -53,7 +53,8 @@ function mapPlace(row) {
     stay: row.stay, stayEn: row.stay_en, stayAr: row.stay_ar,
     transport: row.transport, transportEn: row.transport_en, transportAr: row.transport_ar,
     includes: row.includes, highlights: row.highlights,
-    published: row.published, createdAt: row.created_at, updatedAt: row.updated_at,
+    published: row.published, bookingOpen: row.booking_open,
+    createdAt: row.created_at, updatedAt: row.updated_at,
   };
 }
 

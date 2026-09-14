@@ -231,8 +231,39 @@
   transition: background 0.2s ease;
 }
 
-.place-book__cta:hover {
+.place-book__cta:hover:not(:disabled) {
   background: #2A3548;
+}
+
+.place-book__cta:disabled {
+  background: #9aa3b0;
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+
+.place-book__closed {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(198, 40, 40, 0.08);
+  border: 1px solid rgba(198, 40, 40, 0.18);
+  color: #8b1a1a;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.place-book__closed svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.place-book__closed strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
 }
 
 .place-book__trust {

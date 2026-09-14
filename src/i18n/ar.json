@@ -516,6 +516,8 @@
   "place_activities": "أنشطة في الموقع",
   "place_activities_lead": "تجارب مختارة لهذه الوجهة.",
   "place_book": "احجز هذه الوجهة",
+  "place_booking_closed": "الحجز غير متاح في هذه الفترة",
+  "place_booking_closed_hint": "تواصل معنا لمعرفة موعد إعادة فتح الحجوزات.",
   "place_whatsapp": "اطلب عبر واتساب",
   "place_similar": "وجهات أخرى",
   "place_form_eyebrow": "طلب حجز",

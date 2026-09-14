@@ -515,6 +515,8 @@
   "place_activities": "Activities on site",
   "place_activities_lead": "Experiences selected for this destination.",
   "place_book": "Book this destination",
+  "place_booking_closed": "Booking not available at this time",
+  "place_booking_closed_hint": "Contact us to be notified when bookings reopen.",
   "place_whatsapp": "Ask on WhatsApp",
   "place_similar": "Other destinations",
   "place_form_eyebrow": "Booking request",

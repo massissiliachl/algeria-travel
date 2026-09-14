@@ -516,6 +516,8 @@
   "place_activities": "Activités sur place",
   "place_activities_lead": "Expériences sélectionnées pour cette destination.",
   "place_book": "Réserver cette destination",
+  "place_booking_closed": "Réservation non disponible à cette période",
+  "place_booking_closed_hint": "Contactez-nous pour être informé de la prochaine ouverture.",
   "place_whatsapp": "Demander via WhatsApp",
   "place_similar": "Autres destinations",
   "place_form_eyebrow": "Demande de réservation",

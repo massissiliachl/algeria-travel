@@ -38,6 +38,20 @@ function matchesStaticCatalog(itemType, itemId) {
   return staticIds(itemType).includes(id);
 }
 
+function staticPlaceBookingOpen(itemId) {
+  const id = String(itemId || '').trim();
+  if (!id) return false;
+  if (id === 'taghit') return true;
+  try {
+    const { PLACES } = require('../scripts/data/places.cjs');
+    const place = PLACES.find((p) => String(p.id) === id);
+    if (place) return Boolean(place.bookingOpen);
+  } catch (err) {
+    console.warn('[validateReservationItem] catalogue statique places:', err.message);
+  }
+  return false;
+}
+
 async function validateReservationItem(itemType, itemId) {
   const table = TABLE_BY_TYPE[itemType];
   if (!table) return false;
@@ -46,16 +60,48 @@ async function validateReservationItem(itemType, itemId) {
   if (!normalizedId || (itemType === 'tour' && Number.isNaN(normalizedId))) return false;
 
   try {
+    const selectCols = itemType === 'place' ? 'booking_open' : '1';
     const result = await query(
-      `select 1 from public.${table} where id = $1 and coalesce(published, true) = true limit 1`,
+      `select ${selectCols} from public.${table} where id = $1 and coalesce(published, true) = true limit 1`,
       [normalizedId]
     );
-    if (result.rows.length > 0) return true;
+    if (result.rows.length > 0) {
+      if (itemType === 'place') return Boolean(result.rows[0].booking_open);
+      return true;
+    }
   } catch (err) {
     console.warn('[validateReservationItem] DB:', err.message);
+  }
+
+  if (itemType === 'place') {
+    return matchesStaticCatalog(itemType, itemId) && staticPlaceBookingOpen(itemId);
   }
 
   return matchesStaticCatalog(itemType, itemId);
 }
 
-module.exports = { validateReservationItem, matchesStaticCatalog };
+/** @returns {true|false|null} true = réservable, false = fermé, null = introuvable */
+async function placeReservationAllowed(itemId) {
+  const id = String(itemId || '').trim();
+  if (!id) return null;
+
+  try {
+    const result = await query(
+      `select booking_open from public.places where id = $1 and coalesce(published, true) = true limit 1`,
+      [id]
+    );
+    if (result.rows.length > 0) return Boolean(result.rows[0].booking_open);
+  } catch (err) {
+    console.warn('[placeReservationAllowed] DB:', err.message);
+  }
+
+  if (!matchesStaticCatalog('place', id)) return null;
+  return staticPlaceBookingOpen(id);
+}
+
+module.exports = {
+  validateReservationItem,
+  matchesStaticCatalog,
+  staticPlaceBookingOpen,
+  placeReservationAllowed,
+};
