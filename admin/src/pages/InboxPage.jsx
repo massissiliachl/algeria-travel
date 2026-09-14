@@ -19,12 +19,24 @@ export default function InboxPage() {
   const [error, setError] = useState('');
   const listRef = useRef(null);
 
+  const inboxErrorMessage = (err) => {
+    if (err.message === 'Route introuvable') {
+      return (
+        'Messagerie absente sur l\'API Render — déploiement en cours ou à relancer depuis le dashboard Render. '
+        + 'En local : lancez le backend (cd backend && npm run dev), commentez VITE_API_URL dans admin/.env, '
+        + 'puis redémarrez l\'admin.'
+      );
+    }
+    return err.message;
+  };
+
   const loadConversations = useCallback(async () => {
     try {
       const res = await api.getInboxConversations('open');
       setConversations(res.conversations || []);
+      setError('');
     } catch (e) {
-      setError(e.message);
+      setError(inboxErrorMessage(e));
     }
   }, []);
 

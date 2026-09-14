@@ -21,6 +21,9 @@ async function request(path, options = {}) {
     if (err.name === 'AbortError') {
       throw new Error('API timeout — vérifiez que le backend tourne (cd backend && npm start).');
     }
+    if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+      throw new Error('API backend indisponible. Lancez le serveur : cd backend && npm start');
+    }
     throw err;
   } finally {
     clearTimeout(timer);
