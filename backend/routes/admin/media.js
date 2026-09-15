@@ -31,11 +31,29 @@ const upload = multer({
   },
 });
 
-function listFilesInDir(dir, urlPrefix) {
+function normalizeImageUrl(url) {
+  if (!url) return url;
+  const trimmed = String(url).trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith('/uploads/') || trimmed.startsWith('/images/')) return trimmed;
+  if (trimmed.startsWith('/')) return trimmed;
+  return `/images/${trimmed.replace(/^\.\//, '')}`;
+}
+
+function listFilesInDir(dir, urlPrefix, subPath = '') {
   if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir)
-    .filter((name) => /\.(jpe?g|png|gif|webp|avif|svg)$/i.test(name))
-    .map((name) => ({ url: `${urlPrefix}/${name}`, name, source: urlPrefix === '/uploads' ? 'upload' : 'library' }));
+  const source = urlPrefix === '/uploads' ? 'upload' : 'library';
+  const items = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const rel = subPath ? `${subPath}/${entry.name}` : entry.name;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      items.push(...listFilesInDir(fullPath, urlPrefix, rel));
+    } else if (/\.(jpe?g|png|gif|webp|avif|svg)$/i.test(entry.name)) {
+      items.push({ url: `${urlPrefix}/${rel.replace(/\\/g, '/')}`, name: entry.name, source });
+    }
+  }
+  return items;
 }
 
 router.get('/media', adminAuth, asyncHandler(async (_req, res) => {
@@ -44,7 +62,10 @@ router.get('/media', adminAuth, asyncHandler(async (_req, res) => {
   let galleryRows = [];
   try {
     const result = await query(`select distinct src as url from public.gallery_items where src is not null and src <> '' order by src`);
-    galleryRows = result.rows.map((row) => ({ url: row.url, name: path.basename(row.url), source: 'gallery' }));
+    galleryRows = result.rows.map((row) => {
+      const url = normalizeImageUrl(row.url);
+      return { url, name: path.basename(url), source: 'gallery' };
+    });
   } catch { galleryRows = []; }
   const seen = new Set();
   res.json({ items: [...uploads, ...library, ...galleryRows].filter((item) => {

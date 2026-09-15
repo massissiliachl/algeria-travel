@@ -8,7 +8,8 @@ import SeoHead from '../components/SeoHead';
 import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
 import { HOTELS } from '../data/hotels';
-import { getPlacePathFromTour } from '../data/placeRoutes';
+import { getTourPath } from '../data/placeRoutes';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 import { useContentCatalog } from '../hooks/useContentCatalog';
 import './Favorites.css';
 
@@ -62,9 +63,9 @@ function resolveFavoriteItem(item, pick, catalog) {
       key: `tour-${tour.id}`,
       title: pick(tour.name, tour.name_en, tour.name_ar),
       subtitle: pick(tour.location, tour.location_en, tour.location_ar),
-      image: tour.image,
+      image: resolveMediaUrl(tour.image),
       price: tour.price,
-      link: getPlacePathFromTour(tour),
+      link: getTourPath(tour),
       type: 'tour',
       id: tour.id,
     };

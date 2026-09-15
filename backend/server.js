@@ -181,7 +181,13 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error('[API]', req.method, req.path, err.message);
-  res.status(err.status || 500).json({ error: err.message || 'Erreur serveur' });
+  let message = err.message || 'Erreur serveur';
+  let status = err.status || 500;
+  if (/numeric field overflow/i.test(message)) {
+    status = 400;
+    message = 'Valeur numérique invalide (ex. note entre 0 et 5).';
+  }
+  res.status(status).json({ error: message });
 });
 
 const server = app.listen(PORT, async () => {

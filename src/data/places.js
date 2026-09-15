@@ -14,8 +14,8 @@ export const PLACES = [
     rating: 4.9,
     reviews: 268,
     temp: '22°C',
-    image: '/images/bejaia.jpeg',
-    gallery: ['/images/bejaia.jpeg', '/images/bejaia-kasbah.jpg', '/images/kayak.jpeg'],
+    image: '/images/home/dest-bejaia.jpg',
+    gallery: ['/images/home/dest-bejaia.jpg', '/images/bejaia-kasbah.jpg', '/images/kayak.jpeg', '/images/bejaia.jpeg'],
     description:
       'Mer turquoise, Cap Carbon et montagnes du Djurdjura : Béjaïa offre mer et nature dans un même séjour.',
     description_en:
@@ -68,8 +68,8 @@ export const PLACES = [
     rating: 4.9,
     reviews: 198,
     temp: '28°C',
-    image: '/images/djanet.jpeg',
-    gallery: ['/images/djanet.jpeg', '/images/sahara1.jpeg', '/images/sahara3.jpeg'],
+    image: '/images/home/dest-djanet.jpg',
+    gallery: ['/images/home/dest-djanet.jpg', '/images/djanet.jpeg', '/images/sahara1.jpeg', '/images/sahara3.jpeg'],
     description:
       'Porte d’entrée du Tassili n’Ajjer : art rupestre, dunes et bivouacs sous les étoiles avec guides touaregs.',
     description_en:
@@ -122,8 +122,8 @@ export const PLACES = [
     rating: 4.8,
     reviews: 245,
     temp: '26°C',
-    image: '/images/ghardaia.jpeg',
-    gallery: ['/images/ghardaia.jpeg', '/images/sahara5.jpeg', '/images/maison-hote-sud-1.png'],
+    image: '/images/home/dest-ghardaia.jpg',
+    gallery: ['/images/home/dest-ghardaia.jpg', '/images/ghardaia.jpeg', '/images/sahara5.jpeg', '/images/maison-hote-sud-1.png'],
     description:
       'Cinq cités fortifiées du M’Zab, marchés et architecture mozabite : un joyau UNESCO au cœur du désert.',
     description_en:
@@ -232,8 +232,8 @@ export const PLACES = [
     rating: 4.9,
     reviews: 234,
     temp: '30°C',
-    image: '/images/sahara1.jpeg',
-    gallery: ['/images/sahara1.jpeg', '/images/sahara2.jpeg', '/images/sahara3.jpeg'],
+    image: '/images/home/exp-sahara.jpg',
+    gallery: ['/images/home/exp-sahara.jpg', '/images/sahara1.jpeg', '/images/sahara2.jpeg', '/images/sahara3.jpeg'],
     description:
       'Dunes rouges du Grand Erg Occidental, ksour ocre et couchers de soleil magiques au cœur du Gourara.',
     description_en:

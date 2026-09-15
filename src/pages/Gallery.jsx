@@ -8,25 +8,10 @@ import { api } from '../services/api';
 import { resolveMediaUrl, MEDIA_PLACEHOLDER } from '../utils/mediaUrl';
 import SeoHead from '../components/SeoHead';
 import CommentThread from '../components/comments/CommentThread';
+import { buildGalleryFallbackItems } from '../data/galleryPhotos';
 import './Gallery.css';
 
-const FALLBACK_IMAGES = [
-  { id: 1, src: '/images/sahara1.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 2, src: '/images/sahara2.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 3, src: '/images/sahara3.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 4, src: '/images/sahara4.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 5, src: '/images/sahara5.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 6, src: '/images/sahara6.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 7, src: '/images/sahara7.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 8, src: '/images/sahara8.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 9, src: '/images/galery.jpg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 10, src: '/images/quad.jpg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 11, src: '/images/quad1.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 12, src: '/images/quatre-quatre.jpg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 13, src: '/images/chameau.jpg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 14, src: '/images/kayak.jpeg', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-  { id: 15, src: '/images/visitekseurs.webp', likes: 0, dislikes: 0, userReaction: null, fromApi: false },
-];
+const FALLBACK_IMAGES = buildGalleryFallbackItems();
 
 function mapGalleryItem(item) {
   const src = item.src?.startsWith('/images/') ? item.src : resolveMediaUrl(item.src);

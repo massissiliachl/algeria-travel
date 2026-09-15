@@ -7,6 +7,7 @@ import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
 import { getPlacePathFromTour } from '../data/placeRoutes';
 import { useContentCatalog } from '../hooks/useContentCatalog';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 
@@ -47,14 +48,14 @@ const Tours = () => {
         title={t('seo_tours_title')}
         description={t('seo_tours_desc')}
         path="/tours"
-        image="/images/home/circuits-4x4.png"
+        image="/images/home/circuits-desert.jpg"
       />
       <Navbar />
 
       <section className="acts-hero">
         <img
           className="acts-hero__bg"
-          src="/images/home/circuits-4x4.png"
+          src="/images/home/circuits-desert.jpg"
           alt=""
         />
         <div className="acts-hero__overlay" />
@@ -119,7 +120,7 @@ const Tours = () => {
                 role="link"
                 tabIndex={0}
               >
-                <img src={tour.image} alt="" loading="lazy" />
+                <img src={resolveMediaUrl(tour.image)} alt="" loading="lazy" />
                 <button
                   type="button"
                   className={`acts-card__fav ${isFavorite('tour', tour.id) ? 'is-on' : ''}`}
@@ -177,7 +178,7 @@ const Tours = () => {
             </button>
           </div>
           <div className="acts-promo__visual" data-reveal="right">
-            <img src="/images/home/circuits-4x4.png" alt="" />
+            <img src="/images/home/circuits-desert.jpg" alt="" />
             <div className="acts-promo__stats">
               <div><strong>{tours.length}+</strong><span>{t('tours_stat_circuits')}</span></div>
               <div><strong>4.8</strong><span>{t('tours_stat_rating')}</span></div>

@@ -75,7 +75,6 @@ const PlaceDetail = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     if (!place) {
-      navigate('/destinations', { replace: true });
       return undefined;
     }
     if (id === 'taghit' && searchParams.get('pkg') === 'guesthouse') {
@@ -340,7 +339,9 @@ const PlaceDetail = () => {
                           )}
                         </span>
                         <span className="place-act-card__price">
-                          {act.price.toLocaleString()} DA
+                          {act.price != null
+                            ? `${Number(act.price).toLocaleString('fr-DZ')} DA`
+                            : '—'}
                         </span>
                       </div>
                     </div>

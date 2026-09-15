@@ -2,6 +2,22 @@ function num(v) {
   return v == null || v === '' ? null : Number(v);
 }
 
+function ratingNum(v) {
+  if (v == null || v === '') return null;
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  return Math.min(5, Math.max(0, Math.round(n * 10) / 10));
+}
+
+function mediaPath(v) {
+  if (v == null || v === '') return v;
+  const trimmed = String(v).trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith('/uploads/') || trimmed.startsWith('/images/')) return trimmed;
+  if (trimmed.startsWith('/')) return trimmed;
+  return `/images/${trimmed.replace(/^\.\//, '')}`;
+}
+
 function bool(v, fallback = true) {
   if (v === undefined || v === null) return fallback;
   return Boolean(v);
@@ -28,8 +44,8 @@ function jsonStr(v, fallback) {
 const placeFields = [
   ['id', 'id'], ['name', 'name'], ['name_en', 'nameEn'], ['name_ar', 'nameAr'],
   ['tagline', 'tagline'], ['tagline_en', 'taglineEn'], ['tagline_ar', 'taglineAr'],
-  ['rating', 'rating', num], ['reviews', 'reviews', num], ['temp', 'temp'],
-  ['image', 'image'], ['gallery', 'gallery', (v) => jsonStr(v, [])],
+  ['rating', 'rating', ratingNum], ['reviews', 'reviews', num], ['temp', 'temp'],
+  ['image', 'image', mediaPath], ['gallery', 'gallery', (v) => jsonStr(v, [])],
   ['description', 'description'], ['description_en', 'descriptionEn'], ['description_ar', 'descriptionAr'],
   ['best_time', 'bestTime'], ['best_time_en', 'bestTimeEn'], ['best_time_ar', 'bestTimeAr'],
   ['duration', 'duration'], ['duration_en', 'durationEn'], ['duration_ar', 'durationAr'],
@@ -68,8 +84,8 @@ const tourFields = [
   ['best_time', 'bestTime'], ['best_time_en', 'bestTimeEn'], ['best_time_ar', 'bestTimeAr'],
   ['duration', 'duration'], ['duration_en', 'durationEn'], ['duration_ar', 'durationAr'],
   ['price', 'price', num], ['old_price', 'oldPrice', num],
-  ['rating', 'rating', num], ['reviews', 'reviews', num],
-  ['image', 'image'], ['category', 'category'],
+  ['rating', 'rating', ratingNum], ['reviews', 'reviews', num],
+  ['image', 'image', mediaPath], ['category', 'category'],
   ['activities', 'activities', (v) => jsonStr(v, [])], ['itinerary', 'itinerary', (v) => jsonStr(v, [])],
   ['place_slug', 'placeSlug'], ['pkg', 'pkg'], ['badge', 'badge'], ['published', 'published', bool],
 ];
@@ -101,12 +117,12 @@ const activityFields = [
   ['filters', 'filters', (v) => jsonStr(v, [])], ['places', 'places', (v) => jsonStr(v, [])],
   ['tags', 'tags', (v) => jsonStr(v, {})],
   ['duration_short', 'durationShort'], ['duration_short_en', 'durationShortEn'], ['duration_short_ar', 'durationShortAr'],
-  ['image', 'image'], ['gallery', 'gallery', (v) => jsonStr(v, [])],
+  ['image', 'image', mediaPath], ['gallery', 'gallery', (v) => jsonStr(v, [])],
   ['price', 'price', num], ['duration', 'duration'], ['duration_en', 'durationEn'], ['duration_ar', 'durationAr'],
   ['location', 'location'], ['location_en', 'locationEn'], ['location_ar', 'locationAr'],
   ['dates', 'dates'], ['dates_en', 'datesEn'], ['dates_ar', 'datesAr'],
   ['group', 'group'], ['group_en', 'groupEn'], ['group_ar', 'groupAr'],
-  ['rating', 'rating', num],
+  ['rating', 'rating', ratingNum],
   ['included', 'included', (v) => jsonStr(v, [])], ['included_en', 'includedEn', (v) => jsonStr(v, [])], ['included_ar', 'includedAr', (v) => jsonStr(v, [])],
   ['published', 'published', bool],
 ];
@@ -137,10 +153,10 @@ const stayFields = [
   ['name', 'name'], ['name_en', 'nameEn'], ['name_ar', 'nameAr'],
   ['location', 'location'], ['location_en', 'locationEn'], ['location_ar', 'locationAr'],
   ['desc', 'desc'], ['desc_en', 'descEn'], ['desc_ar', 'descAr'],
-  ['image', 'image'], ['gallery', 'gallery', (v) => jsonStr(v, [])],
+  ['image', 'image', mediaPath], ['gallery', 'gallery', (v) => jsonStr(v, [])],
   ['price', 'price', num], ['old_price', 'oldPrice', num],
   ['price_per_person', 'pricePerPerson', bool],
-  ['rating', 'rating', num], ['reviews', 'reviews', num],
+  ['rating', 'rating', ratingNum], ['reviews', 'reviews', num],
   ['amenities', 'amenities', (v) => jsonStr(v, {})], ['published', 'published', bool],
   ['wilaya', 'wilaya'], ['wilaya_key', 'wilayaKey'],
   ['stars', 'stars', num], ['availability', 'availability'],
@@ -179,7 +195,7 @@ const blogFields = [
   ['category', 'category'], ['category_label', 'categoryLabel'],
   ['category_label_en', 'categoryLabelEn'], ['category_label_ar', 'categoryLabelAr'],
   ['published_at', 'publishedAt'], ['published_at_en', 'publishedAtEn'], ['published_at_ar', 'publishedAtAr'],
-  ['read_time', 'readTime'], ['image', 'image'], ['featured', 'featured', bool], ['published', 'published', bool],
+  ['read_time', 'readTime'], ['image', 'image', mediaPath], ['featured', 'featured', bool], ['published', 'published', bool],
 ];
 
 function mapBlog(row) {
@@ -197,7 +213,7 @@ function mapBlog(row) {
 
 // ─── Gallery ──────────────────────────────────────────────────────────────────
 const galleryFields = [
-  ['src', 'src'],
+  ['src', 'src', mediaPath],
   ['alt', 'alt'],
   ['caption_fr', 'captionFr'],
   ['caption_en', 'captionEn'],

@@ -1,5 +1,9 @@
 /** Normalise les réponses API (camelCase) vers le format attendu par le front */
 
+import { normalizeMediaPath } from './mediaUrl';
+
+const normalizeImage = (url) => (url ? normalizeMediaPath(url) : url);
+
 const asArray = (value) => {
   if (Array.isArray(value)) return value;
   if (typeof value === 'string') {
@@ -12,6 +16,9 @@ const asArray = (value) => {
   }
   return [];
 };
+
+const normalizeGallery = (value) =>
+  asArray(value).map((item) => (typeof item === 'string' ? normalizeImage(item) : item));
 
 const asObject = (value) => {
   if (value && typeof value === 'object' && !Array.isArray(value)) return value;
@@ -38,7 +45,8 @@ export function normalizePlace(row) {
   return withI18n(
     {
       ...row,
-      gallery: asArray(row.gallery),
+      image: normalizeImage(row.image),
+      gallery: normalizeGallery(row.gallery),
       includes: asArray(row.includes),
       highlights: asArray(row.highlights),
       bookingOpen: Boolean(row.bookingOpen ?? row.booking_open),
@@ -68,6 +76,7 @@ export function normalizeTour(row) {
   return withI18n(
     {
       ...row,
+      image: normalizeImage(row.image),
       activities: asArray(row.activities),
       itinerary: asArray(row.itinerary),
       placeSlug: row.placeSlug ?? row.place_slug,
@@ -99,12 +108,16 @@ export function normalizeActivity(row) {
       filters: asArray(row.filters),
       places: asArray(row.places),
       tags: asObject(row.tags),
-      gallery: asArray(row.gallery),
+      image: normalizeImage(row.image),
+      gallery: normalizeGallery(row.gallery),
       included: asArray(row.included),
       included_en: asArray(row.includedEn ?? row.included_en),
       included_ar: asArray(row.includedAr ?? row.included_ar),
-      image: row.image,
-      images: asArray(row.gallery).length ? asArray(row.gallery) : row.image ? [row.image] : [],
+      images: normalizeGallery(row.gallery).length
+        ? normalizeGallery(row.gallery)
+        : row.image
+          ? [normalizeImage(row.image)]
+          : [],
     },
     [
       ['nameEn', 'name_en'],
@@ -143,6 +156,7 @@ export function normalizeBlog(row) {
       categoryLabel_en: row.categoryLabel_en ?? row.category_label_en,
       categoryLabel_ar: row.categoryLabel_ar ?? row.category_label_ar,
       readTime: row.readTime ?? row.read_time,
+      image: normalizeImage(row.image),
     },
     [
       ['titleEn', 'title_en'],
@@ -162,7 +176,8 @@ export function normalizeStay(row) {
     {
       ...row,
       placeId: row.placeId ?? row.place_id,
-      gallery: asArray(row.gallery),
+      image: normalizeImage(row.image),
+      gallery: normalizeGallery(row.gallery),
       amenities: asObject(row.amenities),
       pricePerPerson: row.pricePerPerson ?? row.price_per_person,
       roomsAvailable: row.roomsAvailable ?? row.rooms_available,

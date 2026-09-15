@@ -1,0 +1,52 @@
+/** Photos réelles Algeria Travel — fichiers dans public/images/ */
+
+export const REAL_GALLERY_PHOTOS = [
+  { src: '/images/sahara1.jpeg', alt: 'Sahara', captionFr: 'Dunes du Sahara' },
+  { src: '/images/sahara2.jpeg', alt: 'Sahara', captionFr: 'Coucher de soleil saharien' },
+  { src: '/images/sahara3.jpeg', alt: 'Sahara', captionFr: 'Expédition désert' },
+  { src: '/images/sahara4.jpeg', alt: 'Sahara', captionFr: 'Paysage saharien' },
+  { src: '/images/sahara5.jpeg', alt: 'Sahara', captionFr: 'Campement sous les étoiles' },
+  { src: '/images/sahara6.jpeg', alt: 'Sahara', captionFr: 'Aventure saharienne' },
+  { src: '/images/sahara7.jpeg', alt: 'Sahara', captionFr: 'Horizon infini' },
+  { src: '/images/sahara8.jpeg', alt: 'Sahara', captionFr: 'Balade en dunes' },
+  { src: '/images/home/taghit.webp', alt: 'Taghit', captionFr: 'Taghit, oasis du Sahara' },
+  { src: '/images/taghit.jpeg', alt: 'Taghit', captionFr: 'Palmeraies de Taghit' },
+  { src: '/images/home/dest-djanet.jpg', alt: 'Djanet', captionFr: 'Djanet & Tassili' },
+  { src: '/images/djanet.jpeg', alt: 'Djanet', captionFr: 'Porte du Tassili n\'Ajjer' },
+  { src: '/images/home/dest-ghardaia.jpg', alt: 'Ghardaïa', captionFr: 'Vallée du M\'Zab' },
+  { src: '/images/ghardaia.jpeg', alt: 'Ghardaïa', captionFr: 'Architecture mozabite' },
+  { src: '/images/home/dest-bejaia.jpg', alt: 'Béjaïa', captionFr: 'Côte kabyle' },
+  { src: '/images/bejaia.jpeg', alt: 'Béjaïa', captionFr: 'Mer & montagnes' },
+  { src: '/images/bejaia-kasbah.jpg', alt: 'Béjaïa', captionFr: 'Kasbah de Béjaïa' },
+  { src: '/images/home/dest-alger.jpg', alt: 'Alger', captionFr: 'Alger la blanche' },
+  { src: '/images/alger.jpeg', alt: 'Alger', captionFr: 'Capitale & Casbah' },
+  { src: '/images/hogar.jpeg', alt: 'Hoggar', captionFr: 'Montagnes du Hoggar' },
+  { src: '/images/home/hero-coast.jpg', alt: 'Côte', captionFr: 'Littoral algérien' },
+  { src: '/images/home/news-coast.jpg', alt: 'Côte', captionFr: 'Plages méditerranéennes' },
+  { src: '/images/home/circuits-desert.jpg', alt: 'Circuit', captionFr: 'Circuit 4×4 dans le désert' },
+  { src: '/images/home/exp-sahara.jpg', alt: 'Sahara', captionFr: 'Expérience Sahara' },
+  { src: '/images/home/exp-adventure.jpg', alt: 'Aventure', captionFr: 'Aventure en pleine nature' },
+  { src: '/images/quad.jpg', alt: 'Quad', captionFr: 'Quad dans le désert' },
+  { src: '/images/quad1.jpeg', alt: 'Quad', captionFr: 'Aventure quad' },
+  { src: '/images/quatre-quatre.jpg', alt: '4x4', captionFr: 'Excursion 4×4' },
+  { src: '/images/chameau.jpg', alt: 'Chameau', captionFr: 'Balade à dos de chameau' },
+  { src: '/images/kayak.jpeg', alt: 'Kayak', captionFr: 'Kayak en mer' },
+  { src: '/images/visitekseurs.webp', alt: 'Voyageurs', captionFr: 'Nos voyageurs' },
+  { src: '/images/galery.jpg', alt: 'Galerie', captionFr: 'Moments Algeria Travel' },
+  { src: '/images/couscous-algerien.jpg', alt: 'Gastronomie', captionFr: 'Cuisine algérienne' },
+  { src: '/images/hotels/casbah.webp', alt: 'Casbah', captionFr: 'Casbah d\'Alger' },
+  { src: '/images/hotels/constantine-bridge.png', alt: 'Constantine', captionFr: 'Ponts de Constantine' },
+];
+
+export function buildGalleryFallbackItems() {
+  return REAL_GALLERY_PHOTOS.map((photo, index) => ({
+    id: index + 1,
+    src: photo.src,
+    alt: photo.alt || '',
+    captionFr: photo.captionFr || '',
+    likes: 0,
+    dislikes: 0,
+    userReaction: null,
+    fromApi: false,
+  }));
+}

@@ -155,7 +155,9 @@ const Activities = () => {
                     </span>
                     <span>
                       <Icon name="Tag" size={13} />
-                      {t('acts_from')} {act.price.toLocaleString()} DA
+                      {act.price != null
+                        ? `${t('acts_from')} ${Number(act.price).toLocaleString('fr-DZ')} DA`
+                        : '—'}
                     </span>
                   </div>
                 </div>
@@ -180,7 +182,7 @@ const Activities = () => {
           </div>
           <div className="acts-promo__visual" data-reveal="right">
             <img
-              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&q=80"
+              src="/images/home/exp-nautical.jpg"
               alt=""
             />
             <div className="acts-promo__stats">

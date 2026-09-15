@@ -120,7 +120,7 @@ const Navbar = ({ variant = 'default' }) => {
     }
     if (link.key === 'gallery') return location.pathname.startsWith('/gallery');
     if (link.key === 'tours') {
-      return location.pathname.startsWith('/tours') || location.pathname.startsWith('/place/');
+      return location.pathname === '/tours' || location.pathname.startsWith('/tours/');
     }
     if (link.key === 'blog') return location.pathname.startsWith('/blog');
     if (link.key === 'track') return location.pathname.startsWith('/suivi');

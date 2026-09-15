@@ -13,6 +13,7 @@ import {
   HOME_SPOT_DESTINATIONS,
 } from '../../data/homePage';
 import { getPlacePathFromTour } from '../../data/placeRoutes';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 import { useContentCatalog } from '../../hooks/useContentCatalog';
 import {
   resolveSearchNavigation,
@@ -518,7 +519,7 @@ const HomeLanding = () => {
                     }
                   }}
                 >
-                  <img src={tour.image} alt="" loading="lazy" />
+                  <img src={resolveMediaUrl(tour.image)} alt="" loading="lazy" />
                   <div className="hv-dest-card__body">
                     <h3>{pick(tour.name, tour.name_en, tour.name_ar)}</h3>
                     <p>{pick(tour.subtitle, tour.subtitle_en, tour.subtitle_ar)}</p>

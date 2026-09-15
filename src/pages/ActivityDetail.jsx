@@ -232,7 +232,15 @@ const ActivityDetail = () => {
           <div className="act-page-book">
             <div className="act-page-book__price">
               <span>{t('act_modal_from')}</span>
-              <strong>{activity.price.toLocaleString()} <small>DA</small></strong>
+              <strong>
+                {activity.price != null ? (
+                  <>
+                    {Number(activity.price).toLocaleString('fr-DZ')} <small>DA</small>
+                  </>
+                ) : (
+                  '—'
+                )}
+              </strong>
               <em>{t('act_modal_per_person')}</em>
             </div>
             <button

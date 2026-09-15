@@ -15,6 +15,7 @@ function buildInitial(config) {
       if (f.type === 'checkbox') initial[f.name] = f.name === 'published';
       else if (f.type === 'gallery') initial[f.name] = '[]';
       else if (f.type === 'json') initial[f.name] = f.name === 'filters' || f.name === 'places' || f.name === 'included' || f.name === 'activities' || f.name === 'itinerary' || f.name === 'includes' || f.name === 'highlights' ? '[]' : '{}';
+      else if (f.name === 'rating') initial[f.name] = '4.5';
       else initial[f.name] = '';
     })
   );
@@ -49,7 +50,11 @@ function preparePayload(form, config) {
         payload[f.name] = parseJsonField(form[f.name], f.name === 'amenities' || f.name === 'tags' ? {} : []);
       }
       if (f.type === 'number' && payload[f.name] !== '') {
-        payload[f.name] = Number(payload[f.name]);
+        let n = Number(payload[f.name]);
+        if (f.name === 'rating' && Number.isFinite(n)) {
+          n = Math.min(f.max ?? 5, Math.max(f.min ?? 0, Math.round(n * 10) / 10));
+        }
+        payload[f.name] = n;
       }
       if (f.type === 'checkbox') {
         payload[f.name] = Boolean(form[f.name]);
@@ -224,6 +229,9 @@ export default function EntityEditPage() {
                       value={form[f.name] ?? ''}
                       onChange={(e) => onChange(f.name, e.target.value)}
                       required={f.required}
+                      min={f.min}
+                      max={f.max}
+                      step={f.step}
                       disabled={!isNew && f.name === 'id' && config.resource !== 'tours'}
                     />
                   )}

@@ -184,7 +184,7 @@ h1, h2, h3, .serif {
   height: 100vh;
   min-height: 700px;
   background: linear-gradient(135deg, rgba(27,58,75,0.7), rgba(15,44,58,0.5)), 
-              url('https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-560126657.jpg?c=original') center/cover no-repeat;
+              url('/images/hero.jpeg') center/cover no-repeat;
   background-attachment: fixed;
   display: flex;
   align-items: center;
@@ -397,7 +397,7 @@ h1, h2, h3, .serif {
   min-width: 300px;
   height: 420px;
   border-radius: 36px;
-  background: url('https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-560126657.jpg?c=original') center/cover;
+  background: url('/images/hero.jpeg') center/cover;
   transition: transform 0.4s ease;
 }
 .tour-detail-img:hover { transform: scale(1.02); }
@@ -1044,7 +1044,7 @@ body {
    ============================================ */
 .hero {
   background: var(--hero-overlay), 
-              url('https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-560126657.jpg?c=original') center/cover no-repeat;
+              url('/images/hero.jpeg') center/cover no-repeat;
   background-attachment: fixed;
   position: relative;
 }

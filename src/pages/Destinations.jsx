@@ -7,6 +7,7 @@ import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
 import { getPlacePathFromTour } from '../data/placeRoutes';
 import { useContentCatalog } from '../hooks/useContentCatalog';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './Destinations.css';
@@ -70,8 +71,9 @@ export default function Destinations() {
   }, [filter, destinations]);
 
   const openDestination = (dest) => {
-    if (dest.placeSlug) {
-      navigate(`/place/${dest.placeSlug}`);
+    const isPlace = places.some((p) => p.id === dest.id);
+    if (isPlace) {
+      navigate(`/place/${dest.id}`);
       return;
     }
     navigate(getPlacePathFromTour(dest));
@@ -158,7 +160,7 @@ export default function Destinations() {
                 tabIndex={0}
               >
                 <img
-                  src={dest.image}
+                  src={resolveMediaUrl(dest.image)}
                   alt=""
                   loading="lazy"
                   onError={(e) => {

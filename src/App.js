@@ -11,6 +11,7 @@ import Contact from './pages/Contact';
 import Activities from './pages/Activities';
 import ActivityDetail from './pages/ActivityDetail';
 import Tours from './pages/Tours';
+import TourDetail from './pages/TourDetail';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import PlaceDetail from './pages/PlaceDetail';
@@ -49,6 +50,7 @@ function AppRoutes() {
         <Route path="/hotels/:id" element={<HotelDetail />} />
         <Route path="/guesthouses" element={<Stays />} />
         <Route path="/tours" element={<Tours />} />
+        <Route path="/tours/:id" element={<TourDetail />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/search" element={<SearchResults />} />

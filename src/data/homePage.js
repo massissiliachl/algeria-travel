@@ -23,7 +23,8 @@ export const HOME_SPOT_DESTINATIONS = [
     name: 'Djanet',
     name_en: 'Djanet',
     name_ar: 'جانت',
-    image: '/images/djanet.jpeg',
+    image: '/images/home/dest-djanet.jpg',
+    fallback: '/images/djanet.jpeg',
     link: '/place/djanet',
   },
   {
@@ -40,7 +41,8 @@ export const HOME_SPOT_DESTINATIONS = [
     name: 'Ghardaïa',
     name_en: 'Ghardaia',
     name_ar: 'غرداية',
-    image: '/images/ghardaia.jpeg',
+    image: '/images/home/dest-ghardaia.jpg',
+    fallback: '/images/ghardaia.jpeg',
     link: '/place/ghardaia',
   },
   {
@@ -64,7 +66,8 @@ export const HOME_SPOT_DESTINATIONS = [
     name: 'Timimoun',
     name_en: 'Timimoun',
     name_ar: 'تيميمون',
-    image: '/images/sahara1.jpeg',
+    image: '/images/home/exp-sahara.jpg',
+    fallback: '/images/sahara1.jpeg',
     link: '/place/timimoun',
   },
 ];
@@ -121,7 +124,8 @@ export const HOME_DESTINATIONS = [
     tagline_ar: 'لؤلؤة القبائل',
     rating: 4.9,
     temp: '22°C',
-    image: '/images/bejaia.jpeg',
+    image: '/images/home/dest-bejaia.jpg',
+    fallback: '/images/bejaia.jpeg',
     link: '/place/bejaia',
   },
   {
@@ -134,7 +138,8 @@ export const HOME_DESTINATIONS = [
     tagline_ar: 'بوابة تاسيلي',
     rating: 4.9,
     temp: '28°C',
-    image: '/images/djanet.jpeg',
+    image: '/images/home/dest-djanet.jpg',
+    fallback: '/images/djanet.jpeg',
     link: '/place/djanet',
   },
   {
@@ -147,7 +152,8 @@ export const HOME_DESTINATIONS = [
     tagline_ar: 'وادي مزاب',
     rating: 4.8,
     temp: '26°C',
-    image: '/images/ghardaia.jpeg',
+    image: '/images/home/dest-ghardaia.jpg',
+    fallback: '/images/ghardaia.jpeg',
     link: '/place/ghardaia',
   },
   {
@@ -187,12 +193,13 @@ export const HOME_SHOWCASE_CARDS = [
     ar: 'تجارب',
     descKey: 'home_showcase_exp_desc',
     ctaKey: 'home_showcase_exp_cta',
-    image: '/images/sahara5.jpeg',
-    fallback: '/images/home/circuits-4x4.png',
+    image: '/images/home/exp-adventure.jpg',
+    fallback: '/images/sahara5.jpeg',
     link: '/activities',
   },
 ];
 
 export const HOME_CIRCUITS_BANNER = {
-  image: '/images/home/circuits-4x4.png',
+  image: '/images/home/circuits-desert.jpg',
+  fallback: '/images/sahara3.jpeg',
 };
