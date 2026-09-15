@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../../hooks/useLangHook';
 import Icon from '../ui/Icon';
@@ -12,8 +12,8 @@ import {
   HOME_SHOWCASE_CARDS,
   HOME_SPOT_DESTINATIONS,
 } from '../../data/homePage';
-import { FEATURED_TOURS } from '../../data/tours';
 import { getPlacePathFromTour } from '../../data/placeRoutes';
+import { useContentCatalog } from '../../hooks/useContentCatalog';
 import {
   resolveSearchNavigation,
   suggestActivities,
@@ -32,6 +32,11 @@ const STATS = [
 const HomeLanding = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
+  const { tours, places, activities } = useContentCatalog();
+  const searchCatalogData = useMemo(
+    () => ({ places, activities, tours }),
+    [places, activities, tours]
+  );
   const destRef = useRef(null);
   const toursRef = useRef(null);
   const showcaseRef = useRef(null);
@@ -55,8 +60,8 @@ const HomeLanding = () => {
   const [proposalError, setProposalError] = useState('');
   const searchWrapRef = useRef(null);
 
-  const destSuggestions = suggestDestinations(search.destination);
-  const actSuggestions = suggestActivities(search.activity);
+  const destSuggestions = suggestDestinations(search.destination, 6, searchCatalogData);
+  const actSuggestions = suggestActivities(search.activity, 6, searchCatalogData);
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -71,7 +76,7 @@ const HomeLanding = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setOpenSuggest(null);
-    const { path } = resolveSearchNavigation(search);
+    const { path } = resolveSearchNavigation({ ...search, catalog: searchCatalogData });
     navigate(path);
   };
 
@@ -497,7 +502,7 @@ const HomeLanding = () => {
 
           <div className="hv-carousel">
             <div className="hv-carousel__track" ref={toursRef}>
-              {FEATURED_TOURS.map((tour, i) => (
+              {tours.map((tour, i) => (
                 <article
                   key={tour.id}
                   className="hv-dest-card"

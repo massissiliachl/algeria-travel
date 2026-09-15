@@ -5,8 +5,8 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
-import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 
@@ -28,12 +28,13 @@ const Tours = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { tours } = useContentCatalog();
   const [filter, setFilter] = useState('all');
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return FEATURED_TOURS;
-    return FEATURED_TOURS.filter((tour) => tour.category === filter);
-  }, [filter]);
+    if (filter === 'all') return tours;
+    return tours.filter((tour) => tour.category === filter);
+  }, [filter, tours]);
 
   const toggleFav = (e, id) => {
     e.stopPropagation();
@@ -178,7 +179,7 @@ const Tours = () => {
           <div className="acts-promo__visual" data-reveal="right">
             <img src="/images/home/circuits-4x4.png" alt="" />
             <div className="acts-promo__stats">
-              <div><strong>{FEATURED_TOURS.length}+</strong><span>{t('tours_stat_circuits')}</span></div>
+              <div><strong>{tours.length}+</strong><span>{t('tours_stat_circuits')}</span></div>
               <div><strong>4.8</strong><span>{t('tours_stat_rating')}</span></div>
               <div><strong>100%</strong><span>{t('tours_stat_local')}</span></div>
               <div><strong>24/7</strong><span>{t('tours_stat_support')}</span></div>

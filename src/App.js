@@ -27,6 +27,7 @@ import Chatbot from './components/chat/Chatbot';
 import CookieBanner from './components/CookieBanner';
 import NotificationOptIn from './components/NotificationOptIn';
 import { FavoritesProvider } from './hooks/useFavorites';
+import { ContentCatalogProvider } from './hooks/useContentCatalog';
 
 import './App.css';
 
@@ -75,11 +76,13 @@ function App() {
     <HelmetProvider>
       <LangProvider>
         <FavoritesProvider>
-          <NotificationProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AppRoutes />
-            </BrowserRouter>
-          </NotificationProvider>
+          <ContentCatalogProvider>
+            <NotificationProvider>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <AppRoutes />
+              </BrowserRouter>
+            </NotificationProvider>
+          </ContentCatalogProvider>
         </FavoritesProvider>
       </LangProvider>
     </HelmetProvider>

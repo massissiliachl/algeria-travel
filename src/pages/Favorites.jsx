@@ -8,12 +8,12 @@ import SeoHead from '../components/SeoHead';
 import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
 import { HOTELS } from '../data/hotels';
-import { ACTIVITIES } from '../data/activities';
-import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import './Favorites.css';
 
-function resolveFavoriteItem(item, pick) {
+function resolveFavoriteItem(item, pick, catalog) {
+  const { activities, tours } = catalog;
   if (item.itemType === 'hotel') {
     const hotel = HOTELS.find((h) => h.id === item.itemId);
     if (!hotel) return null;
@@ -30,7 +30,7 @@ function resolveFavoriteItem(item, pick) {
   }
 
   if (item.itemType === 'activity') {
-    const activity = ACTIVITIES.find((a) => a.id === item.itemId);
+    const activity = activities.find((a) => a.id === item.itemId);
     if (!activity) {
       return {
         key: `activity-${item.itemId}`,
@@ -56,7 +56,7 @@ function resolveFavoriteItem(item, pick) {
   }
 
   if (item.itemType === 'tour') {
-    const tour = FEATURED_TOURS.find((t) => String(t.id) === String(item.itemId));
+    const tour = tours.find((t) => String(t.id) === String(item.itemId));
     if (!tour) return null;
     return {
       key: `tour-${tour.id}`,
@@ -76,10 +76,11 @@ function resolveFavoriteItem(item, pick) {
 export default function Favorites() {
   const { t, pick } = useLang();
   const { items, ready, toggleFavorite, isFavorite } = useFavorites();
+  const catalog = useContentCatalog();
 
   const resolved = useMemo(
-    () => items.map((item) => resolveFavoriteItem(item, pick)).filter(Boolean),
-    [items, pick]
+    () => items.map((item) => resolveFavoriteItem(item, pick, catalog)).filter(Boolean),
+    [items, pick, catalog]
   );
 
   return (

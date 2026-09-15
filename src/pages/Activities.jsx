@@ -6,9 +6,9 @@ import Icon from '../components/ui/Icon';
 import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
-import { ACTIVITIES, ACTIVITY_FILTERS } from '../data/activities';
-import { FEATURED_TOURS } from '../data/tours';
+import { ACTIVITY_FILTERS } from '../data/activities';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 
@@ -30,15 +30,16 @@ const Activities = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { activities, tours } = useContentCatalog();
   const [filter, setFilter] = useState('all');
   const destTrackRef = useRef(null);
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return ACTIVITIES;
-    return ACTIVITIES.filter((a) => a.filters?.includes(filter));
-  }, [filter]);
+    if (filter === 'all') return activities;
+    return activities.filter((a) => a.filters?.includes(filter));
+  }, [filter, activities]);
 
-  const destinations = FEATURED_TOURS.slice(0, 5);
+  const destinations = tours.slice(0, 5);
 
   const toggleFav = (e, id) => {
     e.stopPropagation();

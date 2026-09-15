@@ -8,10 +8,11 @@ import MobileBookingBar from '../components/ui/MobileBookingBar';
 import ImageLightbox from '../components/ui/ImageLightbox';
 import BookingSheet from '../components/booking/BookingSheet';
 import { useLang } from '../hooks/useLangHook';
-import { getPlaceById, PLACES } from '../data/places';
 import { TAGHIT_BOOKING_WINDOW } from '../data/taghitPackages';
 import { api } from '../services/api';
-import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities';
+import { ACTIVITY_CATEGORIES } from '../data/activities';
+import { useContentCatalog } from '../hooks/useContentCatalog';
+import { normalizePlace } from '../utils/normalizeContent';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './PlaceDetail.css';
@@ -28,8 +29,10 @@ const PlaceDetail = () => {
   const [searchParams] = useSearchParams();
   const { t, pick } = useLang();
   const pkgParam = searchParams.get('pkg');
-  // Taghit destination page always resolves to hotel package
-  const place = getPlaceById(id, id === 'taghit' ? 'hotel' : pkgParam);
+  const { getPlace, places, getActivitiesForPlace } = useContentCatalog();
+  const [place, setPlace] = useState(() =>
+    getPlace(id, id === 'taghit' ? 'hotel' : pkgParam)
+  );
   const placeActivities = place ? getActivitiesForPlace(place.id) : [];
 
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -37,21 +40,37 @@ const PlaceDetail = () => {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
-    if (!place?.id) return undefined;
-    setCanBook(Boolean(place.bookingOpen));
+    const base = getPlace(id, id === 'taghit' ? 'hotel' : pkgParam);
+    if (base) {
+      setPlace(base);
+      setCanBook(Boolean(base.bookingOpen));
+    }
+
     let cancelled = false;
     api
-      .getPlace(place.id)
+      .getPlace(id)
       .then((data) => {
-        if (!cancelled) setCanBook(Boolean(data.bookingOpen));
+        if (cancelled) return;
+        const normalized = normalizePlace(data);
+        if (!normalized) {
+          if (!base) navigate('/destinations', { replace: true });
+          return;
+        }
+        const merged =
+          id === 'taghit'
+            ? { ...base, ...normalized, bookingOpen: normalized?.bookingOpen ?? true }
+            : { ...(base || {}), ...normalized };
+        setPlace(merged);
+        setCanBook(Boolean(merged.bookingOpen));
       })
       .catch(() => {
-        if (!cancelled) setCanBook(Boolean(place.bookingOpen));
+        if (!cancelled && !base) navigate('/destinations', { replace: true });
       });
+
     return () => {
       cancelled = true;
     };
-  }, [place?.id, place?.bookingOpen]);
+  }, [id, pkgParam, getPlace, navigate]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -132,7 +151,7 @@ const PlaceDetail = () => {
     { icon: 'Users', label: t('place_fact_travelers'), value: audience },
   ];
 
-  const similar = PLACES.filter((p) => p.id !== place.id).slice(0, 3);
+  const similar = places.filter((p) => p.id !== place.id).slice(0, 3);
   const stayField = id === 'taghit' ? 'hotel-only' : 'full';
   const defaultStay = id === 'taghit' ? 'hotel' : '';
 

@@ -8,11 +8,8 @@ import MobileBookingBar from '../components/ui/MobileBookingBar';
 import BottomSheet from '../components/ui/BottomSheet';
 import ImageLightbox from '../components/ui/ImageLightbox';
 import { useLang } from '../hooks/useLangHook';
-import {
-  STAY_PLACE_FILTERS,
-  STAY_TYPES,
-  filterStays,
-} from '../data/stays';
+import { STAY_PLACE_FILTERS, STAY_TYPES } from '../data/stays';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
 import BookingSheet from '../components/booking/BookingSheet';
 import './Activities.css';
@@ -22,6 +19,7 @@ const Stays = () => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t, pick } = useLang();
+  const { filterStays } = useContentCatalog();
 
   const typeFromPath =
     location.pathname.includes('guesthouse')
@@ -55,7 +53,7 @@ const Stays = () => {
 
   const filtered = useMemo(
     () => filterStays({ type, place }),
-    [type, place]
+    [type, place, filterStays]
   );
 
   const selected = filtered.find((s) => s.id === selectedId) || null;

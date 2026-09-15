@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
 import { searchCatalog } from '../data/search';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './SearchResults.css';
@@ -13,6 +14,7 @@ const SearchResults = () => {
   const { t, pick } = useLang();
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const { places, activities, tours } = useContentCatalog();
 
   const q = params.get('q') || '';
   const activity = params.get('activity') || '';
@@ -20,13 +22,13 @@ const SearchResults = () => {
   const travelers = params.get('travelers') || '';
 
   const results = useMemo(
-    () => searchCatalog({ destination: q, activity }),
-    [q, activity]
+    () => searchCatalog({ destination: q, activity, places, activities, tours }),
+    [q, activity, places, activities, tours]
   );
 
-  const places = results.filter((r) => r.type === 'place');
-  const activities = results.filter((r) => r.type === 'activity');
-  const tours = results.filter((r) => r.type === 'tour');
+  const placeResults = results.filter((r) => r.type === 'place');
+  const activityResults = results.filter((r) => r.type === 'activity');
+  const tourResults = results.filter((r) => r.type === 'tour');
   const hasQuery = Boolean(q || activity);
   const empty = hasQuery && results.length === 0;
 
@@ -89,14 +91,14 @@ const SearchResults = () => {
           </div>
         ) : (
           <>
-            {places.length > 0 && (
+            {placeResults.length > 0 && (
               <div className="search-block">
                 <h2 data-reveal>
                   {t('search_places')}{' '}
-                  <em>({places.length})</em>
+                  <em>({placeResults.length})</em>
                 </h2>
                 <div className="search-grid">
-                  {places.map(({ item, path }, i) => (
+                  {placeResults.map(({ item, path }, i) => (
                     <button
                       key={item.id}
                       type="button"
@@ -127,13 +129,13 @@ const SearchResults = () => {
               </div>
             )}
 
-            {activities.length > 0 && (
+            {activityResults.length > 0 && (
               <div className="search-block">
                 <h2 data-reveal>
-                  {t('search_activities')} <em>({activities.length})</em>
+                  {t('search_activities')} <em>({activityResults.length})</em>
                 </h2>
                 <div className="search-grid">
-                  {activities.map(({ item, path }, i) => (
+                  {activityResults.map(({ item, path }, i) => (
                     <button
                       key={item.id}
                       type="button"
@@ -156,13 +158,13 @@ const SearchResults = () => {
               </div>
             )}
 
-            {tours.length > 0 && (
+            {tourResults.length > 0 && (
               <div className="search-block">
                 <h2 data-reveal>
-                  {t('search_tours')} <em>({tours.length})</em>
+                  {t('search_tours')} <em>({tourResults.length})</em>
                 </h2>
                 <div className="search-grid">
-                  {tours.map(({ item, path }, i) => (
+                  {tourResults.map(({ item, path }, i) => (
                     <button
                       key={item.id}
                       type="button"

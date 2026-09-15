@@ -5,8 +5,8 @@ import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import ResponsiveImage from '../components/ui/ResponsiveImage';
 import { useLang } from '../hooks/useLangHook';
-import { FEATURED_TOURS } from '../data/tours';
 import { getPlacePathFromTour } from '../data/placeRoutes';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './Destinations.css';
@@ -28,12 +28,13 @@ const HERO_FEATURES = [
 export default function Destinations() {
   const navigate = useNavigate();
   const { t, pick } = useLang();
+  const { tours } = useContentCatalog();
   const [filter, setFilter] = useState('all');
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return FEATURED_TOURS;
-    return FEATURED_TOURS.filter((d) => d.category === filter);
-  }, [filter]);
+    if (filter === 'all') return tours;
+    return tours.filter((d) => d.category === filter);
+  }, [filter, tours]);
 
   return (
     <div className="acts-page dest-page">
@@ -174,7 +175,7 @@ export default function Destinations() {
             <img src="/images/ghardaia.jpeg" alt="" />
             <div className="acts-promo__stats">
               <div>
-                <strong>{FEATURED_TOURS.length}+</strong>
+                <strong>{tours.length}+</strong>
                 <span>{t('dest_stat_places')}</span>
               </div>
               <div>

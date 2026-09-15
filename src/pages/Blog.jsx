@@ -4,21 +4,23 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
-import { BLOG_POSTS, BLOG_FILTERS } from '../data/blog';
+import { BLOG_FILTERS } from '../data/blog';
+import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
 import './Activities.css';
 import './Blog.css';
 
 const Blog = () => {
   const { t, pick } = useLang();
+  const { blogPosts } = useContentCatalog();
   const [filter, setFilter] = useState('all');
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return BLOG_POSTS;
-    return BLOG_POSTS.filter((p) => p.category === filter);
-  }, [filter]);
+    if (filter === 'all') return blogPosts;
+    return blogPosts.filter((p) => p.category === filter);
+  }, [filter, blogPosts]);
 
-  const featured = BLOG_POSTS.find((p) => p.featured) || BLOG_POSTS[0];
+  const featured = blogPosts.find((p) => p.featured) || blogPosts[0];
 
   return (
     <div className="acts-page blog-page">
@@ -143,7 +145,7 @@ const Blog = () => {
           <div className="acts-promo__visual" data-reveal="right">
             <img src="/images/sahara1.jpeg" alt="" />
             <div className="acts-promo__stats">
-              <div><strong>{BLOG_POSTS.length}+</strong><span>{t('blog_stat_articles')}</span></div>
+              <div><strong>{blogPosts.length}+</strong><span>{t('blog_stat_articles')}</span></div>
               <div><strong>4</strong><span>{t('blog_stat_themes')}</span></div>
               <div><strong>FR</strong><span>{t('blog_stat_langs')}</span></div>
               <div><strong>∞</strong><span>{t('blog_stat_ideas')}</span></div>

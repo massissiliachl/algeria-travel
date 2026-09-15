@@ -95,14 +95,21 @@ const tourHaystack = (tour) =>
 /**
  * @returns {{ type: 'place'|'activity'|'tour', id: string|number, score: number, item: object }[]}
  */
-export const searchCatalog = ({ destination = '', activity = '', q = '' } = {}) => {
+export const searchCatalog = ({
+  destination = '',
+  activity = '',
+  q = '',
+  places = PLACES,
+  activities = ACTIVITIES,
+  tours = FEATURED_TOURS,
+} = {}) => {
   const destQ = destination || q;
   const actQ = activity || q;
   const combined = [destination, activity, q].filter(Boolean).join(' ');
 
   const results = [];
 
-  PLACES.forEach((place) => {
+  places.forEach((place) => {
     const hay = placeHaystack(place);
     const score =
       scoreText(hay, destQ) * 1.2 +
@@ -119,7 +126,7 @@ export const searchCatalog = ({ destination = '', activity = '', q = '' } = {}) 
     }
   });
 
-  ACTIVITIES.forEach((act) => {
+  activities.forEach((act) => {
     const hay = activityHaystack(act);
     const score =
       scoreText(hay, actQ) * 1.2 +
@@ -136,7 +143,7 @@ export const searchCatalog = ({ destination = '', activity = '', q = '' } = {}) 
     }
   });
 
-  FEATURED_TOURS.forEach((tour) => {
+  tours.forEach((tour) => {
     const hay = tourHaystack(tour);
     const score =
       scoreText(hay, destQ) * 1.1 +
@@ -157,10 +164,13 @@ export const searchCatalog = ({ destination = '', activity = '', q = '' } = {}) 
 };
 
 /** Autocomplete suggestions for destination field */
-export const suggestDestinations = (query, limit = 6) => {
+export const suggestDestinations = (query, limit = 6, catalog = {}) => {
+  const places = catalog.places || PLACES;
+  const activities = catalog.activities || ACTIVITIES;
+  const tours = catalog.tours || FEATURED_TOURS;
   const n = normalizeQuery(query);
   if (!n) {
-    return PLACES.slice(0, limit).map((place) => ({
+    return places.slice(0, limit).map((place) => ({
       type: 'place',
       id: place.id,
       label: place.name,
@@ -174,7 +184,7 @@ export const suggestDestinations = (query, limit = 6) => {
     }));
   }
 
-  return searchCatalog({ destination: query })
+  return searchCatalog({ destination: query, places, activities, tours })
     .filter((r) => r.type === 'place' || r.type === 'tour')
     .slice(0, limit)
     .map((r) => ({
@@ -192,10 +202,13 @@ export const suggestDestinations = (query, limit = 6) => {
 };
 
 /** Autocomplete suggestions for activity field */
-export const suggestActivities = (query, limit = 6) => {
+export const suggestActivities = (query, limit = 6, catalog = {}) => {
+  const places = catalog.places || PLACES;
+  const activities = catalog.activities || ACTIVITIES;
+  const tours = catalog.tours || FEATURED_TOURS;
   const n = normalizeQuery(query);
   if (!n) {
-    return ACTIVITIES.slice(0, limit).map((act) => ({
+    return activities.slice(0, limit).map((act) => ({
       type: 'activity',
       id: act.id,
       label: act.name,
@@ -209,7 +222,7 @@ export const suggestActivities = (query, limit = 6) => {
     }));
   }
 
-  return searchCatalog({ activity: query })
+  return searchCatalog({ activity: query, places, activities, tours })
     .filter((r) => r.type === 'activity')
     .slice(0, limit)
     .map((r) => ({
@@ -227,14 +240,23 @@ export const suggestActivities = (query, limit = 6) => {
 };
 
 /** Resolve navigation after form submit */
-export const resolveSearchNavigation = ({ destination, activity, dates, travelers }) => {
+export const resolveSearchNavigation = ({
+  destination,
+  activity,
+  dates,
+  travelers,
+  catalog = {},
+}) => {
+  const places = catalog.places || PLACES;
+  const activities = catalog.activities || ACTIVITIES;
+  const tours = catalog.tours || FEATURED_TOURS;
   const params = new URLSearchParams();
   if (destination.trim()) params.set('q', destination.trim());
   if (activity.trim()) params.set('activity', activity.trim());
   if (dates) params.set('dates', dates);
   if (travelers) params.set('travelers', travelers);
 
-  const results = searchCatalog({ destination, activity });
+  const results = searchCatalog({ destination, activity, places, activities, tours });
 
   // Exact / strong unique place match from destination field
   if (destination.trim()) {

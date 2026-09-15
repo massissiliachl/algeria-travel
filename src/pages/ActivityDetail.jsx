@@ -4,7 +4,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useLang } from '../hooks/useLangHook';
 import { useFavorites } from '../hooks/useFavorites';
-import { ACTIVITIES, ACTIVITY_CATEGORIES } from '../data/activities';
+import { ACTIVITY_CATEGORIES } from '../data/activities';
+import { useContentCatalog } from '../hooks/useContentCatalog';
+import { api } from '../services/api';
+import { normalizeActivity } from '../utils/normalizeContent';
 import Icon from '../components/ui/Icon';
 import SeoHead from '../components/SeoHead';
 import BookingSheet from '../components/booking/BookingSheet';
@@ -15,22 +18,43 @@ const ActivityDetail = () => {
   const navigate = useNavigate();
   const { t, pick } = useLang();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { getActivity, activities } = useContentCatalog();
   const [activity, setActivity] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [tab, setTab] = useState('overview');
   const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
-    const found = ACTIVITIES.find((a) => a.id === id);
+    let cancelled = false;
+    const found = getActivity(id);
     if (!found) {
-      navigate('/activities');
-      return;
+      api
+        .getActivity(id)
+        .then((row) => {
+          if (cancelled) return;
+          const normalized = normalizeActivity(row);
+          if (!normalized) {
+            navigate('/activities', { replace: true });
+            return;
+          }
+          setActivity(normalized);
+          setActiveImage(0);
+          setTab('overview');
+          window.scrollTo(0, 0);
+        })
+        .catch(() => {
+          if (!cancelled) navigate('/activities', { replace: true });
+        });
+      return () => {
+        cancelled = true;
+      };
     }
     setActivity(found);
     setActiveImage(0);
     setTab('overview');
     window.scrollTo(0, 0);
-  }, [id, navigate]);
+    return undefined;
+  }, [id, navigate, getActivity]);
 
   if (!activity) {
     return (
@@ -67,7 +91,7 @@ const ActivityDetail = () => {
     toggleFavorite('activity', activity.id);
   };
 
-  const others = ACTIVITIES.filter((a) => a.id !== activity.id).slice(0, 3);
+  const others = activities.filter((a) => a.id !== activity.id).slice(0, 3);
 
   return (
     <div className="act-page">

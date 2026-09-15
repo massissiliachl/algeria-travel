@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Icon from '../components/ui/Icon';
 import { useLang } from '../hooks/useLangHook';
-import { getBlogPostBySlug, getRelatedBlogPosts } from '../data/blog';
+import { useContentCatalog } from '../hooks/useContentCatalog';
+import { api } from '../services/api';
+import { normalizeBlog } from '../utils/normalizeContent';
 import SeoHead from '../components/SeoHead';
 import './Blog.css';
 import './BlogDetail.css';
@@ -13,16 +15,36 @@ const BlogDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { t, pick } = useLang();
-
-  const post = useMemo(() => getBlogPostBySlug(slug), [slug]);
+  const { getBlogPost, getRelatedBlogPosts } = useContentCatalog();
+  const [post, setPost] = useState(() => getBlogPost(slug));
 
   useEffect(() => {
-    if (!post) {
-      navigate('/blog', { replace: true });
-      return;
+    let cancelled = false;
+    const fromCatalog = getBlogPost(slug);
+    if (fromCatalog) {
+      setPost(fromCatalog);
+      window.scrollTo(0, 0);
+      return undefined;
     }
-    window.scrollTo(0, 0);
-  }, [post, navigate]);
+    api
+      .getBlogPost(slug)
+      .then((row) => {
+        if (cancelled) return;
+        const normalized = normalizeBlog(row);
+        if (!normalized) {
+          navigate('/blog', { replace: true });
+          return;
+        }
+        setPost(normalized);
+        window.scrollTo(0, 0);
+      })
+      .catch(() => {
+        if (!cancelled) navigate('/blog', { replace: true });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, navigate, getBlogPost]);
 
   if (!post) {
     return (
