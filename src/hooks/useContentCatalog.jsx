@@ -25,6 +25,39 @@ function buildTaghitPlace(apiPlace) {
   return { ...base, ...normalized, bookingOpen: normalized.bookingOpen ?? true };
 }
 
+async function fetchContentCatalog() {
+  const [toursRes, placesRes, activitiesRes, blogRes, staysRes] = await Promise.allSettled([
+    api.getTours(),
+    api.getPlaces(),
+    api.getActivities(),
+    api.getBlogPosts(),
+    api.getStays(),
+  ]);
+
+  return {
+    tours:
+      toursRes.status === 'fulfilled' && Array.isArray(toursRes.value)
+        ? mergeCatalog(FEATURED_TOURS, normalizeTours(toursRes.value))
+        : null,
+    places:
+      placesRes.status === 'fulfilled' && Array.isArray(placesRes.value)
+        ? mergeCatalog(PLACES, normalizePlaces(placesRes.value))
+        : null,
+    activities:
+      activitiesRes.status === 'fulfilled' && Array.isArray(activitiesRes.value)
+        ? mergeCatalog(ACTIVITIES, normalizeActivities(activitiesRes.value))
+        : null,
+    blogPosts:
+      blogRes.status === 'fulfilled' && Array.isArray(blogRes.value)
+        ? mergeCatalog(BLOG_POSTS, normalizeBlogPosts(blogRes.value), 'slug')
+        : null,
+    stays:
+      staysRes.status === 'fulfilled' && Array.isArray(staysRes.value)
+        ? mergeCatalog(STAYS, normalizeStays(staysRes.value))
+        : null,
+  };
+}
+
 export function ContentCatalogProvider({ children }) {
   const [tours, setTours] = useState(FEATURED_TOURS);
   const [places, setPlaces] = useState(PLACES);
@@ -36,36 +69,35 @@ export function ContentCatalogProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
-    Promise.allSettled([
-      api.getTours(),
-      api.getPlaces(),
-      api.getActivities(),
-      api.getBlogPosts(),
-      api.getStays(),
-    ]).then(([toursRes, placesRes, activitiesRes, blogRes, staysRes]) => {
-      if (cancelled) return;
-
-      if (toursRes.status === 'fulfilled' && Array.isArray(toursRes.value)) {
-        setTours(mergeCatalog(FEATURED_TOURS, normalizeTours(toursRes.value)));
-      }
-      if (placesRes.status === 'fulfilled' && Array.isArray(placesRes.value)) {
-        setPlaces(mergeCatalog(PLACES, normalizePlaces(placesRes.value)));
-      }
-      if (activitiesRes.status === 'fulfilled' && Array.isArray(activitiesRes.value)) {
-        setActivities(mergeCatalog(ACTIVITIES, normalizeActivities(activitiesRes.value)));
-      }
-      if (blogRes.status === 'fulfilled' && Array.isArray(blogRes.value)) {
-        setBlogPosts(mergeCatalog(BLOG_POSTS, normalizeBlogPosts(blogRes.value), 'slug'));
-      }
-      if (staysRes.status === 'fulfilled' && Array.isArray(staysRes.value)) {
-        setStays(mergeCatalog(STAYS, normalizeStays(staysRes.value)));
-      }
-
+    const applyCatalog = (catalog) => {
+      if (catalog.tours) setTours(catalog.tours);
+      if (catalog.places) setPlaces(catalog.places);
+      if (catalog.activities) setActivities(catalog.activities);
+      if (catalog.blogPosts) setBlogPosts(catalog.blogPosts);
+      if (catalog.stays) setStays(catalog.stays);
       setLoaded(true);
-    });
+    };
+
+    const refresh = () => {
+      fetchContentCatalog()
+        .then((catalog) => {
+          if (!cancelled) applyCatalog(catalog);
+        })
+        .catch(() => {
+          if (!cancelled) setLoaded(true);
+        });
+    };
+
+    refresh();
+
+    const onFocus = () => refresh();
+    window.addEventListener('focus', onFocus);
+    const timer = window.setInterval(refresh, 120_000);
 
     return () => {
       cancelled = true;
+      window.removeEventListener('focus', onFocus);
+      window.clearInterval(timer);
     };
   }, []);
 

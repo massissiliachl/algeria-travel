@@ -25,16 +25,57 @@ const HERO_FEATURES = [
   { icon: 'Star', titleKey: 'dest_feat_rated', descKey: 'dest_feat_rated_desc' },
 ];
 
+function placeToDestinationCard(place) {
+  return {
+    id: place.id,
+    name: place.name,
+    name_en: place.name_en,
+    name_ar: place.name_ar,
+    subtitle: place.tagline,
+    subtitle_en: place.tagline_en,
+    subtitle_ar: place.tagline_ar,
+    location: place.region || place.name,
+    location_en: place.region_en || place.name_en,
+    location_ar: place.region_ar || place.name_ar,
+    image: place.image,
+    price: place.price ?? 0,
+    rating: place.rating ?? 4.5,
+    category: place.category || 'all',
+    placeSlug: place.id,
+    badge: place.badge,
+  };
+}
+
 export default function Destinations() {
   const navigate = useNavigate();
   const { t, pick } = useLang();
-  const { tours } = useContentCatalog();
+  const { tours, places } = useContentCatalog();
   const [filter, setFilter] = useState('all');
 
+  const destinations = useMemo(() => {
+    const map = new Map();
+    tours.forEach((tour) => {
+      const key = String(tour.placeSlug || tour.id);
+      map.set(key, { ...tour, placeSlug: tour.placeSlug || key });
+    });
+    places.forEach((place) => {
+      map.set(place.id, placeToDestinationCard(place));
+    });
+    return [...map.values()];
+  }, [tours, places]);
+
   const filtered = useMemo(() => {
-    if (filter === 'all') return tours;
-    return tours.filter((d) => d.category === filter);
-  }, [filter, tours]);
+    if (filter === 'all') return destinations;
+    return destinations.filter((d) => d.category === filter || !d.category || d.category === 'all');
+  }, [filter, destinations]);
+
+  const openDestination = (dest) => {
+    if (dest.placeSlug) {
+      navigate(`/place/${dest.placeSlug}`);
+      return;
+    }
+    navigate(getPlacePathFromTour(dest));
+  };
 
   return (
     <div className="acts-page dest-page">
@@ -106,11 +147,11 @@ export default function Destinations() {
                 className="acts-card"
                 data-reveal
                 data-delay={i * 60}
-                onClick={() => navigate(getPlacePathFromTour(dest))}
+                onClick={() => openDestination(dest)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    navigate(getPlacePathFromTour(dest));
+                    openDestination(dest);
                   }
                 }}
                 role="link"
@@ -175,7 +216,7 @@ export default function Destinations() {
             <img src="/images/ghardaia.jpeg" alt="" />
             <div className="acts-promo__stats">
               <div>
-                <strong>{tours.length}+</strong>
+                <strong>{destinations.length}+</strong>
                 <span>{t('dest_stat_places')}</span>
               </div>
               <div>
