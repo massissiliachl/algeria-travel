@@ -183,8 +183,7 @@ h1, h2, h3, .serif {
 .hero {
   height: 100vh;
   min-height: 700px;
-  background: linear-gradient(135deg, rgba(27,58,75,0.7), rgba(15,44,58,0.5)), 
-              url('/images/hero.jpeg') center/cover no-repeat;
+  background: linear-gradient(135deg, rgba(27,58,75,0.85), rgba(15,44,58,0.65));
   background-attachment: fixed;
   display: flex;
   align-items: center;
@@ -397,7 +396,7 @@ h1, h2, h3, .serif {
   min-width: 300px;
   height: 420px;
   border-radius: 36px;
-  background: url('/images/hero.jpeg') center/cover;
+  background: linear-gradient(135deg, rgba(27,58,75,0.2), rgba(15,44,58,0.35));
   transition: transform 0.4s ease;
 }
 .tour-detail-img:hover { transform: scale(1.02); }
@@ -1043,8 +1042,8 @@ body {
    STYLES DES SECTIONS SPÉCIALES
    ============================================ */
 .hero {
-  background: var(--hero-overlay), 
-              url('/images/hero.jpeg') center/cover no-repeat;
+  background: var(--hero-overlay),
+              linear-gradient(135deg, rgba(27,58,75,0.85), rgba(15,44,58,0.65));
   background-attachment: fixed;
   position: relative;
 }
