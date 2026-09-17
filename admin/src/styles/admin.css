@@ -726,6 +726,30 @@ body {
 
 .form-grid .full { grid-column: 1 / -1; }
 
+.field-hint {
+  margin: -4px 0 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.color-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-select select {
+  flex: 1;
+}
+
+.color-select__swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
 .field label {
   display: block;
   font-size: 0.8rem;

@@ -14,7 +14,7 @@ import './Gallery.css';
 const FALLBACK_IMAGES = buildGalleryFallbackItems();
 
 function mapGalleryItem(item) {
-  const src = item.src?.startsWith('/images/') ? item.src : resolveMediaUrl(item.src);
+  const src = resolveMediaUrl(item.src);
   return {
     id: item.id,
     src,

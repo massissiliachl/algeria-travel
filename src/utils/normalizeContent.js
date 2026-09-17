@@ -1,8 +1,9 @@
 /** Normalise les réponses API (camelCase) vers le format attendu par le front */
 
-import { normalizeMediaPath } from './mediaUrl';
+import { resolveMediaUrl } from './mediaUrl';
 
-const normalizeImage = (url) => (url ? normalizeMediaPath(url) : url);
+/** Chemin BDD → URL affichable (proxy local ou API en prod pour /uploads/). */
+const normalizeImage = (url) => (url ? resolveMediaUrl(url) : url);
 
 const asArray = (value) => {
   if (Array.isArray(value)) return value;

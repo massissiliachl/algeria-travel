@@ -7,7 +7,10 @@ export function normalizeMediaPath(url) {
   const trimmed = String(url).trim();
   if (!trimmed) return '';
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (trimmed.startsWith('/uploads/') || trimmed.startsWith('/images/')) return trimmed;
+  if (trimmed.startsWith('/uploads/')) {
+    return trimmed.replace(/^\/uploads\//, '/images/cms/');
+  }
+  if (trimmed.startsWith('/images/')) return trimmed;
   if (trimmed.startsWith('/')) return trimmed;
   return `/images/${trimmed.replace(/^\.\//, '')}`;
 }
@@ -17,17 +20,26 @@ export function resolveMediaUrl(url) {
   if (!path) return '';
   if (/^https?:\/\//i.test(path)) return path;
 
-  if (path.startsWith('/images/')) {
-    const site = getPublicSiteBase();
-    const api = resolveApiBase();
-    // Admin local + API prod : images depuis le site déployé
-    if (site && api.includes('onrender.com')) return `${site}${path}`;
+  const api = resolveApiBase();
+  const site = getPublicSiteBase();
+  const adminBase = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+
+  // CMS : backend local (proxy /images) ou API distante
+  if (path.startsWith('/images/cms/')) {
+    if (api) return `${api}${path}`;
     return path;
   }
 
-  const base = resolveApiBase();
-  if (path.startsWith('/uploads/')) {
-    return base ? `${base}${path}` : path;
+  // Bibliothèque /images/… : site public déployé ou préfixe /admin en dev Vite
+  if (path.startsWith('/images/')) {
+    if (site) return `${site}${path}`;
+    if (adminBase && adminBase !== '/') return `${adminBase}${path}`;
+    return path;
   }
+
+  if (path.startsWith('/uploads/')) {
+    return api ? `${api}${path}` : path;
+  }
+
   return path;
 }

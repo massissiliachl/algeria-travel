@@ -15,7 +15,15 @@ export function usePendingCounts(pollMs = 30000) {
     const reservationsOk = reservationsResult.status === 'fulfilled';
     const commentsOk = commentsResult.status === 'fulfilled';
     const inboxOk = inboxResult.status === 'fulfilled';
-    setApiOffline(!reservationsOk && !commentsOk && !inboxOk);
+    const allFailed = !reservationsOk && !commentsOk && !inboxOk;
+    const backendDown = allFailed && [reservationsResult, commentsResult, inboxResult].some(
+      (result) =>
+        result.status === 'rejected' &&
+        /injoignable|ECONNREFUSED|Failed to fetch|NetworkError|fetch/i.test(
+          result.reason?.message || ''
+        )
+    );
+    setApiOffline(backendDown);
 
     setCounts({
       reservations: reservationsOk

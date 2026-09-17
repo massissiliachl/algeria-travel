@@ -1,4 +1,5 @@
 import React from 'react';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 /**
  * Image optimisée : lazy/eager, fetchpriority, sizes.
@@ -18,11 +19,12 @@ const ResponsiveImage = ({
 }) => {
   const loading = priority ? 'eager' : 'lazy';
   const fetchpriority = priority ? 'high' : undefined;
+  const resolvedSrc = resolveMediaUrl(src);
 
   if (srcSet) {
     return (
       <img
-        src={src}
+        src={resolvedSrc}
         srcSet={srcSet}
         sizes={sizes}
         alt={alt}
@@ -40,7 +42,7 @@ const ResponsiveImage = ({
 
   return (
     <img
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       className={className}
       loading={loading}

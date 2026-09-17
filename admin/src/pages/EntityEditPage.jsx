@@ -6,6 +6,8 @@ import { Field, PageHeader, parseJsonField, stringifyJson } from '../components/
 import ImageField from '../components/ImageField';
 import GalleryField from '../components/GalleryField';
 import HotelPartnerPanel from '../components/HotelPartnerPanel';
+import PlacesSelect from '../components/PlacesSelect';
+import ColorSelect from '../components/ColorSelect';
 import { buildPublicContentUrl } from '../utils/publicSiteUrl';
 
 function buildInitial(config) {
@@ -14,7 +16,7 @@ function buildInitial(config) {
     s.fields.forEach((f) => {
       if (f.type === 'checkbox') initial[f.name] = f.name === 'published';
       else if (f.type === 'gallery') initial[f.name] = '[]';
-      else if (f.type === 'json') initial[f.name] = f.name === 'filters' || f.name === 'places' || f.name === 'included' || f.name === 'activities' || f.name === 'itinerary' || f.name === 'includes' || f.name === 'highlights' ? '[]' : '{}';
+      else if (f.type === 'json' || f.type === 'placeSelect') initial[f.name] = f.name === 'filters' || f.name === 'places' || f.name === 'included' || f.name === 'activities' || f.name === 'itinerary' || f.name === 'includes' || f.name === 'highlights' ? '[]' : '{}';
       else if (f.name === 'rating') initial[f.name] = '4.5';
       else initial[f.name] = '';
     })
@@ -46,7 +48,7 @@ function preparePayload(form, config) {
     s.fields.forEach((f) => {
       if (f.type === 'gallery') {
         payload[f.name] = parseJsonField(form[f.name], []);
-      } else if (f.type === 'json') {
+      } else if (f.type === 'json' || f.type === 'placeSelect') {
         payload[f.name] = parseJsonField(form[f.name], f.name === 'amenities' || f.name === 'tags' ? {} : []);
       }
       if (f.type === 'number' && payload[f.name] !== '') {
@@ -82,6 +84,23 @@ export default function EntityEditPage() {
   const [liveUrl, setLiveUrl] = useState('');
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [placeOptions, setPlaceOptions] = useState([]);
+  const [allPlaces, setAllPlaces] = useState([]);
+
+  useEffect(() => {
+    if (entityKey !== 'activities') return;
+    api
+      .list('places')
+      .then((rows) => {
+        const sorted = [...rows].sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
+        setAllPlaces(sorted);
+        setPlaceOptions(sorted.filter((place) => place.published));
+      })
+      .catch(() => {
+        setAllPlaces([]);
+        setPlaceOptions([]);
+      });
+  }, [entityKey]);
 
   useEffect(() => {
     if (!config || isNew) return;
@@ -92,7 +111,7 @@ export default function EntityEditPage() {
         const next = { ...data };
         config.sections.forEach((s) =>
           s.fields.forEach((f) => {
-            if (f.type === 'json' || f.type === 'gallery') next[f.name] = stringifyJson(data[f.name]);
+            if (f.type === 'json' || f.type === 'gallery' || f.type === 'placeSelect') next[f.name] = stringifyJson(data[f.name]);
             if (f.type === 'checkbox') next[f.name] = Boolean(data[f.name]);
             if (f.type === 'number' && data[f.name] != null) next[f.name] = data[f.name];
           })
@@ -193,6 +212,7 @@ export default function EntityEditPage() {
             <div className="form-grid">
               {section.fields.map((f) => (
                 <Field key={f.name} label={f.label} className={f.full ? 'full' : ''}>
+                  {f.hint && <p className="field-hint">{f.hint}</p>}
                   {f.type === 'image' ? (
                     <ImageField
                       value={form[f.name] ?? ''}
@@ -201,6 +221,19 @@ export default function EntityEditPage() {
                     />
                   ) : f.type === 'gallery' ? (
                     <GalleryField value={form[f.name] ?? '[]'} onChange={(val) => onChange(f.name, val)} />
+                  ) : f.type === 'placeSelect' ? (
+                    <PlacesSelect
+                      value={form[f.name] ?? '[]'}
+                      onChange={(val) => onChange(f.name, val)}
+                      options={placeOptions}
+                      allPlaces={allPlaces}
+                    />
+                  ) : f.type === 'colorSelect' ? (
+                    <ColorSelect
+                      value={form[f.name] ?? ''}
+                      onChange={(val) => onChange(f.name, val)}
+                      options={f.options ?? []}
+                    />
                   ) : f.type === 'textarea' || f.type === 'json' ? (
                     <textarea
                       rows={f.type === 'json' ? 6 : 4}

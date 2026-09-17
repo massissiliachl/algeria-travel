@@ -30,4 +30,14 @@ module.exports = function proxy(app) {
       timeout: 60_000,
     })
   );
+
+  app.use(
+    '/images/cms',
+    createProxyMiddleware({
+      target,
+      changeOrigin: true,
+      proxyTimeout: 60_000,
+      timeout: 60_000,
+    })
+  );
 };

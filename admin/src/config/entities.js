@@ -14,6 +14,19 @@ export const WILAYA_OPTIONS = [
 
 const AVAILABILITY_OPTIONS = ['available', 'limited', 'unavailable'];
 
+export const ACTIVITY_COLOR_OPTIONS = [
+  { value: '#B45309', label: 'Orange désert' },
+  { value: '#8B5E34', label: 'Brun sable' },
+  { value: '#CA8A04', label: 'Or' },
+  { value: '#0E7490', label: 'Bleu mer' },
+  { value: '#A45C42', label: 'Terre cuite' },
+  { value: '#047857', label: 'Vert émeraude' },
+  { value: '#1A2332', label: 'Bleu nuit' },
+  { value: '#B8935D', label: 'Doré (marque)' },
+  { value: '#6E7A85', label: 'Gris ardoise' },
+  { value: '#7C3AED', label: 'Violet' },
+];
+
 export const ENTITIES = {
   places: {
     title: 'Destinations',
@@ -53,6 +66,11 @@ export const ENTITIES = {
     columns: [
       { key: 'name', label: 'Nom' },
       { key: 'id', label: 'Slug' },
+      {
+        key: 'places',
+        label: 'Destination',
+        render: (r) => (Array.isArray(r.places) && r.places.length ? r.places[0] : '—'),
+      },
       { key: 'category', label: 'Catégorie' },
       { key: 'price', label: 'Prix (DA)', render: (r) => r.price?.toLocaleString?.() || '—' },
       { key: 'published', label: 'Statut', render: (r) => (r.published ? 'Publié' : 'Brouillon') },
@@ -221,7 +239,7 @@ export const FORM_CONFIGS = {
           { name: 'nameAr', label: 'Nom (AR)' },
           { name: 'category', label: 'Catégorie' },
           { name: 'icon', label: 'Icône Lucide' },
-          { name: 'color', label: 'Couleur hex' },
+          { name: 'color', label: 'Couleur', type: 'colorSelect', options: ACTIVITY_COLOR_OPTIONS },
           { name: 'price', label: 'Prix (DA)', type: 'number' },
           { name: 'rating', label: 'Note (0–5)', type: 'number', min: 0, max: 5, step: 0.1 },
           { name: 'published', label: 'Publié', type: 'checkbox' },
@@ -235,11 +253,17 @@ export const FORM_CONFIGS = {
           { name: 'history', label: 'Histoire (FR)', type: 'textarea', full: true },
           { name: 'visit', label: 'Visite (FR)', type: 'textarea', full: true },
           { name: 'durationShort', label: 'Durée courte' },
-          { name: 'location', label: 'Lieux (FR)' },
+          { name: 'location', label: 'Lieux affichés (FR)', hint: 'Texte libre pour la fiche (ex: Djanet · Hoggar)' },
+          {
+            name: 'places',
+            label: 'Destination',
+            type: 'placeSelect',
+            full: true,
+            hint: 'Seules les destinations publiées apparaissent dans la liste.',
+          },
           { name: 'image', label: 'Image', type: 'image', full: true },
           { name: 'gallery', label: 'Galerie photos', type: 'gallery', full: true },
           { name: 'filters', label: 'Filtres (JSON array)', type: 'json', full: true },
-          { name: 'places', label: 'Destinations liées (JSON array)', type: 'json', full: true },
           { name: 'tags', label: 'Tags (JSON)', type: 'json', full: true },
           { name: 'included', label: 'Inclus (JSON)', type: 'json', full: true },
         ],

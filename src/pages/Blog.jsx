@@ -7,8 +7,14 @@ import { useLang } from '../hooks/useLangHook';
 import { BLOG_FILTERS } from '../data/blog';
 import { useContentCatalog } from '../hooks/useContentCatalog';
 import SeoHead from '../components/SeoHead';
+import { resolveMediaUrl, MEDIA_PLACEHOLDER } from '../utils/mediaUrl';
 import './Activities.css';
 import './Blog.css';
+
+function onBlogImgError(e) {
+  if (e.currentTarget.src.includes('logo.svg')) return;
+  e.currentTarget.src = MEDIA_PLACEHOLDER;
+}
 
 const Blog = () => {
   const { t, pick } = useLang();
@@ -71,7 +77,7 @@ const Blog = () => {
       <section className="blog-featured acts-container" id="blog-featured">
         <article className="blog-featured__card" data-reveal="zoom">
           <Link to={`/blog/${featured.slug}`} className="blog-featured__media">
-            <img src={featured.image} alt="" />
+            <img src={resolveMediaUrl(featured.image)} alt="" onError={onBlogImgError} />
           </Link>
           <div className="blog-featured__body">
             <span className="blog-chip">
@@ -111,7 +117,7 @@ const Blog = () => {
                 data-reveal
                 data-delay={i * 60}
               >
-                <img src={post.image} alt="" loading="lazy" />
+                <img src={resolveMediaUrl(post.image)} alt="" loading="lazy" onError={onBlogImgError} />
                 <div className="blog-card__body">
                   <span className="blog-chip blog-chip--dark">
                     {pick(post.categoryLabel, post.categoryLabel_en, post.categoryLabel_ar)}

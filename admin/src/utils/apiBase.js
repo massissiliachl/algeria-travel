@@ -13,7 +13,10 @@ export function resolveApiBase() {
   const { hostname, origin } = window.location;
   const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
 
-  if (fromEnv && /localhost|127\.0\.0\.1/.test(fromEnv) && !isLocal) {
+  // En dev local, toujours passer par le proxy Vite → backend localhost:5000
+  if (isLocal) return '';
+
+  if (fromEnv && /localhost|127\.0\.0\.1/.test(fromEnv)) {
     return origin;
   }
 

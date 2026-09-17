@@ -12,7 +12,8 @@
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/prepare-seed-data.js && node scripts/seed.mjs",
     "seed:gallery": "node scripts/seed-gallery.js",
-    "prepare:seed": "node scripts/prepare-seed-data.js"
+    "prepare:seed": "node scripts/prepare-seed-data.js",
+    "migrate:uploads": "node scripts/migrate-uploads-to-cms.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

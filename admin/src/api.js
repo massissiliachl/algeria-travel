@@ -47,7 +47,18 @@ async function request(path, options = {}) {
   }
 
   if (!res.ok) {
-    const err = new Error(data.error || `Erreur (${res.status})`);
+    let message = data.error || '';
+    if (!message) {
+      if (res.status === 503) {
+        message = 'Base de données temporairement indisponible — réessayez dans quelques secondes.';
+      } else if (res.status >= 500) {
+        message =
+          'Backend ou base de données indisponible — vérifiez que le backend tourne (cd backend puis npm run dev), puis rechargez.';
+      } else {
+        message = `Erreur (${res.status})`;
+      }
+    }
+    const err = new Error(message);
     err.status = res.status;
     throw err;
   }

@@ -20,22 +20,29 @@ export function AuthProvider({ children }) {
 
     const devKey = import.meta.env.VITE_DEV_ADMIN_KEY?.trim();
     const storedKey = sessionStorage.getItem('admin_key')?.trim();
-    const key = storedKey || (import.meta.env.DEV && devKey ? devKey : '');
-    if (!key) {
+    const candidates = [
+      storedKey,
+      import.meta.env.DEV && devKey ? devKey : '',
+    ].filter(Boolean);
+
+    if (!candidates.length) {
       setBooting(false);
       return;
     }
 
-    verifyKey(key)
-      .then(() => {
-        setAdminKey(key.trim());
-        setAuthenticated(true);
-      })
-      .catch(() => {
-        clearAdminKey();
-        setAuthenticated(false);
-      })
-      .finally(() => setBooting(false));
+    (async () => {
+      for (const key of candidates) {
+        try {
+          await verifyKey(key);
+          setAdminKey(key.trim());
+          setAuthenticated(true);
+          return;
+        } catch {
+          clearAdminKey();
+        }
+      }
+      setAuthenticated(false);
+    })().finally(() => setBooting(false));
   }, []);
 
   const login = async (key) => {

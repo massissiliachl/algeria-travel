@@ -39,10 +39,12 @@ function writeAdminEnv(key) {
     '# Généré par scripts/setup-local-admin.js',
     'VITE_DEV_ADMIN_KEY=' + key,
     '',
-    '# Lire réservations + favoris du site en ligne (API Render)',
+    '# Dev local : API via proxy Vite → http://localhost:5000 (ne pas définir VITE_API_URL ici)',
   ];
-  if (prodVars.VITE_API_URL) lines.push('VITE_API_URL=' + prodVars.VITE_API_URL);
-  if (prodVars.VITE_PUBLIC_SITE_URL) lines.push('VITE_PUBLIC_SITE_URL=' + prodVars.VITE_PUBLIC_SITE_URL);
+  if (prodVars.VITE_PUBLIC_SITE_URL) {
+    lines.push('# Lien « Voir le site public » dans la sidebar');
+    lines.push('VITE_PUBLIC_SITE_URL=' + prodVars.VITE_PUBLIC_SITE_URL);
+  }
   lines.push('');
   fs.writeFileSync(adminEnvPath, lines.join('\n'), 'utf8');
 }

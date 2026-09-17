@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
@@ -10,7 +11,15 @@ export default defineConfig({
   base,
   // Images du site (public/images) disponibles en preview admin local
   publicDir: path.resolve(root, '../public'),
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'copy-admin-pwa-assets',
+      writeBundle() {
+        fs.copyFileSync(path.join(root, 'sw.js'), path.join(root, 'dist', 'sw.js'));
+      },
+    },
+  ],
   server: {
     fs: {
       allow: [path.resolve(root, '..')],
@@ -27,6 +36,10 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/uploads': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/images/cms': {
         target: 'http://localhost:5000',
         changeOrigin: true,
       },

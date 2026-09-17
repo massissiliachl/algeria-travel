@@ -22,7 +22,20 @@ function buildTaghitPlace(apiPlace) {
   const base = { ...resolveTaghitPlace('hotel'), bookingOpen: true };
   if (!apiPlace) return base;
   const normalized = normalizePlace(apiPlace);
-  return { ...base, ...normalized, bookingOpen: normalized.bookingOpen ?? true };
+  // La formule Taghit (prix, includes, transport…) vient toujours de taghitPackages.js
+  return { ...normalized, ...base, bookingOpen: normalized.bookingOpen ?? true };
+}
+
+function mergePlaces(staticPlaces, apiPlaces) {
+  const merged = mergeCatalog(staticPlaces, apiPlaces);
+  return merged.map((place) => {
+    if (place.id !== 'taghit') return place;
+    return {
+      ...place,
+      ...resolveTaghitPlace('hotel'),
+      bookingOpen: place.bookingOpen ?? true,
+    };
+  });
 }
 
 async function fetchContentCatalog() {
@@ -41,7 +54,7 @@ async function fetchContentCatalog() {
         : null,
     places:
       placesRes.status === 'fulfilled' && Array.isArray(placesRes.value)
-        ? mergeCatalog(PLACES, normalizePlaces(placesRes.value))
+        ? mergePlaces(PLACES, normalizePlaces(placesRes.value))
         : null,
     activities:
       activitiesRes.status === 'fulfilled' && Array.isArray(activitiesRes.value)

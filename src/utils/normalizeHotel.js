@@ -1,3 +1,5 @@
+import { resolveMediaUrl } from './mediaUrl';
+
 /** Normalise une réponse API (camelCase) vers le format hôtel front */
 
 export function normalizeHotel(row) {
@@ -30,8 +32,10 @@ export function normalizeHotel(row) {
     desc: row.desc,
     desc_en: row.descEn || row.desc_en,
     desc_ar: row.descAr || row.desc_ar,
-    image: row.image,
-    gallery: gallery.length ? gallery : row.image ? [row.image] : [],
+    image: resolveMediaUrl(row.image),
+    gallery: (gallery.length ? gallery : row.image ? [row.image] : []).map((item) =>
+      resolveMediaUrl(item)
+    ),
     price: row.price,
     oldPrice: row.oldPrice || row.old_price,
     rating: row.rating,

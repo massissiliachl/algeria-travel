@@ -8,8 +8,14 @@ import { useContentCatalog } from '../hooks/useContentCatalog';
 import { api } from '../services/api';
 import { normalizeBlog } from '../utils/normalizeContent';
 import SeoHead from '../components/SeoHead';
+import { resolveMediaUrl, MEDIA_PLACEHOLDER } from '../utils/mediaUrl';
 import './Blog.css';
 import './BlogDetail.css';
+
+function onBlogImgError(e) {
+  if (e.currentTarget.src.includes('logo.svg')) return;
+  e.currentTarget.src = MEDIA_PLACEHOLDER;
+}
 
 const BlogDetail = () => {
   const { slug } = useParams();
@@ -74,7 +80,7 @@ const BlogDetail = () => {
       <Navbar />
 
       <section className="blog-detail-hero">
-        <img className="blog-detail-hero__bg" src={post.image} alt="" />
+        <img className="blog-detail-hero__bg" src={resolveMediaUrl(post.image)} alt="" onError={onBlogImgError} />
         <div className="blog-detail-hero__overlay" />
         <div className="blog-detail-hero__inner">
           <nav className="blog-detail-breadcrumb" aria-label="Breadcrumb">
@@ -143,7 +149,7 @@ const BlogDetail = () => {
             <div className="blog-detail-related__grid">
               {related.map((r) => (
                 <Link key={r.id} to={`/blog/${r.slug}`} className="blog-detail-related__card">
-                  <img src={r.image} alt="" loading="lazy" />
+                  <img src={resolveMediaUrl(r.image)} alt="" loading="lazy" onError={onBlogImgError} />
                   <div>
                     <span className="blog-chip blog-chip--dark">
                       {pick(r.categoryLabel, r.categoryLabel_en, r.categoryLabel_ar)}

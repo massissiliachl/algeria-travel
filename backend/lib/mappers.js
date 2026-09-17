@@ -56,8 +56,30 @@ const placeFields = [
   ['published', 'published', bool], ['booking_open', 'bookingOpen', bool],
 ];
 
-function mapPlace(row) {
+function applyTaghitPlacePackage(mapped) {
+  if (mapped.id !== 'taghit') return mapped;
+  const { resolveTaghitPlace } = require('../scripts/data/taghitPackages.cjs');
+  const pkg = resolveTaghitPlace('hotel');
   return {
+    ...mapped,
+    price: pkg.price,
+    pricePerPerson: pkg.pricePerPerson,
+    stay: pkg.stay,
+    stayEn: pkg.stay_en,
+    stayAr: pkg.stay_ar,
+    transport: pkg.transport,
+    transportEn: pkg.transport_en,
+    transportAr: pkg.transport_ar,
+    duration: pkg.duration,
+    durationEn: pkg.duration_en,
+    durationAr: pkg.duration_ar,
+    includes: pkg.includes,
+    highlights: pkg.highlights,
+  };
+}
+
+function mapPlace(row) {
+  return applyTaghitPlacePackage({
     id: row.id, name: row.name, nameEn: row.name_en, nameAr: row.name_ar,
     tagline: row.tagline, taglineEn: row.tagline_en, taglineAr: row.tagline_ar,
     rating: Number(row.rating), reviews: row.reviews, temp: row.temp,
@@ -71,7 +93,7 @@ function mapPlace(row) {
     includes: row.includes, highlights: row.highlights,
     published: row.published, bookingOpen: row.booking_open,
     createdAt: row.created_at, updatedAt: row.updated_at,
-  };
+  });
 }
 
 // ─── Tours ────────────────────────────────────────────────────────────────────

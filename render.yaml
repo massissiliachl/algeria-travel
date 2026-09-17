@@ -8,7 +8,7 @@ services:
     name: algeria-travel-api
     runtime: node
     plan: free
-    buildCommand: npm install && npm run migrate:render
+    buildCommand: npm install && cd admin && npm install && npm run build && cd .. && npm run migrate:render
     startCommand: npm start
     healthCheckPath: /api/live
     envVars:

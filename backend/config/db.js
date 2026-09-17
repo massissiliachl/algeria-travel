@@ -39,7 +39,8 @@ function getPool() {
   });
 
   pool.on('error', (err) => {
-    console.error('[PostgreSQL]', err.message);
+    console.error('[PostgreSQL] Connexion idle perdue :', err.message);
+    closePool().catch(() => {});
   });
 
   return pool;
@@ -47,14 +48,9 @@ function getPool() {
 
 async function query(text, params, attempt = 0) {
   try {
-    const client = await getPool().connect();
-    try {
-      return await client.query(text, params);
-    } finally {
-      client.release();
-    }
+    return await getPool().query(text, params);
   } catch (err) {
-    if (isRetriableDbError(err) && attempt < 2) {
+    if (isRetriableDbError(err) && attempt < 3) {
       console.warn(`[DB] Reconnexion (tentative ${attempt + 1}) :`, err.message);
       await closePool();
       return query(text, params, attempt + 1);

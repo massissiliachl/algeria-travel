@@ -1,0 +1,56 @@
+{
+  "name": "algeria-travel-admin-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application bureau — admin Algeria Travel (local ou en ligne)",
+  "main": "main.js",
+  "author": "Algeria Travel",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.algeriatravel.admin",
+    "productName": "Algeria Travel Admin",
+    "copyright": "Copyright © Algeria Travel",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "assets/**/*"
+    ],
+    "extraFiles": [
+      {
+        "from": "config.json",
+        "to": "config.json"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Algeria Travel Admin",
+      "installerLanguages": ["fr", "en"],
+      "language": "1036"
+    }
+  }
+}
