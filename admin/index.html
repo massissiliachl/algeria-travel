@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Algeria Travel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="login-page" id="loginPage">
+    <form class="login-card" id="loginForm" autocomplete="on">
+      <h1 class="login-card__brand">Algeria Travel</h1>
+      <p class="login-card__sub">Espace administration — gestion complète du site</p>
+      <p class="login-card__error" id="loginError">Identifiants incorrects.</p>
+      <label>
+        Identifiant
+        <input type="text" name="user" id="loginUser" required placeholder="admin" autocomplete="username" />
+      </label>
+      <label>
+        Mot de passe
+        <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn btn--primary">Se connecter</button>
+      <p class="login-card__hint">Par défaut : <strong>admin</strong> / <strong>AlgeriaTravel2026</strong></p>
+    </form>
+  </div>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__brand">
+        Algeria Travel
+        <span>Admin</span>
+      </div>
+      <button type="button" class="nav-btn is-active" data-section="dashboard">Dashboard</button>
+      <button type="button" class="nav-btn" data-section="bookings">Réservations</button>
+      <button type="button" class="nav-btn" data-section="clients">Clients</button>
+      <button type="button" class="nav-btn" data-section="destinations">Destinations</button>
+      <button type="button" class="nav-btn" data-section="stays">Hébergements</button>
+      <button type="button" class="nav-btn" data-section="tours">Circuits</button>
+      <button type="button" class="nav-btn" data-section="activities">Activités</button>
+      <button type="button" class="nav-btn" data-section="media">Images</button>
+      <button type="button" class="nav-btn" data-section="pages">Textes du site</button>
+      <button type="button" class="nav-btn" data-section="settings">Réglages</button>
+      <div class="sidebar__footer">
+        <a href="/" target="_blank" rel="noopener">Voir le site</a>
+        <button type="button" id="logoutBtn">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+
+      <section class="section is-active" id="section-dashboard">
+        <div class="stats" id="dashStats"></div>
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Dernières réservations</h2>
+            <button type="button" class="btn btn--sm btn--ghost" data-goto="bookings">Tout voir</button>
+          </div>
+          <div class="table-wrap" id="dashBookings"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-bookings">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Demandes de réservation</h2>
+            <select id="bookingFilter" aria-label="Filtrer">
+              <option value="all">Tous les statuts</option>
+              <option value="new">Nouvelles</option>
+              <option value="contacted">Contactées</option>
+              <option value="confirmed">Confirmées</option>
+              <option value="cancelled">Annulées</option>
+            </select>
+          </div>
+          <div class="table-wrap" id="bookingsTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-clients">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Clients</h2>
+            <div class="actions">
+              <button type="button" class="btn btn--sm btn--ghost" id="clientsRebuild">Sync depuis réservations</button>
+              <button type="button" class="btn btn--sm btn--gold" id="clientAddBtn">+ Client</button>
+            </div>
+          </div>
+          <div class="table-wrap" id="clientsTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-destinations">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Destinations</h2>
+            <button type="button" class="btn btn--sm btn--gold" id="destAddBtn">+ Ajouter</button>
+          </div>
+          <div class="table-wrap" id="destinationsTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-stays">
+        <div class="panel">
+          <div class="panel__head"><h2>Hébergements</h2></div>
+          <div class="table-wrap" id="staysTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-tours">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Circuits</h2>
+            <button type="button" class="btn btn--sm btn--gold" id="tourAddBtn">+ Ajouter</button>
+          </div>
+          <div class="table-wrap" id="toursTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-activities">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Activités</h2>
+            <button type="button" class="btn btn--sm btn--gold" id="actAddBtn">+ Ajouter</button>
+          </div>
+          <div class="table-wrap" id="activitiesTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-media">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Bibliothèque d’images</h2>
+            <button type="button" class="btn btn--sm btn--gold" id="mediaAddBtn">+ Insérer une image</button>
+          </div>
+          <div class="panel__body" id="mediaGrid"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-pages">
+        <div class="panel">
+          <div class="panel__head"><h2>Textes & descriptions du site</h2></div>
+          <div class="panel__body">
+            <form id="pagesForm" class="form-grid">
+              <div class="field"><label>Marque (hero)</label><input name="home_brand" /></div>
+              <div class="field"><label>CTA hero</label><input name="home_cta" /></div>
+              <div class="field"><label>Titre ligne 1</label><input name="home_title_before" /></div>
+              <div class="field"><label>Titre accent</label><input name="home_title_em" /></div>
+              <div class="field"><label>Titre ligne 3</label><input name="home_title_after" /></div>
+              <div class="field full"><label>Sous-titre hero</label><textarea name="home_subtitle" rows="2"></textarea></div>
+              <div class="field full"><label>Image hero (URL)</label><input name="home_hero_image" placeholder="/images/hero.jpeg" /></div>
+              <div class="field"><label>Titre à propos</label><input name="about_title" /></div>
+              <div class="field full"><label>Texte à propos</label><textarea name="about_text" rows="3"></textarea></div>
+              <div class="form-actions full">
+                <button type="submit" class="btn btn--primary" style="width:auto">Enregistrer les textes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section-settings">
+        <div class="panel">
+          <div class="panel__head"><h2>Réglages contact</h2></div>
+          <div class="panel__body">
+            <form id="settingsForm" class="form-grid">
+              <div class="field"><label>Nom du site</label><input name="siteName" /></div>
+              <div class="field"><label>WhatsApp (sans +)</label><input id="setWhatsapp" name="whatsapp" /></div>
+              <div class="field"><label>Téléphone affiché</label><input id="setPhone" name="phone" /></div>
+              <div class="field"><label>Email contact</label><input id="setEmail" name="email" type="email" /></div>
+              <div class="form-actions full">
+                <button type="submit" class="btn btn--primary" style="width:auto">Enregistrer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer__panel" id="drawerPanel"></div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/image-upload.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/destinations.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/manage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

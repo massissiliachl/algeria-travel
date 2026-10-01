@@ -1,0 +1,40 @@
+{
+  "name": "algeria-travel",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "lucide-react": "^1.25.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.4",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "sync-admin": "node scripts/sync-admin.js",
+    "prestart": "node scripts/sync-admin.js",
+    "prebuild": "node scripts/sync-admin.js",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "build:ionos": "npm run build && node scripts/strip-admin.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

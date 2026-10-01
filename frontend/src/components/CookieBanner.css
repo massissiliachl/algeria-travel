@@ -1,0 +1,137 @@
+.cookie-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10050;
+  padding: 16px clamp(14px, 3vw, 28px) calc(16px + env(safe-area-inset-bottom, 0));
+  pointer-events: none;
+}
+
+.cookie-banner__inner {
+  pointer-events: auto;
+  max-width: 720px;
+  margin: 0 auto 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 20px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: #1A2332;
+  color: #fff;
+  border: 1px solid rgba(184, 147, 93, 0.28);
+  box-shadow: 0 16px 48px rgba(10, 14, 22, 0.35);
+  animation: cookie-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cookie-banner__text {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.cookie-banner__title {
+  margin: 0 0 6px;
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 550;
+  color: #D4B896;
+}
+
+.cookie-banner__desc {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.cookie-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cookie-banner__btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.cookie-banner__btn--ghost {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: #fff;
+}
+
+.cookie-banner__btn--ghost:hover {
+  border-color: rgba(212, 184, 150, 0.7);
+  color: #D4B896;
+}
+
+.cookie-banner__btn--primary {
+  border: none;
+  background: #B8935D;
+  color: #1A2332;
+}
+
+.cookie-banner__btn--primary:hover {
+  background: #D4B896;
+}
+
+@keyframes cookie-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .cookie-banner {
+    padding-right: 72px; /* laisse de la place au WhatsApp */
+  }
+
+  .cookie-banner__inner {
+    margin: 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  .cookie-banner__actions {
+    width: 100%;
+  }
+
+  .cookie-banner__btn {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner__inner {
+    animation: none;
+  }
+}
+
+[dir='rtl'] .cookie-banner__inner {
+  margin: 0 0 0 auto;
+}
+
+[dir='rtl'] .cookie-banner {
+  padding-right: clamp(14px, 3vw, 28px);
+  padding-left: 72px;
+}
+
+@media (min-width: 641px) {
+  [dir='rtl'] .cookie-banner {
+    padding-left: clamp(14px, 3vw, 28px);
+  }
+}

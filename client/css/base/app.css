@@ -1,0 +1,537 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+:root {
+  --sable: #E8D9C5;
+  --terre-cuite: #C25D3A;
+  --ocre: #D4844A;
+  --bleu-mediterranee: #1B3A4B;
+  --bleu-profondeur: #0F2C3A;
+  --sable-clair: #F5EDE3;
+  --blanc-casse: #FFFCF8;
+  --text-dark: #2C2C2C;
+  --text-light: #6B6B6B;
+  --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+/* Style pour le sélecteur de langue */
+
+/* Style des boutons du LanguageSelector par défaut */
+
+/* Style pour le bouton actif (langue sélectionnée) */
+
+/* Version mobile */
+
+/* Variables de thème par défaut (utilisées via body[data-theme]) */
+body[data-theme="light"] {
+  --bg-body: linear-gradient(135deg, #FFFCF8 0%, #F5EDE3 50%, #E8D9C5 100%);
+  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,239,230,0.9));
+  --text-dark: #111111;
+  --text-light: #6B6B6B;
+  --border-color: rgba(17,17,17,0.08);
+  --accent: #c6a43b;
+}
+
+body[data-theme="dark"] {
+  --bg-body: linear-gradient(135deg, #041019 0%, #07121a 50%, #0f2c3a 100%);
+  --card-bg: linear-gradient(180deg, rgba(7,18,26,0.8), rgba(7,24,32,0.8));
+  --text-dark: #e6eef2;
+  --text-light: #9aa6ad;
+  --border-color: rgba(255,255,255,0.06);
+  --accent: #d4844a;
+}
+
+body {
+  background: var(--bg-body) fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.5;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--sable-clair); }
+::-webkit-scrollbar-thumb { background: var(--terre-cuite); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ocre); }
+
+::selection {
+  background: var(--terre-cuite);
+  color: var(--text-dark);
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.logo:hover { transform: scale(1.02); }
+.logo span { color: var(--ocre); }
+
+.hero {
+  height: 100vh;
+  min-height: 700px;
+  background: linear-gradient(135deg, rgba(27,58,75,0.7), rgba(15,44,58,0.5)), 
+              url('https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-560126657.jpg?c=original') center/cover no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to top, var(--blanc-casse), transparent);
+  pointer-events: none;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.search-card {
+  background: white;
+  border-radius: 60px;
+  padding: 20px 35px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.tours-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 35px;
+  justify-content: center;
+  padding: 40px 0;
+}
+.price {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--terre-cuite);
+}
+.duration {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.itinerary {
+  margin: 60px 40px;
+  padding: 50px;
+  background: var(--card-bg);
+  border-radius: 56px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+}
+
+.rating {
+  margin-top: 12px;
+}
+.rating i { color: #FFB800; margin-right: 3px; }
+
+visa-section {
+  margin: 60px 40px;
+  background: var(--card-bg);
+  border-radius: 56px;
+  padding: 55px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  align-items: center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  padding: 25px 20px;
+  background: var(--sable-clair);
+  border-radius: 40px;
+  transition: transform 0.3s ease;
+}
+.step:hover { transform: translateY(-5px); }
+
+.footer {
+  background: var(--bleu-mediterranee);
+  color: var(--text-light);
+  padding: 70px 50px 40px;
+  margin-top: 80px;
+}
+.footer a { color: var(--text-light); text-decoration: none; transition: color 0.3s; }
+.footer a:hover { color: var(--ocre); }
+
+@media (max-width: 1024px) {
+  .search-card { flex-direction: column; border-radius: 40px; }
+  .itinerary { margin: 30px 20px; padding: 35px; }
+  .hero { background-attachment: scroll; }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .hero {
+    min-height: 100svh;
+    min-height: 100dvh;
+    background-attachment: scroll;
+  }
+}
+
+  /* src/theme.css - Styles supplémentaires pour le thème */
+
+/* Cartes */
+.card {
+  background: var(--card-bg);
+  color: var(--text-dark);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* Sections */
+.section {
+  background-color: var(--bg-body);
+  transition: background 0.3s ease;
+}
+
+/* Bordures */
+
+/* Inputs */
+input, textarea, select {
+  background-color: var(--card-bg);
+  color: var(--text-dark);
+  border-color: var(--border-color);
+}
+
+/* Texte secondaire */
+
+/* Mode clair - ajustements spécifiques */
+
+[data-theme="light"] .logo {
+  color: white;
+}
+
+[data-theme="light"] .logo span {
+  color: var(--ocre);
+}
+/* src/App.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* ============================================
+   VARIABLES PAR DÉFAUT
+   ============================================ */
+:root {
+  --sable: #E8D9C5;
+  --terre-cuite: #C25D3A;
+  --ocre: #D4844A;
+  --bleu-mediterranee: #1B3A4B;
+  --bleu-profondeur: #0F2C3A;
+  --sable-clair: #F5EDE3;
+  --blanc-casse: #FFFCF8;
+  --text-dark: #2C2C2C;
+  --text-light: #6B6B6B;
+  --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ============================================
+   THÈME CLAIR - DÉGRADÉS CHALEUREUX
+   ============================================ */
+body[data-theme="light"] {
+  /* Dégradé principal - lumière du désert */
+  --bg-gradient: linear-gradient(145deg, #FFFCF8 0%, #FEF7E9 25%, #F5EDE3 50%, #EDE3D5 75%, #FFFCF8 100%);
+  
+  /* Dégradé secondaire - sable et terre */
+  --bg-secondary: linear-gradient(135deg, #FFFFFF 0%, #F8F2EA 100%);
+  
+  /* Dégradé pour cartes - effet verre clair */
+  --card-gradient: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,242,234,0.9) 100%);
+  
+  /* Dégradé pour hero overlay */
+  --hero-overlay: linear-gradient(135deg, rgba(27,58,75,0.65), rgba(15,44,58,0.4));
+  
+  /* Couleurs */
+  --text-dark: #2C2C2C;
+  --text-light: #6B6B6B;
+  --border-color: rgba(44,44,44,0.08);
+  --accent: #c6a43b;
+  --accent-glow: 0 0 20px rgba(198,164,59,0.3);
+}
+
+/* ============================================
+   THÈME SOMBRE - DÉGRADÉS PROFONDS
+   ============================================ */
+body[data-theme="dark"] {
+  /* Dégradé principal - nuit étoilée sur le Sahara */
+  --bg-gradient: linear-gradient(145deg, #041019 0%, #06121c 15%, #0a1a28 50%, #06121c 85%, #041019 100%);
+  
+  /* Dégradé secondaire - bleu profond */
+  --bg-secondary: linear-gradient(135deg, #07121a 0%, #0a1a25 100%);
+  
+  /* Dégradé pour cartes - effet verre sombre */
+  --card-gradient: linear-gradient(135deg, rgba(7,18,26,0.9) 0%, rgba(10,26,37,0.85) 100%);
+  
+  /* Dégradé pour hero overlay */
+  --hero-overlay: linear-gradient(135deg, rgba(27,58,75,0.75), rgba(15,44,58,0.5));
+  
+  /* Couleurs */
+  --text-dark: #E6EEF2;
+  --text-light: #9AA6AD;
+  --border-color: rgba(230,238,242,0.06);
+  --accent: #D4844A;
+  --accent-glow: 0 0 25px rgba(212,132,74,0.3);
+}
+
+/* ============================================
+   STYLES DE BASE
+   ============================================ */
+body {
+  background: var(--bg-gradient) fixed;
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.5;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
+/* ============================================
+   STYLES DES SECTIONS AVEC DÉGRADÉS
+   ============================================ */
+.section {
+  background: var(--bg-secondary);
+  transition: background 0.4s ease;
+  border-radius: 0;
+}
+
+/* ============================================
+   STYLES DES CARTES
+   ============================================ */
+.card,
+.search-card,
+.itinerary {
+  background: var(--card-gradient);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  transition: all 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+/* ============================================
+   STYLES DES SECTIONS SPÉCIALES
+   ============================================ */
+.hero {
+  background: var(--hero-overlay), 
+              url('https://media.cnn.com/api/v1/images/stellar/prod/gettyimages-560126657.jpg?c=original') center/cover no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to top, var(--bg-gradient), transparent);
+  pointer-events: none;
+}
+
+/* ============================================
+   STYLES DES TITRES
+   ============================================ */
+
+/* ============================================
+   STYLES DES FORMULAIRES
+   ============================================ */
+input, textarea, select {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(198,164,59,0.2);
+}
+
+/* ============================================
+   STYLES DES BOUTONS
+   ============================================ */
+
+/* ============================================
+   STYLES DU FOOTER
+   ============================================ */
+.footer {
+  background: linear-gradient(135deg, var(--bleu-mediterranee), var(--bleu-profondeur));
+  color: var(--text-light);
+  padding: 70px 50px 40px;
+  margin-top: 80px;
+}
+
+[data-theme="dark"] .footer {
+  background: linear-gradient(135deg, #041019, #07121a);
+}
+
+/* ============================================
+   STYLES DES MODALS
+   ============================================ */
+
+/* ============================================
+   STYLES DES TÉMOIGNAGES
+   ============================================ */
+
+/* ============================================
+   STYLES DES ÉTAPES
+   ============================================ */
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--accent), var(--terre-cuite));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.1);
+}
+
+/* ============================================
+   SÉLECTION DE TEXTE
+   ============================================ */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--accent);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .search-card { flex-direction: column; border-radius: 40px; }
+  .hero { background-attachment: scroll; }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .hero { min-height: 100svh; background-attachment: scroll; }
+  .footer { padding: 50px 20px 30px; }
+}

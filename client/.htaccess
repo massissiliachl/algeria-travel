@@ -1,0 +1,23 @@
+Options -MultiViews
+DirectoryIndex index.html
+
+RewriteEngine On
+
+# /pages/index.html → /
+RewriteCond %{THE_REQUEST} \s/pages/index\.html[\s?]
+RewriteRule ^pages/index\.html$ / [R=301,L]
+
+# /pages/tours.html → /tours.html
+RewriteCond %{THE_REQUEST} \s/pages/([a-z-]+\.html)
+RewriteRule ^pages/([a-z-]+\.html)$ /$1 [R=301,L]
+
+# Anciennes adresses du site React
+RewriteRule ^(destinations|activities|stays|tours|blog|search|gallery|contact)/?$ /$1.html [R=301,L]
+RewriteRule ^place/([^/]+)/?$ /place.html?id=$1 [R=301,L,QSA]
+RewriteRule ^activity/([^/]+)/?$ /activity.html?id=$1 [R=301,L,QSA]
+RewriteRule ^blog/([^/]+)/?$ /article.html?slug=$1 [R=301,L,QSA]
+RewriteRule ^(hotels|guesthouses)/?$ /stays.html?view=$1 [R=301,L,QSA]
+
+# /tours.html affiche pages/tours.html sans changer l'adresse
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([a-z-]+\.html)$ pages/$1 [L]

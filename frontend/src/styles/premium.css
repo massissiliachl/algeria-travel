@@ -1,0 +1,176 @@
+/* Fonts chargées via public/index.html */
+
+/* ═══════════════════════════════════════════
+   Algeria Travel — Design System
+   Encre profonde + or saharien · Playfair + Montserrat
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* Brand */
+  --forest: #1A2332;
+  --forest-mid: #2A3548;
+  --forest-soft: #3A4A5E;
+  --gold: #B8935D;
+  --gold-light: #D4B896;
+  --ink: #1A1A1A;
+  --muted: #6B6560;
+  --page: #FFFFFF;
+  --sand: #F6F5F2;
+  --sand-light: #FAFAF8;
+  --white: #FFFFFF;
+
+  /* Aliases (compat anciens composants) */
+  --ocean: #1A2332;
+  --ocean-deep: #2A3548;
+  --ocean-mid: #3A4A5E;
+  --ocean-light: #F3F2EF;
+  --emerald: #1A2332;
+  --emerald-light: #F3F2EF;
+  --charcoal: #1A1A1A;
+  --sunset: #B8935D;
+  --sunset-light: #F5EDE0;
+  --gray: #6B6560;
+  --gray-light: #8A8480;
+  --hair: rgba(26, 35, 50, 0.1);
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --shadow-sm: 0 2px 16px rgba(26, 35, 50, 0.06);
+  --shadow: 0 8px 32px rgba(26, 35, 50, 0.1);
+  --shadow-lg: 0 20px 56px rgba(26, 35, 50, 0.14);
+  --radius: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.35s var(--ease);
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Montserrat', system-ui, sans-serif;
+  --nav-h: 80px;
+
+  /* Breakpoints (référence) */
+  --bp-xl: 1200px;
+  --bp-lg: 992px;
+  --bp-md: 768px;
+  --bp-sm: 480px;
+  --touch-min: 44px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Force light brand look (mockup) */
+body[data-theme='dark'] {
+  background: var(--page);
+  color: var(--ink);
+}
+
+.home-page-root,
+.acts-page,
+.act-page,
+.dest-page {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--page);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.premium-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 14px 26px;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.premium-btn--primary {
+  background: var(--forest);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(26, 35, 50, 0.22);
+}
+.premium-btn--primary:hover {
+  background: var(--forest-mid);
+  transform: translateY(-2px);
+}
+.premium-btn--ghost {
+  background: transparent;
+  color: var(--forest);
+  border: 1.5px solid var(--hair);
+}
+.premium-btn--ghost:hover {
+  border-color: var(--gold);
+  background: var(--sunset-light);
+}
+
+/* Page hero partagé */
+
+html.js [data-reveal]:not(.is-in):not(.revealed) {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.75s var(--ease),
+    transform 0.75s var(--ease);
+  will-change: opacity, transform;
+}
+html.js [data-reveal][data-reveal='left']:not(.is-in):not(.revealed) {
+  transform: translateX(-32px);
+}
+html.js [data-reveal][data-reveal='right']:not(.is-in):not(.revealed) {
+  transform: translateX(32px);
+}
+html.js [data-reveal][data-reveal='zoom']:not(.is-in):not(.revealed) {
+  transform: scale(0.94);
+}
+html.js [data-reveal][data-reveal='fade']:not(.is-in):not(.revealed) {
+  transform: none;
+}
+[data-reveal].is-in,
+[data-reveal].revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Sans JS : contenu visible immédiatement */
+html:not(.js) [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Entrée de page légère */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root { --nav-h: 72px; }
+}
+[dir='rtl'] .premium-btn { flex-direction: row-reverse; }
+[dir='rtl'] .premium-nav__links { margin-left: 0; margin-right: auto; }

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1A2332" />
+    <meta name="description" content="Séjour à Taghit en passant par Brezina — 5 jours / 4 nuits du 16 au 21 novembre : bivouac, maison d’hôte, safari 4×4, kayak, dromadaire. Algeria Travel." />
+    <title>Séjour à Taghit via Brezina — Algeria Travel</title>
+    <link rel="icon" href="public/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --ink: #1a2332;
+        --gold: #c49a5c;
+        --sand: #f7f1e8;
+        --rust: #c4622d;
+        --text: #3c4452;
+        --line: #e7dccb;
+        --radius: 18px;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: 'Montserrat', system-ui, sans-serif;
+        color: var(--text);
+        background: #fff;
+        line-height: 1.65;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      img { max-width: 100%; display: block; }
+      h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; color: var(--ink); line-height: 1.2; margin: 0; }
+      a { color: inherit; }
+      .wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
+
+      /* Barre du haut */
+      .topbar { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); box-shadow: 0 4px 18px rgba(26,35,50,.06); }
+      .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 76px; }
+      .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+      .brand img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); background: #fff; flex: none; }
+      .brand__text { display: flex; flex-direction: column; line-height: 1.1; }
+      .brand__name { font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 700; letter-spacing: .06em; color: var(--ink); white-space: nowrap; }
+      .brand__name span { color: var(--gold); }
+      .brand__tag { font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #8a8f99; margin-top: 3px; }
+      .topbar__nav { display: flex; gap: 4px; }
+      .topbar__nav a { text-decoration: none; font-size: 14px; font-weight: 500; color: var(--ink); padding: 8px 12px; border-radius: 999px; transition: background .2s; }
+      .topbar__nav a:hover, .topbar__nav a.is-active { background: var(--sand); }
+      .topbar__links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+      /* En-tête du PDF (visible seulement à l'impression) */
+      .print-head { display: none; }
+
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 999px; font: 600 14px 'Montserrat', sans-serif; text-decoration: none; border: 0; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(26,35,50,.15); }
+      .btn svg { width: 18px; height: 18px; flex: none; }
+      .btn--dark { background: var(--ink); color: #fff; }
+      .btn--gold { background: var(--gold); color: #fff; }
+      .btn--wa { background: #25d366; color: #fff; }
+      .btn--ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+
+      /* Hero */
+      .hero { position: relative; color: var(--text); overflow: hidden; background: #fff; }
+      .hero .wrap { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1.05fr; gap: 48px; align-items: center; padding: 64px 0; }
+      .hero__text { min-width: 0; }
+      .hero__media { position: relative; }
+      .hero__media img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 24px; box-shadow: 0 30px 60px rgba(26,35,50,.22); }
+      .hero__media::before { content: ''; position: absolute; inset: 18px -18px -18px 18px; border: 2px solid var(--gold); border-radius: 24px; opacity: .55; }
+      .eyebrow { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
+      .hero h1 { color: var(--ink); font-size: clamp(46px, 6.5vw, 84px); line-height: 1.02; margin: 12px 0 14px; letter-spacing: .01em; }
+      .hero h1 em { color: var(--gold); font-style: italic; }
+      .hero__subtitle { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(22px, 2.6vw, 30px); color: var(--ink); margin: 0 0 16px; line-height: 1.25; }
+      .hero__subtitle em { color: var(--gold); font-style: italic; }
+      .hero p { max-width: 560px; font-size: 16px; margin: 0 0 22px; color: var(--text); }
+      .chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 520px; margin-bottom: 26px; }
+      .chip { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-radius: 14px; background: #f3e7d4; border: 1px solid #e6d3b3; border-left: 4px solid var(--gold); }
+      .chip small { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #a07a45; }
+      .chip strong { font-size: 15px; font-weight: 600; color: var(--ink); }
+      .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+      /* Sections */
+      section { padding: 72px 0; }
+      .section--sand { background: var(--sand); }
+      .section__head { text-align: center; max-width: 680px; margin: 0 auto 40px; }
+      .section__head h2 { font-size: clamp(28px, 4vw, 40px); margin-top: 8px; }
+      .section__head h2 em { color: var(--gold); }
+      .section__head p { margin: 12px 0 0; }
+
+      /* Infos clés */
+      .facts { list-style: none; margin: 0 auto; padding: 0; width: fit-content; max-width: 100%; }
+      .facts li { position: relative; padding-left: 26px; margin: 12px 0; font-size: 17px; font-weight: 500; color: var(--ink); }
+      .facts li::before { content: ''; position: absolute; left: 0; top: .6em; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+      .facts small { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+
+      /* Présentation */
+      .intro { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+      .intro p { margin: 0 0 14px; }
+      .intro img { border-radius: var(--radius); box-shadow: 0 20px 50px rgba(26,35,50,.15); }
+
+      /* Programme jour par jour */
+      .days { display: grid; gap: 22px; }
+      .day { display: grid; grid-template-columns: 280px 1fr; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+      .day img { width: 100%; height: 100%; min-height: 220px; object-fit: cover; }
+      .day__body { padding: 24px 28px; }
+      .day__num { display: inline-block; background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
+      .day h3 { font-size: 23px; margin: 12px 0 10px; }
+      .day ul { margin: 0; padding-left: 20px; }
+      .day li { margin: 5px 0; }
+      .day__tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      .day__tags span { font-size: 12px; font-weight: 600; color: var(--rust); background: #fbeee6; padding: 4px 10px; border-radius: 999px; }
+      .note { margin-top: 22px; font-size: 14px; font-style: italic; text-align: center; color: #6b7280; }
+
+      /* Pourquoi visiter */
+      .why__list { list-style: none; margin: 0 auto; padding: 0; width: fit-content; max-width: 100%; }
+      .why__list li { position: relative; padding-left: 26px; margin: 12px 0; font-size: 17px; font-weight: 500; color: var(--ink); }
+      .why__list li::before { content: ''; position: absolute; left: 0; top: .6em; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+
+      /* Inclus */
+      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+      .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 28px; break-inside: avoid; page-break-inside: avoid; }
+      .card h3 { font-size: 22px; margin-bottom: 14px; }
+      .checks { list-style: none; margin: 0; padding: 0; }
+      .checks li { position: relative; padding-left: 30px; margin: 10px 0; }
+      .checks li::before { content: ''; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border-radius: 50%; background: var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/12px no-repeat; }
+
+      /* Galerie */
+      .gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; gap: 12px; }
+      .gallery figure { margin: 0; position: relative; border-radius: 14px; overflow: hidden; break-inside: avoid; }
+      .gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+      .gallery figure:hover img { transform: scale(1.05); }
+      .gallery figcaption { position: absolute; left: 10px; bottom: 10px; background: rgba(26,35,50,.75); color: #fff; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+      .gallery .big { grid-column: span 2; grid-row: span 2; }
+      .gallery .wide { grid-column: span 2; }
+
+      /* Flyer + réservation */
+      .book { display: grid; grid-template-columns: .8fr 1.2fr; gap: 40px; align-items: center; }
+      .book img { border-radius: var(--radius); box-shadow: 0 20px 50px rgba(26,35,50,.18); }
+      .book h2 { font-size: clamp(28px, 4vw, 38px); margin: 8px 0 14px; }
+      .book__price { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--ink); margin: 6px 0 18px; }
+      .book__price small { font-family: 'Montserrat', sans-serif; font-size: 14px; color: #6b7280; }
+      .book__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+      .phone { font-weight: 700; color: var(--ink); font-size: 20px; letter-spacing: .02em; }
+
+      footer { background: var(--ink); color: rgba(255,255,255,.75); text-align: center; padding: 28px 0; font-size: 14px; }
+      footer a { color: var(--gold); text-decoration: none; }
+
+      @media (max-width: 860px) {
+        .intro, .book, .grid-2 { grid-template-columns: 1fr; }
+        .day { grid-template-columns: 1fr; }
+        .day img { height: 200px; min-height: 0; }
+        .gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+        .topbar__links .btn--ghost, .topbar__nav { display: none; }
+        .brand img { width: 44px; height: 44px; }
+        .brand__name { font-size: 18px; }
+        .brand__tag { display: none; }
+        .topbar__links .btn { padding: 10px 14px; font-size: 13px; }
+        .hero .wrap { grid-template-columns: 1fr; gap: 32px; padding: 40px 0 48px; }
+        .hero__media { order: -1; }
+        .hero__media::before { inset: 12px -10px -10px 12px; }
+        section { padding: 52px 0; }
+      }
+      @media (max-width: 520px) {
+        .topbar__links { display: none; }
+        .topbar .wrap { justify-content: center; min-height: 68px; }
+      }
+
+      /* Version PDF / impression */
+      @page { size: A4; margin: 12mm; }
+      @media print {
+        .topbar, .no-print { display: none !important; }
+        .print-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 0 12px; margin-bottom: 14px; border-bottom: 2px solid var(--gold); }
+        .print-head .brand img { width: 60px; height: 60px; }
+        .print-head .brand__name { font-size: 26px; }
+        .print-head__contact { text-align: right; font-size: 10pt; color: var(--ink); line-height: 1.5; }
+        .print-head__contact strong { color: var(--gold); }
+        body { font-size: 11.5pt; }
+        .hero .wrap { grid-template-columns: 1fr 1fr; gap: 24px; padding: 28px 24px; }
+        .hero__media { order: 0; }
+        .hero__media::before { display: none; }
+        .hero h1 { font-size: 44px; }
+        .hero__subtitle { font-size: 20px; }
+        .wrap { width: 100%; }
+        .btn:hover { transform: none; box-shadow: none; }
+
+        /* Découpage en pages A4 */
+        .pdf-break { break-before: page; page-break-before: always; }
+        section, .day, .card, .gallery figure, .intro, .why__list, .facts, .book { break-inside: avoid; page-break-inside: avoid; }
+        section { padding: 6mm 6mm; border-radius: 4mm; }
+        .section__head { margin-bottom: 5mm; }
+        .section__head h2 { font-size: 24pt; }
+        .section__head p { font-size: 10.5pt; margin-top: 2mm; }
+        .eyebrow { font-size: 8pt; }
+
+        /* Page 1 : en-tête, haut de page, infos clés */
+        .hero .wrap { padding: 4mm 0; }
+        .hero__media img { aspect-ratio: 4 / 3; }
+        .hero p { font-size: 10.5pt; margin-bottom: 4mm; }
+        .chips { display: none; }
+        .hero h1 { font-size: 48px; }
+        .hero__media img { aspect-ratio: 1 / 1; }
+        .facts { width: 100%; background: var(--sand); border: 1px solid var(--line); border-radius: 4mm; padding: 8mm 14mm; margin-top: 4mm; }
+        .facts li { font-size: 12.5pt; margin: 4.5mm 0; }
+
+        /* Page 2 : le séjour + pourquoi visiter */
+        .intro { grid-template-columns: 1.15fr .85fr; gap: 6mm; }
+        .intro h2 { font-size: 22pt !important; }
+        .intro p { font-size: 10.5pt; margin-bottom: 3mm; }
+        .why__list li { font-size: 11.5pt; margin: 2.5mm 0; }
+
+        /* Pages 3-4 : programme */
+        .days { gap: 5mm; }
+        .day { grid-template-columns: 58mm 1fr; }
+        .day img { height: 58mm; min-height: 0; }
+        .day__body { padding: 4mm 5mm; }
+        .day h3 { font-size: 15pt; margin: 2mm 0; }
+        .day li { font-size: 10pt; margin: 1mm 0; }
+        .day__tags { margin-top: 2mm; }
+        .note { margin-top: 4mm; font-size: 9pt; }
+        .grid-2 { grid-template-columns: 1fr 1fr; gap: 5mm; }
+        .card { padding: 5mm; }
+        .card h3 { font-size: 14pt; margin-bottom: 2mm; }
+        .checks li { font-size: 10pt; margin: 1.5mm 0; }
+
+        /* Page 5 : galerie */
+        .gallery { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 52mm; gap: 3mm; }
+        .gallery .big { grid-column: span 2; grid-row: span 2; }
+
+        /* Page 6 : réservation */
+        #reserver { padding-top: 10mm; }
+        .book { grid-template-columns: 1fr; gap: 8mm; text-align: center; }
+        .book img { width: 100%; height: 125mm; object-fit: cover; }
+        .book h2 { font-size: 30pt; }
+        .book__price { font-size: 22pt; }
+        .book p { font-size: 12pt; max-width: 140mm; margin-left: auto; margin-right: auto; }
+        .phone { font-size: 20pt; display: block; margin-top: 2mm; }
+        footer { margin-top: 10mm; border-radius: 4mm; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap">
+        <a class="brand" href="./">
+          <img src="public/logo.png" alt="Algeria Travel" width="52" height="52" />
+          <span class="brand__text">
+            <span class="brand__name">ALGERIA <span>TRAVEL</span></span>
+            <span class="brand__tag">Agence de voyage en Algérie</span>
+          </span>
+        </a>
+        <nav class="topbar__nav" aria-label="Menu">
+          <a href="./">Accueil</a>
+          <a href="pages/destinations.html">Destinations</a>
+          <a href="pages/tours.html" class="is-active">Circuits</a>
+          <a href="pages/contact.html">Contact</a>
+        </nav>
+        <div class="topbar__links">
+          <a class="btn btn--ghost" href="pages/place.html?id=taghit&amp;pkg=brezina">Voir la fiche sur le site</a>
+          <a class="btn btn--gold" href="public/docs/taghit-brezina.pdf" download="Algeria-Travel-Taghit-Brezina.pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Télécharger le PDF
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="print-head">
+      <span class="brand">
+        <img src="public/logo.png" alt="Algeria Travel" width="60" height="60" />
+        <span class="brand__text">
+          <span class="brand__name">ALGERIA <span>TRAVEL</span></span>
+          <span class="brand__tag">Agence de voyage en Algérie</span>
+        </span>
+      </span>
+      <div class="print-head__contact">
+        <strong>algeriatravel.org</strong><br />
+        WhatsApp : 0033 6 19 50 17 08
+      </div>
+    </div>
+
+    <section class="hero" style="padding:0">
+      <div class="wrap">
+        <div class="hero__text">
+        <span class="eyebrow">Aventure · Découverte · Authenticité</span>
+        <h1>Algeria <em>Travel</em></h1>
+        <h2 class="hero__subtitle">Séjour à <em>Taghit</em> en passant par Brezina</h2>
+        <p>Cinq jours entre bivouac sous les étoiles à Brezina, ksars millénaires, dunes du Grand Erg Occidental et soirées musicales dans une maison d’hôte traditionnelle.</p>
+        <div class="chips">
+          <div class="chip"><small>Dates</small><strong>Du 16 au 21 novembre</strong></div>
+          <div class="chip"><small>Durée</small><strong>5 jours / 4 nuits</strong></div>
+          <div class="chip"><small>Transport</small><strong>Van Mercedes VIP</strong></div>
+          <div class="chip"><small>Repas</small><strong>Pension complète</strong></div>
+        </div>
+        <div class="hero__actions no-print">
+          <a class="btn btn--gold" href="public/docs/taghit-brezina.pdf" download="Algeria-Travel-Taghit-Brezina.pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Télécharger le programme (PDF)
+          </a>
+        </div>
+        </div>
+        <div class="hero__media">
+          <img src="public/images/taghit-van-hero.png" alt="Van Mercedes VIP et dromadaire devant le ksar de Taghit au coucher du soleil" fetchpriority="high" />
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <ul class="facts">
+          <li><small>Dates :</small> Du 16 au 21 novembre</li>
+          <li><small>Durée :</small> 5 jours / 4 nuits</li>
+          <li><small>Hébergement :</small> 1 nuit bivouac + 3 nuits maison d’hôte</li>
+          <li><small>Transport :</small> Van Mercedes VIP</li>
+          <li><small>Repas :</small> Pension complète</li>
+          <li><small>Encadrement :</small> Guides francophones et locaux</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section--sand pdf-break">
+      <div class="wrap intro">
+        <div>
+          <span class="eyebrow">Le séjour</span>
+          <h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 18px">Taghit, la perle de la <em style="color:var(--gold)">Saoura</em></h2>
+          <p>Nichée entre la palmeraie de l’oued Zousfana et les grandes dunes du Grand Erg Occidental, Taghit est l’une des plus belles oasis du Sahara algérien. Son ksar en terre, ses ruelles ombragées et ses couchers de soleil sur les dunes en font une destination inoubliable.</p>
+          <p>Ce séjour vous y emmène en passant par <strong>Brezina</strong>, où vous vivrez une première nuit en bivouac sous les étoiles, avant de rejoindre une maison d’hôte traditionnelle pour trois nuits au rythme du désert.</p>
+          <p><strong>Ambiance familiale, conviviale et authentique</strong> : un séjour encadré par des guides francophones et locaux, pour une expérience riche, sécurisée et inoubliable.</p>
+        </div>
+        <img src="public/images/taghit-sejour.png" alt="Ksar et palmeraie de Taghit au coucher du soleil, bivouac, maison d’hôte et van Mercedes VIP" loading="lazy" />
+      </div>
+    </section>
+
+    <section class="why" id="pourquoi">
+      <div class="wrap">
+        <div class="section__head">
+          <span class="eyebrow">Destination</span>
+          <h2>Pourquoi visiter <em>Taghit</em> ?</h2>
+          <p>Entre palmeraies, dunes dorées et patrimoine local, Taghit offre une expérience saharienne unique : ksar millénaire, sources naturelles et couchers de soleil inoubliables au pied du Grand Erg.</p>
+        </div>
+        <ul class="why__list">
+          <li>Palmeraie et sources naturelles</li>
+          <li>Portes du désert du Grand Erg</li>
+          <li>Randonnées et paysages époustouflants</li>
+          <li>Hospitalité et culture locale authentique</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="programme" class="section--sand pdf-break">
+      <div class="wrap">
+        <div class="section__head">
+          <span class="eyebrow">Au programme</span>
+          <h2>Programme <em>jour par jour</em></h2>
+          <p>Toutes les activités du séjour, réparties sur 5 jours.</p>
+        </div>
+
+        <div class="days">
+          <article class="day">
+            <img src="public/images/brezina-bivouac.png" alt="Bivouac à Brezina : tentes et feu de camp sous les étoiles" loading="lazy" />
+            <div class="day__body">
+              <span class="day__num">Jour 1</span>
+              <h3>Départ et nuit en bivouac à Brezina</h3>
+              <ul>
+                <li>Accueil du groupe et départ à bord du van Mercedes VIP.</li>
+                <li>Route vers Brezina, porte du désert, avec pauses en chemin.</li>
+                <li>Installation au bivouac : tentes et matériel fournis.</li>
+                <li>Dîner et nuit sous les étoiles autour du feu de camp.</li>
+              </ul>
+              <div class="day__tags"><span>Van Mercedes VIP</span><span>Bivouac</span></div>
+            </div>
+          </article>
+
+          <article class="day">
+            <img src="public/images/taghit-maison-hote.png" alt="Maison d’hôte traditionnelle à Taghit au coucher du soleil" loading="lazy" />
+            <div class="day__body">
+              <span class="day__num">Jour 2</span>
+              <h3>Peintures rupestres de Brezina, puis Taghit</h3>
+              <ul>
+                <li>Petit-déjeuner au bivouac.</li>
+                <li>Visite des peintures rupestres, témoins des anciennes civilisations sahariennes.</li>
+                <li>Route vers Taghit et installation dans la maison d’hôte traditionnelle.</li>
+                <li>Premier coucher de soleil sur les dunes, dîner à la maison d’hôte.</li>
+              </ul>
+              <div class="day__tags"><span>Peintures rupestres</span><span>Maison d’hôte</span></div>
+            </div>
+          </article>
+
+          <article class="day">
+            <img src="public/images/taghit-jour3.png" alt="Pause autour du feu près des dromadaires et du ksar de Taghit" loading="lazy" />
+            <div class="day__body">
+              <span class="day__num">Jour 3</span>
+              <h3>Ksars, ancienne caserne et dromadaires</h3>
+              <ul>
+                <li>Visite du ksar de Taghit et de ses ruelles en terre.</li>
+                <li>Visite d’une ancienne caserne et des ksars des environs.</li>
+                <li>Randonnée à dos de dromadaire dans les dunes.</li>
+                <li>Soirée musicale à la maison d’hôte.</li>
+              </ul>
+              <div class="day__tags"><span>Ksars</span><span>Dromadaire</span><span>Soirée musicale</span></div>
+            </div>
+          </article>
+
+          <article class="day pdf-break">
+            <img src="public/images/quatre-quatre.jpg" alt="Safari 4x4 dans les dunes" loading="lazy" />
+            <div class="day__body">
+              <span class="day__num">Jour 4</span>
+              <h3>Safari 4×4, thé &amp; qaada, kayak au lac</h3>
+              <ul>
+                <li>Safari en 4×4 à travers les dunes du Grand Erg Occidental.</li>
+                <li>Pause thé et <em>qaada</em> traditionnelle dans le désert.</li>
+                <li>Kayak sur le lac, au milieu des falaises.</li>
+                <li>Dernière soirée conviviale à la maison d’hôte.</li>
+              </ul>
+              <div class="day__tags"><span>Safari 4×4</span><span>Thé &amp; qaada</span><span>Kayak</span></div>
+            </div>
+          </article>
+
+          <article class="day">
+            <img src="public/images/taghit-jour5.png" alt="Lever de soleil sur les dunes, petit-déjeuner, souvenirs et van Mercedes VIP pour le retour" loading="lazy" />
+            <div class="day__body">
+              <span class="day__num">Jour 5</span>
+              <h3>Lever de soleil et retour</h3>
+              <ul>
+                <li>Lever de soleil sur les dunes pour les plus matinaux.</li>
+                <li>Petit-déjeuner, derniers achats et photos.</li>
+                <li>Départ en van Mercedes VIP et retour.</li>
+              </ul>
+              <div class="day__tags"><span>Retour</span></div>
+            </div>
+          </article>
+        </div>
+        <p class="note">L’ordre des activités peut être ajusté sur place selon la météo et le rythme du groupe.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section__head">
+          <span class="eyebrow">Formule</span>
+          <h2>Ce qui est <em>inclus</em></h2>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Hébergement &amp; transport</h3>
+            <ul class="checks">
+              <li>1 nuit en bivouac à Brezina (tentes et matériel fournis)</li>
+              <li>3 nuits en maison d’hôte traditionnelle</li>
+              <li>Van Mercedes VIP pendant tout le séjour</li>
+              <li>Pension complète</li>
+              <li>Guides francophones et locaux</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Activités</h3>
+            <ul class="checks">
+              <li>Visite des peintures rupestres</li>
+              <li>Visite d’une ancienne caserne et des ksars</li>
+              <li>Randonnée à dos de dromadaire</li>
+              <li>Safari 4×4 avec thé &amp; qaada</li>
+              <li>Kayak au lac</li>
+              <li>Soirée musicale</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section--sand pdf-break">
+      <div class="wrap">
+        <div class="section__head">
+          <span class="eyebrow">Galerie</span>
+          <h2>Images du <em>séjour</em></h2>
+        </div>
+        <div class="gallery">
+          <figure class="big"><img src="public/images/sahara5.jpeg" alt="Dunes du Grand Erg Occidental" loading="lazy" /><figcaption>Dunes de Taghit</figcaption></figure>
+          <figure><img src="public/images/maison-hote-sud-1.png" alt="Maison d’hôte traditionnelle" loading="lazy" /><figcaption>Maison d’hôte</figcaption></figure>
+          <figure><img src="public/images/maison-hote-sud-4.png.jpeg" alt="Patio de la maison d’hôte" loading="lazy" /><figcaption>Patio</figcaption></figure>
+          <figure><img src="public/images/chameau.jpg" alt="Randonnée à dos de dromadaire" loading="lazy" /><figcaption>Dromadaire</figcaption></figure>
+          <figure><img src="public/images/sahara4.jpeg" alt="Paysage saharien" loading="lazy" /><figcaption>Désert</figcaption></figure>
+          <figure><img src="public/images/maison-hote-sud-6.png.jpeg" alt="Chambre de la maison d’hôte" loading="lazy" /><figcaption>Chambre</figcaption></figure>
+          <figure><img src="public/images/sahara7.jpeg" alt="Coucher de soleil sur les dunes" loading="lazy" /><figcaption>Coucher de soleil</figcaption></figure>
+          <figure class="wide"><img src="public/images/quad1.jpeg" alt="Balade en 4×4" loading="lazy" /><figcaption>4×4</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="reserver" class="pdf-break">
+      <div class="wrap book">
+        <img src="public/images/taghit-brezina.png" alt="Flyer du séjour Taghit via Brezina" loading="lazy" />
+        <div>
+          <span class="eyebrow">Réservation &amp; informations</span>
+          <h2>Réservez votre place</h2>
+          <div class="book__price">65 000 DA <small>/ personne</small></div>
+          <p>Places limitées. Contactez-nous sur WhatsApp pour connaître les disponibilités et les modalités de réservation.</p>
+          <p>WhatsApp : <span class="phone">0033 6 19 50 17 08</span></p>
+          <div class="book__actions no-print">
+            <a class="btn btn--dark" href="public/docs/taghit-brezina.pdf" download="Algeria-Travel-Taghit-Brezina.pdf">Télécharger le PDF</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">© 2026 Algeria Travel — Brezina · Taghit · Désert · Aventure · Découverte — <a href="./">algeriatravel.org</a></div>
+    </footer>
+  </body>
+</html>
