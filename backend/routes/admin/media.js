@@ -1,0 +1,95 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
+const { query } = require('../../config/db');
+const { adminAuth } = require('../../middleware/adminAuth');
+const { asyncHandler } = require('../../lib/asyncHandler');
+const {
+  CMS_DIR,
+  LEGACY_UPLOAD_DIR,
+  PUBLIC_IMAGES_DIR,
+  ensureDir,
+  sanitizeFilename,
+  publicCmsUrl,
+  normalizeImageUrl,
+} = require('../../lib/mediaPaths');
+
+const router = express.Router();
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      ensureDir(CMS_DIR);
+      cb(null, CMS_DIR);
+    },
+    filename: (_req, file, cb) => {
+      cb(null, sanitizeFilename(file.originalname));
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (/^image\//.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Seules les images sont autorisées.'));
+  },
+});
+
+function listFilesInDir(dir, urlPrefix, subPath = '', source = 'library') {
+  if (!fs.existsSync(dir)) return [];
+  const items = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const rel = subPath ? `${subPath}/${entry.name}` : entry.name;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      items.push(...listFilesInDir(fullPath, urlPrefix, rel, source));
+    } else if (/\.(jpe?g|png|gif|webp|avif|svg)$/i.test(entry.name)) {
+      items.push({ url: `${urlPrefix}/${rel.replace(/\\/g, '/')}`, name: entry.name, source });
+    }
+  }
+  return items;
+}
+
+router.get('/media', adminAuth, asyncHandler(async (_req, res) => {
+  const cms = listFilesInDir(CMS_DIR, '/images/cms', '', 'cms');
+  const legacy = listFilesInDir(LEGACY_UPLOAD_DIR, '/uploads', '', 'upload');
+  const library = listFilesInDir(PUBLIC_IMAGES_DIR, '/images', '', 'library').filter(
+    (item) => !item.url.startsWith('/images/cms/')
+  );
+  let galleryRows = [];
+  try {
+    const result = await query(
+      `select distinct src as url from public.gallery_items where src is not null and src <> '' order by src`
+    );
+    galleryRows = result.rows.map((row) => {
+      const url = normalizeImageUrl(row.url);
+      return { url, name: path.basename(url), source: 'gallery' };
+    });
+  } catch {
+    galleryRows = [];
+  }
+  const seen = new Set();
+  res.json({
+    items: [...cms, ...legacy, ...library, ...galleryRows].filter((item) => {
+      if (seen.has(item.url)) return false;
+      seen.add(item.url);
+      return true;
+    }),
+  });
+}));
+
+router.post(
+  '/media/upload',
+  adminAuth,
+  (req, res, next) => {
+    upload.single('file')(req, res, (err) => {
+      if (err) return res.status(400).json({ error: err.message || 'Upload impossible.' });
+      next();
+    });
+  },
+  (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Aucun fichier reçu.' });
+    res.status(201).json({ url: publicCmsUrl(req.file.filename), name: req.file.originalname });
+  }
+);
+
+module.exports = router;

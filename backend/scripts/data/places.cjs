@@ -1,0 +1,1131 @@
+exports.PLACES = [
+  {
+    "id": "bejaia",
+    "name": "Béjaïa",
+    "name_en": "Bejaia",
+    "name_ar": "بجاية",
+    "tagline": "Perle de la Kabylie",
+    "tagline_en": "Pearl of Kabylie",
+    "tagline_ar": "لؤلؤة القبائل",
+    "rating": 4.9,
+    "reviews": 268,
+    "temp": "22°C",
+    "image": "/images/bejaia.jpeg",
+    "gallery": [
+      "/images/bejaia.jpeg",
+      "/images/bejaia-kasbah.jpg",
+      "/images/kayak.jpeg"
+    ],
+    "description": "Mer turquoise, Cap Carbon et montagnes du Djurdjura : Béjaïa offre mer et nature dans un même séjour.",
+    "description_en": "Turquoise sea, Cap Carbon and Djurdjura mountains: Béjaïa offers sea and nature in one trip.",
+    "description_ar": "بحر فيروزي وكاب كاربون وجبال جرجرة: بجاية تجمع البحر والطبيعة في إقامة واحدة.",
+    "seoTitle": "Tourisme Béjaïa — Séjour Kabylie & mer",
+    "seoTitle_en": "Bejaia Tourism — Kabylie Coast & Stay",
+    "seoTitle_ar": "سياحة بجاية — إقامة ساحل القبائل",
+    "seoDescription": "Voyage à Béjaïa : plages, Cap Carbon et Kabylie. Séjour, excursion et hébergement avec Algeria Travel, agence de voyage en Algérie.",
+    "seoDescription_en": "Travel to Bejaia: beaches, Cap Carbon and Kabyle coast. Tours, stays and activities with Algeria Travel, your Algeria tourism agency.",
+    "seoDescription_ar": "سفر إلى بجاية: شواطئ وكاب كاربون وساحل القبائل. جولات وإقامات مع Algeria Travel، وكالة سفر جزائرية.",
+    "bestTime": "Mai – Octobre",
+    "bestTime_en": "May – October",
+    "bestTime_ar": "ماي – أكتوبر",
+    "duration": "3 à 4 jours",
+    "duration_en": "3 to 4 days",
+    "duration_ar": "3 إلى 4 أيام",
+    "price": 25000,
+    "oldPrice": 30000,
+    "stay": "Hôtel Royal Béjaïa",
+    "stay_en": "Royal Bejaia Hotel",
+    "stay_ar": "فندق رويال بجاية",
+    "transport": "Route depuis Alger ou vol + véhicule",
+    "transport_en": "Road from Algiers or flight + vehicle",
+    "transport_ar": "طريق من الجزائر أو طيران + سيارة",
+    "includes": [
+      {
+        "fr": "Hébergement 2–3 nuits",
+        "en": "2–3 nights stay",
+        "ar": "إقامة 2–3 ليالٍ"
+      },
+      {
+        "fr": "Excursion Cap Carbon",
+        "en": "Cap Carbon outing",
+        "ar": "رحلة كاب كاربون"
+      },
+      {
+        "fr": "Repas traditionnels",
+        "en": "Traditional meals",
+        "ar": "وجبات تقليدية"
+      },
+      {
+        "fr": "Transferts locaux",
+        "en": "Local transfers",
+        "ar": "تنقلات محلية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Waves",
+        "fr": "Plages & criques",
+        "en": "Beaches & coves",
+        "ar": "شواطئ وخلجان"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Randonnées",
+        "en": "Hiking",
+        "ar": "تنزه"
+      },
+      {
+        "icon": "Fish",
+        "fr": "Poissons grillés",
+        "en": "Grilled fish",
+        "ar": "سمك مشوي"
+      }
+    ]
+  },
+  {
+    "id": "djanet",
+    "name": "Djanet",
+    "name_en": "Djanet",
+    "name_ar": "جانت",
+    "tagline": "Porte du Tassili",
+    "tagline_en": "Gateway to Tassili",
+    "tagline_ar": "بوابة تاسيلي",
+    "rating": 4.9,
+    "reviews": 198,
+    "temp": "28°C",
+    "image": "/images/djanet.jpeg",
+    "gallery": [
+      "/images/djanet.jpeg",
+      "/images/sahara1.jpeg",
+      "/images/sahara3.jpeg"
+    ],
+    "description": "Porte d’entrée du Tassili n’Ajjer : art rupestre, dunes et bivouacs sous les étoiles avec guides touaregs.",
+    "description_en": "Gateway to Tassili n’Ajjer: rock art, dunes and starlit bivouacs with Tuareg guides.",
+    "description_ar": "بوابة تاسيلي ناجر: فن صخري وكثبان ومبيت تحت النجوم مع مرشدين طوارق.",
+    "seoTitle": "Tourisme Djanet — Tassili & circuit Sahara",
+    "seoTitle_en": "Djanet Tourism — Tassili & Sahara Algeria Tour",
+    "seoTitle_ar": "سياحة جانت — تاسيلي وجولة الصحراء",
+    "seoDescription": "Voyage à Djanet et circuit Sahara Algérie : art rupestre, dunes et bivouacs. Réservez votre séjour avec Algeria Travel, agence touristique.",
+    "seoDescription_en": "Djanet travel and Sahara Algeria tour: rock art, dunes and bivouacs. Book your Algeria desert tour with Algeria Travel agency.",
+    "seoDescription_ar": "سفر إلى جانت وجولة صحراء الجزائر: فن صخري وكثبان ومبيت. احجز مع Algeria Travel، وكالة سياحية.",
+    "bestTime": "Novembre – Février",
+    "bestTime_en": "November – February",
+    "bestTime_ar": "نوفمبر – فبراير",
+    "duration": "6 à 8 jours",
+    "duration_en": "6 to 8 days",
+    "duration_ar": "6 إلى 8 أيام",
+    "price": 85000,
+    "oldPrice": 95000,
+    "stay": "Campement saharien / bivouac premium",
+    "stay_en": "Saharan camp / premium bivouac",
+    "stay_ar": "مخيم صحراوي / مبيت فاخر",
+    "transport": "Vol vers Djanet + 4×4 guidé",
+    "transport_en": "Flight to Djanet + guided 4×4",
+    "transport_ar": "رحلة إلى جانت + دفع رباعي مرشد",
+    "includes": [
+      {
+        "fr": "Vols internes (selon formule)",
+        "en": "Domestic flights (package)",
+        "ar": "رحلات داخلية (حسب الباقة)"
+      },
+      {
+        "fr": "Circuit 4×4 & trek",
+        "en": "4×4 & trek circuit",
+        "ar": "جولة دفع رباعي ومشي"
+      },
+      {
+        "fr": "Bivouacs & repas",
+        "en": "Bivouacs & meals",
+        "ar": "مبيت ووجبات"
+      },
+      {
+        "fr": "Guide touareg",
+        "en": "Tuareg guide",
+        "ar": "مرشد طوارقي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Palette",
+        "fr": "Art rupestre",
+        "en": "Rock art",
+        "ar": "فن صخري"
+      },
+      {
+        "icon": "Tent",
+        "fr": "Nuits sous les étoiles",
+        "en": "Nights under stars",
+        "ar": "ليالٍ تحت النجوم"
+      },
+      {
+        "icon": "Sun",
+        "fr": "Dunes Tin Merzouga",
+        "en": "Tin Merzouga dunes",
+        "ar": "كثبان تين مرزوقة"
+      }
+    ]
+  },
+  {
+    "id": "ghardaia",
+    "name": "Ghardaïa",
+    "name_en": "Ghardaia",
+    "name_ar": "غرداية",
+    "tagline": "Vallée du M’Zab",
+    "tagline_en": "M’Zab Valley",
+    "tagline_ar": "وادي مزاب",
+    "rating": 4.8,
+    "reviews": 245,
+    "temp": "26°C",
+    "image": "/images/ghardaia.jpeg",
+    "gallery": [
+      "/images/ghardaia.jpeg",
+      "/images/sahara5.jpeg",
+      "/images/maison-hote-sud-1.png"
+    ],
+    "description": "Cinq cités fortifiées du M’Zab, marchés et architecture mozabite : un joyau UNESCO au cœur du désert.",
+    "description_en": "Five fortified M’Zab cities, markets and Mozabite architecture: a UNESCO jewel in the desert.",
+    "description_ar": "خمس مدن مزاب المحصّنة وأسواق وعمارة ميزابية: جوهرة يونسكو في قلب الصحراء.",
+    "seoTitle": "Tourisme Ghardaïa — Vallée du M'Zab & culture",
+    "seoTitle_en": "Ghardaia Tourism — M'Zab Valley & Cultural Trip",
+    "seoTitle_ar": "سياحة غرداية — وادي مزاب وثقافة",
+    "seoDescription": "Tourisme Ghardaïa et vallée du M'Zab : ksour, architecture mozabite et séjour culturel. Circuit touristique avec Algeria Travel.",
+    "seoDescription_en": "Ghardaia tourism and M'Zab Valley: ksour, Mozabite architecture and cultural stays. Algeria cultural tourism with Algeria Travel.",
+    "seoDescription_ar": "سياحة غرداية ووادي مزاب: قصور وعمارة ميزابية وإقامة ثقافية. جولة سياحية مع Algeria Travel.",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "duration": "3 à 4 jours",
+    "duration_en": "3 to 4 days",
+    "duration_ar": "3 إلى 4 أيام",
+    "price": 35000,
+    "oldPrice": 42000,
+    "stay": "Maison d’hôtes traditionnelle mozabite",
+    "stay_en": "Traditional Mozabite guest house",
+    "stay_ar": "بيت ضيافة ميزابي تقليدي",
+    "transport": "Vol ou bus + transferts locaux",
+    "transport_en": "Flight or bus + local transfers",
+    "transport_ar": "طيران أو حافلة + تنقلات محلية",
+    "includes": [
+      {
+        "fr": "Hébergement 3 nuits",
+        "en": "3 nights stay",
+        "ar": "إقامة 3 ليالٍ"
+      },
+      {
+        "fr": "Visite des ksour",
+        "en": "Ksour visits",
+        "ar": "زيارة القصور"
+      },
+      {
+        "fr": "Guide local",
+        "en": "Local guide",
+        "ar": "مرشد محلي"
+      },
+      {
+        "fr": "Dégustation produits locaux",
+        "en": "Local tasting",
+        "ar": "تذوق منتجات محلية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Building2",
+        "fr": "Architecture M’Zab",
+        "en": "M’Zab architecture",
+        "ar": "عمارة مزاب"
+      },
+      {
+        "icon": "ShoppingBag",
+        "fr": "Marchés colorés",
+        "en": "Colourful markets",
+        "ar": "أسواق ملونة"
+      },
+      {
+        "icon": "Users",
+        "fr": "Hospitalité mozabite",
+        "en": "Mozabite hospitality",
+        "ar": "ضيافة ميزابية"
+      }
+    ]
+  },
+  {
+    "id": "hoggar",
+    "name": "Hoggar",
+    "name_en": "Hoggar",
+    "name_ar": "الهقار",
+    "tagline": "Montagnes du Sahara",
+    "tagline_en": "Sahara mountains",
+    "tagline_ar": "جبال الصحراء",
+    "rating": 5,
+    "reviews": 167,
+    "temp": "24°C",
+    "image": "/images/hogar.jpeg",
+    "gallery": [
+      "/images/hogar.jpeg",
+      "/images/sahara2.jpeg",
+      "/images/sahara7.jpeg"
+    ],
+    "description": "Massif volcanique autour de Tamanrasset. Lever de soleil à Assekrem, silence absolu et hospitalité touareg.",
+    "description_en": "Volcanic massif around Tamanrasset. Sunrise at Assekrem, absolute silence and Tuareg hospitality.",
+    "description_ar": "كتلة بركانية حول تمنراست. شروق أسكرام وصمت مطلق وضيافة طوارق.",
+    "seoTitle": "Tourisme Hoggar — Sahara Algérie & Assekrem",
+    "seoTitle_en": "Hoggar Tourism — Sahara Algeria & Assekrem Tour",
+    "seoTitle_ar": "سياحة الهقار — صحراء الجزائر وأسكرام",
+    "seoDescription": "Circuit Sahara Algérie au Hoggar : Assekrem, Tamanrasset et montagnes du désert. Voyage d'aventure avec Algeria Travel.",
+    "seoDescription_en": "Sahara Algeria tour in the Hoggar: Assekrem, Tamanrasset and desert mountains. Adventure tourism with Algeria Travel agency.",
+    "seoDescription_ar": "جولة صحراء الجزائر في الهقار: أسكرام وتمنراست وجبال الصحراء. سياحة مغامرات مع Algeria Travel.",
+    "bestTime": "Novembre – Février",
+    "bestTime_en": "November – February",
+    "bestTime_ar": "نوفمبر – فبراير",
+    "duration": "7 à 9 jours",
+    "duration_en": "7 to 9 days",
+    "duration_ar": "7 إلى 9 أيام",
+    "price": 95000,
+    "oldPrice": 105000,
+    "stay": "Campements & nuits en auberge à Tamanrasset",
+    "stay_en": "Camps & guesthouse nights in Tamanrasset",
+    "stay_ar": "مخيمات وليالٍ في نزل بتمنراست",
+    "transport": "Vol vers Tamanrasset + 4×4",
+    "transport_en": "Flight to Tamanrasset + 4×4",
+    "transport_ar": "رحلة إلى تمنراست + دفع رباعي",
+    "includes": [
+      {
+        "fr": "Circuit Assekrem",
+        "en": "Assekrem circuit",
+        "ar": "جولة أسكرام"
+      },
+      {
+        "fr": "Hébergement mixte",
+        "en": "Mixed accommodation",
+        "ar": "إقامة متنوعة"
+      },
+      {
+        "fr": "Repas sahariens",
+        "en": "Saharan meals",
+        "ar": "وجبات صحراوية"
+      },
+      {
+        "fr": "Équipe locale",
+        "en": "Local team",
+        "ar": "فريق محلي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Sunrise",
+        "fr": "Assekrem",
+        "en": "Assekrem",
+        "ar": "أسكرام"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Paysages volcaniques",
+        "en": "Volcanic landscapes",
+        "ar": "مناظر بركانية"
+      },
+      {
+        "icon": "Tent",
+        "fr": "Immersion touareg",
+        "en": "Tuareg immersion",
+        "ar": "انغماس طوارقي"
+      }
+    ]
+  },
+  {
+    "id": "taghit",
+    "name": "Taghit",
+    "name_en": "Taghit",
+    "name_ar": "تاغيت",
+    "tagline": "Joyau du Grand Erg",
+    "tagline_en": "Jewel of the Grand Erg",
+    "tagline_ar": "جوهرة العرق الكبير",
+    "rating": 4.9,
+    "reviews": 142,
+    "temp": "26°C",
+    "weather": "Ensoleillé",
+    "weather_en": "Sunny",
+    "weather_ar": "مشمس",
+    "idealFor": "Détente & Aventure",
+    "idealFor_en": "Relaxation & Adventure",
+    "idealFor_ar": "استرخاء ومغامرة",
+    "region": "Béchar, Algérie",
+    "region_en": "Béchar, Algeria",
+    "region_ar": "بشار، الجزائر",
+    "recommendedDuration": "2 à 3 jours",
+    "recommendedDuration_en": "2 to 3 days",
+    "recommendedDuration_ar": "يومان إلى 3 أيام",
+    "difficulty": "Facile à modérée",
+    "difficulty_en": "Easy to moderate",
+    "difficulty_ar": "سهل إلى متوسط",
+    "audience": "En couple, famille, amis",
+    "audience_en": "Couples, families, friends",
+    "audience_ar": "أزواج، عائلات، أصدقاء",
+    "image": "/images/home/taghit.webp",
+    "gallery": [
+      "/images/home/taghit.webp",
+      "/images/sahara5.jpeg",
+      "/images/sahara1.jpeg"
+    ],
+    "description": "Entre palmeraies, dunes dorées et patrimoine local, Taghit offre une expérience saharienne unique : ksar millénaire, sources naturelles et couchers de soleil inoubliables au pied du Grand Erg.",
+    "description_en": "Between palm groves, golden dunes and local heritage, Taghit offers a unique Saharan experience: ancient ksar, natural springs and unforgettable sunsets at the foot of the Grand Erg.",
+    "description_ar": "بين واحات النخيل والكثبان الذهبية والتراث المحلي، تقدم تاغيت تجربة صحراوية فريدة: قصر قديم وينابيع طبيعية وغروب لا يُنسى عند سفح العرق الكبير.",
+    "seoTitle": "Tourisme Taghit — Sahara & Grand Erg",
+    "seoTitle_en": "Taghit Tourism — Sahara Algeria Desert Tour",
+    "seoTitle_ar": "سياحة تاغيت — جولة الصحراء",
+    "seoDescription": "Tourisme Taghit et circuit Sahara Algérie : dunes, ksour et palmeraies. Séjour sur mesure avec Algeria Travel, agence de voyage.",
+    "seoDescription_en": "Taghit tourism and Sahara Algeria tour: dunes, ksour and palm groves. Tailor-made desert trip with Algeria Travel agency.",
+    "seoDescription_ar": "سياحة تاغيت وجولة صحراء الجزائر: كثبان وقصور وواحات. إقامة مخصصة مع Algeria Travel.",
+    "bestTime": "Octobre – Mars",
+    "bestTime_en": "October – March",
+    "bestTime_ar": "أكتوبر – مارس",
+    "whyVisit": [
+      {
+        "icon": "TreePalm",
+        "fr": "Palmeraie et sources naturelles",
+        "en": "Palm grove and natural springs",
+        "ar": "واحة نخيل وينابيع طبيعية"
+      },
+      {
+        "icon": "Sunrise",
+        "fr": "Portes du désert du Grand Erg",
+        "en": "Gateway to the Grand Erg desert",
+        "ar": "بوابة صحراء العرق الكبير"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Randonnées et paysages époustouflants",
+        "en": "Hikes and breathtaking landscapes",
+        "ar": "تنزه ومناظر خلابة"
+      },
+      {
+        "icon": "Heart",
+        "fr": "Hospitalité et culture locale authentique",
+        "en": "Hospitality and authentic local culture",
+        "ar": "ضيافة وثقافة محلية أصيلة"
+      }
+    ],
+    "price": 75000,
+    "pricePerPerson": true,
+    "pkgTitle": "Hôtel 4 étoiles",
+    "pkgTitle_en": "4-star hotel",
+    "pkgTitle_ar": "فندق 4 نجوم",
+    "pkgIcon": "Hotel",
+    "stay": "Hôtel 4 étoiles · pension complète",
+    "stay_en": "4-star hotel · full board",
+    "stay_ar": "فندق 4 نجوم · إقامة كاملة",
+    "transport": "✈️ Vol aller-retour : Alger ➤ Béchar · ✈️ Béchar ➤ Alger (23 au 28 oct.) + navette aéroport",
+    "transport_en": "✈️ Round-trip flight: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers (Oct 23–28) + airport shuttle",
+    "transport_ar": "✈️ ذهاب وإياب: الجزائر ➤ بشار · ✈️ بشار ➤ الجزائر (23–28 أكتوبر) + نقل المطار",
+    "duration": "Pension complète",
+    "duration_en": "Full board",
+    "duration_ar": "إقامة كاملة",
+    "includes": [
+      {
+        "fr": "Pension complète",
+        "en": "Full board",
+        "ar": "إقامة كاملة"
+      },
+      {
+        "fr": "Activités : 4×4, ski sur sable, dromadaire, visite des ksars incluse",
+        "en": "Activities: 4×4, sand skiing, camel, ksar visits included",
+        "ar": "أنشطة: دفع رباعي، تزلج على الرمال، جمل، زيارة القصور مشمولة"
+      },
+      {
+        "fr": "Transport navette aéroport",
+        "en": "Airport shuttle transfer",
+        "ar": "نقل المطار بالمكوك"
+      },
+      {
+        "fr": "✈️ Vol aller-retour : Alger ➤ Béchar · ✈️ Béchar ➤ Alger, du 23 au 28 octobre",
+        "en": "✈️ Round-trip flight: Algiers ➤ Béchar · ✈️ Béchar ➤ Algiers, Oct 23–28",
+        "ar": "✈️ رحلة ذهاب وإياب: الجزائر ➤ بشار · ✈️ بشار ➤ الجزائر، من 23 إلى 28 أكتوبر"
+      },
+      {
+        "fr": "Extras : buggy et quad",
+        "en": "Extras: buggy and quad",
+        "ar": "إضافات: باغي وكواد"
+      }
+    ]
+  },
+  {
+    "id": "timimoun",
+    "name": "Timimoun",
+    "name_en": "Timimoun",
+    "name_ar": "تيميمون",
+    "tagline": "Perle rouge du Sahara",
+    "tagline_en": "Red pearl of the Sahara",
+    "tagline_ar": "لؤلؤة الصحراء الحمراء",
+    "rating": 4.9,
+    "reviews": 234,
+    "temp": "30°C",
+    "image": "/images/sahara1.jpeg",
+    "gallery": [
+      "/images/sahara1.jpeg",
+      "/images/sahara2.jpeg",
+      "/images/sahara3.jpeg"
+    ],
+    "description": "Dunes rouges du Grand Erg Occidental, ksour ocre et couchers de soleil magiques au cœur du Gourara.",
+    "description_en": "Red dunes of the Grand Western Erg, ochre ksour and magical sunsets in the heart of Gourara.",
+    "description_ar": "كثبان حمراء من العرق الغربي الكبير وقصور حمراء وغروب ساحر في قلب القورارة.",
+    "seoTitle": "Tourisme Timimoun — Dunes rouges & ksour",
+    "seoTitle_en": "Timimoun Tourism — Red Dunes & Sahara Oasis",
+    "seoTitle_ar": "سياحة تيميمون — كثبان حمراء وقصور",
+    "seoDescription": "Séjour à Timimoun : dunes rouges du Grand Erg, ksour ocre et tourisme Sahara. Vacances en Algérie avec Algeria Travel.",
+    "seoDescription_en": "Timimoun stay: red dunes, ochre ksour and Sahara tourism. Algeria vacation and desert tour with Algeria Travel.",
+    "seoDescription_ar": "إقامة في تيميمون: كثبان حمراء وقصور وسياحة صحراوية. عطل في الجزائر مع Algeria Travel.",
+    "bestTime": "Octobre – Avril",
+    "bestTime_en": "October – April",
+    "bestTime_ar": "أكتوبر – أبريل",
+    "duration": "5 jours",
+    "duration_en": "5 days",
+    "duration_ar": "5 أيام",
+    "price": 45000,
+    "oldPrice": 55000,
+    "stay": "Maison d’hôtes & campement saharien",
+    "stay_en": "Guest house & Saharan camp",
+    "stay_ar": "بيت ضيافة ومخيم صحراوي",
+    "transport": "Vol vers Timimoun + 4×4",
+    "transport_en": "Flight to Timimoun + 4×4",
+    "transport_ar": "رحلة إلى تيميمون + دفع رباعي",
+    "includes": [
+      {
+        "fr": "Hébergement 4 nuits",
+        "en": "4 nights accommodation",
+        "ar": "إقامة 4 ليالٍ"
+      },
+      {
+        "fr": "Excursion dunes & ksour",
+        "en": "Dunes & ksour excursion",
+        "ar": "رحلة الكثبان والقصور"
+      },
+      {
+        "fr": "Repas traditionnels",
+        "en": "Traditional meals",
+        "ar": "وجبات تقليدية"
+      },
+      {
+        "fr": "Guide local",
+        "en": "Local guide",
+        "ar": "مرشد محلي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Sun",
+        "fr": "Dunes rouges",
+        "en": "Red dunes",
+        "ar": "كثبان حمراء"
+      },
+      {
+        "icon": "Landmark",
+        "fr": "Ksour traditionnels",
+        "en": "Traditional ksour",
+        "ar": "قصور تقليدية"
+      },
+      {
+        "icon": "Sunset",
+        "fr": "Couchers de soleil",
+        "en": "Sunsets",
+        "ar": "غروب الشمس"
+      }
+    ]
+  },
+  {
+    "id": "alger",
+    "name": "Alger",
+    "name_en": "Algiers",
+    "name_ar": "الجزائر",
+    "tagline": "Capitale blanche & Casbah",
+    "tagline_en": "White capital & Casbah",
+    "tagline_ar": "العاصمة البيضاء والقصبة",
+    "rating": 4.8,
+    "reviews": 312,
+    "temp": "24°C",
+    "image": "/images/home/dest-alger.jpg",
+    "gallery": [
+      "/images/home/dest-alger.jpg",
+      "/images/alger.jpeg",
+      "/images/home/exp-culture.jpg"
+    ],
+    "description": "Entre la baie méditerranéenne, la Casbah classée UNESCO et la modernité de la capitale, Alger est le point de départ idéal pour découvrir l'Algérie.",
+    "description_en": "Between the Mediterranean bay, UNESCO-listed Casbah and the capital's modern side, Algiers is the ideal starting point to discover Algeria.",
+    "description_ar": "بين خليج المتوسط والقصبة المدرجة في اليونسكو وحداثة العاصمة، الجزائر نقطة انطلاق مثالية لاكتشاف البلاد.",
+    "seoTitle": "Tourisme Alger — Casbah & capitale",
+    "seoTitle_en": "Algiers Tourism — Casbah & Capital City Guide",
+    "seoTitle_ar": "سياحة الجزائر — القصبة والعاصمة",
+    "seoDescription": "Tourisme Alger : Casbah, corniche et musées. Séjour, excursion et hébergement en Algérie avec Algeria Travel, agence de voyage.",
+    "seoDescription_en": "Algiers tourism: Casbah, seafront and museums. Stays, city tours and hotels in Algeria with Algeria Travel agency.",
+    "seoDescription_ar": "سياحة الجزائر العاصمة: القصبة والواجهة البحرية والمتاحف. إقامات وجولات مع وكالة Algeria Travel.",
+    "bestTime": "Mars – Juin / Sept – Nov",
+    "bestTime_en": "March – June / Sept – Nov",
+    "bestTime_ar": "مارس – يونيو / سبتمبر – نوفمبر",
+    "duration": "2 à 4 jours",
+    "duration_en": "2 to 4 days",
+    "duration_ar": "2 إلى 4 أيام",
+    "price": 18000,
+    "oldPrice": 22000,
+    "stay": "Hôtel centre-ville ou bord de mer",
+    "stay_en": "Downtown or seafront hotel",
+    "stay_ar": "فندق وسط المدينة أو على البحر",
+    "transport": "Aéroport Houari Boumediene + transferts",
+    "transport_en": "Houari Boumediene airport + transfers",
+    "transport_ar": "مطار هواري بومدين + تنقلات",
+    "includes": [
+      {
+        "fr": "Hébergement 2 nuits",
+        "en": "2 nights stay",
+        "ar": "إقامة ليلتين"
+      },
+      {
+        "fr": "Visite Casbah & Notre-Dame d'Afrique",
+        "en": "Casbah & Notre-Dame d'Afrique tour",
+        "ar": "زيارة القصبة وسيدة إفريقيا"
+      },
+      {
+        "fr": "Guide francophone",
+        "en": "French-speaking guide",
+        "ar": "مرشد ناطق بالفرنسية"
+      },
+      {
+        "fr": "Transferts aéroport",
+        "en": "Airport transfers",
+        "ar": "نقل المطار"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Landmark",
+        "fr": "Casbah UNESCO",
+        "en": "UNESCO Casbah",
+        "ar": "قصبة يونسكو"
+      },
+      {
+        "icon": "Waves",
+        "fr": "Corniche & baie",
+        "en": "Seafront & bay",
+        "ar": "كورniche وخليج"
+      },
+      {
+        "icon": "Building2",
+        "fr": "Musées & palais",
+        "en": "Museums & palaces",
+        "ar": "متاحف وقصور"
+      }
+    ]
+  },
+  {
+    "id": "oran",
+    "name": "Oran",
+    "name_en": "Oran",
+    "name_ar": "وهران",
+    "tagline": "Perle de l'Ouest",
+    "tagline_en": "Pearl of the West",
+    "tagline_ar": "لؤلؤة الغرب",
+    "rating": 4.7,
+    "reviews": 189,
+    "temp": "23°C",
+    "image": "/images/home/dest-oran.jpg",
+    "gallery": [
+      "/images/home/dest-oran.jpg",
+      "/images/hotels/sheraton-oran.jpg",
+      "/images/home/hero-coast.jpg"
+    ],
+    "description": "Deuxième ville d'Algérie : front de mer animé, fort Santa Cruz, architecture art déco et ambiance méditerranéenne unique.",
+    "description_en": "Algeria's second city: lively seafront, Santa Cruz fort, art deco architecture and a unique Mediterranean vibe.",
+    "description_ar": "ثاني أكبر مدن الجزائر: واجهة بحرية حية وحصن سانتا كروز وعمارة آرت دكو وأجواء متوسطية فريدة.",
+    "seoTitle": "Tourisme Oran — Côte ouest & méditerranée",
+    "seoTitle_en": "Oran Tourism — West Coast & Mediterranean Stay",
+    "seoTitle_ar": "سياحة وهران — الساحل الغربي",
+    "seoDescription": "Tourisme Oran : plages, Santa Cruz et centre-ville. Séjour et vacances en Algérie avec Algeria Travel, agence touristique.",
+    "seoDescription_en": "Oran tourism: beaches, Santa Cruz and city centre. Algeria beach holidays and stays with Algeria Travel agency.",
+    "seoDescription_ar": "سياحة وهران: شواطئ وسanta كروز ووسط المدينة. عطل ساحلية مع وكالة Algeria Travel.",
+    "bestTime": "Mai – Octobre",
+    "bestTime_en": "May – October",
+    "bestTime_ar": "ماي – أكتوبر",
+    "duration": "2 à 3 jours",
+    "duration_en": "2 to 3 days",
+    "duration_ar": "2 إلى 3 أيام",
+    "price": 20000,
+    "oldPrice": 25000,
+    "stay": "Hôtel bord de mer",
+    "stay_en": "Seafront hotel",
+    "stay_ar": "فندق على البحر",
+    "transport": "Vol ou route depuis Alger",
+    "transport_en": "Flight or road from Algiers",
+    "transport_ar": "طيران أو طريق من الجزائر",
+    "includes": [
+      {
+        "fr": "Hébergement 2 nuits",
+        "en": "2 nights stay",
+        "ar": "إقامة ليلتين"
+      },
+      {
+        "fr": "Visite Santa Cruz & front de mer",
+        "en": "Santa Cruz & seafront tour",
+        "ar": "زيارة سانتا كروز والواجهة البحرية"
+      },
+      {
+        "fr": "Dégustation locale",
+        "en": "Local tasting",
+        "ar": "تذوق محلي"
+      },
+      {
+        "fr": "Guide local",
+        "en": "Local guide",
+        "ar": "مرشد محلي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Waves",
+        "fr": "Plages & corniche",
+        "en": "Beaches & seafront",
+        "ar": "شواطئ وكورniche"
+      },
+      {
+        "icon": "Landmark",
+        "fr": "Fort Santa Cruz",
+        "en": "Santa Cruz fort",
+        "ar": "حصn سانتا كروز"
+      },
+      {
+        "icon": "Building2",
+        "fr": "Art déco",
+        "en": "Art deco",
+        "ar": "آرت دكو"
+      }
+    ]
+  },
+  {
+    "id": "jijel",
+    "name": "Jijel",
+    "name_en": "Jijel",
+    "name_ar": "جيجل",
+    "tagline": "Côte verte & criques",
+    "tagline_en": "Green coast & coves",
+    "tagline_ar": "الساحل الأخضر والخلجان",
+    "rating": 4.8,
+    "reviews": 156,
+    "temp": "25°C",
+    "image": "/images/home/news-coast.jpg",
+    "gallery": [
+      "/images/home/news-coast.jpg",
+      "/images/bejaia.jpeg",
+      "/images/kayak.jpeg"
+    ],
+    "description": "Paysages verdoyants, falaises calcaires et eaux cristallines : Jijel est la destination balnéaire de l'Est algérien.",
+    "description_en": "Lush landscapes, limestone cliffs and crystal-clear waters: Jijel is eastern Algeria's seaside gem.",
+    "description_ar": "مناظر خضراء ومنحدرات جيرية ومياه صافية: جيجel هي جوهرة الساحل الشرقي للجزائر.",
+    "seoTitle": "Tourisme Jijel — Plages & côte verte",
+    "seoTitle_en": "Jijel Tourism — Green Coast & Beach Holidays",
+    "seoTitle_ar": "سياحة جيجel — الشاطئ الأخضر",
+    "seoDescription": "Tourisme Jijel : plages sauvages, criques et nature. Séjour balnéaire et activités nautiques avec Algeria Travel.",
+    "seoDescription_en": "Jijel tourism: wild beaches, coves and nature. Beach holidays and water activities with Algeria Travel.",
+    "seoDescription_ar": "سياحة جيجel: شواطئ برية وخلجان وطبيعة. عطل ساحلية مع Algeria Travel.",
+    "bestTime": "Juin – Septembre",
+    "bestTime_en": "June – September",
+    "bestTime_ar": "يونيو – سبتمبر",
+    "duration": "3 à 5 jours",
+    "duration_en": "3 to 5 days",
+    "duration_ar": "3 إلى 5 أيام",
+    "price": 22000,
+    "oldPrice": 27000,
+    "stay": "Hôtel ou résidence bord de mer",
+    "stay_en": "Seafront hotel or residence",
+    "stay_ar": "فندق أو résidence على البحر",
+    "transport": "Route depuis Alger ou Annaba",
+    "transport_en": "Road from Algiers or Annaba",
+    "transport_ar": "طريق من الجزائر أو عنابة",
+    "includes": [
+      {
+        "fr": "Hébergement 3 nuits",
+        "en": "3 nights stay",
+        "ar": "إقامة 3 ليالٍ"
+      },
+      {
+        "fr": "Excursion criques & plages",
+        "en": "Coves & beaches outing",
+        "ar": "رحلة الخلجان والشواطئ"
+      },
+      {
+        "fr": "Kayak ou baignade",
+        "en": "Kayak or swimming",
+        "ar": "كاياك أو سباحة"
+      },
+      {
+        "fr": "Repas de poissons",
+        "en": "Fresh fish meals",
+        "ar": "وجبات سمك"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Waves",
+        "fr": "Criques secrètes",
+        "en": "Hidden coves",
+        "ar": "خلجان سرية"
+      },
+      {
+        "icon": "Trees",
+        "fr": "Forêts de pin",
+        "en": "Pine forests",
+        "ar": "غابات صنوبر"
+      },
+      {
+        "icon": "Sun",
+        "fr": "Eaux turquoise",
+        "en": "Turquoise waters",
+        "ar": "مياه فيروزية"
+      }
+    ]
+  },
+  {
+    "id": "annaba",
+    "name": "Annaba",
+    "name_en": "Annaba",
+    "name_ar": "عنابة",
+    "tagline": "Porte de l'Est",
+    "tagline_en": "Gateway to the East",
+    "tagline_ar": "بوابة الشرق",
+    "rating": 4.7,
+    "reviews": 134,
+    "temp": "24°C",
+    "image": "/images/home/hero-coast.jpg",
+    "gallery": [
+      "/images/home/hero-coast.jpg",
+      "/images/home/news-coast.jpg",
+      "/images/bejaia.jpeg"
+    ],
+    "description": "Ville côtière dynamique entre mer et montagnes du Edough : plages, Hippo Regius et patrimoine romain à proximité.",
+    "description_en": "A lively coastal city between sea and Edough mountains: beaches, Hippo Regius and nearby Roman heritage.",
+    "description_ar": "مدينة ساحلية نابضة بين البحر وجبال edough: شواطئ وHippo Regius وتراث روماني قريب.",
+    "seoTitle": "Tourisme Annaba — Côte est & patrimoine",
+    "seoTitle_en": "Annaba Tourism — East Coast & Roman Heritage",
+    "seoTitle_ar": "سياحة عنابة — الساحل الشرقي",
+    "seoDescription": "Tourisme Annaba : plages, Hippo Regius et séjour méditerranéen. Vacances en Algérie avec Algeria Travel.",
+    "seoDescription_en": "Annaba tourism: beaches, Hippo Regius and Mediterranean stays. Algeria vacation with Algeria Travel agency.",
+    "seoDescription_ar": "سياحة عنابة: شواطئ وHippo Regius وإقامة متوسطية. عطل في الجزائر مع Algeria Travel.",
+    "bestTime": "Mai – Octobre",
+    "bestTime_en": "May – October",
+    "bestTime_ar": "ماي – أكتوبر",
+    "duration": "2 à 4 jours",
+    "duration_en": "2 to 4 days",
+    "duration_ar": "2 إلى 4 أيام",
+    "price": 21000,
+    "oldPrice": 26000,
+    "stay": "Hôtel centre ou bord de mer",
+    "stay_en": "Downtown or seafront hotel",
+    "stay_ar": "فندق وسط أو على البحر",
+    "transport": "Vol ou route depuis Alger",
+    "transport_en": "Flight or road from Algiers",
+    "transport_ar": "طيران أو طريق من الجزائر",
+    "includes": [
+      {
+        "fr": "Hébergement 2 nuits",
+        "en": "2 nights stay",
+        "ar": "إقامة ليلتين"
+      },
+      {
+        "fr": "Visite Hippo Regius",
+        "en": "Hippo Regius visit",
+        "ar": "زيارة Hippo Regius"
+      },
+      {
+        "fr": "Journée plage",
+        "en": "Beach day",
+        "ar": "يوم شاطئ"
+      },
+      {
+        "fr": "Guide local",
+        "en": "Local guide",
+        "ar": "مرشد محلي"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Landmark",
+        "fr": "Hippo Regius",
+        "en": "Hippo Regius",
+        "ar": "Hippo Regius"
+      },
+      {
+        "icon": "Waves",
+        "fr": "Plages dorées",
+        "en": "Golden beaches",
+        "ar": "شواطئ ذهبية"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Monts Edough",
+        "en": "Edough mountains",
+        "ar": "جبال edough"
+      }
+    ]
+  },
+  {
+    "id": "tipaza",
+    "name": "Tipaza",
+    "name_en": "Tipaza",
+    "name_ar": "تيبasa",
+    "tagline": "Ruines romaines & mer",
+    "tagline_en": "Roman ruins & sea",
+    "tagline_ar": "آثار رومانية وبحر",
+    "rating": 4.9,
+    "reviews": 178,
+    "temp": "23°C",
+    "image": "/images/home/exp-culture.jpg",
+    "gallery": [
+      "/images/home/exp-culture.jpg",
+      "/images/home/dest-alger.jpg",
+      "/images/alger.jpeg"
+    ],
+    "description": "Site archéologique face à la Méditerranée : théâtre, basilique et mosaïques romaines dans un cadre marin exceptionnel.",
+    "description_en": "Archaeological site facing the Mediterranean: theatre, basilica and Roman mosaics in an exceptional seaside setting.",
+    "description_ar": "موقع أثري مطل على المتوسط: مسرح وبازilica وفسيفساء رومانية في إطار بحري استثنائي.",
+    "seoTitle": "Tourisme Tipaza — Ruines romaines & mer",
+    "seoTitle_en": "Tipaza Tourism — Roman Ruins & Mediterranean Coast",
+    "seoTitle_ar": "سياحة تيبasa — آثار رومانية",
+    "seoDescription": "Tourisme Tipaza : site romain UNESCO, mer et excursion depuis Alger. Circuit culturel avec Algeria Travel.",
+    "seoDescription_en": "Tipaza tourism: Roman UNESCO site, sea and day trip from Algiers. Cultural tourism with Algeria Travel.",
+    "seoDescription_ar": "سياحة تيبasa: موقع روماني يونسكو وبحر ورحلة من الجزائر. سياحة ثقافية مع Algeria Travel.",
+    "bestTime": "Mars – Nov",
+    "bestTime_en": "March – Nov",
+    "bestTime_ar": "مارس – نوفمبر",
+    "duration": "1 à 2 jours",
+    "duration_en": "1 to 2 days",
+    "duration_ar": "1 إلى 2 أيام",
+    "price": 12000,
+    "oldPrice": 15000,
+    "stay": "Excursion ou nuit à Alger",
+    "stay_en": "Day trip or overnight in Algiers",
+    "stay_ar": "رحلة يوم أو ليلة في الجزائر",
+    "transport": "Route depuis Alger (1h)",
+    "transport_en": "Road from Algiers (1h)",
+    "transport_ar": "طريق من الجزائر (ساعة)",
+    "includes": [
+      {
+        "fr": "Visite site archéologique",
+        "en": "Archaeological site visit",
+        "ar": "زيارة الموقع الأثري"
+      },
+      {
+        "fr": "Guide spécialisé",
+        "en": "Specialist guide",
+        "ar": "مرشد متخصص"
+      },
+      {
+        "fr": "Pause mer & déjeuner",
+        "en": "Sea break & lunch",
+        "ar": "استراحة بحر وغداء"
+      },
+      {
+        "fr": "Transfert depuis Alger",
+        "en": "Transfer from Algiers",
+        "ar": "نقل من الجزائر"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Landmark",
+        "fr": "Ruines romaines",
+        "en": "Roman ruins",
+        "ar": "آثار رومانية"
+      },
+      {
+        "icon": "Waves",
+        "fr": "Bord de mer",
+        "en": "Seaside",
+        "ar": "على البحر"
+      },
+      {
+        "icon": "Camera",
+        "fr": "Mosaïques & théâtre",
+        "en": "Mosaics & theatre",
+        "ar": "فسيفساء ومسرح"
+      }
+    ]
+  },
+  {
+    "id": "tlemcen",
+    "name": "Tlemcen",
+    "name_en": "Tlemcen",
+    "name_ar": "تلمسان",
+    "tagline": "Perle du Maghreb",
+    "tagline_en": "Pearl of the Maghreb",
+    "tagline_ar": "لؤلؤة المغرب",
+    "rating": 4.8,
+    "reviews": 167,
+    "temp": "22°C",
+    "image": "/images/home/exp-culture.jpg",
+    "gallery": [
+      "/images/home/exp-culture.jpg",
+      "/images/alger.jpeg",
+      "/images/ghardaia.jpeg"
+    ],
+    "description": "Mosquée de Mansourah, El Mechouar et cascades d'El Ourit : Tlemcen mêle art andalou, histoire et nature verdoyante.",
+    "description_en": "Mansourah mosque, El Mechouar and El Ourit waterfalls: Tlemcen blends Andalusian art, history and lush nature.",
+    "description_ar": "مسجد المنصورة والمشور وشلالات el ourit: تلمسان تمزج الفن الأندلسي والتاريخ والطبيعة الخضراء.",
+    "seoTitle": "Tourisme Tlemcen — Patrimoine & cascades",
+    "seoTitle_en": "Tlemcen Tourism — Heritage & Andalusian Culture",
+    "seoTitle_ar": "سياحة تلمسان — تراث وثقافة",
+    "seoDescription": "Tourisme Tlemcen : mosquées, palais andalous et cascades. Séjour culturel en Algérie avec Algeria Travel.",
+    "seoDescription_en": "Tlemcen tourism: mosques, Andalusian palaces and waterfalls. Cultural tourism in Algeria with Algeria Travel.",
+    "seoDescription_ar": "سياحة تلمسان: مساجد وقصور أندلسية وشلالات. سياحة ثقافية مع Algeria Travel.",
+    "bestTime": "Mars – Juin / Sept – Nov",
+    "bestTime_en": "March – June / Sept – Nov",
+    "bestTime_ar": "مارس – يونيو / سبتمبر – نوفمبر",
+    "duration": "2 à 3 jours",
+    "duration_en": "2 to 3 days",
+    "duration_ar": "2 إلى 3 أيام",
+    "price": 19000,
+    "oldPrice": 24000,
+    "stay": "Hôtel centre historique",
+    "stay_en": "Historic centre hotel",
+    "stay_ar": "فندق في المركز التاريخي",
+    "transport": "Vol ou route depuis Oran/Alger",
+    "transport_en": "Flight or road from Oran/Algiers",
+    "transport_ar": "طيران أو طريق من وهران/الجزائر",
+    "includes": [
+      {
+        "fr": "Hébergement 2 nuits",
+        "en": "2 nights stay",
+        "ar": "إقامة ليلتين"
+      },
+      {
+        "fr": "Visite El Mechouar & Mansourah",
+        "en": "El Mechouar & Mansourah tour",
+        "ar": "زيارة المشور والمنصورة"
+      },
+      {
+        "fr": "Excursion cascades El Ourit",
+        "en": "El Ourit waterfalls trip",
+        "ar": "رحلة شلالات el ourit"
+      },
+      {
+        "fr": "Guide francophone",
+        "en": "French-speaking guide",
+        "ar": "مرشد ناطق بالفرنسية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Landmark",
+        "fr": "Art andalou",
+        "en": "Andalusian art",
+        "ar": "فن أندلسي"
+      },
+      {
+        "icon": "Waves",
+        "fr": "Cascades El Ourit",
+        "en": "El Ourit waterfalls",
+        "ar": "شلالات el ourit"
+      },
+      {
+        "icon": "Building2",
+        "fr": "Palais & mosquées",
+        "en": "Palaces & mosques",
+        "ar": "قصور ومساجد"
+      }
+    ]
+  },
+  {
+    "id": "constantine",
+    "name": "Constantine",
+    "name_en": "Constantine",
+    "name_ar": "قسنطينة",
+    "tagline": "Ville des ponts suspendus",
+    "tagline_en": "City of suspended bridges",
+    "tagline_ar": "مدينة الجسور المعلقة",
+    "rating": 4.7,
+    "reviews": 145,
+    "temp": "20°C",
+    "image": "/images/hotels/constantine-bridge.png",
+    "gallery": [
+      "/images/hotels/constantine-bridge.png",
+      "/images/home/exp-culture.jpg",
+      "/images/alger.jpeg"
+    ],
+    "description": "Perchée au-dessus des gorges du Rhummel, Constantine — la « ville des ponts » — mêle paysages vertigineux et patrimoine millénaire. Du pont Sidi M'Cid au palais Ahmed Bey, en passant par le musée national de Cirta, la mosquée Emir Abdelkader et les saveurs de la chakhchoukha, chaque coin de la ville raconte une histoire. Idéale en printemps ou en automne pour une escapade culturelle de 2 à 3 jours.",
+    "description_en": "Perched above the Rhummel gorges, Constantine — the \"city of bridges\" — blends vertiginous landscapes with millennia of heritage. From Sidi M'Cid bridge to Ahmed Bey palace, Cirta National Museum, Emir Abdelkader Mosque and the flavours of chakhchoukha, every corner tells a story. Best in spring or autumn for a 2–3 day cultural break.",
+    "description_ar": "تتربع قسنطينة فوق مرتفعات وادي الرمال — «مدينة الجسور» — حيث تختلط المناظر المذهلة بتراث عريق. من جسر سيدي مسيد إلى قصر أحمد باي، مروراً بمتحف قيرطا الوطني ومسجد الأمير عبد القادر ومذاق الشخشوخة، كل زاوية تحكي قصة. مثالية في الربيع أو الخريف لرحلة ثقافية من يومين إلى ثلاثة.",
+    "seoTitle": "Tourisme Constantine — Ville des ponts",
+    "seoTitle_en": "Constantine Tourism — City of Bridges & Culture",
+    "seoTitle_ar": "سياحة قسنطينة — مدينة الجسور",
+    "seoDescription": "Que faire à Constantine : pont Sidi M'Cid, palais Ahmed Bey, musée de Cirta, mosquées et gastronomie locale. Séjour et excursion avec Algeria Travel.",
+    "seoDescription_en": "Things to do in Constantine: Sidi M'Cid bridge, Ahmed Bey palace, Cirta Museum, mosques and local cuisine. Stays and tours with Algeria Travel.",
+    "seoDescription_ar": "ماذا تفعل في قسنطينة: جسر سيدي مسيد، قصر أحمد باي، متحف قيرطا، مساجد ومطبخ محلي. إقامات وجولات مع Algeria Travel.",
+    "bestTime": "Mars – Juin / Sept – Nov",
+    "bestTime_en": "March – June / Sept – Nov",
+    "bestTime_ar": "مارس – يونيو / سبتمبر – نوفمبر",
+    "duration": "3 jours",
+    "duration_en": "3 days",
+    "duration_ar": "3 أيام",
+    "price": 22000,
+    "oldPrice": 28000,
+    "stay": "Hôtel centre-ville",
+    "stay_en": "Downtown hotel",
+    "stay_ar": "فندق وسط المدينة",
+    "transport": "Vol ou train + tramway & taxis locaux",
+    "transport_en": "Flight or train + tram & local taxis",
+    "transport_ar": "طيران أو قطار + ترامواي وت taxis محلية",
+    "includes": [
+      {
+        "fr": "Hébergement 2 nuits",
+        "en": "2 nights stay",
+        "ar": "إقامة ليلتين"
+      },
+      {
+        "fr": "Pont Sidi M'Cid & ponts historiques",
+        "en": "Sidi M'Cid & historic bridges",
+        "ar": "جسر سيدي مسيد والجسور التاريخية"
+      },
+      {
+        "fr": "Palais Ahmed Bey & musée de Cirta",
+        "en": "Ahmed Bey palace & Cirta Museum",
+        "ar": "قصر أحمد باي ومتحف قيرطا"
+      },
+      {
+        "fr": "Mosquée Emir Abdelkader",
+        "en": "Emir Abdelkader Mosque",
+        "ar": "مسجد الأمير عبد القادر"
+      },
+      {
+        "fr": "Guide francophone",
+        "en": "French-speaking guide",
+        "ar": "مرشد ناطق بالفرنسية"
+      }
+    ],
+    "highlights": [
+      {
+        "icon": "Route",
+        "fr": "Pont Sidi M'Cid (175 m)",
+        "en": "Sidi M'Cid bridge (175 m)",
+        "ar": "جسر سيدي مسيد"
+      },
+      {
+        "icon": "Landmark",
+        "fr": "Palais Ahmed Bey",
+        "en": "Ahmed Bey palace",
+        "ar": "قصر أحمد باي"
+      },
+      {
+        "icon": "Building2",
+        "fr": "Musée national de Cirta",
+        "en": "Cirta National Museum",
+        "ar": "متحف قيرطا الوطني"
+      },
+      {
+        "icon": "UtensilsCrossed",
+        "fr": "Chakhchoukha & mhajeb",
+        "en": "Chakhchoukha & mhajeb",
+        "ar": "شخشوخة ومحاجب"
+      },
+      {
+        "icon": "Mountain",
+        "fr": "Gorges du Rhummel",
+        "en": "Rhummel gorges",
+        "ar": "مضيق الرمال"
+      }
+    ]
+  }
+];

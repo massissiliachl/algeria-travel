@@ -31,6 +31,9 @@ yarn-error.log*
 # archives
 *.zip
 
+# notes personnelles contenant des mots de passe
+/client/admin/pwd.html
+
 # données générées par le serveur (réservations, commentaires, photos importées)
 /client/api/data/*
 !/client/api/data/.htaccess
