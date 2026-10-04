@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#8a2e17" />
+    <meta name="description" content="Circuit Tadrart Rouge — Djanet : 6 jours / 6 nuits du 17 au 24 décembre 2026, vols Alger – Djanet – Alger inclus, 4×4, pension complète. 94 990 DA. Algeria Travel." />
+    <title>Circuit Tadrart Rouge — Djanet — Algeria Travel</title>
+    <link rel="icon" href="public/favicon.ico?v=2" sizes="any" />
+    <link rel="icon" type="image/png" sizes="48x48" href="public/favicon-48.png?v=2" />
+    <style>
+      :root {
+        --maroon: #8a2e17;
+        --red: #8f2f1c;
+        --brown: #2e1a12;
+        --dark: #3a2016;
+        --cream: #f8f0e6;
+        --gold: #c9a066;
+        --grey: #6f6a66;
+        --line: #d9cbb8;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: #d8cfc4;
+        color: var(--brown);
+        font-family: 'DejaVu Sans', Verdana, Geneva, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      img { display: block; }
+      h1, h2, h3, p, ul { margin: 0; }
+
+      .doc { display: flex; flex-direction: column; align-items: center; gap: 10mm; padding: 10mm 0; }
+      .page {
+        position: relative;
+        width: 210mm;
+        height: 297mm;
+        background: var(--cream);
+        overflow: hidden;
+        box-shadow: 0 4mm 14mm rgba(46, 26, 18, .25);
+      }
+      .abs { position: absolute; }
+
+      /* Pied de page commun (pages 2 à 9) */
+      .foot {
+        position: absolute; left: 17mm; right: 17mm; top: 280mm;
+        border-top: .3mm solid var(--line);
+        padding-top: 3mm;
+        display: flex; justify-content: space-between;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 6.5pt; letter-spacing: .03em; color: var(--grey);
+      }
+
+      /* Page 1 : couverture */
+      .cover::before, .cover::after { content: ''; position: absolute; left: 0; right: 0; background: var(--maroon); }
+      .cover::before { top: 0; height: 6.5mm; }
+      .cover::after { bottom: 0; height: 4mm; }
+      .cover h1 { position: absolute; top: 18mm; left: 0; right: 0; text-align: center; font-size: 26pt; font-weight: 700; letter-spacing: .02em; color: var(--maroon); }
+      .cover .sub { position: absolute; top: 33.5mm; left: 0; right: 0; text-align: center; font-size: 10.5pt; font-weight: 700; letter-spacing: .02em; color: var(--brown); }
+      .cover .photo { position: absolute; top: 108mm; left: 21mm; width: 167mm; height: 127mm; object-fit: cover; border: .5mm solid #fff; }
+      .cover .banner {
+        position: absolute; top: 236.5mm; left: 23mm; width: 162mm; height: 13mm;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--maroon); border-radius: 3mm;
+        color: #fff; font-size: 9.5pt; font-weight: 700; letter-spacing: .03em; white-space: pre;
+      }
+      .cover .price { position: absolute; top: 252mm; left: 0; right: 0; display: flex; justify-content: center; align-items: baseline; gap: 6mm; }
+      .cover .price strong { font-size: 15.5pt; font-weight: 700; color: var(--brown); }
+      .cover .price span { font-size: 9pt; color: var(--brown); }
+      .cover .tagline { position: absolute; top: 272.5mm; left: 0; right: 0; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 6.5pt; color: var(--grey); }
+
+      /* Page 2 : l'expérience */
+      .exp { font-family: Arial, Helvetica, sans-serif; }
+      .exp .eyebrow { position: absolute; top: 10mm; left: 17mm; font-size: 7.5pt; font-weight: 700; letter-spacing: .06em; color: var(--red); }
+      .exp .photo { position: absolute; top: 16mm; left: 0; width: 210mm; height: 127mm; object-fit: cover; object-position: center 52%; }
+      .exp .overlay {
+        position: absolute; top: 93mm; left: 15mm; width: 181mm; height: 42mm;
+        background: var(--dark); border-radius: 4mm; padding: 6mm 7mm; color: #fff;
+      }
+      .exp .overlay h2 { font-size: 20pt; font-weight: 700; letter-spacing: .01em; margin-bottom: 3mm; }
+      .exp .overlay p { font-size: 9.5pt; line-height: 1.75; }
+      .exp .intro { position: absolute; top: 150mm; left: 17mm; right: 17mm; }
+      .exp .intro h3 { font-size: 12pt; font-weight: 700; color: var(--brown); margin-bottom: 3mm; }
+      .exp .intro p { font-size: 8.8pt; line-height: 1.75; color: var(--grey); }
+      .exp .facts {
+        position: absolute; top: 186mm; left: 17mm; width: 176mm; height: 29mm;
+        display: grid; grid-template-columns: repeat(4, 1fr); align-items: center;
+        background: var(--red); border-radius: 4mm; padding: 0 5mm; color: #fff;
+      }
+      .exp .facts small { display: block; font-size: 6.5pt; font-weight: 700; letter-spacing: .05em; color: #f0c9a8; margin-bottom: 3mm; }
+      .exp .facts strong { font-size: 9.5pt; font-weight: 700; white-space: nowrap; }
+      .exp .features { position: absolute; top: 243mm; left: 17mm; right: 17mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+      .exp .features h4 { position: relative; margin: 0 0 3mm; padding-left: 8mm; font-size: 9pt; font-weight: 700; color: var(--brown); line-height: 5mm; }
+      .exp .features h4::before { content: ''; position: absolute; left: 0; top: 0; width: 5mm; height: 5mm; border-radius: 50%; background: var(--gold); }
+      .exp .features p { padding-left: 8mm; font-size: 7.8pt; line-height: 1.7; color: var(--grey); }
+
+      /* Pages jour */
+      .day .photo { position: absolute; top: 0; left: 0; width: 210mm; height: 92mm; object-fit: cover; }
+      .day .shade { position: absolute; top: 0; left: 0; width: 210mm; height: 92mm; background: linear-gradient(to bottom, rgba(0,0,0,.18), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 75%, rgba(0,0,0,.15) 75.2%, rgba(0,0,0,.15)); }
+      .day .num { position: absolute; top: 10.5mm; left: 18mm; font-size: 10pt; font-weight: 700; color: #fff; letter-spacing: .03em; text-shadow: 0 .3mm 1mm rgba(0,0,0,.35); }
+      .day .date { position: absolute; top: 11mm; right: 18mm; font-size: 8pt; font-weight: 700; color: #fff; letter-spacing: .03em; text-transform: uppercase; text-shadow: 0 .3mm 1mm rgba(0,0,0,.35); }
+      .day h2 { position: absolute; top: 99mm; left: 20mm; right: 15mm; font-size: 16.5pt; font-weight: 700; color: var(--brown); }
+      .day .rule { position: absolute; top: 109.5mm; left: 20mm; width: 28mm; height: .7mm; background: var(--gold); }
+      .day .label { position: absolute; top: 118mm; left: 20mm; font-size: 8.5pt; font-weight: 700; color: var(--red); letter-spacing: .02em; }
+      .day ul { position: absolute; top: 126mm; left: 20mm; right: 20mm; list-style: none; padding: 0; }
+      .bullets li { position: relative; padding-left: 3.6mm; font-size: 8.6pt; line-height: 1.45; color: var(--brown); margin-bottom: 2.1mm; }
+      .bullets li::before { content: ''; position: absolute; left: 0; top: 1.6mm; width: 1.5mm; height: 1.5mm; border-radius: 50%; background: var(--red); }
+      .day .night {
+        position: absolute; top: 242mm; left: 20mm; width: 170mm; height: 23mm;
+        background: #fff; border: .35mm solid #ead9bf; border-radius: 4mm; padding: 6mm 7mm 0;
+      }
+      .day .night small { display: block; font-size: 6.8pt; font-weight: 700; color: var(--red); letter-spacing: .03em; margin-bottom: 2mm; }
+      .day .night span { font-size: 8.6pt; color: var(--brown); }
+
+      /* Page 9 : prestations & conseils */
+      .end .eyebrow { position: absolute; top: 19mm; left: 20mm; font-size: 7.3pt; font-weight: 700; letter-spacing: .03em; color: var(--red); }
+      .end h2 { position: absolute; top: 26mm; left: 20mm; font-size: 21pt; font-weight: 700; color: var(--brown); }
+      .end .lead { position: absolute; top: 38.5mm; left: 20mm; font-size: 8.5pt; color: var(--grey); }
+      .end .col { position: absolute; top: 55mm; width: 76mm; }
+      .end .col--right { width: 72mm; }
+      .end .col--left { left: 20mm; }
+      .end .col--right { left: 111mm; }
+      .end .col h3 { font-size: 11pt; font-weight: 700; color: var(--red); letter-spacing: .02em; margin-bottom: 5.5mm; }
+      .end .col ul { list-style: none; padding: 0; }
+      .end .book {
+        position: absolute; top: 172.5mm; left: 20mm; width: 170mm; height: 58.5mm;
+        background: var(--brown); border-radius: 5mm; color: #fff; text-align: center; padding-top: 10mm;
+      }
+      .end .book small { display: block; font-size: 7.3pt; font-weight: 700; letter-spacing: .04em; color: var(--gold); margin-bottom: 5mm; }
+      .end .book strong { display: block; font-size: 21pt; font-weight: 700; margin-bottom: 5mm; }
+      .end .book p { font-size: 8.5pt; margin-bottom: 6mm; }
+      .end .book .contact { font-size: 9.5pt; font-weight: 700; }
+      .end .final { position: absolute; top: 242.5mm; left: 0; right: 0; text-align: center; }
+      .end .final h3 { font-size: 15pt; font-weight: 700; color: var(--red); letter-spacing: .02em; margin-bottom: 3mm; }
+      .end .final p { font-size: 9pt; color: var(--brown); }
+
+      /* Bouton flottant */
+      .fab {
+        position: fixed; right: 20px; bottom: 20px; z-index: 5;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 20px; border: 0; border-radius: 999px; cursor: pointer;
+        background: var(--maroon); color: #fff; font: 600 14px Arial, Helvetica, sans-serif;
+        box-shadow: 0 8px 22px rgba(46, 26, 18, .3); text-decoration: none;
+      }
+      .fab svg { width: 18px; height: 18px; }
+      .back { left: 20px; right: auto; background: #fff; color: var(--maroon); }
+
+      @page { size: A4; margin: 0; }
+      @media print {
+        body { background: none; }
+        .doc { display: block; padding: 0; }
+        .page { box-shadow: none; zoom: 1 !important; break-after: page; page-break-after: always; }
+        .page:last-child { break-after: auto; page-break-after: auto; }
+        .fab { display: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="doc">
+      <!-- Page 1 -->
+      <section class="page cover">
+        <h1>ALGERIA TRAVEL</h1>
+        <p class="sub">CIRCUIT TADRART ROUGE • DJANET</p>
+        <img class="photo" src="public/images/tadrart-hero.png" alt="Formations rocheuses de la Tadrart Rouge au coucher du soleil" />
+        <div class="banner">6 JOURS • 6 NUITS   |   17 → 24 DÉCEMBRE 2026</div>
+        <p class="price"><strong>94 990 DA</strong><span>par personne • vols Alger – Djanet – Alger inclus</span></p>
+        <p class="tagline">Une immersion au cœur du Sahara algérien</p>
+      </section>
+
+      <!-- Page 2 -->
+      <section class="page exp">
+        <span class="eyebrow">L’EXPÉRIENCE</span>
+        <img class="photo" src="public/images/sahara4.jpeg" alt="Rochers de grès dans le désert" />
+        <div class="overlay">
+          <h2>LE DÉSERT, AUTREMENT</h2>
+          <p>Une immersion au cœur de la Tadrart Rouge, entre dunes,<br />formations rocheuses, art rupestre et grands espaces.</p>
+        </div>
+        <div class="intro">
+          <h3>UN VOYAGE ENTRE NATURE, CULTURE ET GRANDS ESPACES</h3>
+          <p>Paysages sculptés par l’érosion, canyons, arches, dunes et sites d’art rupestre,<br />accompagnés par des guides locaux expérimentés.</p>
+        </div>
+        <div class="facts">
+          <div><small>DATES</small><strong>17 → 24 DÉC. 2026</strong></div>
+          <div><small>DURÉE</small><strong>6 JOURS • 6 NUITS</strong></div>
+          <div><small>TRANSPORT</small><strong>VOL + 4×4</strong></div>
+          <div><small>FORMULE</small><strong>PENSION COMPLÈTE</strong></div>
+        </div>
+        <div class="features">
+          <div><h4>4×4 &amp; VOL</h4><p>Alger – Djanet – Alger<br />+ déplacements en 4×4</p></div>
+          <div><h4>BIVOUAC / LODGE</h4><p>Hébergement selon<br />la formule choisie</p></div>
+          <div><h4>GUIDES LOCAUX</h4><p>Accompagnement par<br />des guides expérimentés</p></div>
+        </div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>2</span></div>
+      </section>
+
+      <!-- Page 3 -->
+      <section class="page day">
+        <img class="photo" src="public/images/tadrart-jour1.png" alt="Arche rocheuse de la Tadrart Rouge et voyageur touareg" />
+        <div class="shade"></div>
+        <span class="num">JOUR 1</span>
+        <span class="date">17 décembre • Alger → Djanet</span>
+        <h2>Arrivée et première immersion saharienne</h2>
+        <div class="rule"></div>
+        <span class="label">AU PROGRAMME</span>
+        <ul class="bullets">
+          <li>Accueil à Alger et départ vers Djanet.</li>
+          <li>Accueil par l’équipe locale à l’arrivée.</li>
+          <li>Présentation du circuit, des 4×4 et des consignes.</li>
+          <li>Première découverte des paysages autour de Djanet.</li>
+          <li>Coucher du soleil, dîner et installation pour la nuit.</li>
+        </ul>
+        <div class="night"><small>NUIT</small><span>Bivouac / hébergement selon l’organisation.</span></div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>3</span></div>
+      </section>
+
+      <!-- Page 4 -->
+      <section class="page day">
+        <img class="photo" src="public/images/tadrart-jour2.png" alt="Bivouac au coucher du soleil dans la Tadrart Rouge" />
+        <div class="shade"></div>
+        <span class="num">JOUR 2</span>
+        <span class="date">18 décembre • Djanet → Tadrart Rouge</span>
+        <h2>Entrée dans le grand décor de la Tadrart</h2>
+        <div class="rule"></div>
+        <span class="label">AU PROGRAMME</span>
+        <ul class="bullets">
+          <li>Petit-déjeuner puis départ en 4×4 vers la Tadrart Rouge.</li>
+          <li>Traversée des plateaux et formations rocheuses du Grand Sud.</li>
+          <li>Découverte des arches, canyons et paysages sculptés par l’érosion.</li>
+          <li>Déjeuner préparé sur place.</li>
+          <li>Installation du bivouac et soirée autour du feu.</li>
+        </ul>
+        <div class="night"><small>NUIT</small><span>Bivouac dans la Tadrart Rouge.</span></div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>4</span></div>
+      </section>
+
+      <!-- Page 5 -->
+      <section class="page day">
+        <img class="photo" src="public/images/tadrart-jour3.png" alt="Bivouac touareg et 4×4 dans les dunes de la Tadrart Rouge" />
+        <div class="shade"></div>
+        <span class="num">JOUR 3</span>
+        <span class="date">19 décembre • Exploration de la Tadrart</span>
+        <h2>Dunes, roches et grands espaces</h2>
+        <div class="rule"></div>
+        <span class="label">AU PROGRAMME</span>
+        <ul class="bullets">
+          <li>Réveil au cœur du désert et petit-déjeuner.</li>
+          <li>Exploration des dunes et formations rocheuses en 4×4.</li>
+          <li>Arrêts photos et découverte des sites naturels.</li>
+          <li>Déjeuner au cours de l’excursion.</li>
+          <li>Retour au camp, dîner et soirée sous les étoiles.</li>
+        </ul>
+        <div class="night"><small>NUIT</small><span>Bivouac.</span></div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>5</span></div>
+      </section>
+
+      <!-- Page 6 -->
+      <section class="page day">
+        <img class="photo" src="public/images/tadrart-jour4.png" alt="Guide touareg présentant les gravures rupestres" />
+        <div class="shade"></div>
+        <span class="num">JOUR 4</span>
+        <span class="date">20 décembre • Sites naturels &amp; art rupestre</span>
+        <h2>Sur les traces des anciens habitants du Sahara</h2>
+        <div class="rule"></div>
+        <span class="label">AU PROGRAMME</span>
+        <ul class="bullets">
+          <li>Départ après le petit-déjeuner.</li>
+          <li>Découverte de secteurs d’art rupestre et de gravures anciennes.</li>
+          <li>Visite accompagnée par un guide local.</li>
+          <li>Continuation vers de nouveaux panoramas de la Tadrart.</li>
+          <li>Dîner et soirée conviviale au bivouac.</li>
+        </ul>
+        <div class="night"><small>NUIT</small><span>Bivouac.</span></div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>6</span></div>
+      </section>
+
+      <!-- Page 7 -->
+      <section class="page day">
+        <img class="photo" src="public/images/tadrart-jour5.png" alt="Dunes et coucher de soleil sur la Tadrart Rouge" />
+        <div class="shade"></div>
+        <span class="num">JOUR 5</span>
+        <span class="date">21 décembre • Dunes &amp; coucher de soleil</span>
+        <h2>Une journée entre sable et roche</h2>
+        <div class="rule"></div>
+        <span class="label">AU PROGRAMME</span>
+        <ul class="bullets">
+          <li>Départ en 4×4 après le petit-déjeuner.</li>
+          <li>Exploration des zones dunaires et reliefs rouges.</li>
+          <li>Temps pour photographier les paysages.</li>
+          <li>Déjeuner préparé par l’équipe.</li>
+          <li>Moment privilégié au coucher du soleil.</li>
+          <li>Dîner traditionnel et soirée au camp.</li>
+        </ul>
+        <div class="night"><small>NUIT</small><span>Bivouac.</span></div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>7</span></div>
+      </section>
+
+      <!-- Page 8 -->
+      <section class="page day">
+        <img class="photo" src="public/images/brezina-bivouac.png" alt="Bivouac et feu de camp sous les étoiles" />
+        <div class="shade"></div>
+        <span class="num">JOUR 6</span>
+        <span class="date">22 décembre • Tadrart → Djanet</span>
+        <h2>Retour progressif vers Djanet</h2>
+        <div class="rule"></div>
+        <span class="label">AU PROGRAMME</span>
+        <ul class="bullets">
+          <li>Petit-déjeuner et démontage du bivouac.</li>
+          <li>Dernière traversée des paysages de la Tadrart.</li>
+          <li>Arrêts photos selon le temps et les conditions.</li>
+          <li>Déjeuner puis retour vers Djanet.</li>
+          <li>Temps de repos et découverte des environs selon l’organisation.</li>
+          <li>Dîner et nuit à Djanet.</li>
+        </ul>
+        <div class="night"><small>NUIT</small><span>Hébergement à Djanet / selon formule.</span></div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>8</span></div>
+      </section>
+
+      <!-- Page 9 -->
+      <section class="page end">
+        <span class="eyebrow">L’ESSENTIEL</span>
+        <h2>Prestations &amp; conseils</h2>
+        <p class="lead">Tout ce qu’il faut savoir avant de partir.</p>
+        <div class="col col--left">
+          <h3>COMPRIS DANS LE CIRCUIT</h3>
+          <ul class="bullets">
+            <li>Billets d’avion : Alger – Djanet – Alger.</li>
+            <li>Transport en 4×4 pendant le séjour.</li>
+            <li>Hébergement en bivouac ou lodge, selon la formule.</li>
+            <li>Pension complète avec cuisine locale préparée sur place.</li>
+            <li>Accompagnement par des guides locaux expérimentés.</li>
+            <li>Découverte de sites naturels, culturels et historiques.</li>
+          </ul>
+        </div>
+        <div class="col col--right">
+          <h3>À PRÉVOIR</h3>
+          <ul class="bullets">
+            <li>Vêtements adaptés aux écarts de température.</li>
+            <li>Chaussures fermées.</li>
+            <li>Lunettes de soleil.</li>
+            <li>Protection solaire.</li>
+            <li>Gourde.</li>
+            <li>Documents de voyage.</li>
+          </ul>
+        </div>
+        <div class="book">
+          <small>RÉSERVATION</small>
+          <strong>94 990 DA / personne</strong>
+          <p>Places limitées — contactez-nous pour les disponibilités et les modalités.</p>
+          <p class="contact">WhatsApp : 0033 6 19 50 17 08 &nbsp;&nbsp;•&nbsp;&nbsp; algeriatravel.org</p>
+        </div>
+        <div class="final">
+          <h3>VIVEZ UNE EXPÉRIENCE UNIQUE</h3>
+          <p>au cœur de la Tadrart Rouge, entre sable, roche et ciel étoilé.</p>
+        </div>
+        <div class="foot"><span>ALGERIA TRAVEL &nbsp;•&nbsp; TADRART ROUGE &nbsp;•&nbsp; DJANET</span><span>9</span></div>
+      </section>
+    </main>
+
+    <a class="fab back" href="pages/tours.html">← Circuits</a>
+    <button class="fab" type="button" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      Télécharger le PDF
+    </button>
+
+    <script>
+      (function () {
+        var pages = document.querySelectorAll('.page');
+        var mm = 96 / 25.4;
+        function fit() {
+          var scale = Math.min(1, (window.innerWidth - 16) / (210 * mm));
+          pages.forEach(function (p) { p.style.zoom = scale < 1 ? scale : ''; });
+        }
+        window.addEventListener('resize', fit);
+        fit();
+      })();
+    </script>
+  </body>
+</html>

@@ -7,7 +7,7 @@
     stays: 'Hébergements',
     tours: 'Circuits',
     activities: 'Activités',
-    media: 'Images',
+    media: 'Galerie',
     pages: 'Textes du site',
     settings: 'Réglages',
   };
@@ -50,6 +50,7 @@
     app.classList.add('is-visible');
     ATStore.ensureSeed();
     refresh();
+    ATStore.probeImageBase().then(refresh);
   }
 
   function showLogin() {
@@ -77,7 +78,7 @@
       <div class="stat"><div class="stat__label">Réservations</div><div class="stat__value">${stats.bookingsTotal}</div></div>
       <div class="stat"><div class="stat__label">Clients</div><div class="stat__value">${stats.clients}</div></div>
       <div class="stat"><div class="stat__label">Destinations</div><div class="stat__value">${stats.destinations}</div></div>
-      <div class="stat"><div class="stat__label">Images</div><div class="stat__value">${stats.media}</div></div>
+      <div class="stat"><div class="stat__label">Photos galerie</div><div class="stat__value">${stats.media}</div></div>
       <div class="stat"><div class="stat__label">Hébergements</div><div class="stat__value">${stats.stays}</div></div>
     `;
 
@@ -94,7 +95,7 @@
     document.getElementById('staysTable').innerHTML = ATContentUI.renderStaysTable();
     document.getElementById('toursTable').innerHTML = ATManageUI.renderTours();
     document.getElementById('activitiesTable').innerHTML = ATManageUI.renderActivities();
-    document.getElementById('mediaGrid').innerHTML = ATManageUI.renderMedia();
+    document.getElementById('galleryGrid').innerHTML = ATManageUI.renderGallery();
   }
 
   document.getElementById('loginForm').addEventListener('submit', (e) => {
@@ -131,7 +132,7 @@
     toast('Clients synchronisés');
     refresh();
   });
-  document.getElementById('mediaAddBtn').addEventListener('click', () => ATManageUI.openMediaForm(openDrawer, toast));
+  document.getElementById('galleryAddBtn').addEventListener('click', () => ATManageUI.openGalleryAddForm(openDrawer, toast));
   document.getElementById('tourAddBtn').addEventListener('click', () => ATManageUI.openTourForm(null, openDrawer, toast));
   document.getElementById('actAddBtn').addEventListener('click', () => ATManageUI.openActivityForm(null, openDrawer, toast));
 
@@ -168,10 +169,27 @@
       );
       return;
     }
+    const delTour = e.target.closest('[data-tour-del]');
+    if (delTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === delTour.dataset.tourDel);
+      if (!confirm(`Supprimer le circuit « ${tour?.name || ''} » ?`)) return;
+      ATStore.deleteTour(delTour.dataset.tourDel);
+      toast('Circuit supprimé');
+      refresh();
+      return;
+    }
+    if (e.target.closest('[data-tour-reset]')) {
+      if (!confirm('Remettre les circuits d’origine ? Vos ajouts et modifications seront perdus.')) return;
+      ATStore.resetTours();
+      ATStore.ensureSeed();
+      toast('Circuits réinitialisés');
+      refresh();
+      return;
+    }
     const editTour = e.target.closest('[data-tour-edit]');
     if (editTour) {
       ATManageUI.openTourForm(
-        ATStore.getTours().find((t) => t.id === editTour.dataset.tourEdit),
+        ATStore.getTours().find((t) => String(t.id) === editTour.dataset.tourEdit),
         openDrawer,
         toast
       );
@@ -194,9 +212,41 @@
       );
       return;
     }
+    const editGallery = e.target.closest('[data-gallery-edit]');
+    if (editGallery) {
+      ATManageUI.openGalleryEditForm(editGallery.dataset.galleryEdit, openDrawer, toast);
+      return;
+    }
+    const delGallery = e.target.closest('[data-gallery-del]');
+    if (delGallery) {
+      if (!confirm('Supprimer cette photo de la page Galerie ?')) return;
+      ATStore.deleteGalleryImage(delGallery.dataset.galleryDel);
+      toast('Photo supprimée de la galerie');
+      refresh();
+      return;
+    }
+    if (e.target.closest('[data-gallery-reset]')) {
+      if (!confirm('Remettre les photos d’origine de la galerie ? Vos ajouts seront retirés.')) return;
+      ATStore.resetGallery();
+      toast('Galerie réinitialisée');
+      refresh();
+      return;
+    }
+    const filterMedia = e.target.closest('[data-media-filter]');
+    if (filterMedia) {
+      ATManageUI.setMediaFilter(filterMedia.dataset.mediaFilter);
+      refresh();
+      return;
+    }
+    if (e.target.closest('[data-media-restore]')) {
+      ATStore.restoreSiteMedia();
+      toast('Photos du site restaurées');
+      refresh();
+      return;
+    }
     const delMedia = e.target.closest('[data-media-del]');
     if (delMedia) {
-      if (!confirm('Supprimer cette image ?')) return;
+      if (!confirm('Supprimer cette image de la bibliothèque ?')) return;
       ATStore.deleteMedia(delMedia.dataset.mediaDel);
       toast('Image supprimée');
       refresh();

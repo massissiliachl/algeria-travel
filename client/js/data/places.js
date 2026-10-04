@@ -1,5 +1,7 @@
 /** Destinations accueil — fiches détaillées + réservation */
 
+import '../core/siteContent.js';
+import { asset } from '../core/dom.js';
 import { resolveTaghitPlace } from './taghitPackages.js';
 
 export const PLACES = [
@@ -568,7 +570,13 @@ const readAdminDestinations = () => {
   if (typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem('at_destinations');
-    return raw ? JSON.parse(raw) : null;
+    const list = raw ? JSON.parse(raw) : null;
+    if (!Array.isArray(list)) return null;
+    return list.map((d) => ({
+      ...d,
+      image: asset(d.image),
+      gallery: Array.isArray(d.gallery) ? d.gallery.map(asset) : d.gallery,
+    }));
   } catch {
     return null;
   }

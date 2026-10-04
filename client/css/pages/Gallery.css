@@ -642,6 +642,7 @@
   margin-bottom: 12px;
 }
 
+.gal-comments__form input,
 .gal-comments__form textarea {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.14);

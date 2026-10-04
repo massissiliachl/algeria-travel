@@ -19,12 +19,14 @@
         pass === CREDENTIALS.pass
       ) {
         sessionStorage.setItem(AUTH_KEY, '1');
+        sessionStorage.setItem('at_admin_pass', pass);
         return true;
       }
       return false;
     },
     logout() {
       sessionStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem('at_admin_pass');
     },
   };
 

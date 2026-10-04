@@ -1,3 +1,4 @@
+import '../core/siteContent.js';
 import { mountPage, navbar, footer } from '../core/layout.js';
 import { t } from '../core/i18n.js';
 import { icon } from '../core/icons.js';
@@ -24,8 +25,12 @@ const INIT_IMAGES = [
 ];
 
 const STORAGE_KEY = 'gallery_reactions_v3';
+const NAME_KEY = 'gallery_comment_name';
+const COMMENTS_API = new URL('../../api/comments.php', import.meta.url);
 
-const loadImages = () => {
+const ADMIN_GALLERY_KEY = 'at_gallery';
+
+const loadReactions = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -40,11 +45,36 @@ const loadImages = () => {
   return INIT_IMAGES;
 };
 
+/** Liste des photos gérée par l’admin (si définie), avec les likes / commentaires déjà enregistrés */
+const loadImages = () => {
+  const reactions = loadReactions();
+  let adminList = null;
+  try {
+    adminList = JSON.parse(localStorage.getItem(ADMIN_GALLERY_KEY) || 'null');
+  } catch {
+    adminList = null;
+  }
+  if (!Array.isArray(adminList)) return reactions;
+  return adminList.map((g) => {
+    const known = reactions.find((r) => r.src === g.src);
+    return known ? { ...known, id: g.id } : { id: g.id, src: g.src, likes: 0, dislikes: 0, comments: [] };
+  });
+};
+
 const state = {
   images: loadImages(),
   selectedIndex: null,
   ready: false,
   commentText: '',
+  commentName: (() => {
+    try {
+      return localStorage.getItem(NAME_KEY) || '';
+    } catch {
+      return '';
+    }
+  })(),
+  commentsOnline: false,
+  sending: false,
   showComments: false,
   burst: [],
   pulse: { like: false, dislike: false },
@@ -139,7 +169,8 @@ const lightboxHtml = () => {
         <div class="gal-comments ${state.showComments ? 'is-open' : ''}" data-gal-comments>
           <h3>${esc(t('gallery_comments_title'))}</h3>
           <div class="gal-comments__form">
-            <textarea rows="2" placeholder="${esc(t('gallery_comment_placeholder'))}" data-gal-text>${esc(state.commentText)}</textarea>
+            <input type="text" maxlength="60" placeholder="${esc(t('gallery_name_placeholder'))}" value="${esc(state.commentName)}" data-gal-name />
+            <textarea rows="2" maxlength="1000" placeholder="${esc(t('gallery_comment_placeholder'))}" data-gal-text>${esc(state.commentText)}</textarea>
             <button type="button"${state.commentText.trim() ? '' : ' disabled'} data-gal-send>${esc(t('gallery_send'))}</button>
           </div>
           <div data-gal-list style="display: contents">${commentListHtml(img)}</div>
@@ -226,7 +257,7 @@ const paintComments = () => {
   $('[data-gal-list]').innerHTML = commentListHtml(img);
   const text = $('[data-gal-text]');
   if (text.value !== state.commentText) text.value = state.commentText;
-  $('[data-gal-send]').disabled = !state.commentText.trim();
+  $('[data-gal-send]').disabled = !state.commentText.trim() || state.sending;
 };
 
 const paintCellLikes = (id) => {
@@ -295,16 +326,71 @@ const react = (key) => {
   paintCellLikes(img.id);
 };
 
-const addComment = () => {
+/* ── Commentaires partagés (api/comments.php), modérés depuis l’admin ── */
+
+const toViewComment = (c) => ({
+  id: c.id,
+  user: c.name || 'Voyageur',
+  text: c.text,
+  date: new Date(c.createdAt).toLocaleDateString(),
+});
+
+const loadServerComments = async () => {
+  try {
+    const res = await fetch(COMMENTS_API, { cache: 'no-store' });
+    const data = res.ok ? await res.json() : null;
+    if (!Array.isArray(data?.comments)) return;
+    state.commentsOnline = true;
+    state.images = state.images.map((img) => ({
+      ...img,
+      comments: data.comments.filter((c) => c.src === img.src).map(toViewComment),
+    }));
+    if (state.selectedIndex !== null) {
+      paintReact();
+      paintComments();
+    }
+  } catch {
+    /* serveur indisponible (dev local) : commentaires du navigateur */
+  }
+};
+
+const addComment = async () => {
   const img = currentImage();
-  if (!img || !state.commentText.trim()) return;
-  const comment = {
-    id: Date.now(),
-    user: 'Voyageur',
-    text: state.commentText.trim(),
-    date: new Date().toLocaleDateString(),
-  };
-  save(state.images.map((i) => (i.id === img.id ? { ...i, comments: [comment, ...(i.comments || [])] } : i)));
+  const text = state.commentText.trim();
+  if (!img || !text || state.sending) return;
+  const name = state.commentName.trim();
+  try {
+    localStorage.setItem(NAME_KEY, name);
+  } catch {
+    /* ignore */
+  }
+
+  let comment = { id: Date.now(), user: name || 'Voyageur', text, date: new Date().toLocaleDateString() };
+  if (state.commentsOnline) {
+    state.sending = true;
+    paintComments();
+    try {
+      const res = await fetch(COMMENTS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ src: img.src, name, text }),
+      });
+      const data = await res.json().catch(() => null);
+      if (res.status === 429) throw new Error(t('gallery_comment_too_many'));
+      if (!res.ok || !data?.comment) throw new Error(t('gallery_comment_error'));
+      comment = toViewComment(data.comment);
+    } catch (err) {
+      state.sending = false;
+      paintComments();
+      alert(err.message);
+      return;
+    }
+    state.sending = false;
+  }
+
+  const next = state.images.map((i) => (i.id === img.id ? { ...i, comments: [comment, ...(i.comments || [])] } : i));
+  if (state.commentsOnline) state.images = next;
+  else save(next);
   state.commentText = '';
   paintComments();
   paintReact();
@@ -365,7 +451,13 @@ const bind = (el) => {
     if (e.key === 'ArrowRight') goNext();
   });
 
+  loadServerComments();
+
   root.addEventListener('input', (e) => {
+    if (e.target.matches('[data-gal-name]')) {
+      state.commentName = e.target.value;
+      return;
+    }
     if (!e.target.matches('[data-gal-text]')) return;
     state.commentText = e.target.value;
     $('[data-gal-send]').disabled = !state.commentText.trim();

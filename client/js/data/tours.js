@@ -1,12 +1,13 @@
 // src/data/tours.js
 
+import '../core/siteContent.js';
 import { TAGHIT_PACKAGES } from './taghitPackages.js';
 
 const taghitHotel = TAGHIT_PACKAGES.hotel;
 const taghitGuest = TAGHIT_PACKAGES.guesthouse;
 const taghitBrezina = TAGHIT_PACKAGES.brezina;
 
-export const FEATURED_TOURS = [
+const BASE_TOURS = [
     {
       id: 10,
       name: "Tadrart Rouge — Djanet",
@@ -415,3 +416,55 @@ export const FEATURED_TOURS = [
       itinerary: [],
     },
   ];
+
+/* ── Circuits gérés par l’admin (localStorage « at_circuits ») ── */
+
+const readAdminCircuits = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const list = JSON.parse(window.localStorage.getItem('at_circuits') || 'null');
+    return Array.isArray(list) ? list : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Un texte modifié dans l’admin (en français) remplace aussi les versions EN / AR */
+const overrideText = (out, base, field, value) => {
+  const v = String(value ?? '').trim();
+  if (!v || v === base[field]) return;
+  out[field] = v;
+  out[`${field}_en`] = v;
+  out[`${field}_ar`] = v;
+};
+
+const fromAdmin = (c) => {
+  const base = BASE_TOURS.find((t) => String(t.id) === String(c.id));
+  const out = base
+    ? { ...base }
+    : { id: c.id, rating: 5, reviews: 0, activities: [], itinerary: [], category: 'desert' };
+  overrideText(out, base || {}, 'name', c.name);
+  overrideText(out, base || {}, 'subtitle', c.subtitle);
+  overrideText(out, base || {}, 'location', c.location);
+  overrideText(out, base || {}, 'duration', c.duration);
+  const desc = String(c.description ?? '').trim();
+  if (desc && desc !== base?.description) {
+    out.description = desc;
+    out.description_en = desc;
+    out.fullDescription = desc;
+    out.fullDescription_en = desc;
+  }
+  if (c.image) out.image = c.image;
+  if (c.category) out.category = c.category;
+  if (c.placeSlug !== undefined) out.placeSlug = c.placeSlug || undefined;
+  out.priceOnRequest = Boolean(c.priceOnRequest);
+  out.price = out.priceOnRequest ? 0 : Number(c.price) || 0;
+  if (base && out.price !== base.price) delete out.oldPrice;
+  return out;
+};
+
+const adminCircuits = readAdminCircuits();
+
+export const FEATURED_TOURS = adminCircuits
+  ? adminCircuits.filter((c) => c.active !== false).map(fromAdmin)
+  : BASE_TOURS;

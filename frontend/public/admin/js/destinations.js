@@ -28,7 +28,7 @@
         <td>
           ${
             d.image
-              ? `<img class="thumb" src="${escapeHtml(d.image)}" alt="" onerror="this.style.display='none'" />`
+              ? `<img class="thumb" src="${escapeHtml(ATStore.src(d.image))}" alt="" onerror="this.style.display='none'" />`
               : ''
           }
           <strong>${escapeHtml(d.name)}</strong>
@@ -156,7 +156,7 @@
       galleryPreview.innerHTML = urls
         .map(
           (u, i) =>
-            `<span class="gallery-preview__item" style="background-image:url('${escapeHtml(u)}')">
+            `<span class="gallery-preview__item" style="background-image:url('${escapeHtml(ATStore.src(u))}')">
               <button type="button" class="gallery-preview__rm" data-rm="${i}" title="Retirer">×</button>
             </span>`
         )

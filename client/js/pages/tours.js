@@ -37,14 +37,14 @@ const filtersHtml = () =>
   ).join('');
 
 const cardHtml = (tour, i) => {
-  const fav = state.favorites.has(tour.id);
+  const fav = state.favorites.has(String(tour.id));
   const price = tour.priceOnRequest
     ? t('place_on_request')
     : `${t('acts_from')} ${tour.price.toLocaleString()} DA`;
   return `
     <article class="acts-card" data-reveal data-delay="${i * 60}" data-href="${esc(getPlacePathFromTour(tour))}" role="link" tabindex="0">
       <img src="${esc(asset(tour.image))}" alt="" loading="lazy" />
-      <button type="button" class="acts-card__fav ${fav ? 'is-on' : ''}" aria-label="Favorite" data-fav="${tour.id}">
+      <button type="button" class="acts-card__fav ${fav ? 'is-on' : ''}" aria-label="Favorite" data-fav="${esc(tour.id)}">
         ${icon('Heart', 16, { strokeWidth: 2, fill: fav ? 'currentColor' : 'none' })}
       </button>
       <div class="acts-card__body">
@@ -136,7 +136,7 @@ const bind = (root) => {
     const fav = e.target.closest('[data-fav]');
     if (fav) {
       e.stopPropagation();
-      const id = Number(fav.getAttribute('data-fav'));
+      const id = fav.getAttribute('data-fav');
       if (state.favorites.has(id)) state.favorites.delete(id);
       else state.favorites.add(id);
       const on = state.favorites.has(id);

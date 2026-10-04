@@ -11,10 +11,119 @@
     clients: 'at_clients',
     media: 'at_media',
     pages: 'at_pages',
-    tours: 'at_tours',
+    tours: 'at_circuits',
     activities: 'at_activities',
+    mediaHidden: 'at_media_hidden',
+    gallery: 'at_gallery',
     seeded: 'at_admin_seeded_v2',
   };
+
+  /** Toutes les photos présentes dans le site (dossier public/) */
+  const SITE_IMAGES = [
+    ['/images/hero.jpeg', 'Hero accueil', 'home'],
+    ['/images/heroaccueil.png', 'Hero accueil (variante)', 'home'],
+    ['/images/home/acc-hotel.jpg', 'Accueil — Hôtel', 'home'],
+    ['/images/home/circuits-4x4.png', 'Accueil — Circuits 4×4', 'home'],
+    ['/images/home/dest-alger.jpg', 'Accueil — Alger', 'home'],
+    ['/images/home/exp-culture.jpg', 'Accueil — Culture', 'home'],
+    ['/images/home/news-coast.jpg', 'Accueil — Côte', 'home'],
+    ['/images/galery.jpg', 'Galerie', 'home'],
+    ['/images/visitekseurs.webp', 'Visiteurs', 'home'],
+    ['/images/alger.jpeg', 'Alger', 'destination'],
+    ['/images/bejaia.jpeg', 'Béjaïa', 'destination'],
+    ['/images/djanet.jpeg', 'Djanet', 'destination'],
+    ['/images/ghardaia.jpeg', 'Ghardaïa', 'destination'],
+    ['/images/hogar.jpeg', 'Hoggar', 'destination'],
+    ['/images/taghit.jpeg', 'Taghit', 'destination'],
+    ['/images/tadrart-djanet.png', 'Tadrart — Djanet', 'destination'],
+    ['/images/sahara1.jpeg', 'Sahara 1', 'destination'],
+    ['/images/sahara2.jpeg', 'Sahara 2', 'destination'],
+    ['/images/sahara3.jpeg', 'Sahara 3', 'destination'],
+    ['/images/sahara4.jpeg', 'Sahara 4', 'destination'],
+    ['/images/sahara5.jpeg', 'Sahara 5', 'destination'],
+    ['/images/sahara6.jpeg', 'Sahara 6', 'destination'],
+    ['/images/sahara7.jpeg', 'Sahara 7', 'destination'],
+    ['/images/sahara8.jpeg', 'Sahara 8', 'destination'],
+    ['/images/taghit-van-hero.png', 'Taghit — Van & dromadaire', 'taghit'],
+    ['/images/taghit-sejour.png', 'Taghit — Le séjour', 'taghit'],
+    ['/images/brezina-bivouac.png', 'Brezina — Bivouac (jour 1)', 'taghit'],
+    ['/images/taghit-maison-hote.png', 'Taghit — Maison d’hôte (jour 2)', 'taghit'],
+    ['/images/taghit-jour3.png', 'Taghit — Jour 3', 'taghit'],
+    ['/images/taghit-jour5.png', 'Taghit — Jour 5', 'taghit'],
+    ['/images/taghit-brezina.png', 'Taghit — Brezina', 'taghit'],
+    ['/images/chameau.jpg', 'Dromadaire', 'activity'],
+    ['/images/kayak.jpeg', 'Kayak', 'activity'],
+    ['/images/quad.jpg', 'Quad', 'activity'],
+    ['/images/quad1.jpeg', 'Quad 2', 'activity'],
+    ['/images/quatre-quatre.jpg', '4×4', 'activity'],
+    ['/images/maison-hote-sud-1.png', 'Maison d’hôte 1', 'stay'],
+    ['/images/maison-hote-sud-2.png', 'Maison d’hôte 2', 'stay'],
+    ['/images/maison-hote-sud-3.png.jpeg', 'Maison d’hôte 3', 'stay'],
+    ['/images/maison-hote-sud-4.png.jpeg', 'Maison d’hôte 4', 'stay'],
+    ['/images/maison-hote-sud-5.png.jpeg', 'Maison d’hôte 5', 'stay'],
+    ['/images/maison-hote-sud-6.png.jpeg', 'Maison d’hôte 6', 'stay'],
+    ['/images/maison-hote-sud-7.png.jpeg', 'Maison d’hôte 7', 'stay'],
+    ['/images/hotels/royal-bejaia-1.jpg', 'Hôtel Royal Béjaïa 1', 'stay'],
+    ['/images/hotels/royal-bejaia-2.jpg', 'Hôtel Royal Béjaïa 2', 'stay'],
+    ['/images/hotels/royal-bejaia-3.jpg', 'Hôtel Royal Béjaïa 3', 'stay'],
+    ['/images/hotels/zeriba-djanet-1.jpg', 'Hôtel Zeriba Djanet 1', 'stay'],
+    ['/images/hotels/zeriba-djanet-2.jpg', 'Hôtel Zeriba Djanet 2', 'stay'],
+    ['/images/hotels/belvedere-ghardaia.jpg', 'Hôtel Belvédère Ghardaïa', 'stay'],
+    ['/images/hotels/le-rym-ghardaia.jpg', 'Hôtel Le Rym Ghardaïa', 'stay'],
+    ['/images/hotels/tahat-1.jpg', 'Hôtel Tahat 1', 'stay'],
+    ['/images/hotels/tahat-2.jpg', 'Hôtel Tahat 2', 'stay'],
+    ['/images/hotels/tahat-3.jpg', 'Hôtel Tahat 3', 'stay'],
+    ['/images/hotels/sheraton-oran.jpg', 'Sheraton Oran', 'stay'],
+    ['/images/hotels/sheraton-oran-pool.jpg', 'Sheraton Oran — Piscine', 'stay'],
+    ['/images/hotels/royal-oran.jpg', 'Royal Hotel Oran', 'stay'],
+    ['/logo.png', 'Logo Algeria Travel', 'other'],
+  ].map(([url, name, category]) => ({
+    id: 'site_' + url.replace(/[^a-z0-9]+/gi, '_'),
+    name,
+    url,
+    category,
+    site: true,
+  }));
+
+  /** Photos affichées par défaut sur la page Galerie (mêmes que client/js/pages/gallery.js) */
+  const SEED_GALLERY = [
+    '/images/sahara1.jpeg', '/images/sahara2.jpeg', '/images/sahara3.jpeg', '/images/sahara4.jpeg',
+    '/images/sahara5.jpeg', '/images/sahara6.jpeg', '/images/sahara7.jpeg', '/images/sahara8.jpeg',
+    '/images/galery.jpg', '/images/quad.jpg', '/images/quad1.jpeg', '/images/quatre-quatre.jpg',
+    '/images/chameau.jpg', '/images/kayak.jpeg', '/images/visitekseurs.webp',
+  ].map((src, i) => ({ id: i + 1, src }));
+
+  /**
+   * Préfixe des images du site selon l’hébergement :
+   * build React → /images, IONOS (client/) → /public/images, local → ../client/public/images
+   */
+  let imageBase = '';
+  const BASE_CANDIDATES = ['', '/public', '../client/public', '../public', '../frontend/public'];
+
+  function probeImageBase() {
+    return new Promise((resolve) => {
+      let i = 0;
+      const next = () => {
+        if (i >= BASE_CANDIDATES.length) return resolve(imageBase);
+        const base = BASE_CANDIDATES[i++];
+        const img = new Image();
+        img.onload = () => {
+          imageBase = base;
+          resolve(base);
+        };
+        img.onerror = next;
+        img.src = base + '/logo.png?probe=' + Date.now();
+      };
+      next();
+    });
+  }
+
+  function src(url) {
+    if (!url) return '';
+    const u = String(url);
+    if (u.startsWith('/') && !u.startsWith('//')) return imageBase + u;
+    return u;
+  }
 
   function read(key, fallback) {
     try {
@@ -82,10 +191,19 @@
     { id: 'img_maison', name: 'Maison d’hôte', url: '/images/maison-hote-sud-1.png', category: 'stay' },
   ];
 
+  /** Circuits du site (client/js/data/tours.js) — description vide = texte d’origine du site */
   const SEED_TOURS = [
-    { id: 'tour-taghit-hotel', name: 'Taghit — Hôtel 4★', destination: 'Taghit', price: 99990, description: 'Pension complète, vol Alger–Béchar–Alger, activités.', image: '/images/taghit.jpeg', active: true },
-    { id: 'tour-taghit-guest', name: 'Taghit — Maison d’hôte', destination: 'Taghit', price: 60000, description: 'Maison d’hôte, bus Mercedes, activités.', image: '/images/taghit.jpeg', active: true },
-  ];
+    { id: 10, name: 'Tadrart Rouge — Djanet', subtitle: '6 jours et 6 nuits en bivouac · vols inclus', location: "Djanet, Tassili n'Ajjer", duration: '6 jours / 6 nuits', price: 94990, category: 'desert', image: '/images/tadrart-djanet.png', placeSlug: 'tadrart' },
+    { id: 1, name: 'Timimoun', subtitle: 'Perle du Sahara', location: 'Gourara, Grand Sud', duration: '5 jours', price: 45000, category: 'desert', image: '/images/sahara1.jpeg', placeSlug: 'timimoun' },
+    { id: 2, name: "Tassili n'Ajjer", subtitle: 'Patrimoine mondial UNESCO', location: 'Djanet, Sahara', duration: '8 jours', price: 85000, category: 'nature', image: '/images/djanet.jpeg', placeSlug: 'djanet' },
+    { id: 3, name: 'Ghardaïa', subtitle: "Vallée du M'Zab", location: "Vallée du M'Zab", duration: '4 jours', price: 35000, category: 'culture', image: '/images/ghardaia.jpeg', placeSlug: 'ghardaia' },
+    { id: 4, name: 'Béjaïa', subtitle: 'Mer & Montagne', location: 'Béjaïa, Méditerranée', duration: '3 jours', price: 25000, category: 'nature', image: '/images/bejaia.jpeg', placeSlug: 'bejaia' },
+    { id: 5, name: 'Le Hoggar', subtitle: 'Au cœur du désert', location: 'Tamanrasset, Sahara', duration: '9 jours', price: 95000, category: 'desert', image: '/images/hogar.jpeg', placeSlug: 'hoggar' },
+    { id: 6, name: 'Constantine', subtitle: 'Ville des ponts', location: 'Constantine, Nord-Est', duration: '3 jours', price: 22000, category: 'culture', image: '/images/alger.jpeg', placeSlug: 'constantine' },
+    { id: 7, name: 'Taghit — Hôtel 4★', subtitle: 'Voyage coup de cœur · vol inclus', location: 'Taghit, Béchar', duration: 'Pension complète', price: 99990, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit' },
+    { id: 8, name: 'Taghit — Maison d’hôte', subtitle: 'Voyage coup de cœur · bus Mercedes', location: 'Taghit, Béchar', duration: 'Pension complète', price: 60000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit' },
+    { id: 9, name: 'Taghit via Brezina', subtitle: '5 jours / 4 nuits · Van Mercedes VIP', location: 'Brezina → Taghit, Béchar', duration: '5 jours / 4 nuits', price: 0, priceOnRequest: true, category: 'desert', image: '/images/taghit-brezina.png', placeSlug: 'taghit' },
+  ].map((t) => ({ description: '', priceOnRequest: false, active: true, ...t }));
 
   const SEED_ACTIVITIES = [
     { id: 'quad', name: 'Quad', price: 8000, description: 'Sensation et liberté sur les dunes en quad.', image: '', active: true },
@@ -173,27 +291,84 @@
     getPages() { return { ...SEED_PAGES, ...read(KEYS.pages, {}) }; },
     savePages(pages) { write(KEYS.pages, pages); },
 
-    getMedia() { return read(KEYS.media, SEED_MEDIA); },
+    src,
+    probeImageBase,
+    siteImages: SITE_IMAGES,
+
+    /** Photos de la page Galerie du site */
+    getGallery() { return read(KEYS.gallery, SEED_GALLERY); },
+    saveGallery(list) {
+      try {
+        write(KEYS.gallery, list);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    addGalleryImages(srcs) {
+      const list = Store.getGallery();
+      let nextId = list.reduce((max, g) => Math.max(max, Number(g.id) || 0), 0) + 1;
+      const added = srcs.filter(Boolean).map((src) => ({ id: nextId++, src }));
+      return Store.saveGallery([...added, ...list]) ? added.length : -1;
+    },
+    updateGalleryImage(id, src, position) {
+      const list = Store.getGallery();
+      const from = list.findIndex((g) => String(g.id) === String(id));
+      if (from < 0) return false;
+      const [item] = list.splice(from, 1);
+      if (src) item.src = src;
+      const to = Math.max(0, Math.min(list.length, position == null ? from : position));
+      list.splice(to, 0, item);
+      return Store.saveGallery(list);
+    },
+    deleteGalleryImage(id) {
+      Store.saveGallery(Store.getGallery().filter((g) => String(g.id) !== String(id)));
+    },
+    resetGallery() { localStorage.removeItem(KEYS.gallery); },
+
+    /** Images ajoutées par l’admin + toutes les photos du site (sauf celles supprimées) */
+    getMedia() {
+      const own = Store.getOwnMedia();
+      const hidden = read(KEYS.mediaHidden, []);
+      const seen = new Set(own.map((m) => m.url));
+      const site = SITE_IMAGES.filter((m) => !seen.has(m.url) && !hidden.includes(m.id));
+      return [...own, ...site];
+    },
+    getOwnMedia() { return read(KEYS.media, SEED_MEDIA); },
     saveMedia(list) { write(KEYS.media, list); },
     addMedia(item) {
-      const list = Store.getMedia();
+      const list = Store.getOwnMedia();
       const media = { id: uid('img'), createdAt: new Date().toISOString(), ...item };
       list.unshift(media);
       Store.saveMedia(list);
       return media;
     },
     deleteMedia(id) {
-      Store.saveMedia(Store.getMedia().filter((m) => m.id !== id));
+      if (String(id).startsWith('site_')) {
+        const hidden = read(KEYS.mediaHidden, []);
+        if (!hidden.includes(id)) hidden.push(id);
+        write(KEYS.mediaHidden, hidden);
+        return;
+      }
+      Store.saveMedia(Store.getOwnMedia().filter((m) => m.id !== id));
     },
+    hiddenSiteMediaCount() { return read(KEYS.mediaHidden, []).length; },
+    restoreSiteMedia() { write(KEYS.mediaHidden, []); },
 
     getTours() { return read(KEYS.tours, SEED_TOURS); },
     saveTours(list) { write(KEYS.tours, list); },
     upsertTour(tour) {
-      return upsertList(Store.getTours, Store.saveTours, tour, 'id');
+      const list = Store.getTours();
+      const i = list.findIndex((x) => String(x.id) === String(tour.id));
+      if (i >= 0) list[i] = { ...list[i], ...tour };
+      else list.unshift(tour);
+      Store.saveTours(list);
+      return tour;
     },
     deleteTour(id) {
-      Store.saveTours(Store.getTours().filter((t) => t.id !== id));
+      Store.saveTours(Store.getTours().filter((t) => String(t.id) !== String(id)));
     },
+    resetTours() { localStorage.removeItem(KEYS.tours); },
 
     getActivities() { return read(KEYS.activities, SEED_ACTIVITIES); },
     saveActivities(list) { write(KEYS.activities, list); },
@@ -278,7 +453,7 @@
         destinations: Store.getDestinations().filter((d) => d.active !== false).length,
         stays: Store.getStays().filter((s) => s.active !== false).length,
         clients: Store.getClients().length,
-        media: Store.getMedia().length,
+        media: Store.getGallery().length,
       };
     },
   };

@@ -6,7 +6,7 @@ export const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ENT
 /** Chemin d'un fichier public depuis client/pages/ ("/images/x.jpg" → "../public/images/x.jpg"). */
 export const asset = (src) => {
   if (!src || typeof src !== 'string') return src;
-  return /^\/(?!\/)/.test(src) ? `../public${src}` : src;
+  return /^\/(?!\/|uploads\/)/.test(src) ? `../public${src}` : src;
 };
 
 /** Concatène des classes CSS en ignorant les valeurs vides. */

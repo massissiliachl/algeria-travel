@@ -30,3 +30,9 @@ yarn-error.log*
 
 # archives
 *.zip
+
+# données générées par le serveur (réservations, commentaires, photos importées)
+/client/api/data/*
+!/client/api/data/.htaccess
+/client/uploads/*
+!/client/uploads/.htaccess

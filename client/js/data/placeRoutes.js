@@ -16,6 +16,9 @@ const TOUR_TO_PLACE = {
 const getPlaceSlugFromTourId = (tourId) =>
   TOUR_TO_PLACE[Number(tourId)] || null;
 
+export const getPlaceSlugFromTour = (tour) =>
+  (tour && (tour.placeSlug || getPlaceSlugFromTourId(tour.id))) || null;
+
 export const getPlacePathFromTourId = (tourId) => {
   const slug = getPlaceSlugFromTourId(tourId);
   return slug ? `/place/${slug}` : '/destinations';

@@ -1,5 +1,5 @@
 /**
- * Copie le dossier ../admin/ (source, à la racine du projet) vers
+ * Copie le dossier ../client/admin/ (source) vers
  * frontend/public/admin/ (servi par CRA, qui ne sert que public/).
  */
 const fs = require('fs');
@@ -7,7 +7,7 @@ const path = require('path');
 
 const frontendRoot = path.join(__dirname, '..');
 const projectRoot = path.join(frontendRoot, '..');
-const srcCandidates = ['admin', 'Admin'].map((name) => path.join(projectRoot, name));
+const srcCandidates = [path.join('client', 'admin'), 'admin'].map((name) => path.join(projectRoot, name));
 const src = srcCandidates.find((p) => fs.existsSync(p));
 const dest = path.join(frontendRoot, 'public', 'admin');
 
@@ -32,7 +32,7 @@ function copyDir(from, to) {
 }
 
 if (!src) {
-  console.error('Dossier admin/ introuvable à la racine du projet.');
+  console.error('Dossier client/admin/ introuvable.');
   process.exit(1);
 }
 

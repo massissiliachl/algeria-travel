@@ -1,10 +1,24 @@
 /**
- * Bridge réservations — site public → localStorage (lu par /admin/)
+ * Bridge réservations — site public → serveur (api/bookings.php) + localStorage (lu par /admin/)
  * Expose window.ATBooking.create(payload)
  */
 (function (global) {
   const KEY = 'at_bookings';
   const CLIENTS_KEY = 'at_clients';
+  const API = new URL('../api/bookings.php', document.currentScript?.src || location.href).href;
+
+  function sendToServer(booking) {
+    const fields = ['id', 'name', 'email', 'phone', 'date', 'travelers', 'stay', 'destination', 'message', 'source'];
+    const payload = Object.fromEntries(fields.map((f) => [f, booking[f]]));
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking: payload }),
+      keepalive: true,
+    }).catch(() => {
+      /* serveur indisponible (dev local) : la réservation reste dans le navigateur */
+    });
+  }
 
   function read(key, fallback) {
     try {
@@ -77,6 +91,7 @@
       list.unshift(booking);
       write(KEY, list);
       syncClient(booking);
+      sendToServer(booking);
       return booking;
     },
   };

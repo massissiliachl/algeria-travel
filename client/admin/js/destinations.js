@@ -28,7 +28,7 @@
         <td>
           ${
             d.image
-              ? `<img class="thumb" src="${escapeHtml(d.image)}" alt="" onerror="this.style.display='none'" />`
+              ? `<img class="thumb" src="${escapeHtml(ATStore.src(d.image))}" alt="" onerror="this.style.display='none'" />`
               : ''
           }
           <strong>${escapeHtml(d.name)}</strong>
@@ -156,7 +156,7 @@
       galleryPreview.innerHTML = urls
         .map(
           (u, i) =>
-            `<span class="gallery-preview__item" style="background-image:url('${escapeHtml(u)}')">
+            `<span class="gallery-preview__item" style="background-image:url('${escapeHtml(ATStore.src(u))}')">
               <button type="button" class="gallery-preview__rm" data-rm="${i}" title="Retirer">×</button>
             </span>`
         )
@@ -213,25 +213,26 @@
         .map((s) => s.trim())
         .filter(Boolean);
 
-      if (isNew) {
-        ATStore.addMedia({
-          name: String(fd.get('name') || id),
-          category: 'destination',
-          url: image,
+      try {
+        ATStore.upsertDestination({
+          id,
+          name: String(fd.get('name') || '').trim(),
+          tagline: String(fd.get('tagline') || '').trim(),
+          price: Number(fd.get('price') || 0),
+          bestTime: String(fd.get('bestTime') || '').trim(),
+          image,
+          gallery: galleryUrls,
+          description: String(fd.get('description') || '').trim(),
+          active: fd.get('active') === 'true',
         });
+      } catch (err) {
+        toast(
+          err.message === 'quota'
+            ? 'Stockage du navigateur plein : supprimez des images dans Médias ou utilisez moins de photos.'
+            : 'Enregistrement impossible'
+        );
+        return;
       }
-
-      ATStore.upsertDestination({
-        id,
-        name: String(fd.get('name') || '').trim(),
-        tagline: String(fd.get('tagline') || '').trim(),
-        price: Number(fd.get('price') || 0),
-        bestTime: String(fd.get('bestTime') || '').trim(),
-        image,
-        gallery: galleryUrls,
-        description: String(fd.get('description') || '').trim(),
-        active: fd.get('active') === 'true',
-      });
       toast(isNew ? 'Destination ajoutée' : 'Destination enregistrée');
       document.dispatchEvent(new CustomEvent('at:refresh'));
       document.getElementById('drawer').classList.remove('is-open');

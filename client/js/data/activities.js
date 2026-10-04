@@ -1,3 +1,9 @@
+import '../core/siteContent.js';
+import { asset } from '../core/dom.js';
+import { getPlaces } from './places.js';
+import { FEATURED_TOURS } from './tours.js';
+import { getPlaceSlugFromTour } from './placeRoutes.js';
+
 export const ACTIVITY_CATEGORIES = {
   adventure: { fr: 'Aventure', en: 'Adventure', ar: 'مغامرة' },
   desert: { fr: 'Désert', en: 'Desert', ar: 'صحراء' },
@@ -16,7 +22,7 @@ export const ACTIVITY_FILTERS = [
   { key: 'extreme', icon: 'Zap', fr: 'Extrême', en: 'Extreme', ar: 'قاسي' },
 ];
 
-export const ACTIVITIES = [
+const BASE_ACTIVITIES = [
   {
     id: 'quad',
     name: 'Quad',
@@ -316,5 +322,103 @@ export const ACTIVITIES = [
   },
 ];
 
-export const getActivitiesForPlace = (placeId) =>
-  ACTIVITIES.filter((a) => Array.isArray(a.places) && a.places.includes(placeId));
+/* ── Activités gérées par l’admin (localStorage « at_activities ») ── */
+
+const readAdminActivities = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const list = JSON.parse(window.localStorage.getItem('at_activities') || 'null');
+    return Array.isArray(list) ? list : null;
+  } catch {
+    return null;
+  }
+};
+
+const setAllLangs = (out, field, value) => {
+  out[field] = value;
+  out[`${field}_en`] = value;
+  out[`${field}_ar`] = value;
+};
+
+/** Lieux et circuits liés, affichés comme « Lieu » sur la fiche activité */
+const linkedLocation = (places, tours) => {
+  const placeNames = getPlaces()
+    .filter((p) => places.includes(p.id))
+    .map((p) => p.name);
+  const tourNames = FEATURED_TOURS.filter((t) => tours.includes(String(t.id))).map((t) => t.name);
+  return [...new Set([...placeNames, ...tourNames])].join(' · ');
+};
+
+const fromAdmin = (a) => {
+  const base = BASE_ACTIVITIES.find((b) => b.id === a.id);
+  const out = base
+    ? { ...base }
+    : {
+        id: a.id,
+        icon: 'Compass',
+        color: '#B45309',
+        category: 'adventure',
+        filters: ['discovery'],
+        tags: { fr: '', en: '', ar: '' },
+        rating: 5,
+        gallery: [],
+        included: [],
+        included_en: [],
+        included_ar: [],
+      };
+  const name = String(a.name ?? '').trim();
+  if (name && name !== base?.name) setAllLangs(out, 'name', name);
+  const desc = String(a.description ?? '').trim();
+  if (desc && desc !== base?.desc) {
+    setAllLangs(out, 'desc', desc);
+    setAllLangs(out, 'fullDesc', desc);
+  }
+  if (a.price !== undefined && a.price !== '') out.price = Number(a.price) || 0;
+  if (a.image) {
+    out.image = asset(a.image);
+    out.gallery = [out.image, ...(base?.gallery || []).filter((g) => g !== out.image)];
+  }
+  if (ACTIVITY_CATEGORIES[a.category]) out.category = a.category;
+  const filters = Array.isArray(a.filters) ? a.filters.filter((f) => ACTIVITY_FILTERS.some((x) => x.key === f)) : [];
+  if (filters.length) {
+    const changed = !base || filters.join() !== (base.filters || []).join();
+    out.filters = filters;
+    if (changed) {
+      const names = filters.map((f) => ACTIVITY_FILTERS.find((x) => x.key === f));
+      out.tags = {
+        fr: names.map((n) => n.fr).join(' • '),
+        en: names.map((n) => n.en).join(' • '),
+        ar: names.map((n) => n.ar).join(' • '),
+      };
+    }
+  }
+  if (Array.isArray(a.places)) out.places = a.places;
+  out.tours = Array.isArray(a.tours) ? a.tours.map(String) : [];
+  if (!base) {
+    const location = linkedLocation(out.places || [], out.tours);
+    ['desc', 'fullDesc', 'history', 'visit', 'location', 'duration', 'durationShort', 'dates', 'group'].forEach((f) => {
+      if (out[f] === undefined) setAllLangs(out, f, '');
+    });
+    if (location) setAllLangs(out, 'location', location);
+  }
+  out.price = Number(out.price) || 0;
+  return out;
+};
+
+const adminActivities = readAdminActivities();
+
+export const ACTIVITIES = adminActivities
+  ? adminActivities.filter((a) => a.id && a.active !== false).map(fromAdmin)
+  : BASE_ACTIVITIES;
+
+/** Activités liées à une destination, directement ou via un circuit qui y mène */
+export const getActivitiesForPlace = (placeId) => {
+  const tourIds = new Set(
+    FEATURED_TOURS.filter((t) => getPlaceSlugFromTour(t) === placeId).map((t) => String(t.id))
+  );
+  return ACTIVITIES.filter(
+    (a) =>
+      (Array.isArray(a.places) && a.places.includes(placeId)) ||
+      (Array.isArray(a.tours) && a.tours.some((id) => tourIds.has(id)))
+  );
+};

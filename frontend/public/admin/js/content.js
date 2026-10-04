@@ -14,7 +14,7 @@
       .map(
         (s) => `<tr>
         <td>
-          ${s.image ? `<img class="thumb" src="${escapeHtml(s.image)}" alt="" />` : ''}
+          ${s.image ? `<img class="thumb" src="${escapeHtml(ATStore.src(s.image))}" alt="" />` : ''}
           <strong>${escapeHtml(s.name)}</strong><br><small>${escapeHtml(s.type)} · ${escapeHtml(s.placeId)}</small>
         </td>
         <td>${Number(s.price || 0).toLocaleString('fr-FR')} DA</td>

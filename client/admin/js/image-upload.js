@@ -2,7 +2,8 @@
  * Zone d’insertion d’image (fichier obligatoire / prioritaire)
  */
 (function (global) {
-  const MAX_KB = 1500;
+  const MAX_KB = 15000;
+  const COMPRESS_ABOVE_KB = 300;
 
   function escapeHtml(str) {
     return String(str || '')
@@ -24,8 +25,15 @@
         return;
       }
       if (file.size > MAX_KB * 1024) {
-        toast(`Image trop lourde (max ${MAX_KB} Ko). Compressez-la puis réessayez.`);
+        toast(`Image trop lourde (max ${MAX_KB / 1000} Mo).`);
         reject(new Error('size'));
+        return;
+      }
+      if (file.size > COMPRESS_ABOVE_KB * 1024 && !/gif|svg/.test(file.type)) {
+        compressFile(file).then(resolve, () => {
+          toast('Impossible de lire le fichier');
+          reject(new Error('read'));
+        });
         return;
       }
       const reader = new FileReader();
@@ -50,16 +58,16 @@
     const multiple = opts.multiple ? 'multiple' : '';
     return `
       <div class="img-insert" data-img-insert="${escapeHtml(id)}" data-required="${required}">
-        <input type="hidden" name="${escapeHtml(opts.name || 'image')}" id="${escapeHtml(id)}Value" value="" />
+        <input type="hidden" name="${escapeHtml(opts.name || 'image')}" id="${escapeHtml(id)}Value" value="${escapeHtml(value)}" />
         <label class="img-insert__drop" for="${escapeHtml(id)}File">
           <input type="file" id="${escapeHtml(id)}File" accept="image/*" ${multiple} hidden />
           <span class="img-insert__icon" aria-hidden="true">📷</span>
           <strong>${escapeHtml(label)}</strong>
-          <span class="img-insert__hint">Cliquez ou glissez une image ici (JPG, PNG, WEBP — max ${MAX_KB} Ko)</span>
+          <span class="img-insert__hint">Cliquez ou glissez une image ici (JPG, PNG, WEBP — compressée automatiquement)</span>
           <span class="btn btn--sm btn--gold img-insert__btn">Choisir un fichier</span>
         </label>
         <div class="img-insert__preview ${value ? 'is-visible' : ''}" id="${escapeHtml(id)}Preview"
-          ${value ? `style="background-image:url('${escapeHtml(value)}')"` : ''}>
+          ${value ? `style="background-image:url('${escapeHtml(global.ATStore ? ATStore.src(value) : value)}')"` : ''}>
           <button type="button" class="img-insert__clear" id="${escapeHtml(id)}Clear" title="Retirer">×</button>
         </div>
         <p class="img-insert__or">ou coller une URL</p>
@@ -81,7 +89,7 @@
     const setValue = (url) => {
       hidden.value = url || '';
       if (url) {
-        preview.style.backgroundImage = `url('${url}')`;
+        preview.style.backgroundImage = `url('${global.ATStore ? ATStore.src(url) : url}')`;
         preview.classList.add('is-visible');
       } else {
         preview.style.backgroundImage = '';
@@ -166,5 +174,31 @@
     return out;
   }
 
-  global.ATImageInsert = { markup, bind, readFile, readMany, MAX_KB };
+  /** Redimensionne une photo (côté max 1600 px, JPEG) pour tenir dans le stockage du navigateur */
+  function compressFile(file, maxSide = 1600, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      if (!file || !file.type.startsWith('image/')) {
+        reject(new Error('type'));
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('read'));
+      };
+      img.src = url;
+    });
+  }
+
+  global.ATImageInsert = { markup, bind, readFile, readMany, compressFile, MAX_KB };
 })(window);
