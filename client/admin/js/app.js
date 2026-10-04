@@ -80,10 +80,9 @@
       ATStore.ensureSeed();
       refresh();
       setPublishBadge(online ? 'published' : 'local');
-      const syncBookings = () => ATStore.remote.pullBookings().then((ok) => ok && refresh());
-      syncBookings();
-      setInterval(syncBookings, 60000);
+      ATNotify.start({ toast, showSection, refresh });
     });
+    document.addEventListener('click', ATNotify.askPermission, { once: true });
   }
 
   function showLogin() {
@@ -135,6 +134,7 @@
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const err = document.getElementById('loginError');
+    ATNotify.askPermission();
     const submit = e.target.querySelector('[type="submit"]');
     const label = submit?.textContent;
     if (submit) {

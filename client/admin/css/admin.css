@@ -209,6 +209,19 @@ a { color: var(--gold); }
   color: var(--gold-light);
 }
 
+.nav-badge {
+  margin-left: auto;
+  min-width: 20px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
 .sidebar__footer {
   margin-top: auto;
   padding-top: 16px;

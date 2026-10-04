@@ -104,6 +104,7 @@
       const updated = await ATStore.remote.api(`/admin/comments/${encodeURIComponent(id)}`, { method: 'PATCH', body: { status } });
       comments = comments.map((c) => (c.id === id ? { ...c, ...updated } : c));
       toast(status === 'approved' ? 'Commentaire publié sur le site' : 'Commentaire masqué sur le site');
+      global.ATNotify?.refreshComments();
     } catch (err) {
       toast(err.message === 'auth' ? 'Reconnectez-vous pour modérer' : 'Action impossible, réessayez');
     }
@@ -115,6 +116,7 @@
       await ATStore.remote.api(`/admin/comments/${encodeURIComponent(id)}`, { method: 'DELETE' });
       comments = comments.filter((c) => c.id !== id && c.parentId !== id);
       toast('Commentaire supprimé');
+      global.ATNotify?.refreshComments();
     } catch (err) {
       toast(err.message === 'auth' ? 'Reconnectez-vous pour modérer' : 'Action impossible, réessayez');
     }
