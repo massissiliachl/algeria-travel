@@ -284,6 +284,7 @@ export default {
   "place_activities": "Activités sur place",
   "place_activities_lead": "Expériences sélectionnées pour cette destination.",
   "place_book": "Réserver cette destination",
+  "place_booking_closed": "Réservations fermées pour le moment",
   "place_similar": "Autres destinations",
   "place_form_eyebrow": "Demande de réservation",
   "place_form_title": "Réserver",

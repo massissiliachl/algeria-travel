@@ -107,13 +107,13 @@ const derive = () => {
   };
 };
 
-const whatsappHref = place?.whatsapp
-  ? `https://wa.me/${place.whatsapp}?text=${encodeURIComponent(
-      `Bonjour, je souhaite réserver : ${place.pkgTitle || place.name} — ${place.name}${
-        place.dates ? ` (${place.dates})` : ''
-      }`
-    )}`
-  : null;
+/** Réservations ouvertes / fermées par l’admin (fiche destination → « Réservations en ligne ») */
+const bookingClosed = place?.bookingOpen === false;
+
+const bookCtaHtml = () =>
+  bookingClosed
+    ? `<button type="button" class="place-bookbar__cta" disabled aria-disabled="true">${esc(t('place_booking_closed'))}</button>`
+    : `<button type="button" class="place-bookbar__cta" data-book>${esc(t('place_book'))} ${icon('ArrowRight', 16)}</button>`;
 
 /* ── Sections ── */
 
@@ -177,13 +177,7 @@ const bookbarHtml = (d) => `
             <strong>${esc(d.offerDates)}</strong>
           </div>
         </div>
-        ${
-          whatsappHref
-            ? `<a class="place-bookbar__cta" href="${esc(whatsappHref)}" target="_blank" rel="noopener noreferrer">${esc(
-                t('place_whatsapp_book')
-              )} ${icon('ArrowRight', 16)}</a>`
-            : `<button type="button" class="place-bookbar__cta" data-book>${esc(t('place_book'))} ${icon('ArrowRight', 16)}</button>`
-        }
+        ${bookCtaHtml()}
       </div>
     </div>
   </section>`;
@@ -606,7 +600,7 @@ const openBooking = () => {
         date: form.date,
         travelers: form.travelers,
         stay: form.stay,
-        destination: pick(place.name, place.name_en, place.name_ar),
+        destination: place.pkgTitle ? `${place.name} — ${place.pkgTitle}` : place.name,
         message: form.message.trim(),
         source: 'place',
         itemType: 'place',
@@ -675,7 +669,7 @@ const render = () => {
     ${mobileBookingBar({
       priceLabel: d.priceLabel,
       price: d.priceDisplay,
-      ctaLabel: whatsappHref ? t('place_whatsapp_book') : t('place_book'),
+      ctaLabel: bookingClosed ? t('place_booking_closed') : t('place_book'),
       className: 'place-mobile-bar',
       ariaLabel: t('place_book'),
     })}
@@ -702,16 +696,8 @@ const bind = (root) => {
       openLightbox(derive().gallery, Number(shot.getAttribute('data-shot')));
       return;
     }
-    if (e.target.closest('[data-book]')) {
-      openBooking();
-      return;
-    }
-    if (e.target.closest('.mobile-booking-bar__btn')) {
-      if (whatsappHref) {
-        window.open(whatsappHref, '_blank', 'noopener,noreferrer');
-        return;
-      }
-      openBooking();
+    if (e.target.closest('[data-book]') || e.target.closest('.mobile-booking-bar__btn')) {
+      if (!bookingClosed) openBooking();
       return;
     }
     const link = e.target.closest('[data-href]');

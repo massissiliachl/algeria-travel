@@ -311,6 +311,12 @@
   transform: translateY(-1px);
 }
 
+.place-bookbar__cta:disabled {
+  background: #9CA3AF;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ── Main content ── */
 .place-main {
   padding: 48px 0 72px;

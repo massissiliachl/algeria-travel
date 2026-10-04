@@ -602,6 +602,7 @@ const applyAdminOverride = (place) => {
     image: override.image || place.image,
     description: override.description || place.description,
     gallery: gallery?.length ? gallery : place.image ? [place.image] : place.gallery,
+    bookingOpen: override.bookingOpen,
   };
 };
 
@@ -649,6 +650,7 @@ const placeFromAdmin = (d) => {
       { icon: 'Camera', fr: 'Paysages', en: 'Landscapes', ar: 'مناظر' },
       { icon: 'Heart', fr: 'Expérience locale', en: 'Local experience', ar: 'تجربة محلية' },
     ],
+    bookingOpen: d.bookingOpen,
     fromAdmin: true,
   };
 };

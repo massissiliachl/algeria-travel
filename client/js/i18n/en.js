@@ -284,6 +284,7 @@ export default {
   "place_activities": "Activities on site",
   "place_activities_lead": "Experiences selected for this destination.",
   "place_book": "Book this destination",
+  "place_booking_closed": "Bookings closed for now",
   "place_similar": "Other destinations",
   "place_form_eyebrow": "Booking request",
   "place_form_title": "Book",

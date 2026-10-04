@@ -239,6 +239,7 @@ export default {
   "place_activities": "أنشطة في الموقع",
   "place_activities_lead": "تجارب مختارة لهذه الوجهة.",
   "place_book": "احجز هذه الوجهة",
+  "place_booking_closed": "الحجز مغلق حالياً",
   "place_similar": "وجهات أخرى",
   "place_form_eyebrow": "طلب حجز",
   "place_form_title": "احجز",
