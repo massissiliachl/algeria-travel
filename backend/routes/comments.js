@@ -10,8 +10,28 @@ const {
   fetchApprovedThreads,
   handleCommentsDbError,
 } = require('../lib/comments');
+const { sendMail } = require('../lib/mail');
 
 const router = express.Router();
+
+const TYPE_LABELS = { gallery: 'photo de la galerie', place: 'destination', tour: 'circuit', activity: 'activité', stay: 'hébergement', hotel: 'hôtel' };
+
+function notifyAdminNewComment({ itemType, itemId, authorName, text }) {
+  const to = process.env.ADMIN_EMAIL || 'travelalgeriadz@gmail.com';
+  const panel = process.env.ADMIN_URL || 'http://algeriatravel.org/admin/';
+  return sendMail({
+    to,
+    subject: `Nouveau commentaire à valider — ${authorName}`,
+    text: [
+      `${authorName} a commenté (${TYPE_LABELS[itemType] || itemType} n° ${itemId}) :`,
+      '',
+      text,
+      '',
+      `Le commentaire est en attente : validez-le ou supprimez-le dans l’admin, onglet Commentaires.`,
+      panel,
+    ].join('\n'),
+  });
+}
 
 const commentsLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
@@ -95,6 +115,10 @@ router.post('/', commentsLimiter, requireClientId, async (req, res, next) => {
       createdAt: result.rows[0].created_at,
       message: 'Commentaire envoyé — visible après validation par notre équipe.',
     });
+
+    notifyAdminNewComment({ itemType, itemId, authorName, text }).catch((err) =>
+      console.warn('[Comments] Email admin échoué:', err.message)
+    );
   } catch (err) {
     next(handleCommentsDbError(err));
   }
