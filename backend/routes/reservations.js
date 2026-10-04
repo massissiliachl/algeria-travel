@@ -257,17 +257,16 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Date de voyage invalide.' });
     }
 
+    /* Taghit propose plusieurs formules (hôtel, maison d’hôte, Brezina…) à des dates différentes :
+       le séjour fixe 23 → 28 octobre n’est appliqué que si le visiteur choisit ce départ. */
+    let isTaghitFixedStay = false;
     if (itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place') {
       const { TAGHIT_BOOKING_WINDOW } = require('../scripts/data/taghitPackages.cjs');
-      const travelDay = String(effectiveTravelDate).slice(0, 10);
-      if (travelDay !== TAGHIT_BOOKING_WINDOW.start) {
-        return res.status(400).json({
-          error: 'Formule Taghit : séjour complet du 23 au 28 octobre uniquement (vol inclus).',
-        });
+      if (String(effectiveTravelDate).slice(0, 10) === TAGHIT_BOOKING_WINDOW.start) {
+        isTaghitFixedStay = true;
+        effectiveCheckIn = TAGHIT_BOOKING_WINDOW.start;
+        effectiveCheckOut = TAGHIT_BOOKING_WINDOW.end;
       }
-      effectiveCheckIn = TAGHIT_BOOKING_WINDOW.start;
-      effectiveCheckOut = TAGHIT_BOOKING_WINDOW.end;
-      effectiveTravelDate = TAGHIT_BOOKING_WINDOW.start;
     }
 
     const today = new Date();
@@ -285,9 +284,6 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Prix estimé invalide.' });
     }
     computedTotal = Math.round(computedTotal);
-
-    const isTaghitFixedStay =
-      itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place';
 
     const referenceCode = await createUniqueReference();
     const accessToken = generateAccessToken();
