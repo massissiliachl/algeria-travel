@@ -609,6 +609,9 @@ const openBooking = () => {
         destination: pick(place.name, place.name_en, place.name_ar),
         message: form.message.trim(),
         source: 'place',
+        itemType: 'place',
+        itemId: place.id,
+        unitPrice: place.price,
       });
     }
     state.sent = true;

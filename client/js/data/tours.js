@@ -438,10 +438,15 @@ const overrideText = (out, base, field, value) => {
   out[`${field}_ar`] = v;
 };
 
+/** Fiche d’origine du circuit : même id et même destination, ou même formule (pkg) sur la même destination */
+const findBase = (c) =>
+  BASE_TOURS.find((t) => String(t.id) === String(c.id) && (!c.placeSlug || t.placeSlug === c.placeSlug)) ||
+  (c.pkg ? BASE_TOURS.find((t) => t.pkg === c.pkg && t.placeSlug === c.placeSlug) : undefined);
+
 const fromAdmin = (c) => {
-  const base = BASE_TOURS.find((t) => String(t.id) === String(c.id));
+  const base = findBase(c);
   const out = base
-    ? { ...base }
+    ? { ...base, id: c.id }
     : { id: c.id, rating: 5, reviews: 0, activities: [], itinerary: [], category: 'desert' };
   overrideText(out, base || {}, 'name', c.name);
   overrideText(out, base || {}, 'subtitle', c.subtitle);
@@ -457,6 +462,7 @@ const fromAdmin = (c) => {
   if (c.image) out.image = c.image;
   if (c.category) out.category = c.category;
   if (c.placeSlug !== undefined) out.placeSlug = c.placeSlug || undefined;
+  if (c.pkg) out.pkg = c.pkg;
   out.priceOnRequest = Boolean(c.priceOnRequest);
   out.price = out.priceOnRequest ? 0 : Number(c.price) || 0;
   if (base && out.price !== base.price) delete out.oldPrice;

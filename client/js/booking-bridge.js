@@ -1,16 +1,16 @@
 /**
- * Bridge réservations — site public → serveur (api/bookings.php) + localStorage (lu par /admin/)
- * Expose window.ATBooking.create(payload)
+ * Bridge réservations — site public → backend Supabase (window.AT_API), sinon api/bookings.php (IONOS)
+ * + localStorage. Expose window.ATBooking.create(payload)
  */
 (function (global) {
   const KEY = 'at_bookings';
   const CLIENTS_KEY = 'at_clients';
-  const API = new URL('../api/bookings.php', document.currentScript?.src || location.href).href;
+  const PHP_API = new URL('../api/bookings.php', document.currentScript?.src || location.href).href;
 
-  function sendToServer(booking) {
+  function sendToPhp(booking) {
     const fields = ['id', 'name', 'email', 'phone', 'date', 'travelers', 'stay', 'destination', 'message', 'source'];
     const payload = Object.fromEntries(fields.map((f) => [f, booking[f]]));
-    fetch(API, {
+    return fetch(PHP_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking: payload }),
@@ -18,6 +18,48 @@
     }).catch(() => {
       /* serveur indisponible (dev local) : la réservation reste dans le navigateur */
     });
+  }
+
+  /** Demande de réservation enregistrée dans Supabase (POST /api/reservations) */
+  async function sendToBackend(booking, extra) {
+    if (!global.AT_API || !extra.itemId) return false;
+    try {
+      const { ok, data } = await global.AT_API.request('/reservations', {
+        method: 'POST',
+        body: {
+          item_type: extra.itemType || 'place',
+          item_id: String(extra.itemId),
+          item_name: booking.destination,
+          name: booking.name,
+          email: booking.email,
+          phone: booking.phone,
+          travel_date: booking.date,
+          travelers: Math.min(20, Math.max(1, parseInt(booking.travelers, 10) || 1)),
+          message: [booking.stay && `Hébergement : ${booking.stay}`, booking.message].filter(Boolean).join('\n'),
+          unit_price: Number(extra.unitPrice) || 0,
+          price_per_person: true,
+          gdpr_consent: true,
+          payment_method: 'pre_request',
+          website: '',
+        },
+      });
+      if (ok && data?.referenceCode) booking.ref = data.referenceCode;
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
+  function sendToServer(booking, extra) {
+    sendToBackend(booking, extra).then((saved) => {
+      if (saved) updateStored(booking);
+      else sendToPhp(booking);
+    });
+  }
+
+  function updateStored(booking) {
+    const list = read(KEY, []).map((b) => (b.id === booking.id ? { ...b, ref: booking.ref } : b));
+    write(KEY, list);
   }
 
   function read(key, fallback) {
@@ -91,7 +133,7 @@
       list.unshift(booking);
       write(KEY, list);
       syncClient(booking);
-      sendToServer(booking);
+      sendToServer(booking, data);
       return booking;
     },
   };

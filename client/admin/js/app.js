@@ -48,7 +48,7 @@
 
   const PUBLISH_LABELS = {
     local: ['is-local', 'Mode local — non publié (serveur indisponible)'],
-    pending: ['is-pending', 'Publication…'],
+    pending: ['is-pending', 'Synchronisation avec la base…'],
     published: ['is-ok', 'Publié sur le site ✓'],
     error: ['is-error', 'Échec de la publication — réessayez'],
     auth: ['is-error', 'Session expirée — reconnectez-vous pour publier'],
@@ -75,18 +75,14 @@
     ATStore.ensureSeed();
     refresh();
     ATStore.probeImageBase().then(refresh);
+    setPublishBadge('pending');
     ATStore.remote.pull().then((online) => {
-      if (online && !ATStore.remote.pass()) {
-        ATAuth.logout();
-        showLogin();
-        return;
-      }
       ATStore.ensureSeed();
       refresh();
       setPublishBadge(online ? 'published' : 'local');
-      if (!online) return;
-      ATStore.remote.pullBookings().then((ok) => ok && refresh());
-      setInterval(() => ATStore.remote.pullBookings().then((ok) => ok && refresh()), 60000);
+      const syncBookings = () => ATStore.remote.pullBookings().then((ok) => ok && refresh());
+      syncBookings();
+      setInterval(syncBookings, 60000);
     });
   }
 
@@ -136,10 +132,21 @@
     document.getElementById('galleryGrid').innerHTML = ATManageUI.renderGallery();
   }
 
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const err = document.getElementById('loginError');
-    if (ATAuth.login(document.getElementById('loginUser').value, document.getElementById('loginPass').value)) {
+    const submit = e.target.querySelector('[type="submit"]');
+    const label = submit?.textContent;
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = 'Connexion… (réveil du serveur, jusqu’à 1 min)';
+    }
+    const { ok } = await ATAuth.login(document.getElementById('loginUser').value, document.getElementById('loginPass').value);
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = label;
+    }
+    if (ok) {
       err.classList.remove('is-visible');
       showApp();
     } else {

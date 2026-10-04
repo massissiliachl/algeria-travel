@@ -42,6 +42,7 @@ export default {
   "gallery_name_placeholder": "Your first name (optional)",
   "gallery_comment_too_many": "Too many comments sent. Please try again in a few minutes.",
   "gallery_comment_error": "Could not send your comment. Please try again.",
+  "gallery_comment_pending": "Thank you! Your comment will appear once approved by our team.",
   "contact_hero_title": "Contact",
   "contact_hero_title_span": " us",
   "contact_hero_desc": "A question? A travel project? Our team is here for you",

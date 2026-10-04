@@ -3,6 +3,7 @@
     new: 'Nouvelle',
     contacted: 'Contactée',
     confirmed: 'Confirmée',
+    rejected: 'Refusée',
     cancelled: 'Annulée',
   };
 
@@ -80,7 +81,10 @@
       <p>Destination : <strong>${escapeHtml(b.destination || '—')}</strong><br>
       Date : ${escapeHtml(b.date || '—')}<br>
       Voyageurs : ${escapeHtml(String(b.travelers || '—'))}<br>
-      Hébergement : ${escapeHtml(b.stay || '—')}</p>
+      Hébergement : ${escapeHtml(b.stay || '—')}
+      ${b.price != null ? `<br>Prix estimé : ${escapeHtml(Number(b.price).toLocaleString('fr-FR'))} DA` : ''}
+      ${b.ref ? `<br>Référence : <strong>${escapeHtml(b.ref)}</strong>` : ''}</p>
+      <p><small>${b.remote === 'db' ? 'Enregistrée dans la base Supabase' : 'Reçue via le serveur IONOS (contact ou demande hors base)'}</small></p>
       <p>${escapeHtml(b.message || '')}</p>
       <div class="field" style="margin-top:16px">
         <label for="bkStatus">Statut</label>
@@ -99,7 +103,7 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn--primary" style="width:auto" id="bkSave">Enregistrer</button>
-        <button type="button" class="btn btn--danger" id="bkDelete">Supprimer</button>
+        ${b.remote === 'db' ? '' : '<button type="button" class="btn btn--danger" id="bkDelete">Supprimer</button>'}
       </div>
     `);
 
@@ -112,7 +116,8 @@
       document.dispatchEvent(new CustomEvent('at:refresh'));
       document.getElementById('drawer').classList.remove('is-open');
     };
-    document.getElementById('bkDelete').onclick = () => {
+    const del = document.getElementById('bkDelete');
+    if (del) del.onclick = () => {
       if (!confirm('Supprimer cette réservation ?')) return;
       ATStore.deleteBooking(id);
       toast('Réservation supprimée');

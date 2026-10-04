@@ -30,6 +30,7 @@ export default {
   "gallery_name_placeholder": "اسمك (اختياري)",
   "gallery_comment_too_many": "تم إرسال تعليقات كثيرة. حاول مجدداً بعد بضع دقائق.",
   "gallery_comment_error": "تعذّر إرسال التعليق. حاول مجدداً.",
+  "gallery_comment_pending": "شكراً! سيظهر تعليقك بعد موافقة فريقنا.",
   "nav_contact": "اتصل بنا",
   "nav_tours": "الجولات",
   "nav_activities": "الأنشطة",

@@ -334,10 +334,10 @@ const readAdminActivities = () => {
   }
 };
 
-const setAllLangs = (out, field, value) => {
+const setAllLangs = (out, field, value, en, ar) => {
   out[field] = value;
-  out[`${field}_en`] = value;
-  out[`${field}_ar`] = value;
+  out[`${field}_en`] = String(en ?? '').trim() || value;
+  out[`${field}_ar`] = String(ar ?? '').trim() || value;
 };
 
 /** Lieux et circuits liés, affichés comme « Lieu » sur la fiche activité */
@@ -367,11 +367,11 @@ const fromAdmin = (a) => {
         included_ar: [],
       };
   const name = String(a.name ?? '').trim();
-  if (name && name !== base?.name) setAllLangs(out, 'name', name);
+  if (name && name !== base?.name) setAllLangs(out, 'name', name, a.nameEn, a.nameAr);
   const desc = String(a.description ?? '').trim();
   if (desc && desc !== base?.desc) {
-    setAllLangs(out, 'desc', desc);
-    setAllLangs(out, 'fullDesc', desc);
+    setAllLangs(out, 'desc', desc, a.descriptionEn, a.descriptionAr);
+    setAllLangs(out, 'fullDesc', desc, a.descriptionEn, a.descriptionAr);
   }
   if (a.price !== undefined && a.price !== '') out.price = Number(a.price) || 0;
   if (a.image) {

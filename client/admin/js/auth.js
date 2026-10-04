@@ -1,6 +1,7 @@
 /**
  * Auth admin — sessionStorage
- * Identifiants par défaut : admin / AlgeriaTravel2026
+ * Identifiant : admin. Mot de passe : la clé ADMIN_API_KEY du backend (vérifiée par le serveur).
+ * Si le backend est injoignable, l’ancien mot de passe local ouvre l’admin en mode local (sans publication).
  */
 (function (global) {
   const AUTH_KEY = 'at_admin_auth';
@@ -9,24 +10,42 @@
     pass: 'AlgeriaTravel2026',
   };
 
+  function open(pass, online) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    sessionStorage.setItem('at_admin_pass', pass);
+    if (online) sessionStorage.setItem(global.AT_API.ADMIN_KEY, pass);
+    else sessionStorage.removeItem(global.AT_API.ADMIN_KEY);
+  }
+
   const Auth = {
     isLoggedIn() {
       return sessionStorage.getItem(AUTH_KEY) === '1';
     },
-    login(user, pass) {
-      if (
-        user.trim().toLowerCase() === CREDENTIALS.user &&
-        pass === CREDENTIALS.pass
-      ) {
-        sessionStorage.setItem(AUTH_KEY, '1');
-        sessionStorage.setItem('at_admin_pass', pass);
-        return true;
+    /** Résout { ok, online } */
+    async login(user, pass) {
+      if (user.trim().toLowerCase() !== CREDENTIALS.user || !pass) return { ok: false };
+      try {
+        const { ok, status } = await global.AT_API.request('/admin/auth/verify', {
+          method: 'POST',
+          body: { key: pass },
+          timeout: 70000,
+        });
+        if (ok) {
+          open(pass, true);
+          return { ok: true, online: true };
+        }
+        if (status === 401) return { ok: false };
+      } catch {
+        /* backend injoignable : mode local */
       }
-      return false;
+      if (pass !== CREDENTIALS.pass) return { ok: false };
+      open(pass, false);
+      return { ok: true, online: false };
     },
     logout() {
       sessionStorage.removeItem(AUTH_KEY);
       sessionStorage.removeItem('at_admin_pass');
+      sessionStorage.removeItem(global.AT_API.ADMIN_KEY);
     },
   };
 

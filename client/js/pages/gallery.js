@@ -24,45 +24,35 @@ const INIT_IMAGES = [
   { id: 15, src: '/images/visitekseurs.webp', likes: 331, dislikes: 5, comments: [] },
 ];
 
-const STORAGE_KEY = 'gallery_reactions_v3';
 const NAME_KEY = 'gallery_comment_name';
-const COMMENTS_API = new URL('../../api/comments.php', import.meta.url);
-
 const ADMIN_GALLERY_KEY = 'at_gallery';
+const api = window.AT_API;
 
-const loadReactions = () => {
+const toImage = (g) => ({
+  id: g.id,
+  src: g.src,
+  likes: Number(g.likes) || 0,
+  dislikes: Number(g.dislikes) || 0,
+  userReaction: g.userReaction || null,
+  comments: [],
+  commentsLoaded: false,
+});
+
+/** Photos publiées (Supabase, copiées dans localStorage par siteContent.js), sinon photos d’origine */
+const loadImages = () => {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length) return parsed;
-    } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INIT_IMAGES));
-    }
+    const list = JSON.parse(localStorage.getItem(ADMIN_GALLERY_KEY) || 'null');
+    if (Array.isArray(list) && list.length) return list.map(toImage);
   } catch {
     /* stockage indisponible */
   }
-  return INIT_IMAGES;
-};
-
-/** Liste des photos gérée par l’admin (si définie), avec les likes / commentaires déjà enregistrés */
-const loadImages = () => {
-  const reactions = loadReactions();
-  let adminList = null;
-  try {
-    adminList = JSON.parse(localStorage.getItem(ADMIN_GALLERY_KEY) || 'null');
-  } catch {
-    adminList = null;
-  }
-  if (!Array.isArray(adminList)) return reactions;
-  return adminList.map((g) => {
-    const known = reactions.find((r) => r.src === g.src);
-    return known ? { ...known, id: g.id } : { id: g.id, src: g.src, likes: 0, dislikes: 0, comments: [] };
-  });
+  return INIT_IMAGES.map(toImage);
 };
 
 const state = {
   images: loadImages(),
+  /** true quand les photos viennent du backend : likes et commentaires y sont enregistrés */
+  online: false,
   selectedIndex: null,
   ready: false,
   commentText: '',
@@ -73,7 +63,6 @@ const state = {
       return '';
     }
   })(),
-  commentsOnline: false,
   sending: false,
   showComments: false,
   burst: [],
@@ -86,13 +75,8 @@ let burstTimer = null;
 const pulseTimers = {};
 let galIo = null;
 
-const save = (next) => {
-  state.images = next;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    /* ignore */
-  }
+const patchImage = (id, patch) => {
+  state.images = state.images.map((i) => (i.id === id ? { ...i, ...patch } : i));
 };
 
 const currentImage = () => (state.selectedIndex !== null ? state.images[state.selectedIndex] : null);
@@ -121,12 +105,16 @@ const burstHtml = () =>
     .join('');
 
 const reactHtml = (img) => `
-  <button type="button" class="gal-react__btn gal-react__btn--like ${state.pulse.like ? 'is-pop' : ''}" data-gal-like>
+  <button type="button" class="gal-react__btn gal-react__btn--like ${state.pulse.like ? 'is-pop' : ''} ${
+    img.userReaction === 'like' ? 'is-on' : ''
+  }" aria-pressed="${img.userReaction === 'like'}" data-gal-like>
     <span class="gal-react__3d">${icon('Heart', 20)}</span>
     <span class="gal-react__count ${state.pulse.like ? 'is-flip' : ''}">${img.likes}</span>
   </button>
 
-  <button type="button" class="gal-react__btn gal-react__btn--dislike ${state.pulse.dislike ? 'is-pop' : ''}" data-gal-dislike>
+  <button type="button" class="gal-react__btn gal-react__btn--dislike ${state.pulse.dislike ? 'is-pop' : ''} ${
+    img.userReaction === 'dislike' ? 'is-on' : ''
+  }" aria-pressed="${img.userReaction === 'dislike'}" data-gal-dislike>
     <span class="gal-react__3d">${icon('ThumbsDown', 18)}</span>
     <span class="gal-react__count ${state.pulse.dislike ? 'is-flip' : ''}">${img.dislikes}</span>
   </button>
@@ -275,6 +263,7 @@ const setSelected = (index) => {
   if (index !== null && !wasOpen) lockScroll();
   if (index === null && wasOpen) unlockScroll();
   paintLightbox();
+  if (index !== null) loadComments(currentImage());
 };
 
 const goPrev = () => {
@@ -315,42 +304,89 @@ const triggerPulse = (key) => {
   }, 650);
 };
 
-const react = (key) => {
+/** Like / dislike enregistré dans Supabase (un vote par visiteur ; recliquer retire le vote) */
+const react = async (key) => {
   const img = currentImage();
   if (!img) return;
-  const field = key === 'like' ? 'likes' : 'dislikes';
   spawnBurst(key);
   triggerPulse(key);
-  save(state.images.map((i) => (i.id === img.id ? { ...i, [field]: (i[field] || 0) + 1 } : i)));
+  if (!state.online) return;
+
+  const field = key === 'like' ? 'likes' : 'dislikes';
+  const other = key === 'like' ? 'dislikes' : 'likes';
+  const removing = img.userReaction === key;
+  const before = { likes: img.likes, dislikes: img.dislikes, userReaction: img.userReaction };
+  patchImage(img.id, {
+    [field]: Math.max(0, img[field] + (removing ? -1 : 1)),
+    [other]: img.userReaction && !removing ? Math.max(0, img[other] - 1) : img[other],
+    userReaction: removing ? null : key,
+  });
+  paintReact();
+  paintCellLikes(img.id);
+
+  try {
+    const { ok, data } = await api.request(`/gallery/${img.id}/reaction`, { method: 'POST', body: { reaction: key } });
+    if (ok && data) patchImage(img.id, { likes: data.likes, dislikes: data.dislikes, userReaction: data.userReaction });
+    else patchImage(img.id, before);
+  } catch {
+    patchImage(img.id, before);
+  }
   paintReact();
   paintCellLikes(img.id);
 };
 
-/* ── Commentaires partagés (api/comments.php), modérés depuis l’admin ── */
+/** Photos, compteurs et vote du visiteur depuis le backend */
+const loadServerGallery = async () => {
+  if (!api) return;
+  try {
+    const { ok, data } = await api.request('/gallery');
+    if (!ok || !Array.isArray(data) || !data.length) return;
+    const sameList = data.length === state.images.length && data.every((g, i) => g.id === state.images[i].id);
+    const previous = new Map(state.images.map((i) => [i.id, i]));
+    state.images = data.map((g) => {
+      const known = previous.get(g.id);
+      return { ...toImage(g), comments: known?.comments || [], commentsLoaded: Boolean(known?.commentsLoaded && sameList) };
+    });
+    state.online = true;
+    localStorage.setItem(ADMIN_GALLERY_KEY, JSON.stringify(api.toLocal.gallery(data)));
+    if (!sameList) {
+      $('.gal-bento').innerHTML = state.images.map(cellHtml).join('');
+      observeCells();
+      if (state.selectedIndex !== null) setSelected(null);
+    } else {
+      state.images.forEach((img) => paintCellLikes(img.id));
+      if (state.selectedIndex !== null) paintReact();
+    }
+    if (state.selectedIndex !== null && state.showComments) loadComments(currentImage());
+  } catch {
+    /* serveur indisponible : photos affichées sans likes partagés */
+  }
+};
+
+/* ── Commentaires (Supabase), visibles après validation par l’admin ── */
 
 const toViewComment = (c) => ({
   id: c.id,
-  user: c.name || 'Voyageur',
-  text: c.text,
+  user: c.authorName || 'Voyageur',
+  text: c.body,
   date: new Date(c.createdAt).toLocaleDateString(),
 });
 
-const loadServerComments = async () => {
+const flattenComments = (items) =>
+  items.flatMap((c) => [toViewComment(c), ...flattenComments(Array.isArray(c.replies) ? c.replies : [])]);
+
+const loadComments = async (img) => {
+  if (!img || !state.online || img.commentsLoaded) return;
   try {
-    const res = await fetch(COMMENTS_API, { cache: 'no-store' });
-    const data = res.ok ? await res.json() : null;
-    if (!Array.isArray(data?.comments)) return;
-    state.commentsOnline = true;
-    state.images = state.images.map((img) => ({
-      ...img,
-      comments: data.comments.filter((c) => c.src === img.src).map(toViewComment),
-    }));
-    if (state.selectedIndex !== null) {
+    const { ok, data } = await api.request(`/comments?item_type=gallery&item_id=${encodeURIComponent(img.id)}`);
+    if (!ok || !Array.isArray(data?.items)) return;
+    patchImage(img.id, { comments: flattenComments(data.items), commentsLoaded: true });
+    if (currentImage()?.id === img.id) {
       paintReact();
       paintComments();
     }
   } catch {
-    /* serveur indisponible (dev local) : commentaires du navigateur */
+    /* serveur indisponible */
   }
 };
 
@@ -364,36 +400,27 @@ const addComment = async () => {
   } catch {
     /* ignore */
   }
-
-  let comment = { id: Date.now(), user: name || 'Voyageur', text, date: new Date().toLocaleDateString() };
-  if (state.commentsOnline) {
-    state.sending = true;
-    paintComments();
-    try {
-      const res = await fetch(COMMENTS_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ src: img.src, name, text }),
-      });
-      const data = await res.json().catch(() => null);
-      if (res.status === 429) throw new Error(t('gallery_comment_too_many'));
-      if (!res.ok || !data?.comment) throw new Error(t('gallery_comment_error'));
-      comment = toViewComment(data.comment);
-    } catch (err) {
-      state.sending = false;
-      paintComments();
-      alert(err.message);
-      return;
-    }
-    state.sending = false;
+  if (!state.online) {
+    alert(t('gallery_comment_error'));
+    return;
   }
 
-  const next = state.images.map((i) => (i.id === img.id ? { ...i, comments: [comment, ...(i.comments || [])] } : i));
-  if (state.commentsOnline) state.images = next;
-  else save(next);
-  state.commentText = '';
+  state.sending = true;
   paintComments();
-  paintReact();
+  try {
+    const { ok, status, data } = await api.request('/comments', {
+      method: 'POST',
+      body: { item_type: 'gallery', item_id: String(img.id), body: text, author_name: name.length >= 2 ? name : 'Voyageur' },
+    });
+    if (status === 429) throw new Error(t('gallery_comment_too_many'));
+    if (!ok) throw new Error(data?.error || t('gallery_comment_error'));
+    state.commentText = '';
+    alert(t('gallery_comment_pending'));
+  } catch (err) {
+    alert(err.name === 'AbortError' || err instanceof TypeError ? t('gallery_comment_error') : err.message);
+  }
+  state.sending = false;
+  paintComments();
 };
 
 /* ── Apparition des cellules ── */
@@ -451,7 +478,7 @@ const bind = (el) => {
     if (e.key === 'ArrowRight') goNext();
   });
 
-  loadServerComments();
+  loadServerGallery();
 
   root.addEventListener('input', (e) => {
     if (e.target.matches('[data-gal-name]')) {
@@ -483,6 +510,7 @@ const bind = (el) => {
       state.showComments = !state.showComments;
       paintReact();
       paintComments();
+      if (state.showComments) loadComments(currentImage());
       return;
     }
     if (e.target.closest('[data-gal-send]')) return addComment();

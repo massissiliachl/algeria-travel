@@ -656,6 +656,11 @@ const placeFromAdmin = (d) => {
 export const getPlaces = () => {
   const adminList = readAdminDestinations() || [];
   const archived = new Set(adminList.filter((d) => d.active === false).map((d) => d.id));
+  /* Supabase ne renvoie pas les destinations archivées : une fiche d’origine absente de la liste est masquée */
+  if (adminList.some((d) => d.synced)) {
+    const listed = new Set(adminList.map((d) => d.id));
+    PLACES.filter((p) => p.id !== 'tadrart' && !listed.has(p.id)).forEach((p) => archived.add(p.id));
+  }
   const baseIds = new Set(PLACES.map((p) => p.id));
 
   const base = PLACES.filter((p) => !archived.has(p.id))

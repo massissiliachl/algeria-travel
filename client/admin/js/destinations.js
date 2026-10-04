@@ -119,6 +119,13 @@
             <option value="false" ${d.active === false ? 'selected' : ''}>Non (archivée)</option>
           </select>
         </div>
+        <div class="field">
+          <label>Réservations en ligne</label>
+          <select name="bookingOpen">
+            <option value="true" ${d.bookingOpen ? 'selected' : ''}>Ouvertes</option>
+            <option value="false" ${!d.bookingOpen ? 'selected' : ''}>Fermées</option>
+          </select>
+        </div>
         <div class="form-actions full">
           <button type="submit" class="btn btn--primary" style="width:auto">Enregistrer la destination</button>
           ${
@@ -224,6 +231,7 @@
           gallery: galleryUrls,
           description: String(fd.get('description') || '').trim(),
           active: fd.get('active') === 'true',
+          bookingOpen: fd.get('bookingOpen') === 'true',
         });
       } catch (err) {
         toast(

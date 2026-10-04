@@ -26,12 +26,36 @@ function read_content(): array
     return is_array($json) ? $json : [];
 }
 
+/** Clé admin acceptée par le backend (résultat positif mis en cache 1 h, sous forme de hash) */
+function backend_accepts(string $key): bool
+{
+    $cache = DATA_DIR . '/admin-key.json';
+    $hash = hash('sha256', $key);
+    $saved = is_file($cache) ? json_decode((string) file_get_contents($cache), true) : null;
+    if (is_array($saved) && ($saved['hash'] ?? '') === $hash && ($saved['until'] ?? 0) > time()) return true;
+
+    $context = stream_context_create(['http' => [
+        'method' => 'POST',
+        'header' => "Content-Type: application/json\r\n",
+        'content' => json_encode(['key' => $key]),
+        'timeout' => 70,
+        'ignore_errors' => true,
+    ]]);
+    $raw = @file_get_contents(BACKEND_API . '/admin/auth/verify', false, $context);
+    $reply = is_string($raw) ? json_decode($raw, true) : null;
+    $ok = is_array($reply) && ($reply['valid'] ?? false) === true;
+    if ($ok && (is_dir(DATA_DIR) || mkdir(DATA_DIR, 0755, true))) {
+        file_put_contents($cache, json_encode(['hash' => $hash, 'until' => time() + 3600]));
+    }
+    return $ok;
+}
+
 function require_admin(): void
 {
     $pass = $_SERVER['HTTP_X_ADMIN_PASS'] ?? '';
-    if (!is_string($pass) || !hash_equals(ADMIN_PASSWORD, $pass)) {
-        respond(['error' => 'unauthorized'], 401);
-    }
+    if (!is_string($pass) || $pass === '') respond(['error' => 'unauthorized'], 401);
+    if (hash_equals(ADMIN_PASSWORD, $pass) || backend_accepts($pass)) return;
+    respond(['error' => 'unauthorized'], 401);
 }
 
 function read_json_body(int $maxBytes): array

@@ -1,23 +1,24 @@
 /**
- * Contenus publiés par l’admin (galerie, circuits, destinations, activités) : récupérés sur le serveur
- * avant que les pages ne lisent localStorage. Sans serveur PHP (dev local), rien ne change.
+ * Contenus publiés par l’admin (galerie, circuits, destinations, activités) : lus dans Supabase
+ * (backend Render) avant que les pages ne lisent localStorage. Si le serveur dort ou ne répond pas,
+ * on garde les dernières données connues et la mise à jour finit en arrière-plan pour la visite suivante.
  */
 
-const API = new URL('../../api/content.php', import.meta.url);
-const KEYS = ['at_gallery', 'at_circuits', 'at_destinations', 'at_activities'];
+const WAIT_MS = 4000;
 
-try {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
-  const res = await fetch(API, { cache: 'no-store', signal: controller.signal });
-  clearTimeout(timer);
-  const data = res.ok ? await res.json() : null;
-  if (data && typeof data.content === 'object' && data.content) {
-    KEYS.forEach((key) => {
-      if (key in data.content) localStorage.setItem(key, JSON.stringify(data.content[key]));
-      else localStorage.removeItem(key);
-    });
-  }
-} catch {
+const syncAll = async () => {
+  const api = window.AT_API;
+  if (!api) return;
+  await Promise.all(
+    Object.entries(api.RESOURCES).map(async ([key, { path, type }]) => {
+      const { ok, data } = await api.request(`/${path}`);
+      if (!ok || !Array.isArray(data)) return;
+      localStorage.setItem(key, JSON.stringify(api.toLocal[type](data)));
+    })
+  );
+};
+
+const sync = syncAll().catch(() => {
   /* serveur indisponible : on garde les données locales */
-}
+});
+await Promise.race([sync, new Promise((resolve) => setTimeout(resolve, WAIT_MS))]);

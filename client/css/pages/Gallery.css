@@ -546,7 +546,9 @@
   border-color: rgba(154, 163, 178, 0.7);
 }
 
-.gal-react__btn--comment.is-on {
+.gal-react__btn--comment.is-on,
+.gal-react__btn--like.is-on,
+.gal-react__btn--dislike.is-on {
   border-color: var(--gold);
   background: rgba(184, 147, 93, 0.22);
 }

@@ -147,35 +147,120 @@
     if (Remote.published.includes(key)) Remote.schedule(key);
   }
 
+  const API = global.AT_API;
+  const IMPORT_FLAG = 'at_backend_imported_v1';
+
+  /** Statuts des réservations Supabase ↔ statuts affichés dans l’admin */
+  const STATUS_FROM_DB = { pending: 'new', reviewed: 'contacted', confirmed: 'confirmed', rejected: 'rejected', cancelled: 'cancelled' };
+  const STATUS_TO_DB = { new: 'pending', contacted: 'reviewed', confirmed: 'confirmed', rejected: 'rejected', cancelled: 'cancelled' };
+
+  const day = (iso) => (iso ? String(iso).slice(0, 10) : '');
+  const normName = (s) =>
+    String(s || '')
+      .normalize('NFD')
+      .replace(/[^a-z0-9]/gi, '')
+      .toLowerCase();
+
+  function fromReservation(r) {
+    return {
+      id: r.id,
+      remote: 'db',
+      ref: r.referenceCode || '',
+      status: STATUS_FROM_DB[r.status] || 'new',
+      notes: r.adminNotes || '',
+      createdAt: r.createdAt,
+      name: r.clientName || '',
+      email: r.clientEmail || '',
+      phone: r.clientPhone || '',
+      date: r.checkInDate && r.checkOutDate ? `${day(r.checkInDate)} → ${day(r.checkOutDate)}` : day(r.travelDate),
+      travelers: r.travelers || '',
+      stay: r.stayType || '',
+      destination: r.itemName || '',
+      message: r.message || '',
+      price: r.priceEstimate,
+      source: 'site',
+    };
+  }
+
   /**
-   * Publication sur le serveur IONOS (client/api/*.php) : les contenus publiés
-   * sont visibles par tous les visiteurs. Sans PHP (dev local), l’admin reste en mode local.
+   * Publication dans Supabase via le backend (window.AT_API, clé admin) : destinations, circuits,
+   * activités et galerie sont visibles par tous les visiteurs. Les photos sont stockées sur IONOS
+   * (api/upload.php → /uploads/), les réservations reçues en secours aussi (api/bookings.php).
    */
   const Remote = {
-    api: '../api/',
+    php: '../api/',
     enabled: false,
-    published: ['at_gallery', 'at_circuits', 'at_destinations', 'at_activities'],
+    phpOk: false,
+    published: Object.keys(API.RESOURCES),
     onStatus: () => {},
     uploads: new Map(),
     timers: {},
     chains: {},
+    /** Dernier état connu du serveur : clé localStorage → Map(id → corps JSON envoyé) */
+    snap: {},
 
     pass() {
       return sessionStorage.getItem('at_admin_pass') || '';
     },
 
+    async api(path, opts = {}) {
+      const res = await API.request(path, { ...opts, admin: true });
+      if (res.status === 401) throw new Error('auth');
+      if (!res.ok) throw Object.assign(new Error(res.data?.error || 'http'), { status: res.status });
+      return res.data;
+    },
+
+    bodyOf(key, item, index) {
+      return API.toApi[API.RESOURCES[key].type](item, index);
+    },
+
+    remember(key, list) {
+      Remote.snap[key] = new Map(list.map((item, i) => [String(item.id), JSON.stringify(Remote.bodyOf(key, item, i))]));
+    },
+
+    /** Éléments présents seulement dans ce navigateur (première connexion au backend) */
+    missingOnServer(key, local, server) {
+      if (!Array.isArray(local)) return [];
+      if (key === 'at_gallery') {
+        const srcs = new Set(server.map((g) => g.src));
+        return local.filter((g) => g.src && !srcs.has(g.src)).map((g) => ({ ...g, id: uid('new') }));
+      }
+      if (key === 'at_circuits') {
+        const same = (s, l) =>
+          normName(s.name) === normName(l.name) ||
+          (String(s.id) === String(l.id) && (!s.placeSlug || !l.placeSlug || s.placeSlug === l.placeSlug));
+        return local
+          .filter((l) => l.name && !server.some((s) => same(s, l)))
+          .map((l) => ({ ...l, id: uid('tour'), pkg: l.pkg || SEED_TOURS.find((s) => s.id === l.id)?.pkg || '' }));
+      }
+      const ids = new Set(server.map((x) => String(x.id)));
+      return local.filter((x) => x.id && !ids.has(String(x.id)));
+    },
+
     async pull() {
+      if (!API.adminKey()) return false;
       try {
-        const res = await fetch(Remote.api + 'content.php', { cache: 'no-store' });
-        const data = res.ok ? await res.json() : null;
-        if (!data || typeof data.content !== 'object' || !data.content) return false;
+        const results = await Promise.all(
+          Remote.published.map(async (key) => {
+            const { path, type } = API.RESOURCES[key];
+            const data = await Remote.api(`/admin/${path}`);
+            let items = Array.isArray(data?.items) ? data.items : [];
+            if (key === 'at_gallery') items = [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.id - b.id);
+            return [key, API.toLocal[type](items)];
+          })
+        );
+        const firstSync = !localStorage.getItem(IMPORT_FLAG);
         Remote.enabled = true;
-        Remote.published.forEach((key) => {
-          if (key in data.content) localStorage.setItem(key, JSON.stringify(data.content[key]));
-          else if (localStorage.getItem(key)) Remote.schedule(key);
+        results.forEach(([key, list]) => {
+          const missing = firstSync ? Remote.missingOnServer(key, read(key, null), list) : [];
+          Remote.remember(key, list);
+          localStorage.setItem(key, JSON.stringify([...list, ...missing]));
+          if (missing.length) Remote.schedule(key);
         });
+        localStorage.setItem(IMPORT_FLAG, '1');
         return true;
-      } catch {
+      } catch (err) {
+        if (err.message === 'auth') Remote.onStatus('auth');
         return false;
       }
     },
@@ -209,8 +294,9 @@
       return value;
     },
 
+    /** Requête vers le PHP d’IONOS (upload des photos, réservations de secours) */
     async request(file, body) {
-      const res = await fetch(Remote.api + file, {
+      const res = await fetch(Remote.php + file, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Admin-Pass': Remote.pass() },
         body: JSON.stringify(body),
@@ -220,32 +306,68 @@
       return res.json();
     },
 
-    /** Réservations envoyées par les formulaires du site (api/bookings.php) */
-    async pullBookings() {
-      if (!Remote.enabled || !Remote.pass()) return false;
+    /** Réservations Supabase ; null si le backend ne répond pas */
+    async pullDbBookings() {
+      if (!Remote.enabled) return null;
       try {
-        const res = await fetch(Remote.api + 'bookings.php', {
-          cache: 'no-store',
-          headers: { 'X-Admin-Pass': Remote.pass() },
-        });
-        if (res.status === 401) {
-          Remote.onStatus('auth');
-          return false;
-        }
-        const data = res.ok ? await res.json() : null;
-        if (!Array.isArray(data?.bookings)) return false;
-        const known = new Set(read(KEYS.bookings, []).map((b) => b.id));
-        localStorage.setItem(KEYS.bookings, JSON.stringify(data.bookings));
-        data.bookings.filter((b) => !known.has(b.id)).forEach((b) => Store.syncClientFromBooking(b));
-        return true;
-      } catch {
-        return false;
+        const data = await Remote.api('/admin/reservations?status=all');
+        return Array.isArray(data?.reservations) ? data.reservations.map(fromReservation) : null;
+      } catch (err) {
+        if (err.message === 'auth') Remote.onStatus('auth');
+        return null;
       }
     },
 
+    /** Messages du formulaire de contact et réservations de secours (api/bookings.php) ; null si indisponible */
+    async pullPhpBookings() {
+      if (!Remote.pass()) return null;
+      try {
+        const res = await fetch(Remote.php + 'bookings.php', {
+          cache: 'no-store',
+          headers: { 'X-Admin-Pass': Remote.pass() },
+        });
+        const data = res.ok ? await res.json() : null;
+        if (!Array.isArray(data?.bookings)) return null;
+        Remote.phpOk = true;
+        return data.bookings;
+      } catch {
+        return null;
+      }
+    },
+
+    async pullBookings() {
+      const [db, php] = await Promise.all([Remote.pullDbBookings(), Remote.pullPhpBookings()]);
+      if (db === null && php === null) return false;
+      const current = read(KEYS.bookings, []);
+      const merged = [
+        ...(db || current.filter((b) => b.remote === 'db')),
+        ...(php || current.filter((b) => b.remote !== 'db')),
+      ].sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+      const known = new Set(current.map((b) => b.id));
+      localStorage.setItem(KEYS.bookings, JSON.stringify(merged));
+      merged.filter((b) => !known.has(b.id)).forEach((b) => Store.syncClientFromBooking(b));
+      return true;
+    },
+
     bookingAction(body) {
-      if (!Remote.enabled) return;
+      if (!Remote.phpOk) return;
       Remote.request('bookings.php', body).catch((err) => Remote.onStatus(err.message === 'auth' ? 'auth' : 'error'));
+    },
+
+    updateDbBooking(id, patch) {
+      if (!Remote.enabled) return;
+      const body = {};
+      if (patch.status) body.status = STATUS_TO_DB[patch.status] || patch.status;
+      if (patch.notes !== undefined) body.admin_notes = patch.notes;
+      Remote.api(`/admin/reservations/${encodeURIComponent(id)}`, { method: 'PATCH', body }).catch((err) =>
+        Remote.onStatus(err.message === 'auth' ? 'auth' : 'error')
+      );
+    },
+
+    /** Remplace un id local temporaire par l’id créé dans Supabase */
+    renameLocal(key, oldId, newId) {
+      const list = read(key, []).map((x) => (String(x.id) === oldId ? { ...x, id: newId } : x));
+      localStorage.setItem(key, JSON.stringify(list));
     },
 
     async push(key) {
@@ -255,10 +377,40 @@
           const { url } = await Remote.request('upload.php', { data: dataUrl });
           Remote.uploads.set(dataUrl, url);
         }
-        const value = Remote.replaceDataUrls(read(key, null));
-        localStorage.setItem(key, JSON.stringify(value));
-        await Remote.request('content.php', { key, value });
+        const list = Remote.replaceDataUrls(read(key, []));
+        localStorage.setItem(key, JSON.stringify(list));
+
+        const { path } = API.RESOURCES[key];
+        const snap = Remote.snap[key] || (Remote.snap[key] = new Map());
+        const seen = new Set();
+        for (let i = 0; i < list.length; i++) {
+          const id = String(list[i].id);
+          const json = JSON.stringify(Remote.bodyOf(key, list[i], i));
+          seen.add(id);
+          if (snap.get(id) === json) continue;
+          const body = JSON.parse(json);
+          if (snap.has(id)) {
+            await Remote.api(`/admin/${path}/${encodeURIComponent(id)}`, { method: 'PUT', body });
+            snap.set(id, json);
+          } else {
+            const created = await Remote.api(`/admin/${path}`, { method: 'POST', body });
+            const newId = created?.id != null ? String(created.id) : id;
+            if (newId !== id) {
+              Remote.renameLocal(key, id, created.id);
+              seen.add(newId);
+            }
+            snap.set(newId, json);
+          }
+        }
+        for (const id of [...snap.keys()]) {
+          if (seen.has(id)) continue;
+          await Remote.api(`/admin/${path}/${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) => {
+            if (err.status !== 404) throw err;
+          });
+          snap.delete(id);
+        }
         Remote.onStatus('published');
+        document.dispatchEvent(new CustomEvent('at:refresh'));
       } catch (err) {
         Remote.onStatus(err.message === 'auth' ? 'auth' : 'error');
       }
@@ -328,7 +480,7 @@
     { id: 6, name: 'Constantine', subtitle: 'Ville des ponts', location: 'Constantine, Nord-Est', duration: '3 jours', price: 22000, category: 'culture', image: '/images/alger.jpeg', placeSlug: 'constantine' },
     { id: 7, name: 'Taghit — Hôtel 4★', subtitle: 'Voyage coup de cœur · vol inclus', location: 'Taghit, Béchar', duration: 'Pension complète', price: 99990, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit' },
     { id: 8, name: 'Taghit — Maison d’hôte', subtitle: 'Voyage coup de cœur · bus Mercedes', location: 'Taghit, Béchar', duration: 'Pension complète', price: 60000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit' },
-    { id: 9, name: 'Taghit via Brezina', subtitle: '5 jours / 4 nuits · Van Mercedes VIP', location: 'Brezina → Taghit, Béchar', duration: '5 jours / 4 nuits', price: 0, priceOnRequest: true, category: 'desert', image: '/images/taghit-brezina.png', placeSlug: 'taghit' },
+    { id: 9, name: 'Taghit via Brezina', subtitle: '5 jours / 4 nuits · Van Mercedes VIP', location: 'Brezina → Taghit, Béchar', duration: '5 jours / 4 nuits', price: 0, priceOnRequest: true, category: 'desert', image: '/images/taghit-brezina.png', placeSlug: 'taghit', pkg: 'brezina' },
   ].map((t) => ({ description: '', priceOnRequest: false, active: true, ...t }));
 
   /** Activités du site (client/js/data/activities.js) — description / image vides = contenu d’origine du site */
@@ -417,14 +569,19 @@
     updateBooking(id, patch) {
       const list = Store.getBookings().map((b) => (b.id === id ? { ...b, ...patch } : b));
       Store.saveBookings(list);
-      Remote.bookingAction({ action: 'update', id, patch });
       const b = list.find((x) => x.id === id);
+      if (b?.remote === 'db') Remote.updateDbBooking(id, patch);
+      else Remote.bookingAction({ action: 'update', id, patch });
       if (b) Store.syncClientFromBooking(b);
       return b;
     },
+    /** Les réservations Supabase ne se suppriment pas (historique) : on les passe en « Annulée » */
     deleteBooking(id) {
-      Store.saveBookings(Store.getBookings().filter((b) => b.id !== id));
+      const b = Store.getBookings().find((x) => x.id === id);
+      if (b?.remote === 'db') return false;
+      Store.saveBookings(Store.getBookings().filter((x) => x.id !== id));
       Remote.bookingAction({ action: 'delete', id });
+      return true;
     },
 
     getDestinations() { return read(KEYS.destinations, SEED_DESTINATIONS); },
@@ -466,7 +623,7 @@
     addGalleryImages(srcs) {
       const list = Store.getGallery();
       let nextId = list.reduce((max, g) => Math.max(max, Number(g.id) || 0), 0) + 1;
-      const added = srcs.filter(Boolean).map((src) => ({ id: nextId++, src }));
+      const added = srcs.filter(Boolean).map((src) => ({ id: Remote.enabled ? uid('new') : nextId++, src }));
       return Store.saveGallery([...added, ...list]) ? added.length : -1;
     },
     updateGalleryImage(id, src, position) {

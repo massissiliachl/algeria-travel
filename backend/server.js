@@ -67,6 +67,8 @@ function isAllowedOrigin(origin) {
   if (corsOrigins.includes(origin)) return true;
   if (/^https:\/\/[\w-]+\.onrender\.com$/i.test(origin)) return true;
   if (/^https:\/\/(www\.)?algeriatravel\.com$/i.test(origin)) return true;
+  if (/^https?:\/\/(www\.)?algeriatravel\.org$/i.test(origin)) return true;
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return true;
   return false;
 }
 
