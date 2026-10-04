@@ -525,11 +525,11 @@ const formHtml = () => {
     <div class="place-form__row">
       <label>
         ${esc(t('place_form_phone'))}
-        <input name="phone" value="${esc(form.phone)}" placeholder="${esc(t('place_form_phone_ph'))}" />
+        <input type="tel" name="phone" value="${esc(form.phone)}" required pattern="[0-9+ ().-]{8,20}" placeholder="${esc(t('place_form_phone_ph'))}" />
       </label>
       <label>
         ${esc(t('place_form_date'))}
-        <input type="date" name="date" value="${esc(form.date)}" required />
+        <input type="date" name="date" value="${esc(form.date)}" min="${new Date().toISOString().slice(0, 10)}" required />
       </label>
     </div>
     <div class="place-form__row">
@@ -597,7 +597,7 @@ const openBooking = () => {
   sheet.el.addEventListener('submit', (e) => {
     e.preventDefault();
     const { form } = state;
-    if (!form.name.trim() || !form.email.trim() || !form.date) return;
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.date) return;
     if (typeof window.ATBooking?.create === 'function') {
       window.ATBooking.create({
         name: form.name.trim(),
