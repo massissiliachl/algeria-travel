@@ -79,4 +79,19 @@ async function closePool() {
   }
 }
 
-module.exports = { getPool, query, testConnection, closePool };
+async function withTransaction(fn) {
+  const client = await getPool().connect();
+  try {
+    await client.query('begin');
+    const result = await fn(client);
+    await client.query('commit');
+    return result;
+  } catch (err) {
+    await client.query('rollback').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { getPool, query, withTransaction, testConnection, closePool };
