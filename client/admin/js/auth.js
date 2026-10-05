@@ -23,6 +23,7 @@
     },
     /** Résout { ok, online } */
     async login(user, pass) {
+      pass = String(pass || '').trim().replace(/^["']|["']$/g, '');
       if (user.trim().toLowerCase() !== CREDENTIALS.user || !pass) return { ok: false };
       try {
         const { ok, status } = await global.AT_API.request('/admin/auth/verify', {

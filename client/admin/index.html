@@ -15,7 +15,7 @@
     <form class="login-card" id="loginForm" autocomplete="on">
       <h1 class="login-card__brand">Algeria Travel</h1>
       <p class="login-card__sub">Espace administration — gestion complète du site</p>
-      <p class="login-card__error" id="loginError">Identifiants incorrects.</p>
+      <p class="login-card__error" id="loginError">Clé admin incorrecte.</p>
       <label>
         Identifiant
         <input type="text" name="user" id="loginUser" required placeholder="admin" autocomplete="username" />
@@ -25,7 +25,7 @@
         <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
       </label>
       <button type="submit" class="btn btn--primary">Se connecter</button>
-      <p class="login-card__hint">Par défaut : <strong>admin</strong> / <strong>AlgeriaTravel2026</strong></p>
+      <p class="login-card__hint">Identifiant : <strong>admin</strong> — mot de passe : la clé admin du backend (<strong>ADMIN_API_KEY</strong>)</p>
     </form>
   </div>
 

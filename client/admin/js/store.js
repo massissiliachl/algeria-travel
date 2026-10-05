@@ -97,8 +97,9 @@
    * Préfixe des images du site selon l’hébergement :
    * build React → /images, IONOS → /public/images, local (client/admin/) → ../public/images
    */
-  const BASE_CANDIDATES = ['', '/public', '../public'];
-  let imageBase = sessionStorage.getItem('at_image_base') || '';
+  const RELATIVE_PUBLIC = new URL('../public', location.href).pathname.replace(/\/$/, '');
+  const BASE_CANDIDATES = [RELATIVE_PUBLIC, '', '/public'];
+  let imageBase = sessionStorage.getItem('at_image_base') ?? RELATIVE_PUBLIC;
 
   function probeImageBase() {
     if (sessionStorage.getItem('at_image_base') !== null) return Promise.resolve(imageBase);
