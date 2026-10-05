@@ -6,12 +6,14 @@ import { renderRooms, renderAllRooms, renderRates } from './views/rooms.js';
 import { renderCalendar } from './views/calendar.js';
 import { renderReservations } from './views/reservations.js';
 import { renderProfile } from './views/profile.js';
+import { renderOwners } from './views/owners.js';
 
 const $ = (id) => document.getElementById(id);
 const view = $('view');
 
 const NAV = [
   { href: '#/dashboard', label: 'Tableau de bord', icon: 'home', match: /^\/dashboard/ },
+  ...(ADMIN_MODE ? [{ href: '#/owners', label: 'Partenaires', icon: 'users', match: /^\/owners/ }] : []),
   { href: '#/properties', label: ADMIN_MODE ? 'Tous les biens' : 'Mes hébergements', icon: 'building', match: /^\/properties(?!.*\/rooms)/ },
   { href: '#/rooms', label: 'Chambres', icon: 'bed', match: /^\/(rooms$|properties\/[^/]+\/rooms)/ },
   { href: '#/rates', label: 'Tarifs', icon: 'tag', match: /^\/(rates|rooms\/[^/]+\/rates)/ },
@@ -34,6 +36,7 @@ const ROUTES = [
   ['/rooms/:id/rates', (p) => renderRates(view, p.id)],
   ['/rooms/:id/availability', (p) => renderCalendar(view, p.id)],
   ['/reservations', () => renderReservations(view)],
+  ['/owners', () => (ADMIN_MODE ? renderOwners(view) : go('/dashboard'))],
   ['/profile', () => (ADMIN_MODE ? go('/dashboard') : renderProfile(view, refreshUser))],
 ];
 

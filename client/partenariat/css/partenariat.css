@@ -191,7 +191,9 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .tabs .is-active { color: var(--primary); border-bottom-color: var(--primary); }
 
 /* ── Formulaires ── */
-.field { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-bottom: 14px; }
+.field { display: block; font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-bottom: 14px; }
+.field > input, .field > select, .field > textarea { display: block; margin-top: 6px; }
+.field > .checks, .field > div { margin-top: 6px; }
 .field small { font-weight: 400; color: var(--muted); }
 input[type=text], input[type=email], input[type=password], input[type=number], input[type=tel], input[type=date], input[type=time], input[type=url], input[type=search], select, textarea {
   width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid #d8dfea; border-radius: 10px; background: #fff; font-size: 14px; font-weight: 400; color: var(--ink); transition: border-color .15s, box-shadow .15s;
