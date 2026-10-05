@@ -1,12 +1,12 @@
 <?php
 /**
  * POST /api/upload.php {data: "data:image/...;base64,..."} → {url: "/uploads/xxx.jpg"}
- * Réservé à l’admin (en-tête X-Admin-Pass).
+ * Réservé à l’admin (en-tête X-Admin-Pass) et aux propriétaires connectés (en-tête X-Owner-Token).
  */
 require __DIR__ . '/_common.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') respond(['error' => 'method'], 405);
-require_admin();
+require_admin_or_owner();
 
 $body = read_json_body(12 * 1024 * 1024);
 $data = $body['data'] ?? '';

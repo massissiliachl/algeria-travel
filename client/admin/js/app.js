@@ -5,6 +5,7 @@
     clients: 'Clients',
     destinations: 'Destinations',
     stays: 'Hébergements',
+    owners: 'Propriétaires',
     tours: 'Circuits',
     activities: 'Activités',
     media: 'Galerie',
@@ -102,6 +103,7 @@
     if (id === 'settings') ATContentUI.fillSettingsForm();
     if (id === 'pages') ATManageUI.fillPagesForm();
     if (id === 'comments') ATCommentsUI.load(toast);
+    if (id === 'owners') ATOwnersUI.load(toast, openDrawer);
   }
 
   function refresh() {
@@ -161,7 +163,7 @@
 
   document.getElementById('menuToggle').addEventListener('click', () => sidebar.classList.toggle('is-open'));
 
-  document.querySelectorAll('.nav-btn').forEach((btn) => {
+  document.querySelectorAll('.nav-btn[data-section]').forEach((btn) => {
     btn.addEventListener('click', () => showSection(btn.dataset.section));
   });
 
@@ -182,6 +184,7 @@
   document.getElementById('actAddBtn').addEventListener('click', () => ATManageUI.openActivityForm(null, openDrawer, toast));
   document.getElementById('commentsReload').addEventListener('click', () => ATCommentsUI.load(toast));
   ATCommentsUI.bind(toast);
+  ATOwnersUI.bind(toast, openDrawer);
 
   document.body.addEventListener('click', (e) => {
     const openBk = e.target.closest('[data-booking-open]');

@@ -5,9 +5,11 @@ const { query, closePool } = require('../config/db');
 
 async function migrate() {
   const sqlDir = path.join(__dirname, '..', 'sql');
+  const only = process.argv.slice(2);
   const files = fs
     .readdirSync(sqlDir)
     .filter((f) => f.endsWith('.sql'))
+    .filter((f) => !only.length || only.some((prefix) => f.startsWith(prefix)))
     .sort();
 
   if (files.length === 0) {

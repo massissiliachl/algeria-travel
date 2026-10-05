@@ -18,4 +18,11 @@ function adminAuth(req, res, next) {
   next();
 }
 
-module.exports = { adminAuth };
+function isAdminRequest(req) {
+  const adminKey = process.env.ADMIN_API_KEY?.trim();
+  const header = req.headers.authorization || '';
+  const token = (header.startsWith('Bearer ') ? header.slice(7) : req.headers['x-admin-key'])?.trim();
+  return Boolean(adminKey && token && token === adminKey);
+}
+
+module.exports = { adminAuth, requireAdmin: adminAuth, isAdminRequest };

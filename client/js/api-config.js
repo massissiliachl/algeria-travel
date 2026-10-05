@@ -3,7 +3,9 @@
  * Expose window.AT_API : adresse, identifiant visiteur, requêtes et conversions de format.
  */
 (function (global) {
-  const BASE = 'https://algeria-travelbackend-9hpl.onrender.com/api';
+  const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  /** En local uniquement : localStorage.at_api_base = 'http://localhost:5000/api' pour tester un backend local */
+  const BASE = (LOCAL && localStorage.getItem('at_api_base')) || 'https://algeria-travelbackend-9hpl.onrender.com/api';
   /** Relais PHP sur IONOS, utilisé si le navigateur bloque l’appel direct (CORS non autorisé sur Render) */
   const PROXY = new URL('../api/proxy.php', document.currentScript?.src || location.href).href;
   const ON_IONOS = /(^|\.)algeriatravel\.(org|com)$/i.test(location.hostname);
@@ -53,10 +55,11 @@
     }
   }
 
-  async function send(url, { method = 'GET', body, admin = false, timeout = 60000, keepalive = false } = {}) {
+  async function send(url, { method = 'GET', body, admin = false, token = '', timeout = 60000, keepalive = false } = {}) {
     const headers = { 'x-favorite-client': clientId() };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (admin) headers['x-admin-key'] = adminKey();
+    if (token) headers.Authorization = `Bearer ${token}`;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
     try {

@@ -1,7 +1,8 @@
 const express = require('express');
-const { query } = require('../../config/db');
+const { query, withTransaction } = require('../../config/db');
 const { adminAuth } = require('../../middleware/adminAuth');
 const { bookHotelRooms, releaseHotelRooms } = require('../../lib/hotelAvailability');
+const { releaseInventory, rehold } = require('../../lib/accommodation');
 
 const router = express.Router();
 
@@ -30,6 +31,10 @@ function mapReservation(row) {
     cardLast4: row.card_last4,
     cardBrand: row.card_brand,
     cardExpiry: row.card_expiry,
+    propertyId: row.property_id,
+    roomTypeId: row.room_type_id,
+    ratePlanId: row.rate_plan_id,
+    ownerId: row.owner_id,
     status: row.status,
     adminNotes: row.admin_notes,
     createdAt: row.created_at,
@@ -105,7 +110,13 @@ router.patch('/:id', async (req, res, next) => {
     const oldStatus = prevRow.status;
     const newStatus = status || oldStatus;
 
-    if (oldStatus !== 'confirmed' && newStatus === 'confirmed') {
+    if (prevRow.room_type_id) {
+      const released = new Set(['rejected', 'cancelled']);
+      await withTransaction(async (client) => {
+        if (released.has(newStatus)) await releaseInventory(client, prevRow);
+        else if (released.has(oldStatus)) await rehold(client, prevRow);
+      });
+    } else if (oldStatus !== 'confirmed' && newStatus === 'confirmed') {
       await bookHotelRooms(prevRow);
     } else if (oldStatus === 'confirmed' && newStatus !== 'confirmed') {
       await releaseHotelRooms(prevRow);

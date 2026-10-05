@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Espace partenaire — Algeria Travel</title>
+  <link rel="icon" href="../favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/partenariat.css" />
+</head>
+<body>
+  <div class="login" id="loginView" hidden>
+    <div class="login__visual">
+      <img src="../public/logo.png" alt="" class="login__logo" />
+      <h2>Ensemble pour un tourisme de qualité en Algérie</h2>
+      <p>Gérez vos établissements, vos chambres, vos tarifs et vos disponibilités en toute simplicité.</p>
+    </div>
+    <form class="login__card" id="loginForm" novalidate>
+      <a class="brand" href="../index.html"><img src="../public/logo.png" alt="" /><span><strong>Algeria Travel</strong><small>Explorez l’Algérie autrement</small></span></a>
+      <h1>Espace partenaire</h1>
+      <p class="muted">Connectez-vous pour gérer vos hébergements.</p>
+      <p class="form-error" id="loginError" hidden></p>
+      <label class="field">Email
+        <input type="email" name="email" required autocomplete="username" placeholder="vous@exemple.com" />
+      </label>
+      <label class="field">Mot de passe
+        <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+      </label>
+      <button type="submit" class="btn btn--primary btn--block">Se connecter</button>
+      <p class="login__hint">Vos identifiants vous sont remis par l’équipe Algeria Travel. Mot de passe oublié ? Contactez-nous au <a href="mailto:travelalgeriadz@gmail.com">travelalgeriadz@gmail.com</a>.</p>
+    </form>
+  </div>
+
+  <div class="shell" id="appView" hidden>
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#/dashboard"><img src="../public/logo.png" alt="" /><span><strong>Algeria Travel</strong><small>Explorez l’Algérie autrement</small></span></a>
+      <nav class="nav" id="nav"></nav>
+      <div class="help-card">
+        <strong>Besoin d’aide ?</strong>
+        <p>Notre équipe est là pour vous aider.</p>
+        <a class="btn btn--ghost btn--sm btn--block" href="mailto:travelalgeriadz@gmail.com">Contacter le support</a>
+      </div>
+      <p class="sidebar__copy">© <span id="year"></span> Algeria Travel</p>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="icon-btn menu-btn" id="menuBtn" aria-label="Menu"></button>
+        <div class="admin-banner" id="adminBanner" hidden></div>
+        <div class="topbar__right">
+          <a class="icon-btn bell" id="bellBtn" href="#/reservations" aria-label="Réservations en attente"><span class="bell__dot" id="bellDot" hidden></span></a>
+          <div class="user-menu">
+            <button type="button" class="user-chip" id="userChip"></button>
+            <div class="user-menu__list" id="userMenu" hidden></div>
+          </div>
+        </div>
+      </header>
+      <main class="content" id="view" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <div class="modal" id="modalRoot"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../js/api-config.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -3,6 +3,13 @@ DirectoryIndex index.html
 
 RewriteEngine On
 
+# Une seule adresse : https://algeriatravel.org
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://algeriatravel.org%{REQUEST_URI} [R=301,L]
+
 # /pages/index.html → /
 RewriteCond %{THE_REQUEST} \s/pages/index\.html[\s?]
 RewriteRule ^pages/index\.html$ / [R=301,L]

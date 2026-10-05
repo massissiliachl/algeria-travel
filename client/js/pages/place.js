@@ -519,7 +519,7 @@ const formHtml = () => {
     <div class="place-form__row">
       <label>
         ${esc(t('place_form_phone'))}
-        <input type="tel" name="phone" value="${esc(form.phone)}" required pattern="[0-9+ ().-]{8,20}" placeholder="${esc(t('place_form_phone_ph'))}" />
+        <input type="tel" name="phone" value="${esc(form.phone)}" required pattern="[0-9+ .\\(\\)\\-]{8,20}" placeholder="${esc(t('place_form_phone_ph'))}" />
       </label>
       <label>
         ${esc(t('place_form_date'))}

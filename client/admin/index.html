@@ -40,6 +40,8 @@
       <button type="button" class="nav-btn" data-section="clients">Clients</button>
       <button type="button" class="nav-btn" data-section="destinations">Destinations</button>
       <button type="button" class="nav-btn" data-section="stays">Hébergements</button>
+      <button type="button" class="nav-btn" data-section="owners">Propriétaires</button>
+      <a class="nav-btn nav-btn--link" href="../partenariat/index.html?admin=1#/properties">Biens &amp; disponibilités</a>
       <button type="button" class="nav-btn" data-section="tours">Circuits</button>
       <button type="button" class="nav-btn" data-section="activities">Activités</button>
       <button type="button" class="nav-btn" data-section="media">Galerie</button>
@@ -112,8 +114,25 @@
 
       <section class="section" id="section-stays">
         <div class="panel">
-          <div class="panel__head"><h2>Hébergements</h2></div>
+          <div class="panel__head">
+            <h2>Hébergements</h2>
+            <a class="btn btn--sm btn--ghost" href="../partenariat/index.html?admin=1#/properties">Biens des propriétaires (chambres, tarifs, calendrier) →</a>
+          </div>
           <div class="table-wrap" id="staysTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-owners">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Propriétaires</h2>
+            <div class="actions">
+              <a class="btn btn--sm btn--ghost" href="../partenariat/index.html?admin=1#/properties">Gérer les biens</a>
+              <a class="btn btn--sm btn--ghost" href="../partenariat/index.html?admin=1#/reservations">Réservations des biens</a>
+              <button type="button" class="btn btn--sm btn--gold" id="ownerAddBtn">+ Ajouter un propriétaire</button>
+            </div>
+          </div>
+          <div class="table-wrap" id="ownersTable"></div>
         </div>
       </section>
 
@@ -212,6 +231,7 @@
   <script src="js/content.js"></script>
   <script src="js/manage.js"></script>
   <script src="js/comments.js"></script>
+  <script src="js/owners.js"></script>
   <script src="js/notify.js"></script>
   <script src="js/app.js"></script>
 </body>

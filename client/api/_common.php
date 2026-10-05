@@ -54,8 +54,47 @@ function require_admin(): void
 {
     $pass = $_SERVER['HTTP_X_ADMIN_PASS'] ?? '';
     if (!is_string($pass) || $pass === '') respond(['error' => 'unauthorized'], 401);
-    if (hash_equals(ADMIN_PASSWORD, $pass) || backend_accepts($pass)) return;
+    if (backend_accepts($pass)) return;
     respond(['error' => 'unauthorized'], 401);
+}
+
+/** Jeton propriétaire valide (vérifié par GET /owner/me, résultat positif mis en cache 10 min) */
+function owner_token_valid(string $token): bool
+{
+    if (!preg_match('/^[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+$/', $token)) return false;
+    $cache = DATA_DIR . '/owner-tokens.json';
+    $hash = hash('sha256', $token);
+    $saved = is_file($cache) ? json_decode((string) file_get_contents($cache), true) : [];
+    if (!is_array($saved)) $saved = [];
+    if (($saved[$hash] ?? 0) > time()) return true;
+
+    $context = stream_context_create(['http' => [
+        'method' => 'GET',
+        'header' => "Authorization: Bearer $token\r\n",
+        'timeout' => 70,
+        'ignore_errors' => true,
+    ]]);
+    $raw = @file_get_contents(BACKEND_API . '/owner/me', false, $context);
+    $reply = is_string($raw) ? json_decode($raw, true) : null;
+    $ok = is_array($reply) && ($reply['success'] ?? false) === true;
+    if ($ok && (is_dir(DATA_DIR) || mkdir(DATA_DIR, 0755, true))) {
+        $now = time();
+        $saved = array_filter($saved, fn ($until) => $until > $now);
+        $saved[$hash] = $now + 600;
+        file_put_contents($cache, json_encode($saved));
+    }
+    return $ok;
+}
+
+/** Admin (X-Admin-Pass) ou propriétaire connecté (X-Owner-Token) */
+function require_admin_or_owner(): void
+{
+    $token = $_SERVER['HTTP_X_OWNER_TOKEN'] ?? '';
+    if (is_string($token) && $token !== '') {
+        if (owner_token_valid($token)) return;
+        respond(['error' => 'unauthorized'], 401);
+    }
+    require_admin();
 }
 
 function read_json_body(int $maxBytes): array

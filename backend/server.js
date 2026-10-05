@@ -102,6 +102,23 @@ app.use('/api/admin', require('./routes/admin/content'));
 app.use('/api/admin/hotel-users', require('./routes/admin/hotelUsers'));
 app.use('/api/admin/hotels/:hotelId/availability', require('./routes/admin/hotelAvailability'));
 app.use('/api/partner', require('./routes/partner'));
+
+const { makeAccommodationRouter } = require('./routes/accommodation');
+const { authenticateOwner } = require('./middleware/ownerAuth');
+const { requireAdmin } = require('./middleware/adminAuth');
+app.use('/api/admin/owners', require('./routes/admin/owners'));
+app.use(
+  '/api/admin/accommodation',
+  requireAdmin,
+  (req, res, next) => {
+    req.actor = { type: 'admin', id: 'admin', label: 'Admin' };
+    next();
+  },
+  makeAccommodationRouter()
+);
+app.use('/api/owner', require('./routes/owner/auth'));
+app.use('/api/owner', authenticateOwner, makeAccommodationRouter());
+app.use('/api/accommodations', require('./routes/accommodationsPublic'));
 app.use('/api', require('./routes/content'));
 
 app.get('/api/live', (req, res) => {

@@ -1,5 +1,5 @@
 <?php
-/** Ancien mot de passe local de l’admin (mode sans backend) : identique à celui de admin/js/auth.js */
+/** Sel du hachage des IP (comments.php). N’autorise plus aucune action admin : seule la clé ADMIN_API_KEY du backend est acceptée. */
 const ADMIN_PASSWORD = 'AlgeriaTravel2026';
 
 /** Backend Node (Render) : la clé admin (ADMIN_API_KEY) y est vérifiée pour autoriser l’upload des photos */

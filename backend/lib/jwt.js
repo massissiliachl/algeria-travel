@@ -17,8 +17,14 @@ function signPartnerToken(payload) {
   });
 }
 
+function signOwnerToken(owner) {
+  return jwt.sign({ sub: owner.id, role: 'owner' }, getSecret(), {
+    expiresIn: process.env.OWNER_JWT_EXPIRES_IN || '7d',
+  });
+}
+
 function verifyToken(token) {
   return jwt.verify(token, getSecret());
 }
 
-module.exports = { signPartnerToken, verifyToken };
+module.exports = { signPartnerToken, signOwnerToken, verifyToken };

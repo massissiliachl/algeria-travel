@@ -30,6 +30,10 @@ $forward = [
     'HTTP_AUTHORIZATION' => 'Authorization',
     'CONTENT_TYPE' => 'Content-Type',
 ];
+if (empty($_SERVER['HTTP_AUTHORIZATION'])) {
+    $all = function_exists('getallheaders') ? array_change_key_case(getallheaders(), CASE_LOWER) : [];
+    $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? ($all['authorization'] ?? '');
+}
 foreach ($forward as $server => $name) {
     $value = $_SERVER[$server] ?? '';
     if (is_string($value) && $value !== '' && strlen($value) < 2000) $headers[] = $name . ': ' . $value;
