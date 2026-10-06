@@ -47,6 +47,56 @@ const state = {
             : 'hotel'
         : '',
   },
+  calendar: null,
+};
+
+/* ── Calendrier de réservation réglé dans l’admin (dates libres, séjours à dates fixes, périodes bloquées) ── */
+
+const calendarKey = id === 'taghit' ? `taghit:${taghitPkg}` : id;
+
+const fmtDay = (iso) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString(pick('fr-FR', 'en-GB', 'ar-DZ'), { day: 'numeric', month: 'long', year: 'numeric' });
+
+const periodLabel = (p) =>
+  p.start === p.end
+    ? fmtDay(p.start)
+    : pick(`Du ${fmtDay(p.start)} au ${fmtDay(p.end)}`, `${fmtDay(p.start)} – ${fmtDay(p.end)}`, `من ${fmtDay(p.start)} إلى ${fmtDay(p.end)}`);
+
+const syncFixedDate = () => {
+  const cal = state.calendar;
+  if (cal?.mode === 'fixed' && !cal.periods.some((p) => p.start === state.form.date)) {
+    state.form.date = cal.periods[0]?.start || '';
+  }
+};
+
+const loadCalendar = async () => {
+  if (!place || !window.AT_API) return;
+  try {
+    const { ok, data } = await window.AT_API.request(`/booking-calendar/${encodeURIComponent(calendarKey)}`, { timeout: 60000 });
+    if (!ok || !data?.data) return;
+    state.calendar = data.data;
+    syncFixedDate();
+    if (state.sheet && !state.sent) state.sheet.setContent(sheetHtml());
+  } catch {
+    /* backend injoignable : le serveur revérifie la date à l’envoi */
+  }
+};
+
+const dateError = (date) => {
+  const cal = state.calendar;
+  if (!cal || !date) return '';
+  const blocked = cal.blocked.find((p) => date >= p.start && date <= p.end);
+  if (blocked) {
+    return pick(
+      `Réservations fermées : ${periodLabel(blocked)}. Choisissez une autre date.`,
+      `Bookings closed: ${periodLabel(blocked)}. Please choose another date.`,
+      `الحجز مغلق: ${periodLabel(blocked)}. اختر تاريخًا آخر.`
+    );
+  }
+  if (cal.mode === 'fixed' && !cal.periods.some((p) => p.start === date)) {
+    return pick('Choisissez une des dates proposées.', 'Please choose one of the proposed dates.', 'اختر أحد التواريخ المقترحة.');
+  }
+  return '';
 };
 
 /* ── Valeurs dérivées (dépendent de la langue) ── */
@@ -521,10 +571,7 @@ const formHtml = () => {
         ${esc(t('place_form_phone'))}
         <input type="tel" name="phone" value="${esc(form.phone)}" required pattern="[0-9+ .\\(\\)\\-]{8,20}" placeholder="${esc(t('place_form_phone_ph'))}" />
       </label>
-      <label>
-        ${esc(t('place_form_date'))}
-        <input type="date" name="date" value="${esc(form.date)}" min="${new Date().toISOString().slice(0, 10)}" required />
-      </label>
+      ${dateFieldHtml()}
     </div>
     <div class="place-form__row">
       <label>
@@ -554,8 +601,34 @@ const formHtml = () => {
       ${esc(t('place_form_message'))}
       <textarea name="message" rows="4" placeholder="${esc(t('place_form_message_ph'))}">${esc(form.message)}</textarea>
     </label>
-    <button type="submit" class="place-form__submit">${esc(t('place_form_submit'))} ${icon('Send', 16)}</button>
+    <p class="place-form__error" role="alert" hidden></p>
+    <button type="submit" class="place-form__submit"${noDates() ? ' disabled' : ''}>${esc(t('place_form_submit'))} ${icon('Send', 16)}</button>
   </form>`;
+};
+
+const noDates = () => state.calendar?.mode === 'fixed' && !state.calendar.periods.length;
+
+const dateFieldHtml = () => {
+  const { form, calendar: cal } = state;
+  const label = esc(t('place_form_date'));
+  if (cal?.mode === 'fixed') {
+    if (!cal.periods.length) {
+      return `<label>${label}<span class="place-form__note">${esc(
+        pick('Aucune date disponible pour le moment.', 'No dates available at the moment.', 'لا توجد تواريخ متاحة حاليًا.')
+      )}</span></label>`;
+    }
+    return `<label>${label}
+      <select name="date" required>${cal.periods.map((p) => option(p.start, periodLabel(p), form.date)).join('')}</select>
+      <span class="place-form__note">${esc(pick('Séjour à dates fixes', 'Fixed-date stay', 'إقامة بتواريخ محددة'))}</span>
+    </label>`;
+  }
+  const blocked = cal?.blocked?.length
+    ? `<span class="place-form__note">${esc(pick('Indisponible', 'Unavailable', 'غير متاح'))} : ${esc(cal.blocked.map(periodLabel).join(' · '))}</span>`
+    : '';
+  return `<label>${label}
+    <input type="date" name="date" value="${esc(form.date)}" min="${new Date().toISOString().slice(0, 10)}" required />
+    ${blocked}
+  </label>`;
 };
 
 const sheetHtml = () => (state.sent ? successHtml() : formHtml());
@@ -572,6 +645,7 @@ const onSheetClosed = () => {
 
 const openBooking = () => {
   if (state.sheet) return;
+  syncFixedDate();
   const sheet = openBottomSheet({
     content: sheetHtml(),
     titleId: 'place-book-title',
@@ -592,6 +666,13 @@ const openBooking = () => {
     e.preventDefault();
     const { form } = state;
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.date) return;
+    const errorEl = sheet.el.querySelector('.place-form__error');
+    const dateMsg = dateError(form.date);
+    if (errorEl) {
+      errorEl.textContent = dateMsg;
+      errorEl.hidden = !dateMsg;
+    }
+    if (dateMsg) return;
     if (typeof window.ATBooking?.create === 'function') {
       window.ATBooking.create({
         name: form.name.trim(),
@@ -605,6 +686,7 @@ const openBooking = () => {
         source: 'place',
         itemType: 'place',
         itemId: place.id,
+        pkg: id === 'taghit' ? taghitPkg : pkgParam || '',
         unitPrice: place.price,
       });
     }
@@ -718,4 +800,5 @@ if (target) {
 } else {
   window.scrollTo(0, 0);
   mountPage({ route: `/place/${place.id}`, render, bind, afterRender });
+  loadCalendar();
 }

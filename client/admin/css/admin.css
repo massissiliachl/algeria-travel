@@ -982,3 +982,43 @@ a.nav-btn { text-decoration: none; box-sizing: border-box; }
 }
 
 .owner-form-error[hidden] { display: none; }
+
+/* ── Calendrier de réservation ── */
+.cal-form { display: grid; gap: 16px; }
+.cal-form .field > label small { font-weight: 500; color: var(--muted); }
+.cal-mode {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid rgba(26, 35, 50, 0.12);
+  border-radius: 12px;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+.cal-mode:has(input:checked) { border-color: var(--gold); background: rgba(184, 147, 93, 0.08); }
+.cal-mode input { width: auto !important; margin-top: 3px; accent-color: var(--gold); }
+.cal-mode small { color: var(--muted); }
+.cal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+.cal-row label { display: grid; gap: 4px; font-size: 0.72rem; font-weight: 600; color: var(--muted); }
+.cal-row input { padding: 8px 10px; border: 1px solid rgba(26, 35, 50, 0.14); border-radius: 10px; font: inherit; font-size: 0.85rem; min-width: 0; }
+.cal-row__rm { height: 36px; }
+.cal-hint, .cal-preview {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--sand);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.cal-preview { background: rgba(37, 160, 111, 0.1); color: #1d6b4c; font-weight: 600; }
+@media (max-width: 520px) {
+  .cal-row { grid-template-columns: 1fr 1fr; }
+  .cal-row__label { grid-column: 1 / 2; }
+}

@@ -30,6 +30,7 @@
           item_type: extra.itemType || 'place',
           item_id: String(extra.itemId),
           item_name: booking.destination,
+          item_pkg: extra.pkg || undefined,
           name: booking.name,
           email: booking.email,
           phone: booking.phone,

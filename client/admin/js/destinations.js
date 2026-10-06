@@ -39,6 +39,7 @@
         <td>${d.active === false ? '<span class="badge badge--cancelled">Archivée</span>' : '<span class="badge badge--confirmed">Active</span>'}</td>
         <td class="actions">
           <button type="button" class="btn btn--sm btn--ghost" data-dest-edit="${escapeHtml(d.id)}">Modifier</button>
+          <button type="button" class="btn btn--sm btn--gold" data-dest-calendar="${escapeHtml(d.id)}">Calendrier</button>
         </td>
       </tr>`
       )

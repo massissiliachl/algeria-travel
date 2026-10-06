@@ -201,6 +201,12 @@
       );
       return;
     }
+    const calDest = e.target.closest('[data-dest-calendar]');
+    if (calDest) {
+      const dest = ATStore.getDestinations().find((d) => d.id === calDest.dataset.destCalendar);
+      if (dest) ATBookingCalendarUI.open(dest, openDrawer, toast);
+      return;
+    }
     const editStay = e.target.closest('[data-stay-edit]');
     if (editStay) {
       ATContentUI.openStayForm(

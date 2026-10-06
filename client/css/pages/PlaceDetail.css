@@ -1267,6 +1267,25 @@
   min-height: 96px;
 }
 
+.place-form__note {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6B7280;
+  line-height: 1.4;
+}
+
+.place-form__error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(196, 69, 58, 0.1);
+  color: #B3261E;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.place-form__error[hidden] { display: none; }
+
 .place-form__submit {
   margin-top: 4px;
   border: none;
