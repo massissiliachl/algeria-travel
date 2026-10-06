@@ -122,6 +122,7 @@ app.use('/api/accommodations', require('./routes/accommodationsPublic'));
 const bookingCalendar = require('./routes/bookingCalendar');
 app.use('/api/booking-calendar', bookingCalendar.publicRouter);
 app.use('/api/admin/booking-calendar', bookingCalendar.adminRouter);
+app.use('/api/qrcode', require('./routes/qrcode'));
 app.use('/api', require('./routes/content'));
 
 app.get('/api/live', (req, res) => {
