@@ -12,6 +12,7 @@ const {
   sendReservationAdminEmail,
 } = require('../lib/reservationEmails');
 const { createPartnerNotification } = require('../lib/partnerNotifications');
+const { notifyOwner } = require('../lib/ownerNotifications');
 const { calendarKey, checkTravelDate } = require('../lib/bookingCalendar');
 
 const router = express.Router();
@@ -79,6 +80,29 @@ router.get('/track', async (req, res, next) => {
     next(err);
   }
 });
+
+async function notifyStayOwner(stayId, details) {
+  try {
+    const result = await query(
+      'select owner_id, name from public.stays where id = $1 and owner_id is not null and deleted_at is null',
+      [stayId]
+    );
+    const stay = result.rows[0];
+    if (!stay) return;
+    const nights =
+      details.checkOut && details.checkOut !== '—'
+        ? Math.max(1, Math.round((new Date(details.checkOut) - new Date(details.checkIn)) / 86400000))
+        : 1;
+    await notifyOwner(stay.owner_id, 'reservation_created', {
+      ...details,
+      propertyName: stay.name,
+      roomName: 'Selon disponibilité',
+      nights,
+    });
+  } catch (err) {
+    console.warn('[OwnerNotify] stay', err.message);
+  }
+}
 
 router.post('/', reservationLimiter, async (req, res, next) => {
   try {
@@ -406,6 +430,16 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       sendReservationAdminEmail(adminPayload).catch((err) =>
         console.warn('[Mail] Réservation admin:', err.message)
       ),
+      normalizedItemType === 'stay'
+        ? notifyStayOwner(itemId.trim(), {
+            referenceCode,
+            checkIn: effectiveCheckIn || String(effectiveTravelDate).slice(0, 10),
+            checkOut: effectiveCheckOut || '—',
+            rooms: roomsCount,
+            clientName: name.trim(),
+            total: computedTotal,
+          })
+        : null,
     ]);
   } catch (err) {
     if (err.message?.includes('relation "public.reservations" does not exist')) {
