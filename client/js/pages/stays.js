@@ -26,11 +26,68 @@ const readFilters = () => {
   return { type, place };
 };
 
-const state = { ...readFilters(), selectedId: null };
+const emptyForm = () => ({
+  roomId: '',
+  checkIn: '',
+  checkOut: '',
+  rooms: '1',
+  adults: '2',
+  children: '0',
+  name: '',
+  email: '',
+  phone: '',
+  message: '',
+  consent: false,
+});
+
+const state = {
+  ...readFilters(),
+  selectedId: null,
+  remote: new Map(),
+  details: new Map(),
+  step: 'detail',
+  form: emptyForm(),
+  sending: false,
+  error: '',
+  sent: null,
+};
 let sheet = null;
 let page = null;
 
-const filtered = () => filterStays({ type: state.type, place: state.place });
+const remoteToStay = (p) => {
+  const type = String(p.propertyType || '').toLowerCase() === 'guesthouse' ? 'guesthouse' : 'hotel';
+  const city = p.city || '';
+  return {
+    id: p.id,
+    type,
+    placeId: p.placeId || '',
+    name: p.name,
+    location: city,
+    desc: p.shortDescription || p.description || '',
+    image: p.image || '/images/home/acc-hotel.jpg',
+    gallery: p.image ? [p.image] : [],
+    price: Number(p.minPrice || p.basePrice) || 0,
+    rating: p.rating || '—',
+    reviews: 0,
+    amenities: { fr: [], en: [], ar: [] },
+  };
+};
+
+const withRemote = (stay) => {
+  const p = state.remote.get(stay.id);
+  if (!p) return stay;
+  return { ...stay, name: p.name || stay.name, price: Number(p.minPrice || p.basePrice) || stay.price };
+};
+
+const filtered = () => {
+  const local = filterStays({ type: state.type, place: state.place });
+  const ids = new Set(local.map((s) => s.id));
+  const extra = [...state.remote.values()]
+    .filter((p) => !ids.has(p.id) && !filterStays().some((s) => s.id === p.id))
+    .map(remoteToStay)
+    .filter((s) => (state.type === 'all' || s.type === state.type) && (state.place === 'all' || s.placeId === state.place));
+  return [...local.map(withRemote), ...extra];
+};
 const getSelected = () => filtered().find((s) => s.id === state.selectedId) || null;
 
 const priceText = (stay) =>
@@ -40,13 +97,273 @@ const priceText = (stay) =>
 
 const typeLabel = (stay) => (stay.type === 'hotel' ? t('stays_type_hotel') : t('stays_type_guesthouse'));
 
-const whatsapp = (stay) => {
-  const name = pick(stay.name, stay.name_en, stay.name_ar);
-  const msg = encodeURIComponent(
-    `Bonjour, je souhaite réserver : ${name} (${pick(stay.location, stay.location_en, stay.location_ar)})`
-  );
-  window.open(`https://wa.me/213557664089?text=${msg}`, '_blank', 'noopener,noreferrer');
+const BOOK_LABEL = () => pick('Réserver', 'Book now', 'احجز الآن');
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const addDays = (iso, n) => {
+  const d = new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
 };
+const nightsBetween = (a, b) => Math.round((new Date(`${b}T12:00:00`) - new Date(`${a}T12:00:00`)) / 86400000);
+const option = (value, label, current) =>
+  `<option value="${esc(value)}"${String(value) === String(current) ? ' selected' : ''}>${esc(label)}</option>`;
+
+const loadRemote = async () => {
+  if (!window.AT_API) return;
+  try {
+    const { ok, data } = await window.AT_API.request('/accommodations?limit=100');
+    if (!ok || !Array.isArray(data?.data)) return;
+    state.remote = new Map(data.data.map((p) => [p.id, p]));
+    page.rerender();
+  } catch {
+    /* backend injoignable : catalogue statique seul */
+  }
+};
+
+const loadDetail = async (id) => {
+  if (!state.remote.has(id) || state.details.has(id)) return state.details.get(id) || null;
+  try {
+    const { ok, data } = await window.AT_API.request(`/accommodations/${encodeURIComponent(id)}`);
+    if (ok && data?.data) state.details.set(id, data.data);
+  } catch {
+    /* demande générique si le détail est indisponible */
+  }
+  return state.details.get(id) || null;
+};
+
+const roomsOf = (stay) => state.details.get(stay.id)?.rooms || [];
+const currentRoom = (stay) => roomsOf(stay).find((r) => r.id === state.form.roomId) || roomsOf(stay)[0] || null;
+
+const estimate = (stay) => {
+  const { checkIn, checkOut } = state.form;
+  if (!checkIn || !checkOut || checkOut <= checkIn) return null;
+  const nights = nightsBetween(checkIn, checkOut);
+  const room = currentRoom(stay);
+  const rooms = Number(state.form.rooms) || 1;
+  if (room) return { nights, total: Number(room.basePrice) * nights * rooms };
+  if (stay.pricePerPerson) return { nights, total: stay.price * ((Number(state.form.adults) || 1) + (Number(state.form.children) || 0)) };
+  return { nights, total: stay.price * nights * rooms };
+};
+
+const openForm = async (stay) => {
+  state.step = 'form';
+  state.error = '';
+  if (!state.form.checkIn) {
+    state.form.checkIn = addDays(todayIso(), 1);
+    state.form.checkOut = addDays(todayIso(), 2);
+  }
+  if (!sheet) return;
+  sheet.setContent(sheetHtml(stay));
+  sheet.panel.querySelector('.stays-book')?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' });
+  if (state.remote.has(stay.id) && !state.details.has(stay.id)) {
+    await loadDetail(stay.id);
+    if (sheet && state.selectedId === stay.id && state.step === 'form') sheet.setContent(sheetHtml(stay));
+  }
+};
+
+const validateForm = (stay) => {
+  const f = state.form;
+  if (!f.checkIn || !f.checkOut) return pick('Choisissez vos dates.', 'Choose your dates.', 'اختر التواريخ.');
+  if (f.checkIn < todayIso()) return pick('La date d’arrivée est passée.', 'Check-in date is in the past.', 'تاريخ الوصول قد مضى.');
+  if (f.checkOut <= f.checkIn)
+    return pick('La date de départ doit être après l’arrivée.', 'Check-out must be after check-in.', 'يجب أن يكون المغادرة بعد الوصول.');
+  const room = currentRoom(stay);
+  if (room) {
+    const rooms = Number(f.rooms) || 1;
+    if (Number(f.adults) > room.capacityAdults * rooms)
+      return pick(
+        `Maximum ${room.capacityAdults} adulte(s) par chambre.`,
+        `Maximum ${room.capacityAdults} adult(s) per room.`,
+        `الحد الأقصى ${room.capacityAdults} بالغ لكل غرفة.`
+      );
+    if (Number(f.children) > room.capacityChildren * rooms)
+      return pick('Trop d’enfants pour cette chambre.', 'Too many children for this room.', 'عدد الأطفال يتجاوز سعة الغرفة.');
+  }
+  if (!f.consent)
+    return pick('Merci d’accepter le traitement de vos données.', 'Please accept data processing.', 'يرجى الموافقة على معالجة بياناتك.');
+  return '';
+};
+
+const submitBooking = async (stay) => {
+  const f = state.form;
+  const msg = validateForm(stay);
+  state.error = msg;
+  if (msg) {
+    sheet?.setContent(sheetHtml(stay));
+    return;
+  }
+  state.sending = true;
+  sheet?.setContent(sheetHtml(stay));
+  const room = currentRoom(stay);
+  const adults = Number(f.adults) || 1;
+  const children = Number(f.children) || 0;
+  const rooms = Number(f.rooms) || 1;
+  const name = pick(stay.name, stay.name_en, stay.name_ar);
+  let res;
+  try {
+    res = room
+      ? await window.AT_API.request('/accommodations/reservations', {
+          method: 'POST',
+          body: {
+            propertyId: stay.id,
+            roomTypeId: room.id,
+            checkIn: f.checkIn,
+            checkOut: f.checkOut,
+            rooms,
+            adults,
+            children,
+            name: f.name.trim(),
+            email: f.email.trim(),
+            phone: f.phone.trim(),
+            message: f.message.trim(),
+            gdprConsent: true,
+            website: '',
+          },
+        })
+      : await window.AT_API.request('/reservations', {
+          method: 'POST',
+          body: {
+            item_type: 'stay',
+            item_id: stay.id,
+            item_name: name,
+            stay_type: stay.type,
+            name: f.name.trim(),
+            email: f.email.trim(),
+            phone: f.phone.trim(),
+            travel_date: f.checkIn,
+            check_in_date: f.checkIn,
+            check_out_date: f.checkOut,
+            rooms_requested: rooms,
+            travelers: Math.min(20, adults + children),
+            message: [`Séjour : du ${f.checkIn} au ${f.checkOut}`, `Adultes : ${adults} · Enfants : ${children}`, f.message.trim()]
+              .filter(Boolean)
+              .join('\n'),
+            unit_price: stay.price,
+            price_per_person: Boolean(stay.pricePerPerson),
+            gdpr_consent: true,
+            payment_method: 'pre_request',
+            website: '',
+          },
+        });
+  } catch {
+    res = { ok: false, data: { message: pick('Serveur injoignable. Réessayez dans un instant.', 'Server unreachable. Please retry.', 'تعذر الاتصال بالخادم.') } };
+  }
+  state.sending = false;
+  if (res.ok) {
+    const d = res.data?.data || res.data || {};
+    state.sent = { ref: d.referenceCode || '', total: d.priceEstimate, email: f.email.trim() };
+    state.step = 'sent';
+  } else {
+    state.error = res.data?.message || res.data?.error || pick('La demande n’a pas pu être envoyée.', 'Request could not be sent.', 'تعذر إرسال الطلب.');
+  }
+  sheet?.setContent(sheetHtml(stay));
+};
+
+const formHtml = (stay) => {
+  const f = state.form;
+  const rooms = roomsOf(stay);
+  const room = currentRoom(stay);
+  const loading = state.remote.has(stay.id) && !state.details.has(stay.id);
+  const est = estimate(stay);
+  const maxRooms = Math.max(1, Math.min(10, room?.totalRooms || 10));
+  if (Number(f.rooms) > maxRooms) f.rooms = String(maxRooms);
+  const maxChildren = room ? room.capacityChildren * (Number(f.rooms) || 1) : 10;
+  if (Number(f.children) > maxChildren) f.children = String(maxChildren);
+  return `
+    <form class="place-form stays-book" novalidate>
+      <h3>${esc(pick('Demande de réservation', 'Booking request', 'طلب حجز'))}</h3>
+      ${
+        loading
+          ? `<p class="place-form__note">${esc(pick('Chargement des chambres…', 'Loading rooms…', 'جارٍ تحميل الغرف…'))}</p>`
+          : rooms.length
+            ? `<label>${esc(pick('Chambre', 'Room', 'الغرفة'))}
+          <select name="roomId">${rooms
+            .map((r) =>
+              option(
+                r.id,
+                `${r.name} — ${Number(r.basePrice).toLocaleString()} DA / ${pick('nuit', 'night', 'ليلة')} · ${r.capacityAdults} ${pick('pers.', 'guests', 'أشخاص')}`,
+                room?.id
+              )
+            )
+            .join('')}</select>
+        </label>`
+            : ''
+      }
+      <div class="place-form__row">
+        <label>${esc(pick('Arrivée', 'Check-in', 'الوصول'))}
+          <input type="date" name="checkIn" value="${esc(f.checkIn)}" min="${todayIso()}" required />
+        </label>
+        <label>${esc(pick('Départ', 'Check-out', 'المغادرة'))}
+          <input type="date" name="checkOut" value="${esc(f.checkOut)}" min="${esc(f.checkIn ? addDays(f.checkIn, 1) : todayIso())}" required />
+        </label>
+      </div>
+      <div class="place-form__row stays-book__counts">
+        <label>${esc(pick('Chambres', 'Rooms', 'الغرف'))}
+          <select name="rooms">${Array.from({ length: maxRooms }, (_, i) => option(i + 1, i + 1, f.rooms)).join('')}</select>
+        </label>
+        <label>${esc(pick('Adultes', 'Adults', 'البالغون'))}
+          <select name="adults">${Array.from({ length: 12 }, (_, i) => option(i + 1, i + 1, f.adults)).join('')}</select>
+        </label>
+        <label>${esc(pick('Enfants', 'Children', 'الأطفال'))}
+          <select name="children">${Array.from({ length: Math.max(0, maxChildren) + 1 }, (_, i) => option(i, i, f.children)).join('')}</select>
+        </label>
+      </div>
+      <div class="place-form__row">
+        <label>${esc(t('place_form_name'))}
+          <input type="text" name="name" value="${esc(f.name)}" required autocomplete="name" />
+        </label>
+        <label>${esc(t('place_form_email'))}
+          <input type="email" name="email" value="${esc(f.email)}" required autocomplete="email" />
+        </label>
+      </div>
+      <label>${esc(t('place_form_phone'))}
+        <input type="tel" name="phone" value="${esc(f.phone)}" required pattern="[0-9+ .\\(\\)\\-]{8,20}" autocomplete="tel" />
+      </label>
+      <label>${esc(t('place_form_message'))}
+        <textarea name="message" rows="3">${esc(f.message)}</textarea>
+      </label>
+      <label class="stays-book__consent">
+        <input type="checkbox" name="consent"${f.consent ? ' checked' : ''} />
+        <span>${esc(
+          pick(
+            'J’accepte que mes données soient transmises à l’établissement et à Algeria Travel pour traiter ma demande.',
+            'I agree that my data is shared with the property and Algeria Travel to process my request.',
+            'أوافق على مشاركة بياناتي مع المؤسسة و Algeria Travel لمعالجة طلبي.'
+          )
+        )}</span>
+      </label>
+      ${
+        est
+          ? `<p class="stays-book__estimate">${esc(pick('Estimation', 'Estimate', 'تقدير'))} : <strong>${est.total.toLocaleString()} DA</strong> · ${est.nights} ${esc(
+              pick('nuit(s)', 'night(s)', 'ليلة')
+            )}</p>`
+          : ''
+      }
+      <p class="place-form__error" role="alert"${state.error ? '' : ' hidden'}>${esc(state.error)}</p>
+      <div class="stays-detail__actions">
+        <button type="button" class="premium-btn premium-btn--ghost" data-book-back>${esc(pick('Retour', 'Back', 'رجوع'))}</button>
+        <button type="submit" class="premium-btn premium-btn--primary"${state.sending || loading ? ' disabled' : ''}>
+          ${icon('Send', 16)} ${esc(state.sending ? pick('Envoi…', 'Sending…', 'جارٍ الإرسال…') : pick('Envoyer la demande', 'Send request', 'إرسال الطلب'))}
+        </button>
+      </div>
+    </form>`;
+};
+
+const sentHtml = () => `
+  <div class="stays-book stays-book--sent" role="status">
+    <h3>${icon('Check', 18)} ${esc(pick('Demande envoyée', 'Request sent', 'تم إرسال الطلب'))}</h3>
+    ${state.sent.ref ? `<p>${esc(pick('Référence', 'Reference', 'المرجع'))} : <strong>${esc(state.sent.ref)}</strong></p>` : ''}
+    <p>${esc(
+      pick(
+        `L’établissement et notre équipe ont reçu votre demande. Une confirmation a été envoyée à ${state.sent.email}.`,
+        `The property and our team have received your request. A confirmation was sent to ${state.sent.email}.`,
+        `استلمت المؤسسة وفريقنا طلبك. تم إرسال تأكيد إلى ${state.sent.email}.`
+      )
+    )}</p>
+    <div class="stays-detail__actions">
+      <button type="button" class="premium-btn premium-btn--ghost" data-book-close>${esc(pick('Fermer', 'Close', 'إغلاق'))}</button>
+    </div>
+  </div>`;
 
 const cardHtml = (stay, i) => `
   <article class="acts-card stays-card ${state.selectedId === stay.id ? 'is-open' : ''}" data-reveal data-delay="${
@@ -109,14 +426,21 @@ const sheetHtml = (selected) => {
       </div>`
           : ''
       }
-      <div class="stays-detail__actions stays-detail__actions--desktop">
-        <button type="button" class="premium-btn premium-btn--primary" data-wa>
-          ${icon('MessageCircle', 16)} ${esc(t('stays_book_wa'))}
+      ${
+        state.step === 'form'
+          ? formHtml(selected)
+          : state.step === 'sent'
+            ? sentHtml()
+            : `
+      <div class="stays-detail__actions">
+        <button type="button" class="premium-btn premium-btn--primary" data-book>
+          ${icon('Calendar', 16)} ${esc(BOOK_LABEL())}
         </button>
         <button type="button" class="premium-btn premium-btn--ghost" data-contact>
           ${esc(t('stays_contact'))}
         </button>
-      </div>
+      </div>`
+      }
     </div>`;
 };
 
@@ -124,8 +448,8 @@ const barHtml = (selected) =>
   mobileBookingBar({
     priceLabel: selected.pricePerPerson ? t('home_v2_coup_per_person') : t('acts_from'),
     price: `${selected.price.toLocaleString()} DA`,
-    ctaLabel: t('stays_book_wa'),
-    ctaIcon: 'MessageCircle',
+    ctaLabel: BOOK_LABEL(),
+    ctaIcon: 'Calendar',
     className: 'stays-mobile-bar',
   });
 
@@ -204,6 +528,15 @@ const render = () => {
   </div>`;
 };
 
+const resetBooking = () => {
+  const { name, email, phone } = state.form;
+  state.step = 'detail';
+  state.error = '';
+  state.sent = null;
+  state.sending = false;
+  state.form = { ...emptyForm(), name, email, phone };
+};
+
 /* Feuille de détail, barre mobile et état "is-open" des cartes */
 const syncSelection = (root) => {
   const selected = getSelected();
@@ -228,6 +561,7 @@ const syncSelection = (root) => {
         if (!sheet) return;
         sheet = null;
         state.selectedId = null;
+        resetBooking();
         syncSelection(root);
       },
     });
@@ -239,11 +573,43 @@ const syncSelection = (root) => {
         openLightbox(current.gallery, Number(galleryBtn.getAttribute('data-gallery-idx')));
         return;
       }
-      if (e.target.closest('[data-wa]')) {
-        whatsapp(current);
+      if (e.target.closest('[data-book]')) {
+        openForm(current);
+        return;
+      }
+      if (e.target.closest('[data-book-back]')) {
+        state.step = 'detail';
+        state.error = '';
+        sheet.setContent(sheetHtml(current));
+        return;
+      }
+      if (e.target.closest('[data-book-close]')) {
+        sheet.close();
         return;
       }
       if (e.target.closest('[data-contact]')) navigate('/contact');
+    });
+    const onField = (e) => {
+      const { name, type, value, checked } = e.target;
+      if (!name || !(name in state.form)) return;
+      state.form[name] = type === 'checkbox' ? checked : value;
+      if (state.error) {
+        state.error = '';
+        const errorEl = sheet.panel.querySelector('.place-form__error');
+        if (errorEl) errorEl.hidden = true;
+      }
+      if (e.type !== 'change' || !['roomId', 'rooms', 'checkIn', 'checkOut'].includes(name)) return;
+      const f = state.form;
+      if (name === 'checkIn' && f.checkIn && (!f.checkOut || f.checkOut <= f.checkIn)) f.checkOut = addDays(f.checkIn, 1);
+      const current = getSelected();
+      if (current) sheet.setContent(sheetHtml(current));
+    };
+    sheet.panel.addEventListener('input', onField);
+    sheet.panel.addEventListener('change', onField);
+    sheet.panel.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const current = getSelected();
+      if (current && !state.sending) submitBooking(current);
     });
   } else if (selected && sheet) {
     sheet.setContent(sheetHtml(selected));
@@ -273,6 +639,7 @@ const applyFilters = () => {
 
 const toggleStay = (root, id) => {
   state.selectedId = state.selectedId === id ? null : id;
+  resetBooking();
   syncSelection(root);
 };
 
@@ -293,7 +660,7 @@ const bind = (root) => {
     }
     if (e.target.closest('.stays-mobile-bar .mobile-booking-bar__btn')) {
       const selected = getSelected();
-      if (selected) whatsapp(selected);
+      if (selected) openForm(selected);
       return;
     }
     const card = e.target.closest('[data-stay]');
@@ -313,3 +680,4 @@ const bind = (root) => {
 
 page = mountPage({ route, render, bind, afterRender: syncSelection });
 window.scrollTo(0, 0);
+loadRemote();
