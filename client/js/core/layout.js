@@ -155,23 +155,6 @@ const socialIcon = (type) => {
   return '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M14.5 3.5c.4 2.1 1.6 3.5 3.5 4.2v2.3c-1.3-.05-2.5-.45-3.6-1.15v5.55c0 3.4-2.7 5.9-6.2 5.9S2 17.8 2 14.4c0-3.3 2.5-5.8 5.8-5.9v2.4c-1.8.1-3.1 1.4-3.1 3.4 0 2.1 1.5 3.6 3.5 3.6s3.4-1.5 3.4-3.6V3.5h2.9z"></path></svg>';
 };
 
-const QR_API = `${window.AT_API?.base || 'https://algeria-travelbackend-9hpl.onrender.com/api'}/qrcode`;
-
-const qrBlock = () => {
-  const lang = getLang();
-  const tr = (fr, en, ar) => (lang === 'ar' ? ar : lang === 'en' ? en : fr);
-  return `
-    <div class="site-footer__qr">
-      <img src="${QR_API}" alt="${esc(tr('QR Code vers algeriatravel.org', 'QR code to algeriatravel.org', 'رمز QR إلى algeriatravel.org'))}" width="96" height="96" loading="lazy" />
-      <div>
-        <p>${esc(tr('Scannez pour découvrir Algeria Travel', 'Scan to discover Algeria Travel', 'امسح الرمز لاكتشاف Algeria Travel'))}</p>
-        <a href="${QR_API}/download" download="algeria-travel-qrcode.png">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg> ${esc(tr('Télécharger le QR Code', 'Download the QR code', 'تحميل رمز QR'))}
-        </a>
-      </div>
-    </div>`;
-};
-
 /** Pied de page (équivalent de <Footer />). */
 export function footer() {
   const waHref = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Bonjour, je souhaite des infos sur Algeria Travel')}`;
@@ -190,7 +173,6 @@ export function footer() {
               ${icon('MessageCircle', 18)}
               ${esc(t('footer_whatsapp'))}
             </a>
-            ${qrBlock()}
           </div>
 
           <nav class="site-footer__nav" aria-label="${esc(t('footer_quick'))}">
