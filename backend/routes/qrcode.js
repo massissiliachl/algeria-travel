@@ -2,8 +2,8 @@
  * QR Code public : ouvre uniquement la page d'accueil du site officiel (jamais l'admin ni le backend).
  */
 const express = require('express');
-const QRCode = require('qrcode');
 const { asyncHandler } = require('../lib/asyncHandler');
+const { buildQrPng } = require('../lib/qrImage');
 
 const router = express.Router();
 const DEFAULT_SITE_URL = 'https://algeriatravel.org';
@@ -24,14 +24,7 @@ let cache = null;
 async function qrPng() {
   const target = publicSiteUrl();
   if (cache?.target !== target) {
-    const buffer = await QRCode.toBuffer(target, {
-      type: 'png',
-      width: 1200,
-      margin: 4,
-      errorCorrectionLevel: 'H',
-      color: { dark: '#1A2332', light: '#FFFFFF' },
-    });
-    cache = { target, buffer };
+    cache = { target, buffer: await buildQrPng(target) };
   }
   return cache.buffer;
 }
