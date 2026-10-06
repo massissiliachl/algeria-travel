@@ -12,6 +12,7 @@ const {
   sendReservationAdminEmail,
 } = require('../lib/reservationEmails');
 const { createPartnerNotification } = require('../lib/partnerNotifications');
+const { calendarKey, checkTravelDate } = require('../lib/bookingCalendar');
 
 const router = express.Router();
 
@@ -85,6 +86,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       item_type: itemType = 'place',
       item_id: itemId,
       item_name: itemName,
+      item_pkg: itemPkgRaw,
       name,
       email,
       phone,
@@ -260,7 +262,21 @@ router.post('/', reservationLimiter, async (req, res, next) => {
     /* Taghit propose plusieurs formules (hôtel, maison d’hôte, Brezina…) à des dates différentes :
        le séjour fixe 23 → 28 octobre n’est appliqué que si le visiteur choisit ce départ. */
     let isTaghitFixedStay = false;
-    if (itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place') {
+    let itemPkg = null;
+    if (normalizedItemTypeEarly === 'place') {
+      itemPkg = String(itemPkgRaw || '').trim().toLowerCase() || null;
+      if (!itemPkg && itemId.trim() === 'taghit' && /brezina/i.test(itemName)) itemPkg = 'brezina';
+      if (itemPkg && !/^[a-z0-9-]{1,40}$/.test(itemPkg)) itemPkg = null;
+      const dateCheck = await checkTravelDate(calendarKey(itemId, itemPkg), effectiveTravelDate);
+      if (!dateCheck.ok) return res.status(400).json({ error: dateCheck.error });
+      if (dateCheck.period) {
+        isTaghitFixedStay = true;
+        effectiveTravelDate = dateCheck.period.start;
+        effectiveCheckIn = dateCheck.period.start;
+        effectiveCheckOut = dateCheck.period.end;
+      }
+    }
+    if (!isTaghitFixedStay && itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place' && itemPkg !== 'brezina') {
       const { TAGHIT_BOOKING_WINDOW } = require('../scripts/data/taghitPackages.cjs');
       if (String(effectiveTravelDate).slice(0, 10) === TAGHIT_BOOKING_WINDOW.start) {
         isTaghitFixedStay = true;
@@ -297,8 +313,8 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         travelers, stay_type, message,
         price_estimate, unit_price, price_per_person, payment_method,
         card_holder, card_last4, card_brand, card_expiry, gdpr_consent_at,
-        reference_code, access_token_hash
-      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, now(), $22, $23)
+        reference_code, access_token_hash, item_pkg
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, now(), $22, $23, $24)
       returning id`,
       [
         normalizedItemType,
@@ -324,6 +340,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         cardMeta.expiry,
         referenceCode,
         accessTokenHash,
+        itemPkg,
       ]
     );
 

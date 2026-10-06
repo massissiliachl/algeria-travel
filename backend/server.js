@@ -119,6 +119,9 @@ app.use(
 app.use('/api/owner', require('./routes/owner/auth'));
 app.use('/api/owner', authenticateOwner, makeAccommodationRouter());
 app.use('/api/accommodations', require('./routes/accommodationsPublic'));
+const bookingCalendar = require('./routes/bookingCalendar');
+app.use('/api/booking-calendar', bookingCalendar.publicRouter);
+app.use('/api/admin/booking-calendar', bookingCalendar.adminRouter);
 app.use('/api', require('./routes/content'));
 
 app.get('/api/live', (req, res) => {
