@@ -24,7 +24,7 @@ const TRUST = [
     icon: 'MessageCircle',
     title: 'home_trust_whatsapp',
     desc: 'home_trust_whatsapp_desc',
-    href: 'https://wa.me/213557664089?text=' + encodeURIComponent('Bonjour, je souhaite réserver une activité sur Algeria Travel'),
+    href: 'https://wa.me/33619501708?text=' + encodeURIComponent('Bonjour, je souhaite réserver une activité sur Algeria Travel'),
   },
 ];
 

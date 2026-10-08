@@ -111,6 +111,7 @@
         pkg: t.pkg || '',
         description: t.description || '',
         active: t.published !== false,
+        bookingOpen: t.bookingOpen !== false,
       })),
     activities: (rows) =>
       list(rows).map((a) => ({
@@ -167,6 +168,7 @@
       pkg: t.pkg || '',
       description: t.description || '',
       published: t.active !== false,
+      bookingOpen: t.bookingOpen !== false,
     }),
     activities: (a) => ({
       id: a.id,

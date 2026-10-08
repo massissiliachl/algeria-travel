@@ -4,7 +4,7 @@ import { icon } from '../core/icons.js';
 import { href } from '../core/router.js';
 import { esc, asset } from '../core/dom.js';
 
-const EMAILS = ['Algeria.travel@gmail.com', 'visit.bougie@gmail.com', 'Algeriatravel@gmail.com'];
+const EMAILS = ['travelalgeriadz@gmail.com'];
 
 const EMPTY_FORM = { name: '', email: '', phone: '', subject: '', message: '' };
 
@@ -133,7 +133,7 @@ const render = () => `
                 ${icon('Users', 18)}
                 <div>
                   <strong>${esc(t('contact_info_phone'))}</strong>
-                  <a href="tel:+213557664089">00213 557 664 089</a>
+                  <a href="tel:+33619501708">+33 6 19 50 17 08</a>
                 </div>
               </li>
               <li>
@@ -152,7 +152,7 @@ const render = () => `
               </li>
             </ul>
 
-            <a class="ct-wa" href="https://wa.me/213557664089?text=${encodeURIComponent(
+            <a class="ct-wa" href="https://wa.me/33619501708?text=${encodeURIComponent(
               'Bonjour, je souhaite des infos sur Algeria Travel'
             )}" target="_blank" rel="noopener noreferrer">
               ${icon('MessageCircle', 18)}

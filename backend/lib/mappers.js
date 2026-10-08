@@ -110,6 +110,7 @@ const tourFields = [
   ['image', 'image', mediaPath], ['category', 'category'],
   ['activities', 'activities', (v) => jsonStr(v, [])], ['itinerary', 'itinerary', (v) => jsonStr(v, [])],
   ['place_slug', 'placeSlug'], ['pkg', 'pkg'], ['badge', 'badge'], ['published', 'published', bool],
+  ['booking_open', 'bookingOpen', bool],
 ];
 
 function mapTour(row) {
@@ -124,7 +125,7 @@ function mapTour(row) {
     price: row.price, oldPrice: row.old_price, rating: Number(row.rating), reviews: row.reviews,
     image: row.image, category: row.category, activities: row.activities, itinerary: row.itinerary,
     placeSlug: row.place_slug, pkg: row.pkg, badge: row.badge,
-    published: row.published, createdAt: row.created_at, updatedAt: row.updated_at,
+    published: row.published, bookingOpen: row.booking_open !== false, createdAt: row.created_at, updatedAt: row.updated_at,
   };
 }
 

@@ -14,7 +14,8 @@
     "seed:gallery": "node scripts/seed-gallery.js",
     "prepare:seed": "node scripts/prepare-seed-data.js",
     "migrate:uploads": "node scripts/migrate-uploads-to-cms.js",
-    "qrcode": "node scripts/generate-qrcode.js"
+    "qrcode": "node scripts/generate-qrcode.js",
+    "test:chatbot": "node scripts/test-chatbot.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

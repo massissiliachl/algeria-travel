@@ -54,6 +54,7 @@ const cardHtml = (tour, i) => {
           <span>${icon('MapPin', 13)}${esc(pick(tour.location, tour.location_en, tour.location_ar))}</span>
           <span>${icon('Clock', 13)}${esc(pick(tour.duration, tour.duration_en, tour.duration_ar))}</span>
           <span>${icon('Tag', 13)}${esc(price)}</span>
+          ${tour.bookingOpen === false ? `<span>${icon('Calendar', 13)}${esc(t('place_booking_closed'))}</span>` : ''}
         </div>
       </div>
     </article>`;

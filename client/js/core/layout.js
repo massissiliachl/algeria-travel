@@ -3,6 +3,7 @@ import { icon } from './icons.js';
 import { href } from './router.js';
 import { esc, asset } from './dom.js';
 import { initReveal, lockScroll, unlockScroll } from './ui.js';
+import { mountChatbot } from './chatbot.js';
 
 const NAV_LINKS = [
   { key: 'home', href: '/', tKey: 'nav_home' },
@@ -29,9 +30,9 @@ const FOOTER_LINKS = [
   { to: '/contact', tKey: 'nav_contact' },
 ];
 
-const EMAILS = ['Algeria.travel@gmail.com', 'visit.bougie@gmail.com', 'Algeriatravel@gmail.com'];
+const EMAILS = ['travelalgeriadz@gmail.com'];
 
-const WA_NUMBER = '213557664089';
+const WA_NUMBER = '33619501708';
 
 /* ── État de la navigation ── */
 
@@ -196,7 +197,7 @@ export function footer() {
                 ${icon('Users', 16)}
                 <span>
                   <strong>${esc(t('footer_phone_label'))}</strong>
-                  <a href="tel:+213557664089">00213 557 664 089</a>
+                  <a href="tel:+33619501708">+33 6 19 50 17 08</a>
                 </span>
               </li>
               <li>
@@ -430,6 +431,7 @@ export function mountPage({ route = '/', render, bind, afterRender }) {
   rerender();
   bindLayout();
   mountWhatsApp();
+  mountChatbot();
   mountCookieBanner();
   initReveal();
   bind?.(root);

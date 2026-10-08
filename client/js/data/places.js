@@ -356,7 +356,7 @@ export const PLACES = [
     pkgTitle_en: '6-day / 6-night bivouac circuit',
     pkgTitle_ar: 'رحلة 6 أيام / 6 ليالٍ في المخيم',
     pkgIcon: 'Tent',
-    whatsapp: '213557664089',
+    whatsapp: '33619501708',
     stay: 'Bivouac ou lodge selon le programme · pension complète',
     stay_en: 'Bivouac or lodge depending on the programme · full board',
     stay_ar: 'مخيم أو نُزل حسب البرنامج · إقامة كاملة',

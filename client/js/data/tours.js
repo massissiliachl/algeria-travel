@@ -2,6 +2,7 @@
 
 import '../core/siteContent.js';
 import { TAGHIT_PACKAGES } from './taghitPackages.js';
+import { getPlaceSlugFromTour } from './placeRoutes.js';
 
 const taghitHotel = TAGHIT_PACKAGES.hotel;
 const taghitGuest = TAGHIT_PACKAGES.guesthouse;
@@ -463,6 +464,7 @@ const fromAdmin = (c) => {
   if (c.category) out.category = c.category;
   if (c.placeSlug !== undefined) out.placeSlug = c.placeSlug || undefined;
   if (c.pkg) out.pkg = c.pkg;
+  out.bookingOpen = c.bookingOpen !== false;
   out.priceOnRequest = Boolean(c.priceOnRequest);
   out.price = out.priceOnRequest ? 0 : Number(c.price) || 0;
   if (base && out.price !== base.price) delete out.oldPrice;
@@ -474,3 +476,12 @@ const adminCircuits = readAdminCircuits();
 export const FEATURED_TOURS = adminCircuits
   ? adminCircuits.filter((c) => c.active !== false).map(fromAdmin)
   : BASE_TOURS;
+
+/** true si l’admin a fermé les réservations du circuit qui mène à cette fiche (destination + formule) */
+export const isCircuitBookingClosed = (placeId, pkg) =>
+  FEATURED_TOURS.some(
+    (tour) =>
+      tour.bookingOpen === false &&
+      getPlaceSlugFromTour(tour) === placeId &&
+      (tour.pkg || '') === (pkg || '')
+  );

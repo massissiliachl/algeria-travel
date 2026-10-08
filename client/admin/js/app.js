@@ -10,6 +10,7 @@
     activities: 'Activités',
     media: 'Galerie',
     comments: 'Commentaires',
+    chat: 'Chat / Messages clients',
     pages: 'Textes du site',
     settings: 'Réglages',
   };
@@ -103,6 +104,7 @@
     if (id === 'settings') ATContentUI.fillSettingsForm();
     if (id === 'pages') ATManageUI.fillPagesForm();
     if (id === 'comments') ATCommentsUI.load(toast);
+    if (id === 'chat') ATChatUI.load(toast);
     if (id === 'owners') ATOwnersUI.load(toast, openDrawer);
   }
 
@@ -184,6 +186,8 @@
   document.getElementById('actAddBtn').addEventListener('click', () => ATManageUI.openActivityForm(null, openDrawer, toast));
   document.getElementById('commentsReload').addEventListener('click', () => ATCommentsUI.load(toast));
   ATCommentsUI.bind(toast);
+  document.getElementById('chatReload').addEventListener('click', () => ATChatUI.load(toast));
+  ATChatUI.bind(toast);
   ATOwnersUI.bind(toast, openDrawer);
 
   document.body.addEventListener('click', (e) => {
@@ -199,6 +203,33 @@
         openDrawer,
         toast
       );
+      return;
+    }
+    const bookingDest = e.target.closest('[data-dest-booking]');
+    if (bookingDest) {
+      const dest = ATStore.getDestinations().find((d) => d.id === bookingDest.dataset.destBooking);
+      if (!dest) return;
+      ATStore.upsertDestination({ ...dest, bookingOpen: !dest.bookingOpen });
+      toast(`Réservations ${dest.bookingOpen ? 'fermées' : 'ouvertes'} : ${dest.name}`);
+      refresh();
+      return;
+    }
+    const bookingTour = e.target.closest('[data-tour-booking]');
+    if (bookingTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === bookingTour.dataset.tourBooking);
+      if (!tour) return;
+      const open = tour.bookingOpen !== false;
+      ATStore.upsertTour({ ...tour, bookingOpen: !open });
+      toast(`Réservations ${open ? 'fermées' : 'ouvertes'} : ${tour.name}`);
+      refresh();
+      return;
+    }
+    const calTour = e.target.closest('[data-tour-calendar]');
+    if (calTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === calTour.dataset.tourCalendar);
+      if (!tour?.placeSlug) return;
+      const dest = ATStore.getDestinations().find((d) => d.id === tour.placeSlug) || { id: tour.placeSlug, name: tour.name };
+      ATBookingCalendarUI.open(dest, openDrawer, toast, tour.pkg ? `${tour.placeSlug}:${tour.pkg}` : tour.placeSlug);
       return;
     }
     const calDest = e.target.closest('[data-dest-calendar]');

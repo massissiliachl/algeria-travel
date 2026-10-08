@@ -37,7 +37,15 @@
         <td>${escapeHtml(d.tagline || '—')}</td>
         <td>${Number(d.price || 0).toLocaleString('fr-FR')} DA</td>
         <td>${d.active === false ? '<span class="badge badge--cancelled">Archivée</span>' : '<span class="badge badge--confirmed">Active</span>'}</td>
+        <td>${
+          d.bookingOpen
+            ? '<span class="badge badge--confirmed">Ouvertes</span>'
+            : '<span class="badge badge--cancelled">Fermées</span>'
+        }</td>
         <td class="actions">
+          <button type="button" class="btn btn--sm ${d.bookingOpen ? 'btn--ghost' : 'btn--gold'}" data-dest-booking="${escapeHtml(d.id)}">${
+            d.bookingOpen ? 'Fermer les réservations' : 'Ouvrir les réservations'
+          }</button>
           <button type="button" class="btn btn--sm btn--ghost" data-dest-edit="${escapeHtml(d.id)}">Modifier</button>
           <button type="button" class="btn btn--sm btn--gold" data-dest-calendar="${escapeHtml(d.id)}">Calendrier</button>
         </td>
@@ -45,7 +53,7 @@
       )
       .join('');
     return `<table>
-      <thead><tr><th>Destination</th><th>Tagline</th><th>Prix</th><th>État</th><th></th></tr></thead>
+      <thead><tr><th>Destination</th><th>Tagline</th><th>Prix</th><th>État</th><th>Réservations</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }

@@ -46,10 +46,12 @@
       .filter((p) => p.start);
   }
 
-  async function open(dest, openDrawer, toast) {
+  async function open(dest, openDrawer, toast, initialKey) {
     if (!global.AT_API.adminKey()) return toast('Connectez-vous avec la clé admin du backend pour régler les calendriers.');
     const options = [[dest.id, `${dest.name} — toutes formules`], ...(PACKAGES[dest.id] || []).map(([k, l]) => [`${dest.id}:${k}`, l])];
-    let key = dest.id === 'taghit' ? 'taghit:brezina' : dest.id;
+    let key = initialKey
+      ? options.some(([k]) => k === initialKey) ? initialKey : dest.id
+      : dest.id === 'taghit' ? 'taghit:brezina' : dest.id;
 
     async function render() {
       openDrawer(`<h3>Calendrier — ${esc(dest.name)}</h3><div class="empty">Chargement…</div>`);

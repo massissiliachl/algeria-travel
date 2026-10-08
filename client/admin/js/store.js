@@ -444,9 +444,9 @@
   ];
 
   const SEED_SETTINGS = {
-    whatsapp: '213557664089',
-    email: 'Algeria.travel@gmail.com',
-    phone: '+213 557 66 40 89',
+    whatsapp: '33619501708',
+    email: 'travelalgeriadz@gmail.com',
+    phone: '+33 6 19 50 17 08',
     siteName: 'Algeria Travel',
   };
 
@@ -479,10 +479,10 @@
     { id: 4, name: 'Béjaïa', subtitle: 'Mer & Montagne', location: 'Béjaïa, Méditerranée', duration: '3 jours', price: 25000, category: 'nature', image: '/images/bejaia.jpeg', placeSlug: 'bejaia' },
     { id: 5, name: 'Le Hoggar', subtitle: 'Au cœur du désert', location: 'Tamanrasset, Sahara', duration: '9 jours', price: 95000, category: 'desert', image: '/images/hogar.jpeg', placeSlug: 'hoggar' },
     { id: 6, name: 'Constantine', subtitle: 'Ville des ponts', location: 'Constantine, Nord-Est', duration: '3 jours', price: 22000, category: 'culture', image: '/images/alger.jpeg', placeSlug: 'constantine' },
-    { id: 7, name: 'Taghit — Hôtel 4★', subtitle: 'Voyage coup de cœur · vol inclus', location: 'Taghit, Béchar', duration: 'Pension complète', price: 99990, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit' },
-    { id: 8, name: 'Taghit — Maison d’hôte', subtitle: 'Voyage coup de cœur · bus Mercedes', location: 'Taghit, Béchar', duration: 'Pension complète', price: 60000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit' },
+    { id: 7, name: 'Taghit — Hôtel 4★', subtitle: 'Voyage coup de cœur · vol inclus', location: 'Taghit, Béchar', duration: 'Pension complète', price: 99990, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'hotel' },
+    { id: 8, name: 'Taghit — Maison d’hôte', subtitle: 'Voyage coup de cœur · bus Mercedes', location: 'Taghit, Béchar', duration: 'Pension complète', price: 60000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'guesthouse' },
     { id: 9, name: 'Taghit via Brezina', subtitle: '5 jours / 4 nuits · Van Mercedes VIP', location: 'Brezina → Taghit, Béchar', duration: '5 jours / 4 nuits', price: 0, priceOnRequest: true, category: 'desert', image: '/images/taghit-brezina.png', placeSlug: 'taghit', pkg: 'brezina' },
-  ].map((t) => ({ description: '', priceOnRequest: false, active: true, ...t }));
+  ].map((t) => ({ description: '', priceOnRequest: false, active: true, bookingOpen: true, ...t }));
 
   /** Activités du site (client/js/data/activities.js) — description / image vides = contenu d’origine du site */
   const SEED_ACTIVITIES = [

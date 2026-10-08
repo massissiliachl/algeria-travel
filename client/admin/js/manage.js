@@ -407,21 +407,30 @@
         <td>${esc(TOUR_CATEGORIES[t.category] || '—')}</td>
         <td>${tourPrice(t)}</td>
         <td>${t.active === false ? '<span class="badge badge--cancelled">Masqué</span>' : '<span class="badge badge--confirmed">En ligne</span>'}</td>
+        <td>${
+          t.bookingOpen !== false
+            ? '<span class="badge badge--confirmed">Ouvertes</span>'
+            : '<span class="badge badge--cancelled">Fermées</span>'
+        }</td>
         <td class="actions">
+          <button type="button" class="btn btn--sm ${t.bookingOpen !== false ? 'btn--ghost' : 'btn--gold'}" data-tour-booking="${esc(t.id)}">${
+            t.bookingOpen !== false ? 'Fermer les réservations' : 'Ouvrir les réservations'
+          }</button>
+          ${t.placeSlug ? `<button type="button" class="btn btn--sm btn--gold" data-tour-calendar="${esc(t.id)}">Calendrier</button>` : ''}
           <button type="button" class="btn btn--sm btn--ghost" data-tour-edit="${esc(t.id)}">Modifier</button>
           <button type="button" class="btn btn--sm btn--danger" data-tour-del="${esc(t.id)}">Supprimer</button>
         </td>
       </tr>`
       )
       .join('');
-    return `<table><thead><tr><th></th><th>Circuit</th><th>Type</th><th>Prix</th><th>État</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    return `<table><thead><tr><th></th><th>Circuit</th><th>Type</th><th>Prix</th><th>État</th><th>Réservations</th><th></th></tr></thead><tbody>${rows}</tbody></table>
       <p class="gallery-admin__hint" style="margin-top:14px">${list.length} circuit(s). ${reset}</p>`;
   }
 
   function openTourForm(tour, openDrawer, toast) {
     const t = tour || {
       id: '', name: '', subtitle: '', location: '', duration: '', price: 0, priceOnRequest: false,
-      category: 'desert', placeSlug: '', description: '', image: '', active: true,
+      category: 'desert', placeSlug: '', description: '', image: '', active: true, bookingOpen: true,
     };
     const isNew = !tour;
     const slugs = [...new Set(['tadrart', ...ATStore.getDestinations().map((d) => d.id)])];
@@ -453,6 +462,10 @@
           <select name="active"><option value="true" ${t.active !== false ? 'selected' : ''}>Oui</option>
           <option value="false" ${t.active === false ? 'selected' : ''}>Non (masqué)</option></select>
         </div>
+        <div class="field"><label>Réservations en ligne</label>
+          <select name="bookingOpen"><option value="true" ${t.bookingOpen !== false ? 'selected' : ''}>Ouvertes</option>
+          <option value="false" ${t.bookingOpen === false ? 'selected' : ''}>Fermées</option></select>
+        </div>
         <div class="form-actions full">
           <button type="submit" class="btn btn--primary" style="width:auto">Enregistrer</button>
           ${!isNew ? '<button type="button" class="btn btn--danger" id="tourDel">Supprimer</button>' : ''}
@@ -482,6 +495,7 @@
         image,
         description: String(fd.get('description') || '').trim(),
         active: fd.get('active') === 'true',
+        bookingOpen: fd.get('bookingOpen') === 'true',
       });
       toast('Circuit enregistré');
       document.dispatchEvent(new CustomEvent('at:refresh'));

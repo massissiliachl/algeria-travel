@@ -31,6 +31,7 @@
 
   <div class="app" id="app">
     <aside class="sidebar" id="sidebar">
+
       <div class="sidebar__brand">
         Algeria Travel
         <span>Admin</span>
@@ -46,6 +47,7 @@
       <button type="button" class="nav-btn" data-section="activities">Activités</button>
       <button type="button" class="nav-btn" data-section="media">Galerie</button>
       <button type="button" class="nav-btn" data-section="comments">Commentaires</button>
+      <button type="button" class="nav-btn" data-section="chat">Chat / Messages clients</button>
       <button type="button" class="nav-btn" data-section="pages">Textes du site</button>
       <button type="button" class="nav-btn" data-section="settings">Réglages</button>
       <div class="sidebar__footer">
@@ -176,6 +178,16 @@
         </div>
       </section>
 
+      <section class="section" id="section-chat">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Chat / Messages clients</h2>
+            <button type="button" class="btn btn--sm btn--ghost" id="chatReload">Actualiser</button>
+          </div>
+          <div class="table-wrap" id="chatPanel"></div>
+        </div>
+      </section>
+
       <section class="section" id="section-pages">
         <div class="panel">
           <div class="panel__head"><h2>Textes & descriptions du site</h2></div>
@@ -231,6 +243,7 @@
   <script src="js/content.js"></script>
   <script src="js/manage.js"></script>
   <script src="js/comments.js"></script>
+  <script src="js/chat.js"></script>
   <script src="js/owners.js"></script>
   <script src="js/booking-calendar.js"></script>
   <script src="js/notify.js"></script>

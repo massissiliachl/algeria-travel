@@ -7,7 +7,7 @@ const { FEATURED_TOURS } = require('../scripts/data/tours.cjs');
 const { PLACES } = require('../scripts/data/places.cjs');
 const { ACTIVITIES } = require('../scripts/data/activities.cjs');
 
-const EMAILS = ['travelalgeriadz@gmail.com', 'visit.bougie@gmail.com'];
+const EMAILS = ['travelalgeriadz@gmail.com'];
 
 /** Abréviations catalogue (recherche locale) */
 const ABBREVIATIONS = {

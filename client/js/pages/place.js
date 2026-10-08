@@ -7,6 +7,7 @@ import { openLightbox, openBottomSheet, mobileBookingBar, responsiveImage } from
 import { getPlaceById, getPlaces } from '../data/places.js';
 import { TAGHIT_PACKAGES, TAGHIT_PLACE_PKGS } from '../data/taghitPackages.js';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities.js';
+import { isCircuitBookingClosed } from '../data/tours.js';
 
 const TRUST_ITEMS = [
   { icon: 'CreditCard', key: 'place_trust_pay' },
@@ -62,6 +63,16 @@ const periodLabel = (p) =>
     ? fmtDay(p.start)
     : pick(`Du ${fmtDay(p.start)} au ${fmtDay(p.end)}`, `${fmtDay(p.start)} – ${fmtDay(p.end)}`, `من ${fmtDay(p.start)} إلى ${fmtDay(p.end)}`);
 
+/** Dates fixées par l’admin (mode « Séjours à dates fixes »), affichées à la place de la meilleure période */
+const calendarDates = () => {
+  const cal = state.calendar;
+  if (cal?.mode !== 'fixed') return '';
+  if (!cal.periods.length) {
+    return pick('Aucune date disponible pour le moment', 'No dates available at the moment', 'لا توجد تواريخ متاحة حاليًا');
+  }
+  return cal.periods.map((p) => (p.label ? `${p.label} : ${periodLabel(p)}` : periodLabel(p))).join(' · ');
+};
+
 const syncFixedDate = () => {
   const cal = state.calendar;
   if (cal?.mode === 'fixed' && !cal.periods.some((p) => p.start === state.form.date)) {
@@ -76,6 +87,8 @@ const loadCalendar = async () => {
     if (!ok || !data?.data) return;
     state.calendar = data.data;
     syncFixedDate();
+    const periodBox = document.querySelector('[data-offer-period]');
+    if (periodBox) periodBox.innerHTML = periodBoxHtml(derive());
     if (state.sheet && !state.sent) state.sheet.setContent(sheetHtml());
   } catch {
     /* backend injoignable : le serveur revérifie la date à l’envoi */
@@ -134,9 +147,11 @@ const derive = () => {
     place.audience_en || 'Couples, families, friends',
     place.audience_ar || 'أزواج، عائلات، أصدقاء'
   );
-  const offerDates = place.dates
-    ? pick(place.dates, place.dates_en, place.dates_ar)
-    : pick(place.bestTime, place.bestTime_en, place.bestTime_ar);
+  const fixedDates = calendarDates();
+  const offerDates =
+    fixedDates ||
+    (place.dates ? pick(place.dates, place.dates_en, place.dates_ar) : pick(place.bestTime, place.bestTime_en, place.bestTime_ar));
+  const offerDatesLabel = fixedDates ? pick('Dates du séjour', 'Trip dates', 'تواريخ الرحلة') : t('place_dates');
   const quickFacts = [
     { icon: 'MapPin', label: t('place_fact_location'), value: region },
     { icon: 'Clock', label: t('place_fact_duration'), value: duration },
@@ -153,12 +168,14 @@ const derive = () => {
     gallery,
     weather,
     offerDates,
+    offerDatesLabel,
     quickFacts,
   };
 };
 
-/** Réservations ouvertes / fermées par l’admin (fiche destination → « Réservations en ligne ») */
-const bookingClosed = place?.bookingOpen === false;
+/** Réservations ouvertes / fermées par l’admin (fiche destination ou circuit → « Réservations en ligne ») */
+const bookingPkg = id === 'taghit' ? taghitPkg : pkgParam || '';
+const bookingClosed = place?.bookingOpen === false || (place && isCircuitBookingClosed(place.id, bookingPkg));
 
 const bookCtaHtml = () =>
   bookingClosed
@@ -187,6 +204,13 @@ const pkgSwitchHtml = () => {
       </div>
     </div>`;
 };
+
+const periodBoxHtml = (d) => `
+  ${icon('Calendar', 18)}
+  <div>
+    <span>${esc(d.offerDatesLabel)}</span>
+    <strong>${esc(d.offerDates)}</strong>
+  </div>`;
 
 const bookbarHtml = (d) => `
   <section class="place-bookbar acts-container" data-reveal>
@@ -220,13 +244,7 @@ const bookbarHtml = (d) => `
         </ul>
       </div>
       <div class="place-bookbar__right">
-        <div class="place-bookbar__period">
-          ${icon('Calendar', 18)}
-          <div>
-            <span>${esc(t('place_dates'))}</span>
-            <strong>${esc(d.offerDates)}</strong>
-          </div>
-        </div>
+        <div class="place-bookbar__period" data-offer-period>${periodBoxHtml(d)}</div>
         ${bookCtaHtml()}
       </div>
     </div>
@@ -686,7 +704,7 @@ const openBooking = () => {
         source: 'place',
         itemType: 'place',
         itemId: place.id,
-        pkg: id === 'taghit' ? taghitPkg : pkgParam || '',
+        pkg: bookingPkg,
         unitPrice: place.price,
       });
     }
