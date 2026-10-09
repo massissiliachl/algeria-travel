@@ -34,13 +34,17 @@ async function processMessage({ conversationId, message, language, pageUrl, user
   const context = conv.context && Object.keys(conv.context).length ? conv.context : freshContext(langOf(language || conv.language));
   if (language && LANGS.includes(language) && !conv.message_count) context.lang = language;
 
+  let requestCreated = false;
   const result = await handleMessage({
     context,
     message,
     language: langOf(language || conv.language),
     actions: {
       createBookingRequest: (data) => store.createRequest(conv.id, 'booking', data),
-      createContactRequest: (data) => store.createRequest(conv.id, 'contact', data),
+      createContactRequest: (data) => {
+        requestCreated = true;
+        return store.createRequest(conv.id, 'contact', data);
+      },
       classify: ai.isAiEnabled() ? ai.classify : null,
     },
   });
@@ -54,6 +58,9 @@ async function processMessage({ conversationId, message, language, pageUrl, user
     suggestions: result.suggestions,
     links: result.links,
   });
+  if (result.flags?.human && !conv.human_requested && !requestCreated) {
+    store.notifyHumanRequest(conv.id).catch((err) => console.warn('[Chatbot] email conseiller :', err.message));
+  }
 
   return {
     conversationId: conv.id,
