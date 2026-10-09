@@ -97,6 +97,7 @@ app.use('/api/admin/favorites', require('./routes/admin/favorites'));
 app.use('/api/admin/comments', require('./routes/admin/comments'));
 app.use('/api/admin/contact-messages', require('./routes/admin/contactMessages'));
 app.use('/api/admin/inbox', require('./routes/admin/inbox'));
+app.use('/api/admin/chat', require('./routes/admin/chat'));
 app.use('/api/admin', require('./routes/admin/media'));
 app.use('/api/admin', require('./routes/admin/content'));
 app.use('/api/admin/hotel-users', require('./routes/admin/hotelUsers'));
@@ -107,6 +108,7 @@ const { makeAccommodationRouter } = require('./routes/accommodation');
 const { authenticateOwner } = require('./middleware/ownerAuth');
 const { requireAdmin } = require('./middleware/adminAuth');
 app.use('/api/admin/owners', require('./routes/admin/owners'));
+app.use('/api/admin/partner-activity', require('./routes/admin/partnerActivity'));
 app.use(
   '/api/admin/accommodation',
   requireAdmin,

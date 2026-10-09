@@ -1,4 +1,4 @@
-const WHATSAPP = '213557664089';
+const WHATSAPP = '33619501708';
 
 const BASE = {
   fr: ['Voyage / circuits', 'Tarif Taghit', '✈️ Vol aller-retour Taghit', 'Réserver', 'Sahara', 'Activités quad'],

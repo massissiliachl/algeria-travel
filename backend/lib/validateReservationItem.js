@@ -60,13 +60,14 @@ async function validateReservationItem(itemType, itemId) {
   if (!normalizedId || (itemType === 'tour' && Number.isNaN(normalizedId))) return false;
 
   try {
-    const selectCols = itemType === 'place' ? 'booking_open' : '1';
+    const selectCols = itemType === 'place' || itemType === 'tour' ? 'booking_open' : '1';
     const result = await query(
       `select ${selectCols} from public.${table} where id = $1 and coalesce(published, true) = true limit 1`,
       [normalizedId]
     );
     if (result.rows.length > 0) {
       if (itemType === 'place') return Boolean(result.rows[0].booking_open);
+      if (itemType === 'tour') return result.rows[0].booking_open !== false;
       return true;
     }
   } catch (err) {
@@ -99,9 +100,37 @@ async function placeReservationAllowed(itemId) {
   return staticPlaceBookingOpen(id);
 }
 
+/** Circuits d’origine sans place_slug : même correspondance que client/js/data/placeRoutes.js */
+const TOUR_TO_PLACE = { 1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar', 6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart' };
+
+/** false si l’admin a fermé les réservations du circuit qui mène à cette fiche (destination + formule) */
+async function circuitReservationAllowed(placeId, pkg) {
+  const id = String(placeId || '').trim();
+  if (!id) return true;
+  const legacyIds = Object.entries(TOUR_TO_PLACE)
+    .filter(([, slug]) => slug === id)
+    .map(([tourId]) => Number(tourId));
+  try {
+    const result = await query(
+      `select 1 from public.tours
+       where booking_open = false
+         and coalesce(published, true) = true
+         and coalesce(pkg, '') = $2
+         and (place_slug = $1 or (coalesce(place_slug, '') = '' and id = any($3::int[])))
+       limit 1`,
+      [id, String(pkg || '').trim(), legacyIds]
+    );
+    return result.rows.length === 0;
+  } catch (err) {
+    console.warn('[circuitReservationAllowed] DB:', err.message);
+    return true;
+  }
+}
+
 module.exports = {
   validateReservationItem,
   matchesStaticCatalog,
   staticPlaceBookingOpen,
   placeReservationAllowed,
+  circuitReservationAllowed,
 };

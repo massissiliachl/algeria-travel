@@ -2,7 +2,11 @@ const express = require('express');
 const { query } = require('../config/db');
 const { createRateLimiter } = require('../middleware/rateLimit');
 const { generateReferenceCode, generateAccessToken, hashAccessToken } = require('../lib/reservationTokens');
-const { validateReservationItem, placeReservationAllowed } = require('../lib/validateReservationItem');
+const {
+  validateReservationItem,
+  placeReservationAllowed,
+  circuitReservationAllowed,
+} = require('../lib/validateReservationItem');
 const { isValidPhone } = require('../lib/phone');
 const { calcBookingTotal } = require('../lib/bookingPrice');
 const { checkStayAvailability } = require('../lib/hotelAvailability');
@@ -258,10 +262,19 @@ router.post('/', reservationLimiter, async (req, res, next) => {
           error: 'Réservation non disponible à cette période pour cette destination.',
         });
       }
+      const circuitPkg = String(itemPkgRaw || '').trim().toLowerCase();
+      if (!(await circuitReservationAllowed(itemId.trim(), circuitPkg))) {
+        return res.status(400).json({ error: 'Les réservations de ce circuit sont actuellement fermées.' });
+      }
     } else {
       const itemValid = await validateReservationItem(normalizedItemTypeEarly, itemId.trim());
       if (!itemValid) {
-        return res.status(400).json({ error: 'Destination ou circuit invalide.' });
+        return res.status(400).json({
+          error:
+            normalizedItemTypeEarly === 'tour'
+              ? 'Circuit invalide ou réservations fermées.'
+              : 'Destination ou circuit invalide.',
+        });
       }
     }
 
