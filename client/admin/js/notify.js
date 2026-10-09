@@ -1,15 +1,16 @@
 /**
- * Notifications de l’admin : nouveaux commentaires (en attente de validation), nouvelles réservations
- * et modifications faites par les partenaires (chambres, tarifs, disponibilités…).
+ * Notifications de l’admin : nouveaux commentaires (en attente de validation), nouvelles réservations,
+ * modifications faites par les partenaires (chambres, tarifs, disponibilités…) et conversations du chat à traiter.
  * Vérification toutes les 30 s : pastille sur le menu, toast, titre de l’onglet et notification du navigateur.
  */
 (function (global) {
   const INTERVAL = 30000;
   const SEEN_BOOKINGS = 'at_seen_bookings';
   const SEEN_PARTNERS = 'at_seen_partner_activity';
+  const SEEN_CHAT = 'at_seen_chat';
   const BASE_TITLE = document.title;
 
-  const counts = { comments: 0, bookings: 0, owners: 0 };
+  const counts = { comments: 0, bookings: 0, owners: 0, chat: 0 };
   let lastPending = null;
   let lastPartnerId = null;
   let partnerItems = [];
@@ -47,7 +48,8 @@
     setBadge('comments', counts.comments);
     setBadge('bookings', counts.bookings);
     setBadge('owners', counts.owners);
-    const total = counts.comments + counts.bookings + counts.owners;
+    setBadge('chat', counts.chat);
+    const total = counts.comments + counts.bookings + counts.owners + counts.chat;
     document.title = total ? `(${total}) ${BASE_TITLE}` : BASE_TITLE;
   }
 
@@ -168,10 +170,51 @@
     if (!(await checkPartners())) renderPartnerActivity('Activité des partenaires indisponible (serveur injoignable). Réessayez.');
   }
 
+  /** Conversations du chatbot à traiter : conseiller demandé ou demande de réservation / rappel laissée */
+  async function checkChat() {
+    if (!ATStore.remote.enabled) return;
+    try {
+      const data = await ATStore.remote.api('/admin/chat/conversations?limit=100');
+      const todo = (Array.isArray(data?.items) ? data.items : []).filter(
+        (c) => c.status !== 'RESOLVED' && (c.human_requested || c.request_count > 0)
+      );
+      let seen;
+      try {
+        seen = JSON.parse(localStorage.getItem(SEEN_CHAT) || 'null');
+      } catch {
+        seen = null;
+      }
+      const key = (c) => `${c.id}:${c.request_count || 0}:${c.human_requested ? 1 : 0}`;
+      if (Array.isArray(seen)) {
+        const known = new Set(seen);
+        const fresh = todo.filter((c) => !known.has(key(c)));
+        if (fresh.length) {
+          const c = fresh[0];
+          const who = c.customer_name || 'Un visiteur';
+          alertAdmin(
+            fresh.length > 1
+              ? `${fresh.length} conversations du chat à traiter`
+              : c.request_count > 0
+                ? `Chat : ${who} a laissé une demande`
+                : `Chat : ${who} demande un conseiller`,
+            'chat'
+          );
+          if (document.getElementById('section-chat')?.classList.contains('is-active')) ATChatUI.load(ctx.toast);
+        }
+      }
+      localStorage.setItem(SEEN_CHAT, JSON.stringify(todo.map(key)));
+      counts.chat = todo.length;
+      paint();
+    } catch {
+      /* backend momentanément indisponible */
+    }
+  }
+
   function tick() {
     checkComments();
     checkBookings();
     checkPartners();
+    checkChat();
   }
 
   /** À appeler depuis un clic (connexion) : le navigateur n’autorise la demande qu’après une action de l’utilisateur */

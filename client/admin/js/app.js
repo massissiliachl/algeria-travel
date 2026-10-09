@@ -82,6 +82,8 @@
       ATStore.ensureSeed();
       refresh();
       setPublishBadge(online ? 'published' : 'local');
+      const current = document.querySelector('.section.is-active')?.id.replace('section-', '');
+      if (online && current) showSection(current);
       ATNotify.start({ toast, showSection, refresh });
     });
     document.addEventListener('click', ATNotify.askPermission, { once: true });

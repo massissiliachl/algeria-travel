@@ -187,6 +187,21 @@ async function notifyTeam(row) {
   await sendMail({ to: ADMIN_EMAIL, subject: `Chatbot — ${title} ${row.reference}`, text: lines.join('\n') });
 }
 
+/** Premier « je veux parler à un conseiller » d’une conversation : prévenir l’équipe même sans coordonnées. */
+async function notifyHumanRequest(conversationId) {
+  const messages = (await getMessages(conversationId, { limit: 200 })).slice(-12);
+  const who = { user: 'Client', bot: 'Assistant', agent: 'Équipe' };
+  const lines = [
+    'Un visiteur du site demande à parler à un conseiller via le chatbot.',
+    '',
+    'Derniers messages :',
+    ...messages.map((m) => `${who[m.sender] || m.sender} : ${String(m.body).replace(/\s+/g, ' ').slice(0, 300)}`),
+    '',
+    'Répondre depuis l’admin › Chat / Messages clients : la réponse s’affiche dans le chat du visiteur.',
+  ];
+  await sendMail({ to: ADMIN_EMAIL, subject: 'Chatbot — Un client demande un conseiller', text: lines.join('\n') });
+}
+
 /* ── Admin ── */
 
 async function listConversations({ status, q, limit = 50, offset = 0 } = {}) {
@@ -283,6 +298,7 @@ module.exports = {
   addMessage,
   saveTurn,
   createRequest,
+  notifyHumanRequest,
   listConversations,
   getConversationDetail,
   updateConversation,
