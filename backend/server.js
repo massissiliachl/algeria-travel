@@ -108,6 +108,7 @@ const { makeAccommodationRouter } = require('./routes/accommodation');
 const { authenticateOwner } = require('./middleware/ownerAuth');
 const { requireAdmin } = require('./middleware/adminAuth');
 app.use('/api/admin/owners', require('./routes/admin/owners'));
+app.use('/api/admin/partner-activity', require('./routes/admin/partnerActivity'));
 app.use(
   '/api/admin/accommodation',
   requireAdmin,

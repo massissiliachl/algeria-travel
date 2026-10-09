@@ -105,7 +105,10 @@
     if (id === 'pages') ATManageUI.fillPagesForm();
     if (id === 'comments') ATCommentsUI.load(toast);
     if (id === 'chat') ATChatUI.load(toast);
-    if (id === 'owners') ATOwnersUI.load(toast, openDrawer);
+    if (id === 'owners') {
+      ATOwnersUI.load(toast, openDrawer);
+      ATNotify.showPartnerActivity();
+    }
   }
 
   function refresh() {
@@ -189,6 +192,7 @@
   document.getElementById('chatReload').addEventListener('click', () => ATChatUI.load(toast));
   ATChatUI.bind(toast);
   ATOwnersUI.bind(toast, openDrawer);
+  document.getElementById('partnerActivityReload').addEventListener('click', () => ATNotify.showPartnerActivity());
 
   document.body.addEventListener('click', (e) => {
     const openBk = e.target.closest('[data-booking-open]');
