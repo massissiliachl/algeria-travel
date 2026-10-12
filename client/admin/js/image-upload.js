@@ -71,7 +71,7 @@
           <button type="button" class="img-insert__clear" id="${escapeHtml(id)}Clear" title="Retirer">×</button>
         </div>
         <p class="img-insert__or">ou coller une URL</p>
-        <input type="url" class="img-insert__url" id="${escapeHtml(id)}Url" value="${escapeHtml(value && !String(value).startsWith('data:') ? value : '')}" placeholder="https://… ou /images/photo.jpg" />
+        <input type="text" inputmode="url" autocomplete="off" spellcheck="false" class="img-insert__url" id="${escapeHtml(id)}Url" value="${escapeHtml(value && !String(value).startsWith('data:') ? value : '')}" placeholder="https://… ou /images/photo.jpg" />
       </div>
     `;
   }
