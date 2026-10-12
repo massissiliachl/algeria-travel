@@ -31,6 +31,18 @@ const reservationLimiter = createRateLimiter({
   message: 'Trop de demandes de réservation. Réessayez dans une heure.',
 });
 
+/** Calendrier admin d’une formule séjour Algeria Travel (prix par personne) rattachée à une destination (ex. taghit:guesthouse → taghit). Hôtels classiques et biens des propriétaires : null. */
+async function stayCalendarKey(stayId, stayType) {
+  try {
+    const r = await query('select place_id, type, owner_id, price_per_person from public.stays where id = $1 and deleted_at is null', [stayId]);
+    const row = r.rows[0];
+    if (!row?.place_id || row.owner_id || !row.price_per_person) return null;
+    return calendarKey(row.place_id, String(row.type || stayType || '').toLowerCase());
+  } catch {
+    return null;
+  }
+}
+
 function mapPublicTrack(row) {
   return {
     referenceCode: row.reference_code,
@@ -275,6 +287,19 @@ router.post('/', reservationLimiter, async (req, res, next) => {
               ? 'Circuit invalide ou réservations fermées.'
               : 'Destination ou circuit invalide.',
         });
+      }
+    }
+
+    if (normalizedItemTypeEarly === 'stay') {
+      const stayKey = await stayCalendarKey(itemId.trim(), normalizedStayType);
+      if (stayKey) {
+        const dateCheck = await checkTravelDate(stayKey, effectiveCheckIn || effectiveTravelDate);
+        if (!dateCheck.ok) return res.status(400).json({ error: dateCheck.error });
+        if (dateCheck.period) {
+          effectiveTravelDate = dateCheck.period.start;
+          effectiveCheckIn = dateCheck.period.start;
+          effectiveCheckOut = dateCheck.period.end;
+        }
       }
     }
 

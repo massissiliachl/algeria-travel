@@ -45,6 +45,7 @@ const state = {
   selectedId: null,
   remote: new Map(),
   details: new Map(),
+  calendars: new Map(),
   step: 'detail',
   form: emptyForm(),
   sending: false,
@@ -134,9 +135,42 @@ const loadDetail = async (id) => {
 const roomsOf = (stay) => state.details.get(stay.id)?.rooms || [];
 const currentRoom = (stay) => roomsOf(stay).find((r) => r.id === state.form.roomId) || roomsOf(stay)[0] || null;
 
+/* ── Calendrier réglé dans l’admin pour les formules séjour (prix par personne) d’une destination, ex. maison d’hôte de Taghit ── */
+
+const stayCalKey = (stay) => (stay.pricePerPerson && stay.placeId ? `${stay.placeId}:${stay.type}` : '');
+const stayCalendar = (stay) => state.calendars.get(stayCalKey(stay)) || null;
+const isFixed = (stay) => stayCalendar(stay)?.mode === 'fixed';
+
+const fmtDay = (iso) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString(pick('fr-FR', 'en-GB', 'ar-DZ'), { day: 'numeric', month: 'long', year: 'numeric' });
+const periodText = (p) =>
+  p.start === p.end
+    ? fmtDay(p.start)
+    : pick(`Du ${fmtDay(p.start)} au ${fmtDay(p.end)}`, `${fmtDay(p.start)} – ${fmtDay(p.end)}`, `من ${fmtDay(p.start)} إلى ${fmtDay(p.end)}`);
+
+const loadStayCalendar = async (stay) => {
+  const key = stayCalKey(stay);
+  if (!key || state.calendars.has(key) || !window.AT_API) return;
+  try {
+    const { ok, data } = await window.AT_API.request(`/booking-calendar/${encodeURIComponent(key)}`, { timeout: 60000 });
+    if (ok && data?.data) state.calendars.set(key, data.data);
+  } catch {
+    /* backend injoignable : le serveur revérifie les dates à l’envoi */
+  }
+};
+
+/** Dates fixes : arrivée = début du séjour choisi, départ = fin */
+const syncStayDates = (stay) => {
+  const cal = stayCalendar(stay);
+  if (cal?.mode !== 'fixed') return;
+  const p = cal.periods.find((x) => x.start === state.form.checkIn) || cal.periods[0];
+  state.form.checkIn = p?.start || '';
+  state.form.checkOut = p?.end || '';
+};
+
 const estimate = (stay) => {
   const { checkIn, checkOut } = state.form;
-  if (!checkIn || !checkOut || checkOut <= checkIn) return null;
+  if (!checkIn || !checkOut || checkOut < checkIn || (checkOut === checkIn && !isFixed(stay))) return null;
   const nights = nightsBetween(checkIn, checkOut);
   const room = currentRoom(stay);
   const rooms = Number(state.form.rooms) || 1;
@@ -152,21 +186,37 @@ const openForm = async (stay) => {
     state.form.checkIn = addDays(todayIso(), 1);
     state.form.checkOut = addDays(todayIso(), 2);
   }
+  syncStayDates(stay);
   if (!sheet) return;
   sheet.setContent(sheetHtml(stay));
   sheet.panel.querySelector('.stays-book')?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' });
-  if (state.remote.has(stay.id) && !state.details.has(stay.id)) {
-    await loadDetail(stay.id);
-    if (sheet && state.selectedId === stay.id && state.step === 'form') sheet.setContent(sheetHtml(stay));
-  }
+  const needsCalendar = stayCalKey(stay) && !state.calendars.has(stayCalKey(stay));
+  const needsDetail = state.remote.has(stay.id) && !state.details.has(stay.id);
+  if (!needsCalendar && !needsDetail) return;
+  await Promise.all([needsCalendar ? loadStayCalendar(stay) : null, needsDetail ? loadDetail(stay.id) : null]);
+  syncStayDates(stay);
+  if (sheet && state.selectedId === stay.id && state.step === 'form') sheet.setContent(sheetHtml(stay));
 };
 
 const validateForm = (stay) => {
   const f = state.form;
-  if (!f.checkIn || !f.checkOut) return pick('Choisissez vos dates.', 'Choose your dates.', 'اختر التواريخ.');
-  if (f.checkIn < todayIso()) return pick('La date d’arrivée est passée.', 'Check-in date is in the past.', 'تاريخ الوصول قد مضى.');
-  if (f.checkOut <= f.checkIn)
-    return pick('La date de départ doit être après l’arrivée.', 'Check-out must be after check-in.', 'يجب أن يكون المغادرة بعد الوصول.');
+  const cal = stayCalendar(stay);
+  if (cal?.mode === 'fixed') {
+    if (!cal.periods.some((p) => p.start === f.checkIn))
+      return pick('Choisissez une des dates proposées.', 'Please choose one of the proposed dates.', 'اختر أحد التواريخ المقترحة.');
+  } else {
+    if (!f.checkIn || !f.checkOut) return pick('Choisissez vos dates.', 'Choose your dates.', 'اختر التواريخ.');
+    if (f.checkIn < todayIso()) return pick('La date d’arrivée est passée.', 'Check-in date is in the past.', 'تاريخ الوصول قد مضى.');
+    if (f.checkOut <= f.checkIn)
+      return pick('La date de départ doit être après l’arrivée.', 'Check-out must be after check-in.', 'يجب أن يكون المغادرة بعد الوصول.');
+    const blocked = cal?.blocked?.find((p) => f.checkIn <= p.end && f.checkOut > p.start);
+    if (blocked)
+      return pick(
+        `Réservations fermées : ${periodText(blocked)}. Choisissez d’autres dates.`,
+        `Bookings closed: ${periodText(blocked)}. Please choose other dates.`,
+        `الحجز مغلق: ${periodText(blocked)}. اختر تواريخ أخرى.`
+      );
+  }
   const room = currentRoom(stay);
   if (room) {
     const rooms = Number(f.rooms) || 1;
@@ -259,6 +309,37 @@ const submitBooking = async (stay) => {
   sheet?.setContent(sheetHtml(stay));
 };
 
+const noStayDates = (stay) => isFixed(stay) && !stayCalendar(stay).periods.length;
+
+const datesHtml = (stay) => {
+  const f = state.form;
+  const cal = stayCalendar(stay);
+  if (cal?.mode === 'fixed') {
+    if (!cal.periods.length) {
+      return `<p class="place-form__note">${esc(
+        pick('Aucune date disponible pour le moment.', 'No dates available at the moment.', 'لا توجد تواريخ متاحة حاليًا.')
+      )}</p>`;
+    }
+    return `<label>${esc(pick('Dates du séjour', 'Stay dates', 'تواريخ الإقامة'))}
+        <select name="checkIn" required>${cal.periods
+          .map((p) => option(p.start, p.label ? `${p.label} : ${periodText(p)}` : periodText(p), f.checkIn))
+          .join('')}</select>
+        <span class="place-form__note">${esc(pick('Séjour à dates fixes', 'Fixed-date stay', 'إقامة بتواريخ محددة'))}</span>
+      </label>`;
+  }
+  const blocked = cal?.blocked?.length
+    ? `<p class="place-form__note">${esc(pick('Indisponible', 'Unavailable', 'غير متاح'))} : ${esc(cal.blocked.map(periodText).join(' · '))}</p>`
+    : '';
+  return `<div class="place-form__row">
+        <label>${esc(pick('Arrivée', 'Check-in', 'الوصول'))}
+          <input type="date" name="checkIn" value="${esc(f.checkIn)}" min="${todayIso()}" required />
+        </label>
+        <label>${esc(pick('Départ', 'Check-out', 'المغادرة'))}
+          <input type="date" name="checkOut" value="${esc(f.checkOut)}" min="${esc(f.checkIn ? addDays(f.checkIn, 1) : todayIso())}" required />
+        </label>
+      </div>${blocked}`;
+};
+
 const formHtml = (stay) => {
   const f = state.form;
   const rooms = roomsOf(stay);
@@ -289,14 +370,7 @@ const formHtml = (stay) => {
         </label>`
             : ''
       }
-      <div class="place-form__row">
-        <label>${esc(pick('Arrivée', 'Check-in', 'الوصول'))}
-          <input type="date" name="checkIn" value="${esc(f.checkIn)}" min="${todayIso()}" required />
-        </label>
-        <label>${esc(pick('Départ', 'Check-out', 'المغادرة'))}
-          <input type="date" name="checkOut" value="${esc(f.checkOut)}" min="${esc(f.checkIn ? addDays(f.checkIn, 1) : todayIso())}" required />
-        </label>
-      </div>
+      ${datesHtml(stay)}
       <div class="place-form__row stays-book__counts">
         <label>${esc(pick('Chambres', 'Rooms', 'الغرف'))}
           <select name="rooms">${Array.from({ length: maxRooms }, (_, i) => option(i + 1, i + 1, f.rooms)).join('')}</select>
@@ -342,7 +416,7 @@ const formHtml = (stay) => {
       <p class="place-form__error" role="alert"${state.error ? '' : ' hidden'}>${esc(state.error)}</p>
       <div class="stays-detail__actions">
         <button type="button" class="premium-btn premium-btn--ghost" data-book-back>${esc(pick('Retour', 'Back', 'رجوع'))}</button>
-        <button type="submit" class="premium-btn premium-btn--primary"${state.sending || loading ? ' disabled' : ''}>
+        <button type="submit" class="premium-btn premium-btn--primary"${state.sending || loading || noStayDates(stay) ? ' disabled' : ''}>
           ${icon('Send', 16)} ${esc(state.sending ? pick('Envoi…', 'Sending…', 'جارٍ الإرسال…') : pick('Envoyer la demande', 'Send request', 'إرسال الطلب'))}
         </button>
       </div>
@@ -600,8 +674,9 @@ const syncSelection = (root) => {
       }
       if (e.type !== 'change' || !['roomId', 'rooms', 'checkIn', 'checkOut'].includes(name)) return;
       const f = state.form;
-      if (name === 'checkIn' && f.checkIn && (!f.checkOut || f.checkOut <= f.checkIn)) f.checkOut = addDays(f.checkIn, 1);
       const current = getSelected();
+      if (current && isFixed(current)) syncStayDates(current);
+      else if (name === 'checkIn' && f.checkIn && (!f.checkOut || f.checkOut <= f.checkIn)) f.checkOut = addDays(f.checkIn, 1);
       if (current) sheet.setContent(sheetHtml(current));
     };
     sheet.panel.addEventListener('input', onField);
