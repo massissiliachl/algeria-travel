@@ -62,7 +62,7 @@ function applyTaghitPlacePackage(mapped) {
   const pkg = resolveTaghitPlace('hotel');
   return {
     ...mapped,
-    price: pkg.price,
+    price: mapped.price ?? pkg.price,
     pricePerPerson: pkg.pricePerPerson,
     stay: pkg.stay,
     stayEn: pkg.stay_en,

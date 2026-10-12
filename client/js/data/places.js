@@ -3,6 +3,8 @@
 import '../core/siteContent.js';
 import { asset } from '../core/dom.js';
 import { resolveTaghitPlace } from './taghitPackages.js';
+import { FEATURED_TOURS } from './tours.js';
+import { getPlaceSlugFromTour } from './placeRoutes.js';
 
 export const PLACES = [
   {
@@ -606,6 +608,23 @@ const applyAdminOverride = (place) => {
   };
 };
 
+/** Une destination et son circuit sont la même offre : le prix du circuit (destination + formule) fait foi */
+const DEFAULT_PKG = { taghit: 'hotel' };
+
+const withCircuitPrice = (place, pkg) => {
+  if (!place) return place;
+  const want = pkg || DEFAULT_PKG[place.id] || '';
+  const tour = FEATURED_TOURS.find(
+    (t) => getPlaceSlugFromTour(t) === place.id && (t.pkg || '') === want
+  );
+  if (!tour) return place;
+  if (tour.priceOnRequest) return { ...place, price: 0, priceOnRequest: true };
+  if (!(tour.price > 0)) return place;
+  const out = { ...place, price: tour.price, priceOnRequest: false };
+  if (!(out.oldPrice > out.price)) delete out.oldPrice;
+  return out;
+};
+
 /** Destination créée uniquement dans l’admin */
 const placeFromAdmin = (d) => {
   if (!d || d.active === false) return null;
@@ -667,12 +686,14 @@ export const getPlaces = () => {
 
   const base = PLACES.filter((p) => !archived.has(p.id))
     .map(applyAdminOverride)
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((p) => withCircuitPrice(p));
 
   const custom = adminList
     .filter((d) => d.active !== false && !baseIds.has(d.id) && d.id !== 'taghit')
     .map(placeFromAdmin)
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((p) => withCircuitPrice(p));
 
   const taghitOverride = adminList.find((d) => d.id === 'taghit');
   if (taghitOverride?.active === false) {
@@ -687,12 +708,12 @@ export const getPlaceById = (id, pkg) => {
     const override = adminList?.find((d) => d.id === 'taghit');
     if (override?.active === false) return null;
     const pkgId = pkg === 'brezina' || pkg === 'hotel' ? pkg : 'hotel';
-    return applyAdminOverride(resolveTaghitPlace(pkgId));
+    return withCircuitPrice(applyAdminOverride(resolveTaghitPlace(pkgId)), pkgId);
   }
   const place = PLACES.find((p) => p.id === id);
-  if (place) return applyAdminOverride(place);
+  if (place) return withCircuitPrice(applyAdminOverride(place), pkg);
 
   const adminList = readAdminDestinations() || [];
   const custom = adminList.find((d) => d.id === id);
-  return placeFromAdmin(custom);
+  return withCircuitPrice(placeFromAdmin(custom), pkg);
 };

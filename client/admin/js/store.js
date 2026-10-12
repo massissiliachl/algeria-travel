@@ -266,6 +266,22 @@
       }
     },
 
+    /** Recharge une liste depuis le serveur (sauf modification locale en attente d’envoi) */
+    async refresh(key) {
+      const snap = Remote.snap[key];
+      const local = read(key, []);
+      const dirty =
+        !snap ||
+        local.length !== snap.size ||
+        local.some((item, i) => snap.get(String(item.id)) !== JSON.stringify(Remote.bodyOf(key, item, i)));
+      if (dirty) return;
+      const { path, type } = API.RESOURCES[key];
+      const data = await Remote.api(`/admin/${path}`);
+      const list = API.toLocal[type](Array.isArray(data?.items) ? data.items : []);
+      Remote.remember(key, list);
+      localStorage.setItem(key, JSON.stringify(list));
+    },
+
     schedule(key) {
       if (!Remote.enabled) return;
       clearTimeout(Remote.timers[key]);
@@ -384,11 +400,13 @@
         const { path } = API.RESOURCES[key];
         const snap = Remote.snap[key] || (Remote.snap[key] = new Map());
         const seen = new Set();
+        let wrote = false;
         for (let i = 0; i < list.length; i++) {
           const id = String(list[i].id);
           const json = JSON.stringify(Remote.bodyOf(key, list[i], i));
           seen.add(id);
           if (snap.get(id) === json) continue;
+          wrote = true;
           const body = JSON.parse(json);
           if (snap.has(id)) {
             await Remote.api(`/admin/${path}/${encodeURIComponent(id)}`, { method: 'PUT', body });
@@ -410,6 +428,9 @@
           });
           snap.delete(id);
         }
+        /* Destination et circuit partagent le prix : le serveur a pu modifier l’autre liste */
+        const linked = { at_destinations: 'at_circuits', at_circuits: 'at_destinations' }[key];
+        if (wrote && linked) await Remote.refresh(linked).catch(() => {});
         Remote.onStatus('published');
         document.dispatchEvent(new CustomEvent('at:refresh'));
       } catch (err) {

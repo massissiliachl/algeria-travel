@@ -65,7 +65,7 @@ exports.TAGHIT_BOOKING_WINDOW = {
 exports.TAGHIT_PACKAGES = {
   hotel: {
     id: 'hotel',
-    price: 75000,
+    price: 99990,
     icon: 'Hotel',
     title: 'Hôtel 4 étoiles',
     title_en: '4-star hotel',

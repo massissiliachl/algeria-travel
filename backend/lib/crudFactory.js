@@ -19,9 +19,19 @@ function makeAdminCrud({
   notifyContentType = null,
   fixedWhere = null,
   insertDefaults = null,
+  afterWrite = null,
 }) {
   const router = express.Router();
   router.use(adminAuth);
+
+  const runAfterWrite = async (row) => {
+    if (!afterWrite) return;
+    try {
+      await afterWrite(row);
+    } catch (err) {
+      console.error(`[admin/${table}] synchronisation :`, err.message);
+    }
+  };
 
   const whereId = (paramRef = '$1') =>
     fixedWhere ? `${idColumn} = ${paramRef} and ${fixedWhere}` : `${idColumn} = ${paramRef}`;
@@ -58,6 +68,7 @@ function makeAdminCrud({
         values
       );
       const row = result.rows[0];
+      await runAfterWrite(row);
       if (notifyContentType && row.published !== false) {
         const { notifyContentPublished } = require('./contentNotify');
         notifyContentPublished(notifyContentType, row).catch((err) =>
@@ -84,6 +95,7 @@ function makeAdminCrud({
       );
       if (!result.rows.length) return res.status(404).json({ error: 'Introuvable.' });
       const row = result.rows[0];
+      await runAfterWrite(row);
       const wasPublished = prev.rows[0]?.published === true;
       if (notifyContentType && row.published !== false && !wasPublished) {
         const { notifyContentPublished } = require('./contentNotify');

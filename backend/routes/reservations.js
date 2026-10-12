@@ -18,6 +18,7 @@ const {
 const { createPartnerNotification } = require('../lib/partnerNotifications');
 const { notifyOwner } = require('../lib/ownerNotifications');
 const { calendarKey, checkTravelDate } = require('../lib/bookingCalendar');
+const { circuitPrice } = require('../lib/priceLink');
 
 const router = express.Router();
 
@@ -345,6 +346,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       itemPkg = String(itemPkgRaw || '').trim().toLowerCase() || null;
       if (!itemPkg && itemId.trim() === 'taghit' && /brezina/i.test(itemName)) itemPkg = 'brezina';
       if (itemPkg && !/^[a-z0-9-]{1,40}$/.test(itemPkg)) itemPkg = null;
+      packageUnitPrice = await circuitPrice(itemId.trim(), itemPkg);
       const dateCheck = await checkTravelDate(calendarKey(itemId, itemPkg), effectiveTravelDate);
       if (!dateCheck.ok) return res.status(400).json({ error: dateCheck.error });
       if (dateCheck.period) {

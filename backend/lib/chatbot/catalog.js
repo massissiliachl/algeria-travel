@@ -229,7 +229,7 @@ function staticCatalog() {
   const { FEATURED_TOURS } = require('../../scripts/data/tours.cjs');
   const { ACTIVITIES } = require('../../scripts/data/activities.cjs');
   const { STAYS } = require('../../scripts/data/stays.cjs');
-  const places = [...PLACES.filter((p) => p.id !== 'taghit'), { ...TAGHIT_PLACE, price: 75000 }].map((p) =>
+  const places = [...PLACES.filter((p) => p.id !== 'taghit'), { ...TAGHIT_PLACE, price: 99990 }].map((p) =>
     buildPlace({ ...p, booking_open: p.id === 'taghit' ? true : p.bookingOpen ?? null })
   );
   return {
