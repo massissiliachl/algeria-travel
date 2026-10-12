@@ -22,11 +22,17 @@
       </label>
       <label>
         Mot de passe
-        <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
-      </label>
-      <label class="login-card__show">
-        <input type="checkbox" onchange="document.getElementById('loginPass').type = this.checked ? 'text' : 'password'" />
-        Afficher le mot de passe
+        <span class="login-card__pass">
+          <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="login-card__eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"
+            onclick="const i = document.getElementById('loginPass'); const show = i.type === 'password'; i.type = show ? 'text' : 'password'; this.classList.toggle('is-on', show); this.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'); this.title = this.getAttribute('aria-label');">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+              <circle cx="12" cy="12" r="3" />
+              <line class="login-card__eye-slash" x1="3" y1="3" x2="21" y2="21" />
+            </svg>
+          </button>
+        </span>
       </label>
       <button type="submit" class="btn btn--primary">Se connecter</button>
       <p class="login-card__hint">Identifiant : <strong>admin</strong> — mot de passe : la clé admin du backend (<strong>ADMIN_API_KEY</strong>)</p>
