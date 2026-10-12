@@ -100,6 +100,7 @@ export default {
   "acts_feat_cancel": "إلغاء سهل",
   "acts_feat_cancel_desc": "مرونة مضمونة",
   "acts_from": "من",
+  "per_person": "/للفرد",
   "acts_empty": "لا توجد أنشطة في هذه الفئة.",
   "acts_promo_eyebrow": "تجارب أصيلة",
   "acts_promo_title": "اكتشف الجزائر بطريقة مختلفة",

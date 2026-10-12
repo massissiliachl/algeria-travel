@@ -40,7 +40,7 @@ const cardHtml = (tour, i) => {
   const fav = state.favorites.has(String(tour.id));
   const price = tour.priceOnRequest
     ? t('place_on_request')
-    : `${t('acts_from')} ${tour.price.toLocaleString()} DA`;
+    : `${tour.price.toLocaleString()} DA ${t('per_person')}`;
   return `
     <article class="acts-card" data-reveal data-delay="${i * 60}" data-href="${esc(getPlacePathFromTour(tour))}" role="link" tabindex="0">
       <img src="${esc(asset(tour.image))}" alt="" loading="lazy" />

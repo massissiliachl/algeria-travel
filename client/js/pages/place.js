@@ -115,13 +115,8 @@ const dateError = (date) => {
 /* ── Valeurs dérivées (dépendent de la langue) ── */
 
 const derive = () => {
-  const isPerPerson = place.id === 'taghit' || place.pricePerPerson;
   const priceOnRequest = Boolean(place.priceOnRequest) || place.price == null;
-  const priceLabel = priceOnRequest
-    ? t('place_on_request')
-    : isPerPerson
-      ? t('home_v2_coup_per_person')
-      : t('acts_from');
+  const priceLabel = priceOnRequest ? t('place_on_request') : t('home_v2_coup_per_person');
   const priceDisplay = priceOnRequest ? t('place_on_request') : `${Number(place.price).toLocaleString()} DA`;
   const placeName = pick(place.name, place.name_en, place.name_ar);
   const whyItems = place.whyVisit?.length ? place.whyVisit : place.highlights || [];
@@ -159,7 +154,7 @@ const derive = () => {
     { icon: 'Users', label: t('place_fact_travelers'), value: audience },
   ];
   return {
-    isPerPerson,
+    isPerPerson: !priceOnRequest,
     priceOnRequest,
     priceLabel,
     priceDisplay,
@@ -619,9 +614,34 @@ const formHtml = () => {
       ${esc(t('place_form_message'))}
       <textarea name="message" rows="4" placeholder="${esc(t('place_form_message_ph'))}">${esc(form.message)}</textarea>
     </label>
+    <div class="place-form__total" data-place-total aria-live="polite">${totalHtml()}</div>
     <p class="place-form__error" role="alert" hidden></p>
     <button type="submit" class="place-form__submit"${noDates() ? ' disabled' : ''}>${esc(t('place_form_submit'))} ${icon('Send', 16)}</button>
   </form>`;
+};
+
+/** Prix admin = par personne pour tout le séjour (pas par jour) : total = prix × voyageurs */
+const totalHtml = () => {
+  if (place.priceOnRequest || place.price == null) return '';
+  const travelers = Math.max(1, parseInt(state.form.travelers, 10) || 1);
+  const unit = Number(place.price);
+  const total = unit * travelers;
+  const period = state.calendar?.mode === 'fixed' ? state.calendar.periods.find((p) => p.start === state.form.date) : null;
+  const money = (n) => `${n.toLocaleString('fr-FR')} DA`;
+  const detail = pick(
+    `${money(unit)} × ${travelers} voyageur${travelers > 1 ? 's' : ''} · prix par personne pour tout le séjour`,
+    `${money(unit)} × ${travelers} traveler${travelers > 1 ? 's' : ''} · price per person for the whole stay`,
+    `${money(unit)} × ${travelers} مسافر · السعر للفرد لكامل الإقامة`
+  );
+  return `
+    <span class="place-form__total-label">${esc(pick('Total estimé', 'Estimated total', 'المجموع التقديري'))}</span>
+    <strong class="place-form__total-value">${esc(money(total))}</strong>
+    <span class="place-form__note">${esc(detail)}${period ? ` · ${esc(periodLabel(period))}` : ''}</span>`;
+};
+
+const refreshTotal = (root) => {
+  const box = root?.querySelector('[data-place-total]');
+  if (box) box.innerHTML = totalHtml();
 };
 
 const noDates = () => state.calendar?.mode === 'fixed' && !state.calendar.periods.length;
@@ -676,6 +696,7 @@ const openBooking = () => {
   const onField = (e) => {
     const { name, value } = e.target;
     if (name && name in state.form) state.form[name] = value;
+    if (name === 'travelers' || name === 'date') refreshTotal(sheet.el);
   };
   sheet.el.addEventListener('input', onField);
   sheet.el.addEventListener('change', onField);

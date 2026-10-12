@@ -112,7 +112,7 @@ function buildPlace(row) {
     region: REGION[id] || null,
     price: num(row.price),
     priceOnRequest: false,
-    perPerson: id === 'taghit' || Boolean(row.price_per_person),
+    perPerson: true,
     duration: txt(row.duration, row.duration_en, row.duration_ar),
     bestTime: txt(row.best_time ?? row.bestTime, row.best_time_en ?? row.bestTime_en, row.best_time_ar ?? row.bestTime_ar),
     description: txt(row.description, row.description_en, row.description_ar),

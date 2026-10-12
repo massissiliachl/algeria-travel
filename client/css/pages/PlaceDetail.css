@@ -1286,6 +1286,21 @@
 
 .place-form__error[hidden] { display: none; }
 
+.place-form__total {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(184, 147, 93, 0.12);
+  border: 1px solid rgba(184, 147, 93, 0.35);
+}
+.place-form__total:empty { display: none; }
+.place-form__total-label { font-size: 0.82rem; font-weight: 600; color: #1A2332; }
+.place-form__total-value { font-size: 1.15rem; color: #1A2332; white-space: nowrap; }
+.place-form__total .place-form__note { grid-column: 1 / -1; }
+
 .place-form__submit {
   margin-top: 4px;
   border: none;

@@ -447,7 +447,7 @@
         <div class="field full"><label>Sous-titre</label><input name="subtitle" value="${esc(t.subtitle || '')}" placeholder="Ex. 5 jours / 4 nuits · Van Mercedes VIP" /></div>
         <div class="field"><label>Lieu</label><input name="location" value="${esc(t.location || t.destination || '')}" placeholder="Ex. Taghit, Béchar" /></div>
         <div class="field"><label>Durée</label><input name="duration" value="${esc(t.duration || '')}" placeholder="Ex. 5 jours / 4 nuits" /></div>
-        <div class="field"><label>Prix (DA / personne)</label><input name="price" type="number" min="0" value="${Number(t.price || 0)}" /></div>
+        <div class="field"><label>Prix (DA / personne, pour tout le séjour)</label><input name="price" type="number" min="0" value="${Number(t.price || 0)}" /></div>
         <div class="field"><label>Prix sur demande</label>
           <select name="priceOnRequest"><option value="false" ${!t.priceOnRequest ? 'selected' : ''}>Non, afficher le prix</option>
           <option value="true" ${t.priceOnRequest ? 'selected' : ''}>Oui</option></select>

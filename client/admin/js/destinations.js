@@ -89,7 +89,7 @@
           <input name="tagline" value="${escapeHtml(d.tagline || '')}" placeholder="Ex. Côte antique" />
         </div>
         <div class="field">
-          <label>Prix dès (DA)</label>
+          <label>Prix (DA / personne, pour tout le séjour)</label>
           <input name="price" type="number" min="0" value="${Number(d.price || 0)}" />
         </div>
         <div class="field">
