@@ -5,6 +5,8 @@ import { href, navigate, params } from '../core/router.js';
 import { esc, asset } from '../core/dom.js';
 import { responsiveImage, openBottomSheet, openLightbox, mobileBookingBar } from '../core/ui.js';
 import { STAY_PLACE_FILTERS, STAY_TYPES, filterStays } from '../data/stays.js';
+import { FEATURED_TOURS } from '../data/tours.js';
+import { getPlaceSlugFromTour } from '../data/placeRoutes.js';
 
 const view = params().get('view') || '';
 const typeFromPath = view.includes('guesthouse') ? 'guesthouse' : view.includes('hotel') ? 'hotel' : null;
@@ -80,6 +82,18 @@ const withRemote = (stay) => {
   return { ...stay, name: p.name || stay.name, price: Number(p.minPrice || p.basePrice) || stay.price };
 };
 
+/** Formule séjour = circuit de l’admin (même destination, même formule) : un seul prix, celui du circuit */
+const withCircuit = (stay) => {
+  if (!stay.pricePerPerson || !stay.placeId) return stay;
+  const circuit = FEATURED_TOURS.find((t) => getPlaceSlugFromTour(t) === stay.placeId && (t.pkg || '') === stay.type);
+  if (!circuit) return stay;
+  return {
+    ...stay,
+    price: !circuit.priceOnRequest && circuit.price ? circuit.price : stay.price,
+    bookingClosed: circuit.bookingOpen === false,
+  };
+};
+
 const filtered = () => {
   const local = filterStays({ type: state.type, place: state.place });
   const ids = new Set(local.map((s) => s.id));
@@ -87,7 +101,7 @@ const filtered = () => {
     .filter((p) => !ids.has(p.id) && !filterStays().some((s) => s.id === p.id))
     .map(remoteToStay)
     .filter((s) => (state.type === 'all' || s.type === state.type) && (state.place === 'all' || s.placeId === state.place));
-  return [...local.map(withRemote), ...extra];
+  return [...local.map(withRemote), ...extra].map(withCircuit);
 };
 const getSelected = () => filtered().find((s) => s.id === state.selectedId) || null;
 
@@ -180,6 +194,7 @@ const estimate = (stay) => {
 };
 
 const openForm = async (stay) => {
+  if (stay.bookingClosed) return;
   state.step = 'form';
   state.error = '';
   if (!state.form.checkIn) {
@@ -506,10 +521,25 @@ const sheetHtml = (selected) => {
           : state.step === 'sent'
             ? sentHtml()
             : `
+      ${
+        selected.bookingClosed
+          ? `<p class="place-form__note">${esc(
+              pick(
+                'Les réservations en ligne sont fermées pour cette formule. Contactez-nous pour plus d’informations.',
+                'Online booking is closed for this package. Contact us for more information.',
+                'الحجز عبر الإنترنت مغلق لهذه الباقة. تواصل معنا لمزيد من المعلومات.'
+              )
+            )}</p>`
+          : ''
+      }
       <div class="stays-detail__actions">
-        <button type="button" class="premium-btn premium-btn--primary" data-book>
+        ${
+          selected.bookingClosed
+            ? ''
+            : `<button type="button" class="premium-btn premium-btn--primary" data-book>
           ${icon('Calendar', 16)} ${esc(BOOK_LABEL())}
-        </button>
+        </button>`
+        }
         <button type="button" class="premium-btn premium-btn--ghost" data-contact>
           ${esc(t('stays_contact'))}
         </button>

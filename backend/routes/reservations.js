@@ -31,13 +31,24 @@ const reservationLimiter = createRateLimiter({
   message: 'Trop de demandes de réservation. Réessayez dans une heure.',
 });
 
-/** Calendrier admin d’une formule séjour Algeria Travel (prix par personne) rattachée à une destination (ex. taghit:guesthouse → taghit). Hôtels classiques et biens des propriétaires : null. */
-async function stayCalendarKey(stayId, stayType) {
+/**
+ * Formule séjour Algeria Travel (prix par personne) rattachée à une destination, ex. maison d’hôte de Taghit :
+ * c’est le circuit « taghit » + formule « guesthouse » (même calendrier, même prix, même ouverture).
+ * Hôtels classiques et biens des propriétaires : null.
+ */
+async function stayPackage(stayId, stayType) {
   try {
     const r = await query('select place_id, type, owner_id, price_per_person from public.stays where id = $1 and deleted_at is null', [stayId]);
     const row = r.rows[0];
     if (!row?.place_id || row.owner_id || !row.price_per_person) return null;
-    return calendarKey(row.place_id, String(row.type || stayType || '').toLowerCase());
+    const pkg = String(row.type || stayType || '').toLowerCase();
+    const tour = await query(
+      `select price from public.tours where place_slug = $1 and coalesce(pkg, '') = $2 and coalesce(published, true) = true
+       order by updated_at desc nulls last limit 1`,
+      [row.place_id, pkg]
+    ).catch(() => ({ rows: [] }));
+    const price = Number(tour.rows[0]?.price) || null;
+    return { placeId: row.place_id, pkg, key: calendarKey(row.place_id, pkg), price };
   } catch {
     return null;
   }
@@ -290,10 +301,15 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       }
     }
 
+    let packageUnitPrice = null;
     if (normalizedItemTypeEarly === 'stay') {
-      const stayKey = await stayCalendarKey(itemId.trim(), normalizedStayType);
-      if (stayKey) {
-        const dateCheck = await checkTravelDate(stayKey, effectiveCheckIn || effectiveTravelDate);
+      const pkgInfo = await stayPackage(itemId.trim(), normalizedStayType);
+      if (pkgInfo) {
+        if (!(await circuitReservationAllowed(pkgInfo.placeId, pkgInfo.pkg))) {
+          return res.status(400).json({ error: 'Les réservations de cette formule sont actuellement fermées.' });
+        }
+        packageUnitPrice = pkgInfo.price;
+        const dateCheck = await checkTravelDate(pkgInfo.key, effectiveCheckIn || effectiveTravelDate);
         if (!dateCheck.ok) return res.status(400).json({ error: dateCheck.error });
         if (dateCheck.period) {
           effectiveTravelDate = dateCheck.period.start;
@@ -353,8 +369,8 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'La date de voyage doit être dans le futur.' });
     }
 
-    const perPerson = Boolean(pricePerPerson);
-    const unit = unitPrice != null ? Number(unitPrice) : Number(priceEstimate);
+    const perPerson = packageUnitPrice ? true : Boolean(pricePerPerson);
+    const unit = packageUnitPrice || (unitPrice != null ? Number(unitPrice) : Number(priceEstimate));
     let computedTotal = isHotelStay
       ? hotelStayPricing.totalPrice
       : calcBookingTotal(unit, travelersCount, perPerson);
