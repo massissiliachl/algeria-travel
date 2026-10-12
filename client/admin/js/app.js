@@ -124,13 +124,14 @@
       <div class="stat"><div class="stat__label">Hébergements</div><div class="stat__value">${stats.stays}</div></div>
     `;
 
-    const recent = ATStore.getBookings().slice(0, 5);
+    const recent = ATStore.getBookings().filter((b) => !ATStore.isArchived(b)).slice(0, 5);
     document.getElementById('dashBookings').innerHTML = ATBookingsUI.renderRows(recent, { compact: true });
 
+    const archived = document.getElementById('bookingView').value === 'archived';
     const filter = document.getElementById('bookingFilter').value;
-    let bookings = ATStore.getBookings();
+    let bookings = ATStore.getBookings().filter((b) => ATStore.isArchived(b) === archived);
     if (filter !== 'all') bookings = bookings.filter((b) => b.status === filter);
-    document.getElementById('bookingsTable').innerHTML = ATBookingsUI.renderRows(bookings);
+    document.getElementById('bookingsTable').innerHTML = ATBookingsUI.renderRows(bookings, { archived });
 
     document.getElementById('clientsTable').innerHTML = ATManageUI.renderClients();
     document.getElementById('destinationsTable').innerHTML = ATDestinationsUI.renderTable();
@@ -179,6 +180,7 @@
   });
 
   document.getElementById('bookingFilter').addEventListener('change', refresh);
+  document.getElementById('bookingView').addEventListener('change', refresh);
   document.getElementById('destAddBtn').addEventListener('click', () => ATDestinationsUI.openForm(null, openDrawer, toast));
   document.getElementById('clientAddBtn').addEventListener('click', () => ATManageUI.openClientForm(null, openDrawer, toast));
   document.getElementById('clientsRebuild').addEventListener('click', () => {
@@ -200,6 +202,11 @@
     const openBk = e.target.closest('[data-booking-open]');
     if (openBk) {
       ATBookingsUI.openDetail(openBk.dataset.bookingOpen, openDrawer, toast);
+      return;
+    }
+    const deleteBk = e.target.closest('[data-booking-delete]');
+    if (deleteBk) {
+      ATBookingsUI.remove(deleteBk.dataset.bookingDelete, toast);
       return;
     }
     const editDest = e.target.closest('[data-dest-edit]');

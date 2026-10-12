@@ -154,6 +154,8 @@
   /** Statuts des réservations Supabase ↔ statuts affichés dans l’admin */
   const STATUS_FROM_DB = { pending: 'new', reviewed: 'contacted', confirmed: 'confirmed', rejected: 'rejected', cancelled: 'cancelled' };
   const STATUS_TO_DB = { new: 'pending', contacted: 'reviewed', confirmed: 'confirmed', rejected: 'rejected', cancelled: 'cancelled' };
+  /** Statuts « traités » : la réservation passe en archive (supprimée 6 mois plus tard par le serveur) */
+  const ARCHIVED_STATUSES = new Set(['confirmed', 'rejected', 'cancelled']);
 
   const day = (iso) => (iso ? String(iso).slice(0, 10) : '');
   const normName = (s) =>
@@ -169,6 +171,7 @@
       ref: r.referenceCode || '',
       status: STATUS_FROM_DB[r.status] || 'new',
       notes: r.adminNotes || '',
+      archivedAt: r.archivedAt || '',
       createdAt: r.createdAt,
       name: r.clientName || '',
       email: r.clientEmail || '',
@@ -595,8 +598,15 @@
       Remote.bookingAction({ action: 'create', booking });
       return booking;
     },
+    isArchived: (b) => Boolean(b?.archivedAt),
     updateBooking(id, patch) {
-      const list = Store.getBookings().map((b) => (b.id === id ? { ...b, ...patch } : b));
+      const archive = (b) => {
+        const next = { ...b, ...patch };
+        if (!ARCHIVED_STATUSES.has(next.status)) next.archivedAt = '';
+        else if (!next.archivedAt) next.archivedAt = new Date().toISOString();
+        return next;
+      };
+      const list = Store.getBookings().map((b) => (b.id === id ? archive(b) : b));
       Store.saveBookings(list);
       const b = list.find((x) => x.id === id);
       if (b?.remote === 'db') Remote.updateDbBooking(id, patch);
@@ -799,7 +809,7 @@
     },
 
     stats() {
-      const bookings = Store.getBookings();
+      const bookings = Store.getBookings().filter((b) => !Store.isArchived(b));
       return {
         bookingsTotal: bookings.length,
         bookingsNew: bookings.filter((b) => b.status === 'new').length,

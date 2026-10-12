@@ -7,6 +7,12 @@ const { releaseInventory, rehold } = require('../../lib/accommodation');
 const router = express.Router();
 
 const VALID_STATUSES = new Set(['pending', 'reviewed', 'confirmed', 'rejected', 'cancelled']);
+const ARCHIVED_STATUSES = new Set(['confirmed', 'rejected', 'cancelled']);
+
+async function purgeOldArchives() {
+  const r = await query(`delete from public.reservations where archived_at < now() - interval '6 months'`);
+  if (r.rowCount) console.log(`[Reservation] ${r.rowCount} réservation(s) archivée(s) depuis plus de 6 mois supprimée(s)`);
+}
 
 function mapReservation(row) {
   return {
@@ -37,6 +43,7 @@ function mapReservation(row) {
     ownerId: row.owner_id,
     status: row.status,
     adminNotes: row.admin_notes,
+    archivedAt: row.archived_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -47,6 +54,7 @@ router.use(adminAuth);
 router.get('/', async (req, res, next) => {
   try {
     const { status } = req.query;
+    await purgeOldArchives().catch((err) => console.error('[Reservation] Purge archives :', err.message));
     const params = [];
     let sql = 'select * from public.reservations';
 
@@ -125,10 +133,11 @@ router.patch('/:id', async (req, res, next) => {
     const result = await query(
       `update public.reservations
        set status = coalesce($2, status),
-           admin_notes = coalesce($3, admin_notes)
+           admin_notes = coalesce($3, admin_notes),
+           archived_at = case when $4 then coalesce(archived_at, now()) else null end
        where id = $1
        returning *`,
-      [req.params.id, status || null, adminNotes ?? null]
+      [req.params.id, status || null, adminNotes ?? null, ARCHIVED_STATUSES.has(newStatus)]
     );
 
     const reservation = mapReservation(result.rows[0]);

@@ -10,6 +10,8 @@ require __DIR__ . '/_common.php';
 const BOOKINGS_FILE = DATA_DIR . '/bookings.json';
 const BOOKING_FIELDS = ['name', 'email', 'phone', 'date', 'travelers', 'stay', 'destination', 'message', 'source'];
 const MAX_BOOKINGS = 5000;
+/** Réservations traitées : archivées, puis supprimées 6 mois après l'archivage */
+const ARCHIVED_STATUSES = ['confirmed', 'rejected', 'cancelled'];
 
 function read_bookings(): array
 {
@@ -46,7 +48,19 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($method === 'GET') {
     require_admin();
-    respond(['bookings' => read_bookings()]);
+    $list = with_bookings(function (array $list) {
+        $limit = strtotime('-6 months');
+        $kept = [];
+        foreach ($list as $b) {
+            if (in_array($b['status'] ?? '', ARCHIVED_STATUSES, true) && empty($b['archivedAt'])) {
+                $b['archivedAt'] = $b['createdAt'] ?? gmdate('c');
+            }
+            if (!empty($b['archivedAt']) && strtotime($b['archivedAt']) < $limit) continue;
+            $kept[] = $b;
+        }
+        return $kept;
+    });
+    respond(['bookings' => array_values($list)]);
 }
 
 if ($method !== 'POST') respond(['error' => 'method'], 405);
@@ -92,6 +106,8 @@ if ($action === 'update') {
             foreach ($allowed as $field) {
                 if (array_key_exists($field, $patch)) $b[$field] = clean_text($patch[$field], 3000);
             }
+            if (!in_array($b['status'] ?? '', ARCHIVED_STATUSES, true)) $b['archivedAt'] = '';
+            elseif (empty($b['archivedAt'])) $b['archivedAt'] = gmdate('c');
         }
         return $list;
     });
