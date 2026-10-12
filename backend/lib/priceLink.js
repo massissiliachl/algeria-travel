@@ -18,7 +18,7 @@ const pkgOf = (value) => String(value || '').trim().toLowerCase();
 const defaultPkg = (placeId) => DEFAULT_PKG[placeId] || '';
 
 async function linkedTours(placeId, pkg) {
-  const r = await query('select id, place_slug, pkg, price from public.tours where coalesce(published, true) = true order by id');
+  const r = await query('select id, place_slug, pkg, price, booking_open from public.tours where coalesce(published, true) = true order by id');
   return r.rows.filter((t) => placeOfTour(t) === placeId && pkgOf(t.pkg) === pkg);
 }
 
@@ -34,21 +34,31 @@ async function circuitPrice(placeId, pkg) {
   }
 }
 
-/** Prix modifié sur la destination → circuit de sa formule par défaut */
+const isOpen = (value) => value !== false;
+
+/** Destination modifiée → circuit de sa formule par défaut (prix et ouverture des réservations) */
 async function syncFromPlace(place) {
-  const price = Number(place?.price);
-  if (!place?.id || !(price > 0)) return;
+  if (!place?.id) return;
+  const price = Number(place.price);
+  const open = isOpen(place.booking_open);
   const tours = await linkedTours(place.id, defaultPkg(place.id));
-  const ids = tours.filter((t) => Number(t.price) !== price).map((t) => t.id);
-  if (ids.length) await query('update public.tours set price = $1 where id = any($2)', [price, ids]);
+  for (const t of tours) {
+    const newPrice = price > 0 ? price : Number(t.price);
+    if (Number(t.price) === newPrice && isOpen(t.booking_open) === open) continue;
+    await query('update public.tours set price = $1, booking_open = $2 where id = $3', [newPrice, open, t.id]);
+  }
 }
 
-/** Prix modifié sur le circuit → destination, si c’est sa formule par défaut */
+/** Circuit modifié → destination, si c’est sa formule par défaut */
 async function syncFromTour(tour) {
-  const price = Number(tour?.price);
   const placeId = tour && placeOfTour(tour);
-  if (!placeId || !(price > 0) || pkgOf(tour.pkg) !== defaultPkg(placeId)) return;
-  await query('update public.places set price = $1 where id = $2 and price is distinct from $1', [price, placeId]);
+  if (!placeId || pkgOf(tour.pkg) !== defaultPkg(placeId)) return;
+  const price = Number(tour.price);
+  await query(
+    `update public.places set price = coalesce($1, price), booking_open = $2
+     where id = $3 and (price is distinct from coalesce($1, price) or coalesce(booking_open, true) <> $2)`,
+    [price > 0 ? price : null, isOpen(tour.booking_open), placeId]
+  );
 }
 
 module.exports = { circuitPrice, syncFromPlace, syncFromTour };

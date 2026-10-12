@@ -7,7 +7,7 @@
   const AUTH_KEY = 'at_admin_auth';
   const CREDENTIALS = {
     user: 'admin',
-    pass: 'AlgeriaTravel2026',
+    pass: 'adminalgeria1954',
   };
 
   function open(pass, online) {
