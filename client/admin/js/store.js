@@ -381,6 +381,13 @@
       );
     },
 
+    deleteDbBooking(id) {
+      if (!Remote.enabled) return;
+      Remote.api(`/admin/reservations/${encodeURIComponent(id)}`, { method: 'DELETE' }).catch((err) =>
+        Remote.onStatus(err.message === 'auth' ? 'auth' : 'error')
+      );
+    },
+
     /** Remplace un id local temporaire par l’id créé dans Supabase */
     renameLocal(key, oldId, newId) {
       const list = read(key, []).map((x) => (String(x.id) === oldId ? { ...x, id: newId } : x));
@@ -597,12 +604,11 @@
       if (b) Store.syncClientFromBooking(b);
       return b;
     },
-    /** Les réservations Supabase ne se suppriment pas (historique) : on les passe en « Annulée » */
     deleteBooking(id) {
       const b = Store.getBookings().find((x) => x.id === id);
-      if (b?.remote === 'db') return false;
       Store.saveBookings(Store.getBookings().filter((x) => x.id !== id));
-      Remote.bookingAction({ action: 'delete', id });
+      if (b?.remote === 'db') Remote.deleteDbBooking(id);
+      else Remote.bookingAction({ action: 'delete', id });
       return true;
     },
 

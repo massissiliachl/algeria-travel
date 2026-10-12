@@ -140,4 +140,31 @@ router.patch('/:id', async (req, res, next) => {
   }
 });
 
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const prevResult = await query('select * from public.reservations where id = $1', [req.params.id]);
+    if (!prevResult.rows.length) {
+      return res.status(404).json({ error: 'Réservation introuvable.' });
+    }
+
+    const row = prevResult.rows[0];
+    const released = new Set(['rejected', 'cancelled']);
+
+    if (row.room_type_id) {
+      await withTransaction(async (client) => {
+        if (!released.has(row.status)) await releaseInventory(client, row);
+        await client.query('delete from public.reservations where id = $1', [row.id]);
+      });
+    } else {
+      if (row.status === 'confirmed') await releaseHotelRooms(row);
+      await query('delete from public.reservations where id = $1', [row.id]);
+    }
+
+    console.log(`[Reservation] Supprimée par l’admin — ${row.id}`);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

@@ -103,7 +103,7 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn--primary" style="width:auto" id="bkSave">Enregistrer</button>
-        ${b.remote === 'db' ? '' : '<button type="button" class="btn btn--danger" id="bkDelete">Supprimer</button>'}
+        <button type="button" class="btn btn--danger" style="width:auto" id="bkDelete">Supprimer</button>
       </div>
     `);
 
@@ -118,7 +118,7 @@
     };
     const del = document.getElementById('bkDelete');
     if (del) del.onclick = () => {
-      if (!confirm('Supprimer cette réservation ?')) return;
+      if (!confirm('Supprimer définitivement cette demande de réservation ?')) return;
       ATStore.deleteBooking(id);
       toast('Réservation supprimée');
       document.dispatchEvent(new CustomEvent('at:refresh'));
