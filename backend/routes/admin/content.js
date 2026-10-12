@@ -9,6 +9,7 @@ const {
   mapPlace, mapTour, mapActivity, mapStay, mapBlog, mapGallery,
   makeBuilders, placeFields, tourFields, activityFields, stayFields, blogFields, galleryFields,
 } = require('../../lib/mappers');
+const { syncFromPlace, syncFromTour } = require('../../lib/priceLink');
 
 const router = express.Router();
 
@@ -110,6 +111,7 @@ const placeCrud = makeAdminCrud({
   mapRow: mapPlace,
   orderBy: 'name asc',
   notifyContentType: 'places',
+  afterWrite: syncFromPlace,
   ...makeBuilders(placeFields, { requireId: true }),
 });
 
@@ -119,6 +121,7 @@ const tourCrud = makeAdminCrud({
   mapRow: mapTour,
   orderBy: 'id asc',
   notifyContentType: 'tours',
+  afterWrite: syncFromTour,
   ...makeBuilders(tourFields),
 });
 
