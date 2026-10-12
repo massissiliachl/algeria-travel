@@ -284,6 +284,20 @@ async function loadFromDb() {
   };
 }
 
+/** Formule séjour (ex. maison d’hôte de Taghit) = circuit de même destination et même formule : même prix, même ouverture */
+function linkStayPackages(data) {
+  for (const s of data.stays) {
+    if (!s.perPerson || !s.placeId) continue;
+    const tour = data.tours.find((t) => t.placeId === s.placeId && (t.pkg || '') === s.stayType);
+    if (!tour) continue;
+    if (tour.price) {
+      s.price = tour.price;
+      s.priceOnRequest = false;
+    }
+    if (tour.bookingOpen === false) s.bookingOpen = false;
+  }
+}
+
 let cache = null;
 let cacheAt = 0;
 let loading = null;
@@ -294,6 +308,7 @@ async function getCatalog() {
     loading = (async () => {
       let data = process.env.DATABASE_URL ? await loadFromDb().catch(() => null) : null;
       if (!data) data = staticCatalog();
+      linkStayPackages(data);
       data.all = [...data.places, ...data.tours, ...data.stays, ...data.activities];
       data.byKey = new Map(data.all.map((i) => [i.key, i]));
       cache = data;
