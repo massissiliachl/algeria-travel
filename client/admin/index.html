@@ -24,6 +24,10 @@
         Mot de passe
         <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
       </label>
+      <label class="login-card__show">
+        <input type="checkbox" onchange="document.getElementById('loginPass').type = this.checked ? 'text' : 'password'" />
+        Afficher le mot de passe
+      </label>
       <button type="submit" class="btn btn--primary">Se connecter</button>
       <p class="login-card__hint">Identifiant : <strong>admin</strong> — mot de passe : la clé admin du backend (<strong>ADMIN_API_KEY</strong>)</p>
     </form>

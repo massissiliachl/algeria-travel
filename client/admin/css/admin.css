@@ -83,6 +83,21 @@ a { color: var(--gold); }
   font-size: 0.95rem;
 }
 
+.login-card .login-card__show {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -6px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.login-card .login-card__show input {
+  width: auto;
+  margin: 0;
+}
+
 .login-card__error {
   display: none;
   margin: 0 0 12px;
