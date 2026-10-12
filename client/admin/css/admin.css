@@ -83,36 +83,6 @@ a { color: var(--gold); }
   font-size: 0.95rem;
 }
 
-.login-card__pass {
-  position: relative;
-  display: block;
-}
-
-.login-card__pass input {
-  padding-right: 46px;
-}
-
-.login-card__eye {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  transform: translateY(-50%);
-}
-
-.login-card__eye:hover { color: var(--ink); }
-
-.login-card__eye.is-on .login-card__eye-slash { display: none; }
-
 .login-card__error {
   display: none;
   margin: 0 0 12px;
