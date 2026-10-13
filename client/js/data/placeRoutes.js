@@ -11,6 +11,7 @@ const TOUR_TO_PLACE = {
   8: 'taghit',
   9: 'taghit',
   10: 'tadrart',
+  12: 'taghit',
 };
 
 const getPlaceSlugFromTourId = (tourId) =>

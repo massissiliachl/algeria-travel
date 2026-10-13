@@ -194,15 +194,135 @@ export const TAGHIT_PACKAGES = {
     ],
     path: '/place/taghit?pkg=brezina',
   },
+  /** 3ᵉ offre Taghit — séjour 4 jours / 3 nuits, départs par avion (flyers « Départs Taghit par avion ») */
+  avion: {
+    id: 'avion',
+    price: 75000,
+    priceTiers: [
+      { fr: '+ 10 ans', en: 'Over 10', ar: 'أكثر من 10 سنوات', price: 75000 },
+      { fr: 'De 2 à 10 ans', en: '2 to 10 years', ar: 'من 2 إلى 10 سنوات', price: 55000 },
+      { fr: '- 2 ans', en: 'Under 2', ar: 'أقل من سنتين', price: 30000 },
+    ],
+    icon: 'Plane',
+    title: 'Séjour Taghit par avion',
+    title_en: 'Taghit stay by plane',
+    title_ar: 'إقامة تاغيت بالطائرة',
+    stay: 'Hébergement 3 nuits · pension complète',
+    stay_en: '3 nights accommodation · full board',
+    stay_ar: 'إقامة 3 ليالٍ · إقامة كاملة',
+    transport: 'Vol aller-retour + transport sur place inclus',
+    transport_en: 'Round-trip flight + local transport included',
+    transport_ar: 'رحلة ذهاب وإياب + النقل المحلي مشمول',
+    duration: '4 jours / 3 nuits',
+    duration_en: '4 days / 3 nights',
+    duration_ar: '4 أيام / 3 ليالٍ',
+    dates: '7 départs du 17 novembre au 29 décembre 2026',
+    dates_en: '7 departures from 17 November to 29 December 2026',
+    dates_ar: '7 رحلات من 17 نوفمبر إلى 29 ديسمبر 2026',
+    departures: [
+      { start: '2026-11-17', end: '2026-11-20', fr: 'Du 17 au 20 novembre', en: '17–20 November', ar: 'من 17 إلى 20 نوفمبر' },
+      { start: '2026-11-24', end: '2026-11-27', fr: 'Du 24 au 27 novembre', en: '24–27 November', ar: 'من 24 إلى 27 نوفمبر' },
+      { start: '2026-12-01', end: '2026-12-04', fr: 'Du 1er au 4 décembre', en: '1–4 December', ar: 'من 1 إلى 4 ديسمبر' },
+      { start: '2026-12-08', end: '2026-12-11', fr: 'Du 8 au 11 décembre', en: '8–11 December', ar: 'من 8 إلى 11 ديسمبر' },
+      { start: '2026-12-15', end: '2026-12-18', fr: 'Du 15 au 18 décembre', en: '15–18 December', ar: 'من 15 إلى 18 ديسمبر' },
+      { start: '2026-12-22', end: '2026-12-25', fr: 'Du 22 au 25 décembre', en: '22–25 December', ar: 'من 22 إلى 25 ديسمبر' },
+      { start: '2026-12-29', end: '2027-01-01', fr: 'Du 29 décembre au 1er janvier 2027', en: '29 December – 1 January 2027', ar: 'من 29 ديسمبر إلى 1 يناير 2027' },
+    ],
+    tagline: 'Évasion au cœur du Sahara algérien',
+    tagline_en: 'Escape to the heart of the Algerian Sahara',
+    tagline_ar: 'رحلة إلى قلب الصحراء الجزائرية',
+    image: '../public/images/taghit-avion.png',
+    whatsapp: '33619501708',
+    itinerary: [
+      {
+        day: 1,
+        title: 'Repérage & premières découvertes',
+        title_en: 'First discoveries',
+        steps: [
+          ['Arrivée dans la journée à Taghit', 'Arrival in Taghit during the day'],
+          ['Check-in dans les chambres et prise de repères', 'Check-in and getting your bearings'],
+          ['Ascension de la grande dune de Taghit', 'Climb of the great dune of Taghit'],
+          ['Qaâda traditionnelle autour d’un thé', 'Traditional qaada over tea'],
+          ['Ski sur sable', 'Sand skiing'],
+          ['Dîner traditionnel à la table d’hôte chez l’habitant', 'Traditional dinner with a local host'],
+        ],
+      },
+      {
+        day: 2,
+        title: 'Patrimoine, lac & traditions',
+        title_en: 'Heritage, lake & traditions',
+        steps: [
+          ['Petit-déjeuner', 'Breakfast'],
+          ['Visite des peintures et gravures rupestres', 'Rock paintings and engravings'],
+          ['Déjeuner en pleine palmeraie', 'Lunch in the palm grove'],
+          ['Activité kayak et visite du lac', 'Kayak and lake visit'],
+          ['Balade à dos de dromadaire', 'Camel ride'],
+          ['Dîner et soirée musicale locale', 'Dinner and local music evening'],
+        ],
+      },
+      {
+        day: 3,
+        title: 'Histoire, ksar & dunes',
+        title_en: 'History, ksar & dunes',
+        steps: [
+          ['Visite du Djebel Baroun et de l’ancienne caserne coloniale', 'Djebel Baroun and the old colonial barracks'],
+          ['Déjeuner et détente en pleine palmeraie', 'Lunch and relaxation in the palm grove'],
+          ['Visite du ksar de Taghit et de ses ruelles étroites', 'Taghit ksar and its narrow alleys'],
+          ['Sortie 4×4 dans les dunes pour l’un des plus beaux couchers de soleil au monde', '4×4 dune outing for one of the most beautiful sunsets in the world'],
+          ['Dîner surprise', 'Surprise dinner'],
+        ],
+      },
+      {
+        day: 4,
+        title: 'Souvenirs & retour',
+        title_en: 'Souvenirs & return',
+        steps: [
+          ['Petit-déjeuner', 'Breakfast'],
+          ['Temps libre pour découverte et détente', 'Free time to explore and relax'],
+          ['Quartier libre pour l’achat de souvenirs (au choix)', 'Free time for souvenir shopping (optional)'],
+          ['Retour à la maison, fin du séjour', 'Return home, end of the stay'],
+        ],
+      },
+    ],
+    includes: [
+      {
+        fr: '4 jours / 3 nuits · hébergement et pension complète',
+        en: '4 days / 3 nights · accommodation and full board',
+        ar: '4 أيام / 3 ليالٍ · إقامة كاملة',
+      },
+      {
+        fr: 'Vol aller-retour et transport sur place inclus',
+        en: 'Round-trip flight and local transport included',
+        ar: 'رحلة ذهاب وإياب والنقل المحلي مشمول',
+      },
+      {
+        fr: 'Activités : kayak, 4×4 dans les dunes, dromadaire, ski sur sable',
+        en: 'Activities: kayak, 4×4 in the dunes, camel ride, sand skiing',
+        ar: 'أنشطة: كاياك، دفع رباعي في الكثبان، جمل، تزلج على الرمال',
+      },
+      {
+        fr: 'Peintures rupestres, ksar de Taghit, Djebel Baroun, soirée musicale',
+        en: 'Rock art, Taghit ksar, Djebel Baroun, music evening',
+        ar: 'رسوم صخرية، قصر تاغيت، جبل بارون، سهرة موسيقية',
+      },
+    ],
+    extra: {
+      fr: 'Tarifs : 75 000 DA (+ 10 ans) · 55 000 DA (2 à 10 ans) · 30 000 DA (- 2 ans)',
+      en: 'Prices: 75,000 DZD (over 10) · 55,000 DZD (2–10 years) · 30,000 DZD (under 2)',
+      ar: 'الأسعار: 75000 دج (+10 سنوات) · 55000 دج (2–10 سنوات) · 30000 دج (أقل من سنتين)',
+    },
+    highlights: [
+      { icon: 'Plane', fr: 'Vol inclus', en: 'Flight included', ar: 'رحلة مشمولة' },
+      { icon: 'Calendar', fr: '4 j / 3 n · 7 départs', en: '4 d / 3 n · 7 departures', ar: '4 أيام · 7 رحلات' },
+      { icon: 'Car', fr: '4×4, kayak, dromadaire', en: '4×4, kayak, camel', ar: 'دفع رباعي، كاياك، جمل' },
+    ],
+    path: '/place/taghit?pkg=avion',
+  },
 };
 
-export const TAGHIT_PLACE_PKGS = ['hotel', 'brezina'];
+export const TAGHIT_PLACE_PKGS = ['hotel', 'brezina', 'avion'];
 
-const getTaghitPackage = (pkgId) => {
-  if (pkgId === 'guesthouse') return TAGHIT_PACKAGES.guesthouse;
-  if (pkgId === 'brezina') return TAGHIT_PACKAGES.brezina;
-  return TAGHIT_PACKAGES.hotel;
-};
+const getTaghitPackage = (pkgId) => TAGHIT_PACKAGES[pkgId] || TAGHIT_PACKAGES.hotel;
 
 /** Fusion lieu + formule pour /place/taghit */
 export const resolveTaghitPlace = (pkgId = 'hotel') => {
@@ -232,6 +352,8 @@ export const resolveTaghitPlace = (pkgId = 'hotel') => {
     whatsapp: pkg.whatsapp || null,
     includes: pkg.extra ? [...pkg.includes, pkg.extra] : pkg.includes,
     highlights: pkg.highlights,
+    ...(pkg.itinerary ? { itinerary: pkg.itinerary } : {}),
+    priceTiers: pkg.priceTiers || null,
     activePkg: pkg.id,
   };
 };

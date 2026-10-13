@@ -101,7 +101,7 @@ async function placeReservationAllowed(itemId) {
 }
 
 /** Circuits d’origine sans place_slug : même correspondance que client/js/data/placeRoutes.js */
-const TOUR_TO_PLACE = { 1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar', 6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart' };
+const TOUR_TO_PLACE = { 1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar', 6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart', 12: 'taghit' };
 
 /** false si l’admin a fermé les réservations du circuit qui mène à cette fiche (destination + formule) */
 async function circuitReservationAllowed(placeId, pkg) {

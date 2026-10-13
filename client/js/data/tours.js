@@ -7,6 +7,9 @@ import { getPlaceSlugFromTour } from './placeRoutes.js';
 const taghitHotel = TAGHIT_PACKAGES.hotel;
 const taghitGuest = TAGHIT_PACKAGES.guesthouse;
 const taghitBrezina = TAGHIT_PACKAGES.brezina;
+const taghitAvion = TAGHIT_PACKAGES.avion;
+const avionDates = taghitAvion.departures.map((d) => d.fr).join(' · ');
+const avionDates_en = taghitAvion.departures.map((d) => d.en).join(' · ');
 
 const BASE_TOURS = [
     {
@@ -415,6 +418,59 @@ const BASE_TOURS = [
         label_ar: h.ar,
       })),
       itinerary: [],
+    },
+    {
+      id: 12,
+      name: "Séjour Taghit — Départs par avion",
+      name_en: "Taghit stay — Departures by plane",
+      name_ar: "إقامة تاغيت — رحلات بالطائرة",
+      subtitle: "4 jours / 3 nuits · vol inclus",
+      subtitle_en: "4 days / 3 nights · flight included",
+      subtitle_ar: "4 أيام / 3 ليالٍ · الطيران مشمول",
+      description:
+        taghitAvion.includes.map((i) => i.fr).join(', ') +
+        `. ${taghitAvion.dates}. ${taghitAvion.extra.fr}.`,
+      description_en:
+        taghitAvion.includes.map((i) => i.en).join(', ') +
+        `. ${taghitAvion.dates_en}. ${taghitAvion.extra.en}.`,
+      fullDescription:
+        `Séjour Taghit 4 jours / 3 nuits — ${taghitAvion.tagline}.\nDéparts : ${avionDates}.\n` +
+        taghitAvion.includes.map((i) => `• ${i.fr}`).join('\n') +
+        `\n• ${taghitAvion.extra.fr}`,
+      fullDescription_en:
+        `Taghit stay 4 days / 3 nights — ${taghitAvion.tagline_en}.\nDepartures: ${avionDates_en}.\n` +
+        taghitAvion.includes.map((i) => `• ${i.en}`).join('\n') +
+        `\n• ${taghitAvion.extra.en}`,
+      location: "Taghit, Béchar",
+      location_en: "Taghit, Béchar",
+      location_ar: "تاغيت، بشار",
+      bestTime: taghitAvion.dates,
+      bestTime_en: taghitAvion.dates_en,
+      bestTime_ar: taghitAvion.dates_ar,
+      duration: taghitAvion.duration,
+      duration_en: taghitAvion.duration_en,
+      duration_ar: taghitAvion.duration_ar,
+      price: taghitAvion.price,
+      rating: 4.9,
+      reviews: 0,
+      image: taghitAvion.image,
+      category: "desert",
+      placeSlug: "taghit",
+      pkg: "avion",
+      badge: { fr: "NEW", en: "NEW", ar: "جديد" },
+      activities: taghitAvion.highlights.map((h) => ({
+        icon: h.icon,
+        label: h.fr,
+        label_en: h.en,
+        label_ar: h.ar,
+      })),
+      itinerary: taghitAvion.itinerary.map((d) => ({
+        day: d.day,
+        title: d.title,
+        title_en: d.title_en,
+        desc: d.steps.map(([fr]) => fr).join(', '),
+        desc_en: d.steps.map(([, en]) => en).join(', '),
+      })),
     },
   ];
 

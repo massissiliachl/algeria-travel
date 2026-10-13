@@ -33,9 +33,10 @@ const PLACE_ALIASES = {
 const REGION = { tadrart: 'djanet' };
 
 /** Circuits d’origine sans place_slug (même table que client/js/data/placeRoutes.js). */
-const TOUR_TO_PLACE = { 1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar', 6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart' };
+const TOUR_TO_PLACE = { 1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar', 6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart', 12: 'taghit' };
 
 const PKG_ALIASES = {
+  avion: ['taghit avion', 'taghit par avion', 'avion taghit', 'sejour taghit avion', 'departs taghit', 'taghit 4 jours', 'تاغيت بالطائرة', 'تاغيت طائرة'],
   hotel: ['taghit hotel', 'hotel taghit', 'taghit 4 etoiles', 'formule hotel'],
   guesthouse: ['taghit maison dhote', 'formule maison dhote', 'بيت ضيافه'],
   brezina: ['brezina', 'brizina', 'taghit via brezina', 'taghit brezina', 'بريزينه', 'بريزينا'],

@@ -16,6 +16,7 @@
     taghit: [
       ['hotel', 'Formule Hôtel 4★'],
       ['brezina', 'Formule Taghit via Brezina'],
+      ['avion', 'Séjour Taghit par avion (4 jours / 3 nuits)'],
     ],
   };
 

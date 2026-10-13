@@ -18,7 +18,7 @@ const TRUST_ITEMS = [
 const searchParams = params();
 const id = searchParams.get('id');
 const pkgParam = searchParams.get('pkg');
-const taghitPkg = pkgParam === 'brezina' ? 'brezina' : 'hotel';
+const taghitPkg = TAGHIT_PLACE_PKGS.includes(pkgParam) ? pkgParam : 'hotel';
 const place = getPlaceById(id, id === 'taghit' ? taghitPkg : pkgParam);
 const placeActivities = place ? getActivitiesForPlace(place.id) : [];
 
@@ -41,11 +41,9 @@ const state = {
     travelers: searchParams.get('travelers') || '2',
     stay:
       id === 'taghit'
-        ? pkgParam === 'brezina'
-          ? 'brezina'
-          : pkgParam === 'guesthouse'
-            ? 'guesthouse'
-            : 'hotel'
+        ? pkgParam === 'guesthouse'
+          ? 'guesthouse'
+          : taghitPkg
         : '',
   },
   calendar: null,
@@ -829,7 +827,7 @@ const bind = (root) => {
 const redirect = () => {
   if (!place) return '/destinations';
   if (id === 'taghit' && pkgParam === 'guesthouse') return '/guesthouses';
-  if (id === 'taghit' && pkgParam && pkgParam !== 'hotel' && pkgParam !== 'brezina') return '/place/taghit?pkg=hotel';
+  if (id === 'taghit' && pkgParam && !TAGHIT_PLACE_PKGS.includes(pkgParam)) return '/place/taghit?pkg=hotel';
   return null;
 };
 

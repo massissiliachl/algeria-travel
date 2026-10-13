@@ -41,6 +41,28 @@ const BREZINA = {
   perPerson: true,
 };
 
+const AVION = {
+  duration: L('4 jours / 3 nuits', '4 days / 3 nights', '4 أيام / 3 ليالٍ'),
+  dates: L(
+    'Départs : 17–20 nov., 24–27 nov., 1er–4 déc., 8–11 déc., 15–18 déc., 22–25 déc., 29 déc.–1er janv. 2027',
+    'Departures: 17–20 Nov, 24–27 Nov, 1–4 Dec, 8–11 Dec, 15–18 Dec, 22–25 Dec, 29 Dec–1 Jan 2027',
+    'الرحلات: 17–20 نوفمبر، 24–27 نوفمبر، 1–4 ديسمبر، 8–11 ديسمبر، 15–18 ديسمبر، 22–25 ديسمبر، 29 ديسمبر–1 يناير 2027'
+  ),
+  transport: L('Vol aller-retour + transport sur place inclus', 'Round-trip flight + local transport included', 'رحلة ذهاب وإياب + النقل المحلي مشمول'),
+  stay: L('Hébergement 3 nuits · pension complète', '3 nights accommodation · full board', 'إقامة 3 ليالٍ · إقامة كاملة'),
+  includes: [
+    L('Kayak, 4×4 dans les dunes, dromadaire, ski sur sable', 'Kayak, 4×4 in the dunes, camel ride, sand skiing', 'كاياك، دفع رباعي، جمل، تزلج على الرمال'),
+    L('Peintures rupestres, ksar de Taghit, Djebel Baroun, soirée musicale', 'Rock art, Taghit ksar, Djebel Baroun, music evening', 'رسوم صخرية، قصر تاغيت، جبل بارون، سهرة موسيقية'),
+    L('Tarifs : 75 000 DA (+ 10 ans) · 55 000 DA (2 à 10 ans) · 30 000 DA (- 2 ans)', 'Prices: 75,000 DZD (over 10) · 55,000 DZD (2–10) · 30,000 DZD (under 2)', 'الأسعار: 75000 دج (+10 سنوات) · 55000 دج (2–10) · 30000 دج (أقل من سنتين)'),
+  ],
+  description: L(
+    'Séjour Taghit 4 jours / 3 nuits par avion : grande dune, ski sur sable, kayak au lac, dromadaire, ksar, Djebel Baroun et sortie 4×4 au coucher du soleil.',
+    'Taghit 4-day / 3-night stay by plane: great dune, sand skiing, lake kayak, camel ride, ksar, Djebel Baroun and a 4×4 sunset outing.',
+    'إقامة تاغيت 4 أيام / 3 ليالٍ بالطائرة: الكثيب الكبير، تزلج على الرمال، كاياك، جمل، القصر، جبل بارون وجولة دفع رباعي عند الغروب.'
+  ),
+  perPerson: true,
+};
+
 function taghitPackage(pkg) {
   const p = TAGHIT_PACKAGES[pkg];
   if (!p) return null;
@@ -57,6 +79,7 @@ function taghitPackage(pkg) {
 function siteDetailsFor(placeSlug, pkg) {
   if (placeSlug === 'tadrart') return TADRART;
   if (placeSlug === 'taghit' && pkg === 'brezina') return BREZINA;
+  if (placeSlug === 'taghit' && pkg === 'avion') return AVION;
   if (placeSlug === 'taghit' && (pkg === 'hotel' || pkg === 'guesthouse')) return taghitPackage(pkg);
   return null;
 }

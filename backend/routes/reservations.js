@@ -345,6 +345,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
     if (normalizedItemTypeEarly === 'place') {
       itemPkg = String(itemPkgRaw || '').trim().toLowerCase() || null;
       if (!itemPkg && itemId.trim() === 'taghit' && /brezina/i.test(itemName)) itemPkg = 'brezina';
+      if (!itemPkg && itemId.trim() === 'taghit' && /avion/i.test(itemName)) itemPkg = 'avion';
       if (itemPkg && !/^[a-z0-9-]{1,40}$/.test(itemPkg)) itemPkg = null;
       packageUnitPrice = await circuitPrice(itemId.trim(), itemPkg);
       const dateCheck = await checkTravelDate(calendarKey(itemId, itemPkg), effectiveTravelDate);
@@ -356,7 +357,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
         effectiveCheckOut = dateCheck.period.end;
       }
     }
-    if (!isTaghitFixedStay && itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place' && itemPkg !== 'brezina') {
+    if (!isTaghitFixedStay && itemId.trim() === 'taghit' && normalizedItemTypeEarly === 'place' && itemPkg !== 'brezina' && itemPkg !== 'avion') {
       const { TAGHIT_BOOKING_WINDOW } = require('../scripts/data/taghitPackages.cjs');
       if (String(effectiveTravelDate).slice(0, 10) === TAGHIT_BOOKING_WINDOW.start) {
         isTaghitFixedStay = true;

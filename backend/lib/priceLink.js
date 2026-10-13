@@ -7,7 +7,7 @@ const { query } = require('../config/db');
 /** Circuits d’origine sans place_slug en base (même table que client/js/data/placeRoutes.js) */
 const TOUR_TO_PLACE = {
   1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar',
-  6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart',
+  6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart', 12: 'taghit',
 };
 
 /** Formule affichée par défaut sur la fiche destination */

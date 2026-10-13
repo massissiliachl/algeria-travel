@@ -2,7 +2,7 @@
 
 import '../core/siteContent.js';
 import { asset } from '../core/dom.js';
-import { resolveTaghitPlace } from './taghitPackages.js';
+import { resolveTaghitPlace, TAGHIT_PLACE_PKGS } from './taghitPackages.js';
 import { FEATURED_TOURS } from './tours.js';
 import { getPlaceSlugFromTour } from './placeRoutes.js';
 
@@ -707,7 +707,7 @@ export const getPlaceById = (id, pkg) => {
     const adminList = readAdminDestinations();
     const override = adminList?.find((d) => d.id === 'taghit');
     if (override?.active === false) return null;
-    const pkgId = pkg === 'brezina' || pkg === 'hotel' ? pkg : 'hotel';
+    const pkgId = TAGHIT_PLACE_PKGS.includes(pkg) ? pkg : 'hotel';
     return withCircuitPrice(applyAdminOverride(resolveTaghitPlace(pkgId)), pkgId);
   }
   const place = PLACES.find((p) => p.id === id);
