@@ -18,6 +18,18 @@ const {
 const { createPartnerNotification } = require('../lib/partnerNotifications');
 const { notifyOwner } = require('../lib/ownerNotifications');
 const { calendarKey, checkTravelDate } = require('../lib/bookingCalendar');
+
+/** Formules à tarifs par âge : le prix du circuit vaut pour les + 10 ans */
+const AGE_TIER_PRICES = { avion: { children: 55000, infants: 30000 } };
+
+/** { adults, children, infants } valide et cohérent avec le nombre de voyageurs, sinon null */
+function parseBreakdown(raw, travelersCount) {
+  if (!raw || typeof raw !== 'object') return null;
+  const n = (v) => Number(v ?? 0);
+  const out = { adults: n(raw.adults), children: n(raw.children), infants: n(raw.infants) };
+  if (!Object.values(out).every((v) => Number.isInteger(v) && v >= 0) || out.adults < 1) return null;
+  return out.adults + out.children + out.infants === travelersCount ? out : null;
+}
 const { circuitPrice } = require('../lib/priceLink');
 
 const router = express.Router();
@@ -152,6 +164,7 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       unit_price: unitPrice,
       price_per_person: pricePerPerson,
       price_estimate: priceEstimate,
+      travelers_breakdown: travelersBreakdown,
       gdpr_consent: gdprConsent,
       payment_method: paymentMethod,
       card_holder: cardHolder,
@@ -374,9 +387,13 @@ router.post('/', reservationLimiter, async (req, res, next) => {
 
     const perPerson = packageUnitPrice ? true : Boolean(pricePerPerson);
     const unit = packageUnitPrice || (unitPrice != null ? Number(unitPrice) : Number(priceEstimate));
+    const tiers = !isHotelStay && AGE_TIER_PRICES[itemPkg];
+    const breakdown = tiers ? parseBreakdown(travelersBreakdown, travelersCount) : null;
     let computedTotal = isHotelStay
       ? hotelStayPricing.totalPrice
-      : calcBookingTotal(unit, travelersCount, perPerson);
+      : breakdown
+        ? breakdown.adults * unit + breakdown.children * tiers.children + breakdown.infants * tiers.infants
+        : calcBookingTotal(unit, travelersCount, perPerson);
     if (computedTotal == null || !Number.isFinite(computedTotal)) {
       return res.status(400).json({ error: 'Prix estimé invalide.' });
     }

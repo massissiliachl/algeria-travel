@@ -211,6 +211,44 @@
   font-size: 0.9rem;
 }
 
+.place-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: -4px 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.place-tiers__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #F6EFE6;
+  border: 1px solid rgba(139, 94, 52, 0.18);
+}
+
+.place-tiers__item span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8B5E34;
+}
+
+.place-tiers__item strong {
+  font-family: var(--serif, 'Playfair Display', Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1A2332;
+}
+
+.place-form__row.place-form__row--tiers {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .place-bookbar__badge {
   display: inline-flex;
   align-items: center;

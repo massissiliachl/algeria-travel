@@ -39,6 +39,7 @@
           message: [booking.stay && `Hébergement : ${booking.stay}`, booking.message].filter(Boolean).join('\n'),
           unit_price: Number(extra.unitPrice) || 0,
           price_per_person: true,
+          travelers_breakdown: extra.travelersBreakdown || undefined,
           gdpr_consent: true,
           payment_method: 'pre_request',
           website: '',

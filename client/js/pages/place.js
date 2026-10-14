@@ -28,9 +28,19 @@ const emptyForm = () => ({
   phone: '',
   date: '',
   travelers: '2',
+  adults: '2',
+  children: '0',
+  infants: '0',
   stay: '',
   message: '',
 });
+
+/** Tarifs par âge (+ 10 ans · 2 à 10 ans · - 2 ans) : le 1er palier suit le prix du circuit (admin) */
+const AGE_FIELDS = ['adults', 'children', 'infants'];
+const ageTiers = () =>
+  place.priceTiers?.length === 3
+    ? place.priceTiers.map((tier, i) => ({ ...tier, field: AGE_FIELDS[i], price: i === 0 ? Number(place.price) : tier.price }))
+    : null;
 
 const state = {
   sent: false,
@@ -205,6 +215,19 @@ const periodBoxHtml = (d) => `
     <strong>${esc(d.offerDates)}</strong>
   </div>`;
 
+const tiersHtml = () => `
+  <ul class="place-tiers" aria-label="${esc(pick('Tarifs par âge', 'Prices by age', 'الأسعار حسب العمر'))}">
+    ${ageTiers()
+      .map(
+        (tier) => `
+      <li class="place-tiers__item">
+        <span>${esc(pick(tier.fr, tier.en, tier.ar))}</span>
+        <strong>${esc(tier.price.toLocaleString('fr-FR'))} DA</strong>
+      </li>`
+      )
+      .join('')}
+  </ul>`;
+
 const bookbarHtml = (d) => `
   <section class="place-bookbar acts-container" data-reveal>
     <div class="place-bookbar__inner">
@@ -227,6 +250,7 @@ const bookbarHtml = (d) => `
               : ''
           }
         </div>
+        ${!d.priceOnRequest && ageTiers() ? tiersHtml() : ''}
         <ul class="place-bookbar__trust">
           ${TRUST_ITEMS.map(
             (item) => `
@@ -584,13 +608,34 @@ const formHtml = () => {
       </label>
       ${dateFieldHtml()}
     </div>
-    <div class="place-form__row">
+    ${
+      ageTiers()
+        ? `<div class="place-form__row place-form__row--tiers">
+      ${ageTiers()
+        .map(
+          (tier, i) => `
       <label>
+        ${esc(pick(tier.fr, tier.en, tier.ar))}
+        <select name="${tier.field}">
+          ${[...Array(9).keys()].slice(i === 0 ? 1 : 0).map((n) => option(n, n, form[tier.field])).join('')}
+        </select>
+      </label>`
+        )
+        .join('')}
+    </div>`
+        : ''
+    }
+    <div class="place-form__row">
+      ${
+        ageTiers()
+          ? ''
+          : `<label>
         ${esc(t('place_form_travelers'))}
         <select name="travelers">
           ${[1, 2, 3, 4, 5, 6, 7, 8].map((n) => option(n, n, form.travelers)).join('')}
         </select>
-      </label>
+      </label>`
+      }
       <label>
         ${esc(t('place_form_stay'))}
         <select name="stay">
@@ -619,13 +664,34 @@ const formHtml = () => {
 };
 
 /** Prix admin = par personne pour tout le séjour (pas par jour) : total = prix × voyageurs */
+const countOf = (field) => Math.max(0, parseInt(state.form[field], 10) || 0);
+
+const travelersBreakdown = () =>
+  ageTiers() ? { adults: Math.max(1, countOf('adults')), children: countOf('children'), infants: countOf('infants') } : null;
+
+const breakdownText = (b) =>
+  ageTiers()
+    .map((tier) => `${b[tier.field]} × ${pick(tier.fr, tier.en, tier.ar)}`)
+    .join(' · ');
+
 const totalHtml = () => {
   if (place.priceOnRequest || place.price == null) return '';
+  const period = state.calendar?.mode === 'fixed' ? state.calendar.periods.find((p) => p.start === state.form.date) : null;
+  const money = (n) => `${n.toLocaleString('fr-FR')} DA`;
+  const breakdown = travelersBreakdown();
+  if (breakdown) {
+    const total = ageTiers().reduce((sum, tier) => sum + breakdown[tier.field] * tier.price, 0);
+    const lines = ageTiers()
+      .filter((tier) => breakdown[tier.field] > 0)
+      .map((tier) => `${breakdown[tier.field]} × ${money(tier.price)} (${pick(tier.fr, tier.en, tier.ar)})`);
+    return `
+    <span class="place-form__total-label">${esc(pick('Total estimé', 'Estimated total', 'المجموع التقديري'))}</span>
+    <strong class="place-form__total-value">${esc(money(total))}</strong>
+    <span class="place-form__note">${esc(lines.join(' + '))}${period ? ` · ${esc(periodLabel(period))}` : ''}</span>`;
+  }
   const travelers = Math.max(1, parseInt(state.form.travelers, 10) || 1);
   const unit = Number(place.price);
   const total = unit * travelers;
-  const period = state.calendar?.mode === 'fixed' ? state.calendar.periods.find((p) => p.start === state.form.date) : null;
-  const money = (n) => `${n.toLocaleString('fr-FR')} DA`;
   const detail = pick(
     `${money(unit)} × ${travelers} voyageur${travelers > 1 ? 's' : ''} · prix par personne pour tout le séjour`,
     `${money(unit)} × ${travelers} traveler${travelers > 1 ? 's' : ''} · price per person for the whole stay`,
@@ -694,7 +760,7 @@ const openBooking = () => {
   const onField = (e) => {
     const { name, value } = e.target;
     if (name && name in state.form) state.form[name] = value;
-    if (name === 'travelers' || name === 'date') refreshTotal(sheet.el);
+    if (name === 'travelers' || name === 'date' || AGE_FIELDS.includes(name)) refreshTotal(sheet.el);
   };
   sheet.el.addEventListener('input', onField);
   sheet.el.addEventListener('change', onField);
@@ -710,16 +776,18 @@ const openBooking = () => {
       errorEl.hidden = !dateMsg;
     }
     if (dateMsg) return;
+    const breakdown = travelersBreakdown();
     if (typeof window.ATBooking?.create === 'function') {
       window.ATBooking.create({
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
         date: form.date,
-        travelers: form.travelers,
+        travelers: breakdown ? breakdown.adults + breakdown.children + breakdown.infants : form.travelers,
+        travelersBreakdown: breakdown || undefined,
         stay: form.stay,
         destination: place.pkgTitle ? `${place.name} — ${place.pkgTitle}` : place.name,
-        message: form.message.trim(),
+        message: [breakdown && `Voyageurs : ${breakdownText(breakdown)}`, form.message.trim()].filter(Boolean).join('\n'),
         source: 'place',
         itemType: 'place',
         itemId: place.id,
