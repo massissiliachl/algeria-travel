@@ -208,12 +208,46 @@ const pkgSwitchHtml = () => {
     </div>`;
 };
 
-const periodBoxHtml = (d) => `
+const shortDay = (iso, withMonth = true) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString(pick('fr-FR', 'en-GB', 'ar-DZ'), withMonth ? { day: 'numeric', month: 'short' } : { day: 'numeric' });
+
+/** « 17 – 20 nov. » ou « 29 déc. – 1 janv. » */
+const shortPeriod = (p) =>
+  p.start.slice(0, 7) === p.end.slice(0, 7)
+    ? `${shortDay(p.start, false)} – ${shortDay(p.end)}`
+    : `${shortDay(p.start)} – ${shortDay(p.end)}`;
+
+const departuresHtml = (periods) => `
+  <div class="place-departs">
+    <p class="place-departs__head">
+      ${icon('Calendar', 16)}
+      <span>${esc(pick('Dates de départ', 'Departure dates', 'تواريخ الانطلاق'))}</span>
+      <em>${esc(pick(`${periods.length} départs`, `${periods.length} departures`, `${periods.length} رحلات`))}</em>
+    </p>
+    <ul class="place-departs__list">
+      ${periods
+        .map(
+          (p) => `
+        <li>
+          <button type="button" class="place-departs__chip" ${bookingClosed ? 'disabled' : `data-depart="${esc(p.start)}"`} title="${esc(periodLabel(p))}">
+            ${esc(shortPeriod(p))}
+          </button>
+        </li>`
+        )
+        .join('')}
+    </ul>
+  </div>`;
+
+const periodBoxHtml = (d) => {
+  const cal = state.calendar;
+  if (cal?.mode === 'fixed' && cal.periods.length > 1) return departuresHtml(cal.periods);
+  return `
   ${icon('Calendar', 18)}
   <div>
     <span>${esc(d.offerDatesLabel)}</span>
     <strong>${esc(d.offerDates)}</strong>
   </div>`;
+};
 
 const tiersHtml = () => `
   <ul class="place-tiers" aria-label="${esc(pick('Tarifs par âge', 'Prices by age', 'الأسعار حسب العمر'))}">
@@ -623,19 +657,13 @@ const formHtml = () => {
         )
         .join('')}
     </div>`
-        : ''
-    }
-    <div class="place-form__row">
-      ${
-        ageTiers()
-          ? ''
-          : `<label>
+        : `<div class="place-form__row">
+      <label>
         ${esc(t('place_form_travelers'))}
         <select name="travelers">
           ${[1, 2, 3, 4, 5, 6, 7, 8].map((n) => option(n, n, form.travelers)).join('')}
         </select>
-      </label>`
-      }
+      </label>
       <label>
         ${esc(t('place_form_stay'))}
         <select name="stay">
@@ -652,7 +680,8 @@ const formHtml = () => {
           }
         </select>
       </label>
-    </div>
+    </div>`
+    }
     <label>
       ${esc(t('place_form_message'))}
       <textarea name="message" rows="4" placeholder="${esc(t('place_form_message_ph'))}">${esc(form.message)}</textarea>
@@ -785,7 +814,7 @@ const openBooking = () => {
         date: form.date,
         travelers: breakdown ? breakdown.adults + breakdown.children + breakdown.infants : form.travelers,
         travelersBreakdown: breakdown || undefined,
-        stay: form.stay,
+        stay: breakdown ? '' : form.stay,
         destination: place.pkgTitle ? `${place.name} — ${place.pkgTitle}` : place.name,
         message: [breakdown && `Voyageurs : ${breakdownText(breakdown)}`, form.message.trim()].filter(Boolean).join('\n'),
         source: 'place',
@@ -881,6 +910,12 @@ const bind = (root) => {
     const shot = e.target.closest('[data-shot]');
     if (shot) {
       openLightbox(derive().gallery, Number(shot.getAttribute('data-shot')));
+      return;
+    }
+    const depart = e.target.closest('[data-depart]');
+    if (depart) {
+      state.form.date = depart.getAttribute('data-depart');
+      if (!bookingClosed) openBooking();
       return;
     }
     if (e.target.closest('[data-book]') || e.target.closest('.mobile-booking-bar__btn')) {
