@@ -16,6 +16,7 @@ const {
   sendReservationAdminEmail,
 } = require('../lib/reservationEmails');
 const { createPartnerNotification } = require('../lib/partnerNotifications');
+const { sendReservationWhatsApp } = require('../lib/whatsappNotify');
 const { notifyOwner } = require('../lib/ownerNotifications');
 const { calendarKey, checkTravelDate } = require('../lib/bookingCalendar');
 
@@ -503,6 +504,9 @@ router.post('/', reservationLimiter, async (req, res, next) => {
       ),
       sendReservationAdminEmail(adminPayload).catch((err) =>
         console.warn('[Mail] Réservation admin:', err.message)
+      ),
+      sendReservationWhatsApp(adminPayload).catch((err) =>
+        console.warn('[WhatsApp] Réservation admin:', err.message)
       ),
       normalizedItemType === 'stay'
         ? notifyStayOwner(itemId.trim(), {

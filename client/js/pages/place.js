@@ -1,4 +1,4 @@
-import { mountPage, navbar, footer } from '../core/layout.js';
+import { mountPage, navbar, footer, WA_NUMBER, WA_PATH } from '../core/layout.js';
 import { t, pick } from '../core/i18n.js';
 import { icon } from '../core/icons.js';
 import { href, navigate, params } from '../core/router.js';
@@ -604,12 +604,68 @@ const similarHtml = () => {
 
 /* ── Formulaire de réservation (bottom sheet) ── */
 
+const estimateTotal = () => {
+  if (place.priceOnRequest || place.price == null) return null;
+  const breakdown = travelersBreakdown();
+  if (breakdown) return ageTiers().reduce((sum, tier) => sum + breakdown[tier.field] * tier.price, 0);
+  return Number(place.price) * Math.max(1, parseInt(state.form.travelers, 10) || 1);
+};
+
+/** Message WhatsApp prérempli, envoyé par le client à l’agence après sa demande */
+const whatsappBookingUrl = () => {
+  const { form } = state;
+  const breakdown = travelersBreakdown();
+  const period = state.calendar?.periods?.find((p) => p.start === form.date);
+  const total = estimateTotal();
+  const ref = state.lastBooking?.ref;
+  const placeName = pick(place.name, place.name_en, place.name_ar);
+  const offer = place.pkgTitle ? `${placeName} — ${pick(place.pkgTitle, place.pkgTitle_en, place.pkgTitle_ar)}` : placeName;
+  const lines = [
+    pick('Bonjour Algeria Travel 👋', 'Hello Algeria Travel 👋', 'مرحبًا Algeria Travel 👋'),
+    pick(
+      `Je suis ${form.name.trim()} et je viens d’envoyer une demande de réservation sur votre site :`,
+      `I’m ${form.name.trim()} and I’ve just sent a booking request on your website:`,
+      `أنا ${form.name.trim()} وقد أرسلت للتو طلب حجز عبر موقعكم:`
+    ),
+    '',
+    `🌴 ${pick('Offre', 'Offer', 'العرض')} : ${offer}`,
+    ref ? `🔖 ${pick('Référence', 'Reference', 'المرجع')} : ${ref}` : null,
+    `🗓️ ${pick('Date', 'Date', 'التاريخ')} : ${period ? periodLabel(period) : form.date ? fmtDay(form.date) : '—'}`,
+    `👥 ${pick('Voyageurs', 'Travelers', 'المسافرون')} : ${breakdown ? breakdownText(breakdown) : form.travelers}`,
+    total != null ? `💰 ${pick('Total estimé', 'Estimated total', 'المجموع التقديري')} : ${total.toLocaleString('fr-FR')} DA` : null,
+    '',
+    `📞 ${form.phone.trim()}`,
+    `✉️ ${form.email.trim()}`,
+    form.message.trim() ? `📝 ${form.message.trim()}` : null,
+    '',
+    pick(
+      'Merci de me recontacter pour confirmer 🙏',
+      'Please get back to me to confirm 🙏',
+      'يرجى التواصل معي للتأكيد 🙏'
+    ),
+  ].filter((line) => line !== null);
+  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
+};
+
 const successHtml = () => `
   <div class="place-modal__success">
     <div class="place-modal__success-icon">${icon('Check', 28)}</div>
     <h2>${esc(t('place_form_success_title'))}</h2>
     <p>${esc(t('place_form_success_text'))}</p>
-    <button type="button" data-close-booking>${esc(t('place_form_close'))}</button>
+    <div class="place-modal__success-actions">
+      <button type="button" class="place-modal__wa" data-wa-booking>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="${WA_PATH}"></path></svg>
+        ${esc(pick('Envoyer aussi sur WhatsApp', 'Also send on WhatsApp', 'أرسل أيضًا عبر واتساب'))}
+      </button>
+      <button type="button" data-close-booking>${esc(t('place_form_close'))}</button>
+    </div>
+    <p class="place-modal__wa-hint">${esc(
+      pick(
+        'Réponse plus rapide : votre demande détaillée est déjà rédigée, il suffit de l’envoyer.',
+        'Faster reply: your detailed request is already written, just send it.',
+        'رد أسرع: طلبك المفصل جاهز، فقط أرسله.'
+      )
+    )}</p>
   </div>`;
 
 const option = (value, label, current) =>
@@ -700,6 +756,7 @@ const travelersBreakdown = () =>
 
 const breakdownText = (b) =>
   ageTiers()
+    .filter((tier) => b[tier.field] > 0)
     .map((tier) => `${b[tier.field]} × ${pick(tier.fr, tier.en, tier.ar)}`)
     .join(' · ');
 
@@ -807,7 +864,7 @@ const openBooking = () => {
     if (dateMsg) return;
     const breakdown = travelersBreakdown();
     if (typeof window.ATBooking?.create === 'function') {
-      window.ATBooking.create({
+      state.lastBooking = window.ATBooking.create({
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
@@ -828,7 +885,11 @@ const openBooking = () => {
     sheet.setContent(sheetHtml());
   });
 
-  sheet.el.addEventListener('click', (e) => {
+  sheet.panel.addEventListener('click', (e) => {
+    if (e.target.closest('[data-wa-booking]')) {
+      window.open(whatsappBookingUrl(), '_blank', 'noopener');
+      return;
+    }
     if (e.target.closest('[data-close-booking]')) closeBooking();
   });
 };

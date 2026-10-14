@@ -1487,6 +1487,32 @@
   font-family: inherit;
 }
 
+.place-modal__success-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.place-modal__success .place-modal__wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #fff;
+}
+
+.place-modal__success .place-modal__wa:hover {
+  background: #1EBE5A;
+}
+
+.place-modal__success .place-modal__wa-hint {
+  margin: 12px auto 0;
+  max-width: 340px;
+  font-size: 0.8rem;
+  color: #6B6560;
+}
+
 @media (max-width: 960px) {
   .place-bookbar__inner {
     grid-template-columns: 1fr;
