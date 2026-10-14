@@ -231,7 +231,8 @@ export const TAGHIT_PACKAGES = {
     tagline: 'Évasion au cœur du Sahara algérien',
     tagline_en: 'Escape to the heart of the Algerian Sahara',
     tagline_ar: 'رحلة إلى قلب الصحراء الجزائرية',
-    image: '../public/images/taghit-avion.png',
+    image: '../public/images/taghit.jpeg',
+    gallery: ['../public/images/taghit-avion-departs.png', '../public/images/taghit-avion.png'],
     whatsapp: '33619501708',
     itinerary: [
       {
@@ -329,7 +330,9 @@ export const resolveTaghitPlace = (pkgId = 'hotel') => {
   const pkg = getTaghitPackage(pkgId);
   return {
     ...TAGHIT_PLACE,
-    ...(pkg.image ? { image: pkg.image, gallery: [pkg.image, ...TAGHIT_PLACE.gallery] } : {}),
+    ...(pkg.image
+      ? { image: pkg.image, gallery: [...new Set([pkg.image, ...(pkg.gallery || []), ...TAGHIT_PLACE.gallery])] }
+      : {}),
     price: pkg.price,
     priceOnRequest: Boolean(pkg.priceOnRequest),
     pricePerPerson: true,

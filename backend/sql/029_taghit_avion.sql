@@ -12,7 +12,7 @@ insert into public.tours (
   '',
   'Taghit, Béchar', 'Taghit, Béchar', 'تاغيت، بشار',
   '4 jours / 3 nuits', '4 days / 3 nights', '4 أيام / 3 ليالٍ',
-  75000, 4.9, 0, '/images/taghit-avion.png', 'desert',
+  75000, 4.9, 0, '/images/taghit.jpeg', 'desert',
   '[]'::jsonb, '[]'::jsonb, 'taghit', 'avion', true, true
 )
 on conflict (id) do nothing;
