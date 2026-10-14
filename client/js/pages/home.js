@@ -206,7 +206,7 @@ const coupHtml = () => `
                       ? `<strong>${esc(t('home_v2_coup_on_request'))}</strong>
                          <em>${esc(t('home_v2_coup_pkg_brezina_dates'))}</em>`
                       : `<strong>${esc(pkg.price.toLocaleString('fr-DZ'))}<span> ${esc(t('home_v2_coup_price_unit'))}</span></strong>
-                         <em>${esc(t('home_v2_coup_per_person'))}</em>`
+                         <em>${esc(t(pkg.priceNoteKey || 'home_v2_coup_per_person'))}</em>`
                   }
                 </div>
                 <a href="${href(pkg.ctaPath || `${HOME_COUP_TAGHIT.link}?pkg=${pkg.id}`)}" class="hv-coup__formula-cta">
