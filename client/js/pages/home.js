@@ -22,7 +22,7 @@ const coupPackages = () => {
     FEATURED_TOURS.filter((t) => getPlaceSlugFromTour(t) === 'taghit' && t.pkg).map((t) => t.pkg)
   );
   return HOME_COUP_TAGHIT.packages
-    .filter((pkg) => live.has(pkg.id))
+    .filter((pkg) => pkg.id !== 'brezina' && live.has(pkg.id))
     .map((pkg) => {
       const tour = FEATURED_TOURS.find((t) => t.placeSlug === 'taghit' && t.pkg === pkg.id);
       if (!tour) return pkg;

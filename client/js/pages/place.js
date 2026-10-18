@@ -998,7 +998,7 @@ const bind = (root) => {
 const redirect = () => {
   if (!place) return '/destinations';
   if (id === 'taghit' && pkgParam === 'guesthouse') return '/guesthouses';
-  if (id === 'taghit' && pkgParam && !taghitPkgs().includes(pkgParam)) {
+  if (id === 'taghit' && (pkgParam === 'brezina' || (pkgParam && !taghitPkgs().includes(pkgParam)))) {
     return `/place/taghit?pkg=${taghitPkgs()[0] || 'hotel'}`;
   }
   return null;

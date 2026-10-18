@@ -599,12 +599,9 @@
   color: var(--coup-ember-deep, #B8935D) !important;
 }
 
-.hv-coup__formula--brezina .hv-coup__formula-cta {
-  background: #1A2332;
-}
-
-.hv-coup__formula--brezina .hv-coup__formula-cta:hover {
-  background: #2A3548;
+/* Brezina retiré : cache navigateur / ancien JS — la carte ne s’affiche plus */
+.hv-coup__formula--brezina {
+  display: none !important;
 }
 
 .hv-coup__formula-list {
