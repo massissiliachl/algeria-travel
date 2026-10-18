@@ -6,7 +6,6 @@ import { getPlaceSlugFromTour } from './placeRoutes.js';
 
 const taghitHotel = TAGHIT_PACKAGES.hotel;
 const taghitGuest = TAGHIT_PACKAGES.guesthouse;
-const taghitBrezina = TAGHIT_PACKAGES.brezina;
 const taghitAvion = TAGHIT_PACKAGES.avion;
 const avionDates = taghitAvion.departures.map((d) => d.fr).join(' · ');
 const avionDates_en = taghitAvion.departures.map((d) => d.en).join(' · ');
@@ -369,54 +368,6 @@ const BASE_TOURS = [
         { icon: "Car", label: "Bus Mercedes", label_en: "Mercedes bus", label_ar: "حافلة مرسيدس" },
         { icon: "ShieldCheck", label: "24h/24", label_en: "24/7", label_ar: "24/7" },
       ],
-      itinerary: [],
-    },
-    {
-      id: 9,
-      name: "Taghit via Brezina",
-      name_en: "Taghit via Brezina",
-      name_ar: "تاغيت عبر بريزينا",
-      subtitle: "5 jours / 4 nuits · Van Mercedes VIP",
-      subtitle_en: "5 days / 4 nights · Mercedes VIP van",
-      subtitle_ar: "5 أيام / 4 ليالٍ · فان مرسيدس VIP",
-      description:
-        taghitBrezina.includes.map((i) => i.fr).join(', ') +
-        `. ${taghitBrezina.dates}. Sur devis.`,
-      description_en:
-        taghitBrezina.includes.map((i) => i.en).join(', ') +
-        `. ${taghitBrezina.dates_en}. On request.`,
-      fullDescription:
-        `Séjour à Taghit en passant par Brezina — ${taghitBrezina.dates}.\n` +
-        taghitBrezina.includes.map((i) => `• ${i.fr}`).join('\n') +
-        `\n• ${taghitBrezina.extra.fr}\nPrix sur devis`,
-      fullDescription_en:
-        `Taghit stay via Brezina — ${taghitBrezina.dates_en}.\n` +
-        taghitBrezina.includes.map((i) => `• ${i.en}`).join('\n') +
-        `\n• ${taghitBrezina.extra.en}\nPrice on request`,
-      location: "Brezina → Taghit, Béchar",
-      location_en: "Brezina → Taghit, Béchar",
-      location_ar: "بريزينا → تاغيت، بشار",
-      bestTime: taghitBrezina.dates,
-      bestTime_en: taghitBrezina.dates_en,
-      bestTime_ar: taghitBrezina.dates_ar,
-      duration: taghitBrezina.duration,
-      duration_en: taghitBrezina.duration_en,
-      duration_ar: taghitBrezina.duration_ar,
-      price: 0,
-      priceOnRequest: true,
-      rating: 4.9,
-      reviews: 48,
-      image: taghitBrezina.image,
-      category: "desert",
-      placeSlug: "taghit",
-      pkg: "brezina",
-      badge: { fr: "NEW", en: "NEW", ar: "جديد" },
-      activities: taghitBrezina.highlights.map((h) => ({
-        icon: h.icon,
-        label: h.fr,
-        label_en: h.en,
-        label_ar: h.ar,
-      })),
       itinerary: [],
     },
     {

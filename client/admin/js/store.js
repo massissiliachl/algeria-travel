@@ -514,7 +514,6 @@
     { id: 6, name: 'Constantine', subtitle: 'Ville des ponts', location: 'Constantine, Nord-Est', duration: '3 jours', price: 22000, category: 'culture', image: '/images/alger.jpeg', placeSlug: 'constantine' },
     { id: 7, name: 'Taghit — Hôtel 4★', subtitle: 'Voyage coup de cœur · vol inclus', location: 'Taghit, Béchar', duration: 'Pension complète', price: 99990, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'hotel' },
     { id: 8, name: 'Taghit — Maison d’hôte', subtitle: 'Voyage coup de cœur · bus Mercedes', location: 'Taghit, Béchar', duration: 'Pension complète', price: 60000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'guesthouse' },
-    { id: 9, name: 'Taghit via Brezina', subtitle: '5 jours / 4 nuits · Van Mercedes VIP', location: 'Brezina → Taghit, Béchar', duration: '5 jours / 4 nuits', price: 0, priceOnRequest: true, category: 'desert', image: '/images/taghit-brezina.png', placeSlug: 'taghit', pkg: 'brezina' },
     { id: 12, name: 'Séjour Taghit — Départs par avion', subtitle: '4 jours / 3 nuits · vol inclus', location: 'Taghit, Béchar', duration: '4 jours / 3 nuits', price: 75000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'avion' },
   ].map((t) => ({ description: '', priceOnRequest: false, active: true, bookingOpen: true, ...t }));
 

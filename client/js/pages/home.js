@@ -10,15 +10,17 @@ import {
   HOME_COUP_TAGHIT,
   HOME_HERO,
 } from '../data/homePage.js';
-import { FEATURED_TOURS, liveTaghitPkgs } from '../data/tours.js';
-import { getPlacePathFromTour } from '../data/placeRoutes.js';
+import { FEATURED_TOURS } from '../data/tours.js';
+import { getPlacePathFromTour, getPlaceSlugFromTour } from '../data/placeRoutes.js';
 import { getPlaces } from '../data/places.js';
 import { resolveSearchNavigation, suggestActivities, suggestDestinations } from '../data/search.js';
 import { getAdminPageValue } from '../utils/adminContent.js';
 
-/** Formules Taghit encore publiées dans l’admin (prix du circuit si présent) */
+/** Formules Taghit encore publiées (circuits admin / API) — ne dépend pas d’exports récents de tours.js */
 const coupPackages = () => {
-  const live = new Set(liveTaghitPkgs());
+  const live = new Set(
+    FEATURED_TOURS.filter((t) => getPlaceSlugFromTour(t) === 'taghit' && t.pkg).map((t) => t.pkg)
+  );
   return HOME_COUP_TAGHIT.packages
     .filter((pkg) => live.has(pkg.id))
     .map((pkg) => {

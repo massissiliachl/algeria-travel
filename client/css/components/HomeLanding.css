@@ -557,22 +557,6 @@
   border-left: 1px solid var(--coup-line);
 }
 
-.hv-coup__formula--avion {
-  grid-column: 1 / -1;
-}
-
-.hv-coup__formula.hv-coup__formula--avion {
-  border-left: none;
-}
-
-@media (min-width: 900px) {
-  .hv-coup__formula--avion .hv-coup__formula-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 24px;
-  }
-}
-
 .hv-coup__formula-top {
   display: flex;
   align-items: flex-start;

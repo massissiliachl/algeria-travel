@@ -8,7 +8,6 @@ export const HOME_HERO = {
 };
 
 const hotel = TAGHIT_PACKAGES.hotel;
-const brezina = TAGHIT_PACKAGES.brezina;
 const avion = TAGHIT_PACKAGES.avion;
 
 export const HOME_COUP_TAGHIT = {
@@ -31,23 +30,6 @@ export const HOME_COUP_TAGHIT = {
       ],
       extraKey: 'home_v2_coup_pkg_hotel_extra',
       ctaPath: hotel.path,
-    },
-    {
-      id: brezina.id,
-      price: brezina.price,
-      priceOnRequest: true,
-      icon: brezina.icon,
-      titleKey: 'home_v2_coup_pkg_brezina_title',
-      transportKey: 'home_v2_coup_pkg_brezina_transport',
-      datesKey: 'home_v2_coup_pkg_brezina_dates',
-      includes: [
-        'home_v2_coup_pkg_brezina_inc_1',
-        'home_v2_coup_pkg_brezina_inc_2',
-        'home_v2_coup_pkg_brezina_inc_3',
-        'home_v2_coup_pkg_brezina_inc_4',
-      ],
-      extraKey: 'home_v2_coup_pkg_brezina_extra',
-      ctaPath: brezina.path,
     },
     {
       id: avion.id,

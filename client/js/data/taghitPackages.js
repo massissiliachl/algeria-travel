@@ -321,7 +321,8 @@ export const TAGHIT_PACKAGES = {
   },
 };
 
-export const TAGHIT_PLACE_PKGS = ['hotel', 'brezina', 'avion'];
+/** Formules proposées sur la fiche Taghit (Brezina retiré du catalogue tant qu’il n’est pas republie en admin) */
+export const TAGHIT_PLACE_PKGS = ['hotel', 'avion'];
 
 const getTaghitPackage = (pkgId) => TAGHIT_PACKAGES[pkgId] || TAGHIT_PACKAGES.hotel;
 
