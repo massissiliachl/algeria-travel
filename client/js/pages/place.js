@@ -7,7 +7,13 @@ import { openLightbox, openBottomSheet, mobileBookingBar, responsiveImage } from
 import { getPlaceById, getPlaces } from '../data/places.js';
 import { TAGHIT_PACKAGES, TAGHIT_PLACE_PKGS } from '../data/taghitPackages.js';
 import { ACTIVITY_CATEGORIES, getActivitiesForPlace } from '../data/activities.js';
-import { isCircuitBookingClosed } from '../data/tours.js';
+import { isCircuitBookingClosed, liveTaghitPkgs } from '../data/tours.js';
+
+/** Formules Taghit encore publiées (admin) — sinon catalogue d’origine */
+const taghitPkgs = () => {
+  const live = liveTaghitPkgs();
+  return live.length ? live : TAGHIT_PLACE_PKGS;
+};
 
 const TRUST_ITEMS = [
   { icon: 'CreditCard', key: 'place_trust_pay' },
@@ -18,7 +24,7 @@ const TRUST_ITEMS = [
 const searchParams = params();
 const id = searchParams.get('id');
 const pkgParam = searchParams.get('pkg');
-const taghitPkg = TAGHIT_PLACE_PKGS.includes(pkgParam) ? pkgParam : 'hotel';
+const taghitPkg = taghitPkgs().includes(pkgParam) ? pkgParam : taghitPkgs()[0] || 'hotel';
 const place = getPlaceById(id, id === 'taghit' ? taghitPkg : pkgParam);
 const placeActivities = place ? getActivitiesForPlace(place.id) : [];
 
@@ -193,8 +199,9 @@ const pkgSwitchHtml = () => {
     <div class="place-pkg-switch acts-container" data-reveal>
       <p class="place-pkg-switch__label">${esc(t('place_pkg_switch'))}</p>
       <div class="place-pkg-switch__list" role="tablist">
-        ${TAGHIT_PLACE_PKGS.map((key) => {
+        ${taghitPkgs().map((key) => {
           const pkg = TAGHIT_PACKAGES[key];
+          if (!pkg) return '';
           const active = (place.activePkg || 'hotel') === key;
           return `
           <button type="button" role="tab" aria-selected="${active}" class="place-pkg-switch__btn${
@@ -991,7 +998,9 @@ const bind = (root) => {
 const redirect = () => {
   if (!place) return '/destinations';
   if (id === 'taghit' && pkgParam === 'guesthouse') return '/guesthouses';
-  if (id === 'taghit' && pkgParam && !TAGHIT_PLACE_PKGS.includes(pkgParam)) return '/place/taghit?pkg=hotel';
+  if (id === 'taghit' && pkgParam && !taghitPkgs().includes(pkgParam)) {
+    return `/place/taghit?pkg=${taghitPkgs()[0] || 'hotel'}`;
+  }
   return null;
 };
 

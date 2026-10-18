@@ -3,7 +3,7 @@
 import '../core/siteContent.js';
 import { asset } from '../core/dom.js';
 import { resolveTaghitPlace, TAGHIT_PLACE_PKGS } from './taghitPackages.js';
-import { FEATURED_TOURS } from './tours.js';
+import { FEATURED_TOURS, isTaghitPkgLive, liveTaghitPkgs } from './tours.js';
 import { getPlaceSlugFromTour } from './placeRoutes.js';
 
 export const PLACES = [
@@ -707,7 +707,9 @@ export const getPlaceById = (id, pkg) => {
     const adminList = readAdminDestinations();
     const override = adminList?.find((d) => d.id === 'taghit');
     if (override?.active === false) return null;
-    const pkgId = TAGHIT_PLACE_PKGS.includes(pkg) ? pkg : 'hotel';
+    const live = liveTaghitPkgs();
+    const allowed = live.length ? live : TAGHIT_PLACE_PKGS;
+    const pkgId = isTaghitPkgLive(pkg) ? pkg : allowed[0] || 'hotel';
     return withCircuitPrice(applyAdminOverride(resolveTaghitPlace(pkgId)), pkgId);
   }
   const place = PLACES.find((p) => p.id === id);

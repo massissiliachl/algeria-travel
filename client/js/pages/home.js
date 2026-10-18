@@ -8,13 +8,47 @@ import {
   HOME_ACCOMMODATIONS,
   HOME_CIRCUITS_BANNER,
   HOME_COUP_TAGHIT,
-  HOME_DESTINATIONS,
   HOME_HERO,
 } from '../data/homePage.js';
-import { FEATURED_TOURS } from '../data/tours.js';
+import { FEATURED_TOURS, liveTaghitPkgs } from '../data/tours.js';
 import { getPlacePathFromTour } from '../data/placeRoutes.js';
+import { getPlaces } from '../data/places.js';
 import { resolveSearchNavigation, suggestActivities, suggestDestinations } from '../data/search.js';
 import { getAdminPageValue } from '../utils/adminContent.js';
+
+/** Formules Taghit encore publiées dans l’admin (prix du circuit si présent) */
+const coupPackages = () => {
+  const live = new Set(liveTaghitPkgs());
+  return HOME_COUP_TAGHIT.packages
+    .filter((pkg) => live.has(pkg.id))
+    .map((pkg) => {
+      const tour = FEATURED_TOURS.find((t) => t.placeSlug === 'taghit' && t.pkg === pkg.id);
+      if (!tour) return pkg;
+      return {
+        ...pkg,
+        price: tour.priceOnRequest ? null : Number(tour.price) || pkg.price,
+        priceOnRequest: Boolean(tour.priceOnRequest),
+      };
+    });
+};
+
+/** Destinations actives (admin) pour le carrousel accueil */
+const homeDestinations = () =>
+  getPlaces()
+    .filter((p) => p.id !== 'tadrart')
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      name_en: p.name_en,
+      name_ar: p.name_ar,
+      tagline: p.tagline,
+      tagline_en: p.tagline_en,
+      tagline_ar: p.tagline_ar,
+      rating: p.rating ?? 5,
+      temp: p.temp || '',
+      image: p.image,
+      link: `/place/${p.id}`,
+    }));
 
 const TRUST = [
   { icon: 'Calendar', title: 'home_trust_book', desc: 'home_trust_book_desc' },
@@ -148,7 +182,10 @@ const searchHtml = () => {
     </div>`;
 };
 
-const coupHtml = () => `
+const coupHtml = () => {
+  const packages = coupPackages();
+  if (!packages.length) return '';
+  return `
   <section class="hv-coup" aria-labelledby="hv-coup-title" data-reveal>
     <div class="hv-container">
       <div class="hv-coup__stage">
@@ -169,13 +206,13 @@ const coupHtml = () => `
 
           <div class="hv-coup__banner-media">
             <img src="${esc(asset(HOME_COUP_TAGHIT.image))}" alt="${esc(t('home_v2_coup_place'))}" onerror="this.onerror=null;this.src='${esc(
-  asset(HOME_COUP_TAGHIT.fallback)
-)}'" />
+    asset(HOME_COUP_TAGHIT.fallback)
+  )}'" />
           </div>
         </a>
 
         <div class="hv-coup__formulas" aria-label="${esc(t('home_v2_coup_meta_label'))}">
-          ${HOME_COUP_TAGHIT.packages
+          ${packages
             .map(
               (pkg) => `
             <article class="hv-coup__formula hv-coup__formula--${esc(pkg.id)}">
@@ -201,7 +238,7 @@ const coupHtml = () => `
                   ${
                     pkg.priceOnRequest || pkg.price == null
                       ? `<strong>${esc(t('home_v2_coup_on_request'))}</strong>
-                         <em>${esc(t('home_v2_coup_pkg_brezina_dates'))}</em>`
+                         <em>${pkg.datesKey ? esc(t(pkg.datesKey)) : ''}</em>`
                       : `<strong>${esc(pkg.price.toLocaleString('fr-DZ'))}<span> ${esc(t('home_v2_coup_price_unit'))}</span></strong>
                          <em>${esc(t(pkg.priceNoteKey || 'home_v2_coup_per_person'))}</em>`
                   }
@@ -218,6 +255,7 @@ const coupHtml = () => `
       </div>
     </div>
   </section>`;
+};
 
 const trustHtml = () => `
   <section class="hv-trust" aria-label="Avantages">
@@ -260,8 +298,9 @@ const destHtml = () => `
 
       <div class="hv-carousel">
         <div class="hv-carousel__track" data-track="dest">
-          ${HOME_DESTINATIONS.map(
-            (d, i) => `
+          ${homeDestinations()
+            .map(
+              (d, i) => `
             <article class="hv-dest-card" data-reveal data-delay="${i * 60}" data-href="${esc(d.link)}" role="link" tabindex="0">
               <img src="${esc(asset(d.image))}" alt="" loading="lazy" />
               <div class="hv-dest-card__body">
@@ -269,11 +308,12 @@ const destHtml = () => `
                 <p>${esc(pick(d.tagline, d.tagline_en, d.tagline_ar))}</p>
                 <div class="hv-dest-card__meta">
                   <span>${icon('Star', 12)} ${esc(d.rating)}</span>
-                  <span>${icon('Sun', 12)} ${esc(d.temp)}</span>
+                  ${d.temp ? `<span>${icon('Sun', 12)} ${esc(d.temp)}</span>` : ''}
                 </div>
               </div>
             </article>`
-          ).join('')}
+            )
+            .join('')}
         </div>
         ${carouselNext('dest')}
       </div>

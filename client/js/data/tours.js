@@ -533,6 +533,15 @@ export const FEATURED_TOURS = adminCircuits
   ? adminCircuits.filter((c) => c.active !== false).map(fromAdmin)
   : BASE_TOURS;
 
+/** Formules Taghit encore publiées (accueil, fiche, switch) — suit les circuits admin actifs */
+export const liveTaghitPkgs = () => [
+  ...new Set(
+    FEATURED_TOURS.filter((t) => getPlaceSlugFromTour(t) === 'taghit' && t.pkg).map((t) => t.pkg)
+  ),
+];
+
+export const isTaghitPkgLive = (pkg) => liveTaghitPkgs().includes(pkg);
+
 /** true si l’admin a fermé les réservations du circuit qui mène à cette fiche (destination + formule) */
 export const isCircuitBookingClosed = (placeId, pkg) =>
   FEATURED_TOURS.some(
