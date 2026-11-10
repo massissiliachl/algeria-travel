@@ -1,0 +1,20 @@
+create table if not exists public.inmir_requests (
+  id uuid primary key default gen_random_uuid(),
+  product_id text,
+  product_name text not null,
+  product_type text,
+  destination text,
+  client_name text not null,
+  client_phone text not null,
+  client_email text,
+  departure_date date not null,
+  return_date date,
+  adults integer not null default 1,
+  children integer not null default 0,
+  travelers integer not null default 1,
+  origin_city text,
+  trip_type text,
+  message text,
+  status text not null default 'pending',
+  created_at timestamptz not null default now()
+);

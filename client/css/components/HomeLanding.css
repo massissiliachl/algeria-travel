@@ -551,10 +551,27 @@
   padding: clamp(22px, 3vw, 32px);
   background: #fff;
   border-top: 1px solid var(--coup-line);
+  position: relative;
 }
 
 .hv-coup__formula + .hv-coup__formula {
   border-left: 1px solid var(--coup-line);
+}
+
+.hv-coup__formula-promo {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #c8102e;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 .hv-coup__formula-top {
@@ -860,6 +877,21 @@
   font-style: italic;
   color: var(--gold);
   font-weight: 500;
+}
+
+.hv-new {
+  position: absolute;
+  top: 12px;
+  inset-inline-start: 12px;
+  z-index: 2;
+  background: #c4a36a;
+  color: #1b2740;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
 }
 
 .hv-dest-card {

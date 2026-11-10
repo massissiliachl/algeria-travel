@@ -37,14 +37,23 @@
         <td>${escapeHtml(d.tagline || '—')}</td>
         <td>${Number(d.price || 0).toLocaleString('fr-FR')} DA</td>
         <td>${d.active === false ? '<span class="badge badge--cancelled">Archivée</span>' : '<span class="badge badge--confirmed">Active</span>'}</td>
+        <td>${
+          d.bookingOpen
+            ? '<span class="badge badge--confirmed">Ouvertes</span>'
+            : '<span class="badge badge--cancelled">Fermées</span>'
+        }</td>
         <td class="actions">
+          <button type="button" class="btn btn--sm ${d.bookingOpen ? 'btn--ghost' : 'btn--gold'}" data-dest-booking="${escapeHtml(d.id)}">${
+            d.bookingOpen ? 'Fermer les réservations' : 'Ouvrir les réservations'
+          }</button>
           <button type="button" class="btn btn--sm btn--ghost" data-dest-edit="${escapeHtml(d.id)}">Modifier</button>
+          <button type="button" class="btn btn--sm btn--gold" data-dest-calendar="${escapeHtml(d.id)}">Calendrier</button>
         </td>
       </tr>`
       )
       .join('');
     return `<table>
-      <thead><tr><th>Destination</th><th>Tagline</th><th>Prix</th><th>État</th><th></th></tr></thead>
+      <thead><tr><th>Destination</th><th>Tagline</th><th>Prix</th><th>État</th><th>Réservations</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }
@@ -80,7 +89,7 @@
           <input name="tagline" value="${escapeHtml(d.tagline || '')}" placeholder="Ex. Côte antique" />
         </div>
         <div class="field">
-          <label>Prix dès (DA)</label>
+          <label>Prix (DA / personne, pour tout le séjour)</label>
           <input name="price" type="number" min="0" value="${Number(d.price || 0)}" />
         </div>
         <div class="field">
@@ -117,6 +126,13 @@
           <select name="active">
             <option value="true" ${d.active !== false ? 'selected' : ''}>Oui</option>
             <option value="false" ${d.active === false ? 'selected' : ''}>Non (archivée)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Réservations en ligne</label>
+          <select name="bookingOpen">
+            <option value="true" ${d.bookingOpen ? 'selected' : ''}>Ouvertes</option>
+            <option value="false" ${!d.bookingOpen ? 'selected' : ''}>Fermées</option>
           </select>
         </div>
         <div class="form-actions full">
@@ -213,25 +229,27 @@
         .map((s) => s.trim())
         .filter(Boolean);
 
-      if (isNew) {
-        ATStore.addMedia({
-          name: String(fd.get('name') || id),
-          category: 'destination',
-          url: image,
+      try {
+        ATStore.upsertDestination({
+          id,
+          name: String(fd.get('name') || '').trim(),
+          tagline: String(fd.get('tagline') || '').trim(),
+          price: Number(fd.get('price') || 0),
+          bestTime: String(fd.get('bestTime') || '').trim(),
+          image,
+          gallery: galleryUrls,
+          description: String(fd.get('description') || '').trim(),
+          active: fd.get('active') === 'true',
+          bookingOpen: fd.get('bookingOpen') === 'true',
         });
+      } catch (err) {
+        toast(
+          err.message === 'quota'
+            ? 'Stockage du navigateur plein : supprimez des images dans Médias ou utilisez moins de photos.'
+            : 'Enregistrement impossible'
+        );
+        return;
       }
-
-      ATStore.upsertDestination({
-        id,
-        name: String(fd.get('name') || '').trim(),
-        tagline: String(fd.get('tagline') || '').trim(),
-        price: Number(fd.get('price') || 0),
-        bestTime: String(fd.get('bestTime') || '').trim(),
-        image,
-        gallery: galleryUrls,
-        description: String(fd.get('description') || '').trim(),
-        active: fd.get('active') === 'true',
-      });
       toast(isNew ? 'Destination ajoutée' : 'Destination enregistrée');
       document.dispatchEvent(new CustomEvent('at:refresh'));
       document.getElementById('drawer').classList.remove('is-open');

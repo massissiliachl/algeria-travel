@@ -2,6 +2,7 @@ const express = require('express');
 const { adminAuth } = require('../../middleware/adminAuth');
 const { asyncHandler } = require('../../lib/asyncHandler');
 const store = require('../../lib/chatbot/store');
+const { purgeExpiredArchives } = require('../../lib/archive');
 
 const router = express.Router();
 router.use(adminAuth);
@@ -10,9 +11,11 @@ router.use(adminAuth);
 router.get(
   '/conversations',
   asyncHandler(async (req, res) => {
+    purgeExpiredArchives().catch((err) => console.error('[Archive]', err.message));
     const data = await store.listConversations({
       status: String(req.query.status || '').toUpperCase(),
       q: req.query.q,
+      archived: req.query.archived === '1' || req.query.archived === 'true',
       limit: req.query.limit,
       offset: req.query.offset,
     });
@@ -35,9 +38,19 @@ router.patch(
   asyncHandler(async (req, res) => {
     const status = req.body?.status ? String(req.body.status).toUpperCase() : undefined;
     const humanRequested = typeof req.body?.humanRequested === 'boolean' ? req.body.humanRequested : undefined;
-    const conv = await store.updateConversation(req.params.id, { status, humanRequested });
+    const archived = typeof req.body?.archived === 'boolean' ? req.body.archived : undefined;
+    const conv = await store.updateConversation(req.params.id, { status, humanRequested, archived });
     if (!conv) return res.status(404).json({ success: false, error: 'Conversation introuvable.' });
     res.json({ success: true, conversation: conv });
+  })
+);
+
+router.delete(
+  '/conversations/:id',
+  asyncHandler(async (req, res) => {
+    const gone = await store.deleteConversation(req.params.id);
+    if (!gone) return res.status(404).json({ success: false, error: 'Conversation introuvable.' });
+    res.json({ success: true });
   })
 );
 

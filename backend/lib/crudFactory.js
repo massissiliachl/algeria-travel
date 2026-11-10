@@ -2,6 +2,7 @@ const express = require('express');
 const { query } = require('../config/db');
 const { adminAuth } = require('../middleware/adminAuth');
 const { asyncHandler } = require('./asyncHandler');
+const { purgeExpiredArchives } = require('./archive');
 
 const RESERVED = new Set(['desc', 'group']);
 
@@ -39,6 +40,7 @@ function makeAdminCrud({
   router.get(
     '/',
     asyncHandler(async (req, res) => {
+      purgeExpiredArchives().catch((err) => console.error('[Archive]', err.message));
       let sql = `select * from public.${table}`;
       const params = [];
       if (fixedWhere) sql += ` where ${fixedWhere}`;
@@ -85,9 +87,28 @@ function makeAdminCrud({
       const prev = await query(`select published from public.${table} where ${whereId()}`, [
         req.params.id,
       ]);
-      const { columns, values } = buildUpdate(req.body);
-      if (!columns.length) return res.status(400).json({ error: 'Aucune donnée à mettre à jour.' });
-      const sets = columns.map((col, i) => `${q(col)} = $${i + 1}`).join(', ');
+      const built = buildUpdate(req.body);
+      const columns = [...built.columns];
+      const values = [...built.values];
+      const archive = typeof req.body?.archived === 'boolean' ? req.body.archived : null;
+      if (archive === true) {
+        const publishedIndex = columns.indexOf('published');
+        if (publishedIndex >= 0) {
+          columns.splice(publishedIndex, 1);
+          values.splice(publishedIndex, 1);
+        }
+      }
+      const archiveSql =
+        archive === null
+          ? ''
+          : archive
+            ? 'archived_at = coalesce(archived_at, now()), published = false'
+            : 'archived_at = null';
+      if (!columns.length && !archiveSql) return res.status(400).json({ error: 'Aucune donnée à mettre à jour.' });
+      const sets = [
+        ...columns.map((col, i) => `${q(col)} = $${i + 1}`),
+        ...(archiveSql ? [archiveSql] : []),
+      ].join(', ');
       values.push(req.params.id);
       const result = await query(
         `update public.${table} set ${sets} where ${whereId(`$${values.length}`)} returning *`,
@@ -158,6 +179,7 @@ function makePublicRead({
       }
 
       conditions.push('coalesce(published, true) = true');
+      conditions.push('archived_at is null');
       sql += ` where ${conditions.join(' and ')} order by ${orderBy}`;
 
       const result = await query(sql, params);
@@ -169,7 +191,7 @@ function makePublicRead({
     '/:id',
     asyncHandler(async (req, res) => {
       const col = idColumn === 'slug' ? 'slug' : idColumn;
-      const conditions = [`${col} = $1`, 'coalesce(published, true) = true'];
+      const conditions = [`${col} = $1`, 'coalesce(published, true) = true', 'archived_at is null'];
       if (fixedWhere) conditions.push(fixedWhere);
       const result = await query(
         `select * from public.${table} where ${conditions.join(' and ')}`,

@@ -41,11 +41,31 @@ const emptyForm = () => ({
   message: '',
 });
 
-/** Tarifs par âge (+ 10 ans · 2 à 10 ans · - 2 ans) : le 1er palier suit le prix du circuit (admin) */
+/** Tarifs affichés (durée hôtel / avion, ou paliers âge) */
 const AGE_FIELDS = ['adults', 'children', 'infants'];
+const isAgePricing = () =>
+  place.priceTiers?.length === 3 &&
+  /ans|years|سنوات|Over|Under/i.test(
+    `${place.priceTiers[0]?.fr || ''} ${place.priceTiers[0]?.en || ''} ${place.priceTiers[0]?.ar || ''}`
+  );
+const displayTiers = () => {
+  if (!place.priceTiers?.length) return null;
+  return place.priceTiers.map((tier, i) => {
+    const tierPrice = Number(tier.price) || 0;
+    /* Adulte : privilégier le palier catalogue (évite 75 000 DA si price admin est faux) */
+    const price =
+      isAgePricing() && i === 0
+        ? tierPrice > 0
+          ? tierPrice
+          : Number(place.price) || 0
+        : tierPrice;
+    return { ...tier, price };
+  });
+};
+/** Paliers âge uniquement (formulaire voyageurs) */
 const ageTiers = () =>
-  place.priceTiers?.length === 3
-    ? place.priceTiers.map((tier, i) => ({ ...tier, field: AGE_FIELDS[i], price: i === 0 ? Number(place.price) : tier.price }))
+  isAgePricing()
+    ? displayTiers().map((tier, i) => ({ ...tier, field: AGE_FIELDS[i] }))
     : null;
 
 const state = {
@@ -61,9 +81,34 @@ const state = {
           ? 'guesthouse'
           : taghitPkg
         : '',
+    durationPrice: '',
   },
   calendar: null,
 };
+
+/* Départs catalogue (hôtel = avion) : mode dates fixes dès le premier rendu */
+{
+  const catalogDeparts =
+    Array.isArray(place?.departures) && place.departures.length > 1 ? place.departures : null;
+  if (catalogDeparts) {
+    state.calendar = {
+      mode: 'fixed',
+      periods: catalogDeparts.map((p) => ({
+        start: p.start,
+        end: p.end,
+        label: p.fr || p.label || '',
+      })),
+    };
+    if (!state.form.date) state.form.date = catalogDeparts[0].start;
+  }
+}
+
+/* Prix durée hôtel : initialise sur le palier « dès » (4 j / 3 n) si présent */
+if (place?.priceTiers?.length >= 2 && place.priceFrom != null) {
+  state.form.durationPrice = String(place.priceFrom);
+} else if (place?.priceTiers?.length >= 2 && !/ans|years|سنوات|Over|Under/i.test(place.priceTiers[0]?.fr || '')) {
+  state.form.durationPrice = String(place.priceTiers[place.priceTiers.length - 1]?.price || place.price || '');
+}
 
 /* ── Calendrier de réservation réglé dans l’admin (dates libres, séjours à dates fixes, périodes bloquées) ── */
 
@@ -87,10 +132,23 @@ const calendarDates = () => {
   return cal.periods.map((p) => (p.label ? `${p.label} : ${periodLabel(p)}` : periodLabel(p))).join(' · ');
 };
 
-const syncFixedDate = () => {
+/** Départs catalogue (ex. affiche Taghit avion) : prioritaire sur un calendrier API périmé */
+const packageDepartures = () =>
+  Array.isArray(place.departures) && place.departures.length > 1 ? place.departures : null;
+
+const fixedPeriods = () => {
+  const fromPkg = packageDepartures();
+  if (fromPkg) return fromPkg;
   const cal = state.calendar;
-  if (cal?.mode === 'fixed' && !cal.periods.some((p) => p.start === state.form.date)) {
-    state.form.date = cal.periods[0]?.start || '';
+  if (cal?.mode === 'fixed' && cal.periods?.length) return cal.periods;
+  return [];
+};
+
+const syncFixedDate = () => {
+  const periods = fixedPeriods();
+  if (!periods.length) return;
+  if (!periods.some((p) => p.start === state.form.date)) {
+    state.form.date = periods[0]?.start || '';
   }
 };
 
@@ -100,6 +158,15 @@ const loadCalendar = async () => {
     const { ok, data } = await window.AT_API.request(`/booking-calendar/${encodeURIComponent(calendarKey)}`, { timeout: 60000 });
     if (!ok || !data?.data) return;
     state.calendar = data.data;
+    /* Si le catalogue a les dates officielles (affiche), elles remplacent l’ancien calendrier API */
+    const fromPkg = packageDepartures();
+    if (fromPkg) {
+      state.calendar = {
+        ...state.calendar,
+        mode: 'fixed',
+        periods: fromPkg.map((p) => ({ start: p.start, end: p.end, label: p.fr || p.label || '' })),
+      };
+    }
     syncFixedDate();
     const periodBox = document.querySelector('[data-offer-period]');
     if (periodBox) periodBox.innerHTML = periodBoxHtml(derive());
@@ -111,16 +178,19 @@ const loadCalendar = async () => {
 
 const dateError = (date) => {
   const cal = state.calendar;
-  if (!cal || !date) return '';
-  const blocked = cal.blocked.find((p) => date >= p.start && date <= p.end);
-  if (blocked) {
-    return pick(
-      `Réservations fermées : ${periodLabel(blocked)}. Choisissez une autre date.`,
-      `Bookings closed: ${periodLabel(blocked)}. Please choose another date.`,
-      `الحجز مغلق: ${periodLabel(blocked)}. اختر تاريخًا آخر.`
-    );
+  if (!date) return '';
+  const periods = fixedPeriods();
+  if (cal?.blocked?.length) {
+    const blocked = cal.blocked.find((p) => date >= p.start && date <= p.end);
+    if (blocked) {
+      return pick(
+        `Réservations fermées : ${periodLabel(blocked)}. Choisissez une autre date.`,
+        `Bookings closed: ${periodLabel(blocked)}. Please choose another date.`,
+        `الحجز مغلق: ${periodLabel(blocked)}. اختر تاريخًا آخر.`
+      );
+    }
   }
-  if (cal.mode === 'fixed' && !cal.periods.some((p) => p.start === date)) {
+  if (periods.length && !periods.some((p) => p.start === date)) {
     return pick('Choisissez une des dates proposées.', 'Please choose one of the proposed dates.', 'اختر أحد التواريخ المقترحة.');
   }
   return '';
@@ -128,10 +198,46 @@ const dateError = (date) => {
 
 /* ── Valeurs dérivées (dépendent de la langue) ── */
 
+const selectedDurationPrice = () => {
+  const tiers = displayTiers();
+  if (!tiers || isAgePricing()) return Number(tiers?.[0]?.price) || Number(place.price) || 0;
+  const selected = tiers.find((tier) => String(tier.price) === String(state.form.durationPrice));
+  return Number(selected?.price ?? place.priceFrom ?? place.price) || 0;
+};
+
 const derive = () => {
   const priceOnRequest = Boolean(place.priceOnRequest) || place.price == null;
   const priceLabel = priceOnRequest ? t('place_on_request') : t('home_v2_coup_per_person');
-  const priceDisplay = priceOnRequest ? t('place_on_request') : `${Number(place.price).toLocaleString()} DA`;
+  const tiers = displayTiers();
+  const dual =
+    !priceOnRequest && tiers && !isAgePricing()
+      ? tiers.map((tier) => `${Number(tier.price).toLocaleString('fr-FR')} DA`).join(' · ')
+      : '';
+  const activePrice = selectedDurationPrice();
+  /* Avion : prix principal = palier +10 ans (100 000), pas le 99 990 DA hôtel */
+  const headline =
+    !priceOnRequest && isAgePricing()
+      ? Number(tiers?.[0]?.price) || Number(place.price) || 0
+      : dual
+        ? Number(activePrice || place.price) || 0
+        : Number(place.price) || 0;
+  const priceDisplay = priceOnRequest
+    ? t('place_on_request')
+    : `${headline.toLocaleString('fr-FR')} DA`;
+  const priceSub =
+    !priceOnRequest && dual && tiers
+      ? pick(
+          `Offre −20 % · ${tiers
+            .map((tier) => `${tier.fr} · ${Number(tier.price).toLocaleString('fr-FR')} DA`)
+            .join(' · ou ')}`,
+          `Offer −20% · ${tiers
+            .map((tier) => `${tier.en || tier.fr} · ${Number(tier.price).toLocaleString('en-US')} DZD`)
+            .join(' · or ')}`,
+          `عرض −20٪ · ${tiers
+            .map((tier) => `${tier.ar || tier.fr} · ${Number(tier.price).toLocaleString('fr-FR')} دج`)
+            .join(' · أو ')}`
+        )
+      : '';
   const placeName = pick(place.name, place.name_en, place.name_ar);
   const whyItems = place.whyVisit?.length ? place.whyVisit : place.highlights || [];
   const gallery = place.gallery?.length ? place.gallery : [place.image];
@@ -172,6 +278,7 @@ const derive = () => {
     priceOnRequest,
     priceLabel,
     priceDisplay,
+    priceSub,
     placeName,
     whyItems,
     gallery,
@@ -246,8 +353,8 @@ const departuresHtml = (periods) => `
   </div>`;
 
 const periodBoxHtml = (d) => {
-  const cal = state.calendar;
-  if (cal?.mode === 'fixed' && cal.periods.length > 1) return departuresHtml(cal.periods);
+  const periods = fixedPeriods();
+  if (periods.length > 1) return departuresHtml(periods);
   return `
   ${icon('Calendar', 18)}
   <div>
@@ -256,18 +363,34 @@ const periodBoxHtml = (d) => {
   </div>`;
 };
 
-const tiersHtml = () => `
-  <ul class="place-tiers" aria-label="${esc(pick('Tarifs par âge', 'Prices by age', 'الأسعار حسب العمر'))}">
-    ${ageTiers()
-      .map(
-        (tier) => `
-      <li class="place-tiers__item">
-        <span>${esc(pick(tier.fr, tier.en, tier.ar))}</span>
-        <strong>${esc(tier.price.toLocaleString('fr-FR'))} DA</strong>
-      </li>`
-      )
+const tiersHtml = () => {
+  const tiers = displayTiers();
+  const durationMode = !isAgePricing();
+  return `
+  <ul class="place-tiers" aria-label="${esc(
+    durationMode
+      ? pick('Tarifs selon la durée', 'Prices by duration', 'الأسعار حسب المدة')
+      : pick('Tarifs par âge', 'Prices by age', 'الأسعار حسب العمر')
+  )}">
+    ${tiers
+      .map((tier) => {
+        const selected = durationMode && String(state.form.durationPrice) === String(tier.price);
+        return `
+      <li class="place-tiers__item${selected ? ' is-selected' : ''}">
+        ${
+          durationMode
+            ? `<button type="button" class="place-tiers__btn" data-duration-price="${esc(tier.price)}">
+                <span>${esc(pick(tier.fr, tier.en, tier.ar))}</span>
+                <strong>${esc(Number(tier.price).toLocaleString('fr-FR'))} DA</strong>
+              </button>`
+            : `<span>${esc(pick(tier.fr, tier.en, tier.ar))}</span>
+               <strong>${esc(Number(tier.price).toLocaleString('fr-FR'))} DA</strong>`
+        }
+      </li>`;
+      })
       .join('')}
   </ul>`;
+};
 
 const bookbarHtml = (d) => `
   <section class="place-bookbar acts-container" data-reveal>
@@ -285,13 +408,24 @@ const bookbarHtml = (d) => `
             !d.priceOnRequest ? `<small>${d.isPerPerson ? esc(` ${t('per_person')}`) : ''}</small>` : ''
           }</strong>
           ${!d.priceOnRequest && place.oldPrice ? `<s>${esc(place.oldPrice.toLocaleString())} DA</s>` : ''}
+          ${d.priceSub ? `<em class="place-bookbar__dual">${esc(d.priceSub)}</em>` : ''}
           ${
             !d.priceOnRequest
-              ? `<em class="place-bookbar__badge">${icon('BadgePercent', 14)} ${esc(t('place_best_price'))}</em>`
+              ? `<em class="place-bookbar__badge">${icon('BadgePercent', 14)} ${esc(
+                  place.activePkg === 'avion' || place.groupDiscount
+                    ? pick(
+                        'Offre −20 % · −5 000 DA / pers. dès 3 pers.',
+                        'Offer −20% · −5,000 DZD / pers. from 3 people',
+                        'عرض −20٪ · −5000 دج للفرد من 3 أشخاص'
+                      )
+                    : id === 'taghit' || place.oldPrice > place.price
+                      ? pick('Offre −20 %', 'Offer −20%', 'عرض −20٪')
+                      : t('place_best_price')
+                )}</em>`
               : ''
           }
         </div>
-        ${!d.priceOnRequest && ageTiers() ? tiersHtml() : ''}
+        ${!d.priceOnRequest && displayTiers() ? tiersHtml() : ''}
         <ul class="place-bookbar__trust">
           ${TRUST_ITEMS.map(
             (item) => `
@@ -611,11 +745,24 @@ const similarHtml = () => {
 
 /* ── Formulaire de réservation (bottom sheet) ── */
 
+/** Remise groupe flyer avion : −5 000 DA / pers. dès 3 personnes */
+const groupDiscountAmount = (partySize) => {
+  const gd = place.groupDiscount;
+  if (!gd || partySize < Number(gd.from || 0)) return 0;
+  return Number(gd.amount) || 0;
+};
+
 const estimateTotal = () => {
   if (place.priceOnRequest || place.price == null) return null;
   const breakdown = travelersBreakdown();
-  if (breakdown) return ageTiers().reduce((sum, tier) => sum + breakdown[tier.field] * tier.price, 0);
-  return Number(place.price) * Math.max(1, parseInt(state.form.travelers, 10) || 1);
+  if (breakdown) {
+    const party = AGE_FIELDS.reduce((n, f) => n + (breakdown[f] || 0), 0);
+    const off = groupDiscountAmount(party);
+    return ageTiers().reduce((sum, tier) => sum + breakdown[tier.field] * Math.max(0, tier.price - off), 0);
+  }
+  const travelers = Math.max(1, parseInt(state.form.travelers, 10) || 1);
+  const unit = selectedDurationPrice() || Number(place.price) || 0;
+  return Math.max(0, unit - groupDiscountAmount(travelers)) * travelers;
 };
 
 /** Message WhatsApp prérempli, envoyé par le client à l’agence après sa demande */
@@ -773,17 +920,26 @@ const totalHtml = () => {
   const money = (n) => `${n.toLocaleString('fr-FR')} DA`;
   const breakdown = travelersBreakdown();
   if (breakdown) {
-    const total = ageTiers().reduce((sum, tier) => sum + breakdown[tier.field] * tier.price, 0);
+    const party = AGE_FIELDS.reduce((n, f) => n + (breakdown[f] || 0), 0);
+    const off = groupDiscountAmount(party);
+    const total = ageTiers().reduce((sum, tier) => sum + breakdown[tier.field] * Math.max(0, tier.price - off), 0);
     const lines = ageTiers()
       .filter((tier) => breakdown[tier.field] > 0)
-      .map((tier) => `${breakdown[tier.field]} × ${money(tier.price)} (${pick(tier.fr, tier.en, tier.ar)})`);
+      .map((tier) => {
+        const unit = Math.max(0, tier.price - off);
+        return `${breakdown[tier.field]} × ${money(unit)} (${pick(tier.fr, tier.en, tier.ar)})`;
+      });
+    const groupNote =
+      off > 0
+        ? pick(` · remise groupe −${off.toLocaleString('fr-FR')} DA / pers.`, ` · group −${off.toLocaleString('en-US')} DZD / pers.`, ` · خصم مجموعة −${off.toLocaleString('fr-FR')} دج للفرد`)
+        : '';
     return `
     <span class="place-form__total-label">${esc(pick('Total estimé', 'Estimated total', 'المجموع التقديري'))}</span>
     <strong class="place-form__total-value">${esc(money(total))}</strong>
-    <span class="place-form__note">${esc(lines.join(' + '))}${period ? ` · ${esc(periodLabel(period))}` : ''}</span>`;
+    <span class="place-form__note">${esc(lines.join(' + '))}${esc(groupNote)}${period ? ` · ${esc(periodLabel(period))}` : ''}</span>`;
   }
   const travelers = Math.max(1, parseInt(state.form.travelers, 10) || 1);
-  const unit = Number(place.price);
+  const unit = Math.max(0, (selectedDurationPrice() || Number(place.price) || 0) - groupDiscountAmount(travelers));
   const total = unit * travelers;
   const detail = pick(
     `${money(unit)} × ${travelers} voyageur${travelers > 1 ? 's' : ''} · prix par personne pour tout le séjour`,
@@ -973,8 +1129,26 @@ const afterRender = () => {
   state.sheet?.setContent(sheetHtml());
 };
 
+const refreshOfferUi = (root) => {
+  const d = derive();
+  const bookbar = root.querySelector('.place-bookbar');
+  if (bookbar) bookbar.outerHTML = bookbarHtml(d);
+  const mobilePrice = root.querySelector('.mobile-booking-bar__price strong, .place-mobile-bar strong');
+  if (mobilePrice) mobilePrice.textContent = d.priceDisplay;
+  const mobileLabel = root.querySelector('.mobile-booking-bar__price span, .place-mobile-bar .mobile-booking-bar__label');
+  if (mobileLabel && d.priceLabel) mobileLabel.textContent = d.priceLabel;
+};
+
 const bind = (root) => {
   root.addEventListener('click', (e) => {
+    const durationBtn = e.target.closest('[data-duration-price]');
+    if (durationBtn) {
+      state.form.durationPrice = durationBtn.getAttribute('data-duration-price') || '';
+      const tier = displayTiers()?.find((t) => String(t.price) === String(state.form.durationPrice));
+      if (tier) state.form.stay = `${taghitPkg || 'hotel'}:${pick(tier.fr, tier.en, tier.ar)}`;
+      refreshOfferUi(root);
+      return;
+    }
     const shot = e.target.closest('[data-shot]');
     if (shot) {
       openLightbox(derive().gallery, Number(shot.getAttribute('data-shot')));

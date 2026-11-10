@@ -83,7 +83,7 @@ async function fetchGalleryItems(clientId = null) {
      from public.gallery_items gi
      left join public.gallery_reactions gr on gr.gallery_item_id = gi.id
      ${userJoin}
-     where coalesce(gi.published, true) = true
+     where coalesce(gi.published, true) = true and gi.archived_at is null
      group by gi.id
      order by gi.sort_order asc, gi.id asc`,
     params
@@ -110,7 +110,7 @@ async function fetchGalleryItemStats(itemId, clientId = null) {
      from public.gallery_items gi
      left join public.gallery_reactions gr on gr.gallery_item_id = gi.id
      ${userJoin}
-     where gi.id = $1 and coalesce(gi.published, true) = true
+     where gi.id = $1 and coalesce(gi.published, true) = true and gi.archived_at is null
      group by gi.id`,
     params
   );

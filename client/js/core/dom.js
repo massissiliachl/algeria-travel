@@ -4,9 +4,16 @@ const ENTITIES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '
 export const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ENTITIES[c]);
 
 /** Chemin d'un fichier public depuis client/pages/ ("/images/x.jpg" → "../public/images/x.jpg"). */
+const API_ORIGIN = 'https://algeria-travelbackend-9hpl.onrender.com';
+
 export const asset = (src) => {
   if (!src || typeof src !== 'string') return src;
-  return /^\/(?!\/|uploads\/)/.test(src) ? `../public${src}` : src;
+  if (/^https?:\/\//i.test(src)) return src;
+  if (src.startsWith('/images/cms/') || src.startsWith('/uploads/')) {
+    const path = src.startsWith('/uploads/') ? src.replace(/^\/uploads\//, '/images/cms/') : src;
+    return API_ORIGIN + path;
+  }
+  return /^\/(?!\/)/.test(src) ? `../public${src}` : src;
 };
 
 /** Concatène des classes CSS en ignorant les valeurs vides. */

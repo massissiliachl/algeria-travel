@@ -91,7 +91,7 @@ function mapPlace(row) {
     stay: row.stay, stayEn: row.stay_en, stayAr: row.stay_ar,
     transport: row.transport, transportEn: row.transport_en, transportAr: row.transport_ar,
     includes: row.includes, highlights: row.highlights,
-    published: row.published, bookingOpen: row.booking_open,
+    published: row.published, bookingOpen: row.booking_open, archivedAt: row.archived_at || null,
     createdAt: row.created_at, updatedAt: row.updated_at,
   });
 }
@@ -111,6 +111,7 @@ const tourFields = [
   ['activities', 'activities', (v) => jsonStr(v, [])], ['itinerary', 'itinerary', (v) => jsonStr(v, [])],
   ['place_slug', 'placeSlug'], ['pkg', 'pkg'], ['badge', 'badge'], ['published', 'published', bool],
   ['booking_open', 'bookingOpen', bool],
+  ['price_tiers', 'priceTiers', (v) => jsonStr(v, null)],
 ];
 
 function mapTour(row) {
@@ -125,7 +126,9 @@ function mapTour(row) {
     price: row.price, oldPrice: row.old_price, rating: Number(row.rating), reviews: row.reviews,
     image: row.image, category: row.category, activities: row.activities, itinerary: row.itinerary,
     placeSlug: row.place_slug, pkg: row.pkg, badge: row.badge,
-    published: row.published, bookingOpen: row.booking_open !== false, createdAt: row.created_at, updatedAt: row.updated_at,
+    priceTiers: json(row.price_tiers, null),
+    published: row.published, bookingOpen: row.booking_open !== false, archivedAt: row.archived_at || null,
+    createdAt: row.created_at, updatedAt: row.updated_at,
   };
 }
 
@@ -166,7 +169,7 @@ function mapActivity(row) {
     dates: row.dates, datesEn: row.dates_en, datesAr: row.dates_ar,
     group: row.group, groupEn: row.group_en, groupAr: row.group_ar,
     rating: Number(row.rating), included: row.included, includedEn: row.included_en, includedAr: row.included_ar,
-    published: row.published, createdAt: row.created_at, updatedAt: row.updated_at,
+    published: row.published, archivedAt: row.archived_at || null, createdAt: row.created_at, updatedAt: row.updated_at,
   };
 }
 
@@ -197,7 +200,7 @@ function mapStay(row) {
     desc: row.desc, descEn: row.desc_en, descAr: row.desc_ar,
     image: row.image, gallery: row.gallery, price: row.price, oldPrice: row.old_price,
     pricePerPerson: row.price_per_person, rating: Number(row.rating), reviews: row.reviews,
-    amenities: row.amenities, published: row.published,
+    amenities: row.amenities, published: row.published, archivedAt: row.archived_at || null,
     wilaya: row.wilaya, wilayaKey: row.wilaya_key,
     stars: row.stars != null ? Number(row.stars) : null,
     availability: row.availability || 'available',
@@ -230,7 +233,7 @@ function mapBlog(row) {
     categoryLabelEn: row.category_label_en, categoryLabelAr: row.category_label_ar,
     publishedAt: row.published_at, publishedAtEn: row.published_at_en, publishedAtAr: row.published_at_ar,
     readTime: row.read_time, image: row.image, featured: row.featured,
-    published: row.published, createdAt: row.created_at, updatedAt: row.updated_at,
+    published: row.published, archivedAt: row.archived_at || null, createdAt: row.created_at, updatedAt: row.updated_at,
   };
 }
 
@@ -255,6 +258,7 @@ function mapGallery(row) {
     captionAr: row.caption_ar,
     sortOrder: row.sort_order ?? 0,
     published: row.published,
+    archivedAt: row.archived_at || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

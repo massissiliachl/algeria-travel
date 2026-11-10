@@ -8,29 +8,52 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="css/admin.css?v=20261012" />
+  <style>
+    .login-card__pass { position: relative; display: block; }
+    .login-card .login-card__pass input { padding-right: 48px; }
+    .login-card__eye {
+      position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+      display: grid; place-items: center; width: 34px; height: 34px; padding: 0;
+      border: 0; border-radius: 8px; background: transparent; color: #8a93a3; cursor: pointer;
+      transition: color .15s, background .15s;
+    }
+    .login-card__eye:hover { color: #1a2332; background: rgba(26, 35, 50, .06); }
+    .login-card__eye:focus-visible { outline: 2px solid #c9a24a; outline-offset: 1px; }
+    .login-card__eye.is-on .login-card__eye-slash { display: none; }
+  </style>
 </head>
 <body>
   <div class="login-page" id="loginPage">
     <form class="login-card" id="loginForm" autocomplete="on">
       <h1 class="login-card__brand">Algeria Travel</h1>
       <p class="login-card__sub">Espace administration — gestion complète du site</p>
-      <p class="login-card__error" id="loginError">Identifiants incorrects.</p>
+      <p class="login-card__error" id="loginError">Clé admin incorrecte.</p>
       <label>
         Identifiant
         <input type="text" name="user" id="loginUser" required placeholder="admin" autocomplete="username" />
       </label>
       <label>
         Mot de passe
-        <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
+        <span class="login-card__pass">
+          <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="login-card__eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"
+            onclick="const i = document.getElementById('loginPass'); const show = i.type === 'password'; i.type = show ? 'text' : 'password'; this.classList.toggle('is-on', show); this.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'); this.title = this.getAttribute('aria-label');">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+              <circle cx="12" cy="12" r="3" />
+              <line class="login-card__eye-slash" x1="3" y1="3" x2="21" y2="21" />
+            </svg>
+          </button>
+        </span>
       </label>
       <button type="submit" class="btn btn--primary">Se connecter</button>
-      <p class="login-card__hint">Par défaut : <strong>admin</strong> / <strong>AlgeriaTravel2026</strong></p>
     </form>
   </div>
 
   <div class="app" id="app">
     <aside class="sidebar" id="sidebar">
+
       <div class="sidebar__brand">
         Algeria Travel
         <span>Admin</span>
@@ -40,9 +63,13 @@
       <button type="button" class="nav-btn" data-section="clients">Clients</button>
       <button type="button" class="nav-btn" data-section="destinations">Destinations</button>
       <button type="button" class="nav-btn" data-section="stays">Hébergements</button>
+      <button type="button" class="nav-btn" data-section="owners">Propriétaires</button>
+      <a class="nav-btn nav-btn--link" href="../partenariat/index.html?admin=1#/properties">Biens &amp; disponibilités</a>
       <button type="button" class="nav-btn" data-section="tours">Circuits</button>
       <button type="button" class="nav-btn" data-section="activities">Activités</button>
       <button type="button" class="nav-btn" data-section="media">Galerie</button>
+      <button type="button" class="nav-btn" data-section="comments">Commentaires</button>
+      <button type="button" class="nav-btn" data-section="chat">Chat / Messages clients</button>
       <button type="button" class="nav-btn" data-section="pages">Textes du site</button>
       <button type="button" class="nav-btn" data-section="settings">Réglages</button>
       <div class="sidebar__footer">
@@ -55,6 +82,7 @@
       <div class="topbar">
         <button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
         <h1 id="pageTitle">Dashboard</h1>
+        <span class="publish-badge" id="publishBadge" hidden></span>
       </div>
 
       <section class="section is-active" id="section-dashboard">
@@ -72,13 +100,20 @@
         <div class="panel">
           <div class="panel__head">
             <h2>Demandes de réservation</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <select id="bookingView" aria-label="Afficher">
+              <option value="active">En cours</option>
+              <option value="archived">Archivées (supprimées après 6 mois)</option>
+            </select>
             <select id="bookingFilter" aria-label="Filtrer">
               <option value="all">Tous les statuts</option>
               <option value="new">Nouvelles</option>
               <option value="contacted">Contactées</option>
               <option value="confirmed">Confirmées</option>
+              <option value="rejected">Refusées</option>
               <option value="cancelled">Annulées</option>
             </select>
+            </div>
           </div>
           <div class="table-wrap" id="bookingsTable"></div>
         </div>
@@ -109,8 +144,32 @@
 
       <section class="section" id="section-stays">
         <div class="panel">
-          <div class="panel__head"><h2>Hébergements</h2></div>
+          <div class="panel__head">
+            <h2>Hébergements</h2>
+            <a class="btn btn--sm btn--ghost" href="../partenariat/index.html?admin=1#/properties">Biens des propriétaires (chambres, tarifs, calendrier) →</a>
+          </div>
           <div class="table-wrap" id="staysTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-owners">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Propriétaires</h2>
+            <div class="actions">
+              <a class="btn btn--sm btn--ghost" href="../partenariat/index.html?admin=1#/properties">Gérer les biens</a>
+              <a class="btn btn--sm btn--ghost" href="../partenariat/index.html?admin=1#/reservations">Réservations des biens</a>
+              <button type="button" class="btn btn--sm btn--gold" id="ownerAddBtn">+ Ajouter un propriétaire</button>
+            </div>
+          </div>
+          <div class="table-wrap" id="ownersTable"></div>
+        </div>
+        <div class="panel partner-activity-panel">
+          <div class="panel__head">
+            <h2>Activité des partenaires</h2>
+            <button type="button" class="btn btn--sm btn--ghost" id="partnerActivityReload">Actualiser</button>
+          </div>
+          <div class="partner-activity" id="partnerActivity"><div class="empty">Chargement…</div></div>
         </div>
       </section>
 
@@ -141,6 +200,26 @@
             <button type="button" class="btn btn--sm btn--gold" id="galleryAddBtn">+ Ajouter des photos</button>
           </div>
           <div class="panel__body" id="galleryGrid"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-comments">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Commentaires des visiteurs</h2>
+            <button type="button" class="btn btn--sm btn--ghost" id="commentsReload">Actualiser</button>
+          </div>
+          <div class="table-wrap" id="commentsTable"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-chat">
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Chat / Messages clients</h2>
+            <button type="button" class="btn btn--sm btn--ghost" id="chatReload">Actualiser</button>
+          </div>
+          <div class="table-wrap" id="chatPanel"></div>
         </div>
       </section>
 
@@ -190,6 +269,7 @@
   </div>
   <div class="toast" id="toast" role="status"></div>
 
+  <script src="../js/api-config.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/image-upload.js"></script>
@@ -197,6 +277,11 @@
   <script src="js/destinations.js"></script>
   <script src="js/content.js"></script>
   <script src="js/manage.js"></script>
+  <script src="js/comments.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/owners.js"></script>
+  <script src="js/booking-calendar.js"></script>
+  <script src="js/notify.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

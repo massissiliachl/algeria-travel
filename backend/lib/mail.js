@@ -3,7 +3,8 @@ const nodemailer = require('nodemailer');
 let transporter;
 
 function isMailConfigured() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+  const pass = String(process.env.SMTP_PASS || '');
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && pass && pass !== 'votre-mot-de-passe-application');
 }
 
 function getTransporter() {

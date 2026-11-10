@@ -3,11 +3,12 @@ const { query, withTransaction } = require('../../config/db');
 const { adminAuth } = require('../../middleware/adminAuth');
 const { bookHotelRooms, releaseHotelRooms } = require('../../lib/hotelAvailability');
 const { releaseInventory, rehold } = require('../../lib/accommodation');
+const { notifyReservationDecision } = require('../../lib/reservationEmails');
 
 const router = express.Router();
 
 const VALID_STATUSES = new Set(['pending', 'reviewed', 'confirmed', 'rejected', 'cancelled']);
-const ARCHIVED_STATUSES = new Set(['confirmed', 'rejected', 'cancelled']);
+const ARCHIVED_STATUSES = new Set(['rejected', 'cancelled']);
 
 async function purgeOldArchives() {
   const r = await query(`delete from public.reservations where archived_at < now() - interval '6 months'`);
@@ -99,9 +100,10 @@ router.get('/:id', async (req, res, next) => {
 
 router.patch('/:id', async (req, res, next) => {
   try {
-    const { status, admin_notes: adminNotes } = req.body;
+    const { status, admin_notes: adminNotes, archived } = req.body;
+    const hasArchive = typeof archived === 'boolean';
 
-    if (!status && adminNotes === undefined) {
+    if (!status && adminNotes === undefined && !hasArchive) {
       return res.status(400).json({ error: 'Aucune modification fournie.' });
     }
 
@@ -130,6 +132,7 @@ router.patch('/:id', async (req, res, next) => {
       await releaseHotelRooms(prevRow);
     }
 
+    const archiveValue = hasArchive ? archived : ARCHIVED_STATUSES.has(newStatus);
     const result = await query(
       `update public.reservations
        set status = coalesce($2, status),
@@ -137,13 +140,18 @@ router.patch('/:id', async (req, res, next) => {
            archived_at = case when $4 then coalesce(archived_at, now()) else null end
        where id = $1
        returning *`,
-      [req.params.id, status || null, adminNotes ?? null, ARCHIVED_STATUSES.has(newStatus)]
+      [req.params.id, status || null, adminNotes ?? null, archiveValue]
     );
 
     const reservation = mapReservation(result.rows[0]);
     console.log(`[Reservation] Mise à jour admin — ${reservation.id} → ${reservation.status}`);
 
-    res.json({ success: true, reservation });
+    let notice = null;
+    if (status && oldStatus !== newStatus && (newStatus === 'confirmed' || newStatus === 'rejected')) {
+      notice = await notifyReservationDecision(reservation, newStatus);
+    }
+
+    res.json({ success: true, reservation, notice });
   } catch (err) {
     next(err);
   }

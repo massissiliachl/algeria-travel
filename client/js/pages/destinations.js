@@ -5,8 +5,9 @@ import { href, navigate } from '../core/router.js';
 import { esc, asset } from '../core/dom.js';
 import { responsiveImage } from '../core/ui.js';
 import { FEATURED_TOURS } from '../data/tours.js';
-import { getPlacePathFromTour } from '../data/placeRoutes.js';
+import { getPlaceSlugFromTour } from '../data/placeRoutes.js';
 import { getPlaces } from '../data/places.js';
+import { formatPriceTiersLabel, TAGHIT_PACKAGES } from '../data/taghitPackages.js';
 
 const FILTERS = [
   { key: 'all', icon: 'Compass', fr: 'Toutes', en: 'All', ar: 'الكل' },
@@ -22,40 +23,42 @@ const HERO_FEATURES = [
   { icon: 'Star', titleKey: 'dest_feat_rated', descKey: 'dest_feat_rated_desc' },
 ];
 
-const adminPlacesAsCards = () =>
+/** Catégorie héritée du circuit lié (filtre UI), sinon desert pour les fiches admin. */
+const categoryForPlace = (placeId) => {
+  const tour = FEATURED_TOURS.find((tour) => getPlaceSlugFromTour(tour) === placeId);
+  return tour?.category || 'desert';
+};
+
+const placeCards = () =>
   getPlaces()
-    .filter((p) => p.fromAdmin)
+    .filter((p) => p.id !== 'tadrart')
     .map((p) => ({
-      id: `admin-${p.id}`,
-      placeSlug: p.id,
+      id: p.id,
       name: p.name,
       name_en: p.name_en,
       name_ar: p.name_ar,
       subtitle: p.tagline,
       subtitle_en: p.tagline_en,
       subtitle_ar: p.tagline_ar,
-      location: p.name,
-      location_en: p.name_en,
-      location_ar: p.name_ar,
+      location: p.region || p.name,
+      location_en: p.region_en || p.name_en,
+      location_ar: p.region_ar || p.name_ar,
       rating: p.rating || 4.8,
       image: p.image,
       price: p.price || 0,
-      category: 'all',
+      priceOnRequest: Boolean(p.priceOnRequest),
+      category: categoryForPlace(p.id),
       link: `/place/${p.id}`,
-      badge: { fr: 'NOUVEAU', en: 'NEW', ar: 'جديد' },
+      badge: p.fromAdmin ? { fr: 'NOUVEAU', en: 'NEW', ar: 'جديد' } : null,
     }));
 
 const state = { filter: 'all' };
 
 const filtered = () => {
-  const adminCards = adminPlacesAsCards();
-  const tours =
-    state.filter === 'all' ? FEATURED_TOURS : FEATURED_TOURS.filter((d) => d.category === state.filter);
-  if (state.filter === 'all') return [...tours, ...adminCards];
-  return tours;
+  const places = placeCards();
+  if (state.filter === 'all') return places;
+  return places.filter((p) => p.category === state.filter);
 };
-
-const destPath = (dest) => dest.link || getPlacePathFromTour(dest);
 
 const filtersHtml = () =>
   FILTERS.map(
@@ -68,17 +71,37 @@ const filtersHtml = () =>
       </button>`
   ).join('');
 
+const cardPrice = (dest) => {
+  if (dest.priceOnRequest) return t('place_on_request');
+  if (dest.id === 'taghit' || dest.placeSlug === 'taghit') {
+    const dual = formatPriceTiersLabel(TAGHIT_PACKAGES.hotel.priceTiers);
+    if (dual) return dual;
+  }
+  if (Array.isArray(dest.priceTiers) && dest.priceTiers.length >= 2) {
+    return formatPriceTiersLabel(dest.priceTiers);
+  }
+  return dest.price ? `${dest.price.toLocaleString('fr-DZ')} DA` : t('place_on_request');
+};
+
 const cardHtml = (dest, i) => {
-  const price = dest.priceOnRequest ? t('place_on_request') : `${dest.price.toLocaleString('fr-DZ')} DA`;
+  const price = cardPrice(dest);
+  const subtitle =
+    dest.id === 'taghit'
+      ? pick(
+          'Offre −20 % · 4 j / 3 n · 99 990 DA · ou 5 j / 4 n · 130 000 DA',
+          'Offer −20% · 4 d / 3 n · 99,990 DZD · or 5 d / 4 n · 130,000 DZD',
+          'عرض −20٪ · 4 أيام / 3 ليالٍ · 99990 دج · أو 5 أيام / 4 ليالٍ · 130000 دج'
+        )
+      : pick(dest.subtitle, dest.subtitle_en, dest.subtitle_ar);
   return `
-    <article class="acts-card" data-reveal data-delay="${i * 60}" data-href="${esc(destPath(dest))}" role="link" tabindex="0">
+    <article class="acts-card" data-reveal data-delay="${i * 60}" data-href="${esc(dest.link)}" role="link" tabindex="0">
       <img src="${esc(asset(dest.image))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${asset(
         '/images/djanet.jpeg'
       )}'" />
       ${dest.badge ? `<span class="acts-card__new">${esc(pick(dest.badge.fr, dest.badge.en, dest.badge.ar))}</span>` : ''}
       <div class="acts-card__body">
         <h3>${esc(pick(dest.name, dest.name_en, dest.name_ar))}</h3>
-        <p class="acts-card__tags">${esc(pick(dest.subtitle, dest.subtitle_en, dest.subtitle_ar))}</p>
+        <p class="acts-card__tags">${esc(subtitle)}</p>
         <div class="acts-card__meta">
           <span>${icon('MapPin', 13)}${esc(pick(dest.location, dest.location_en, dest.location_ar))}</span>
           <span>${icon('Star', 13)}${esc(dest.rating)}</span>
@@ -148,9 +171,9 @@ const render = () => `
         <div class="acts-promo__visual" data-reveal="right">
           <img src="${asset('/images/ghardaia.jpeg')}" alt="" />
           <div class="acts-promo__stats">
-            <div><strong>${FEATURED_TOURS.length}+</strong><span>${esc(t('dest_stat_places'))}</span></div>
+            <div><strong>${placeCards().length}+</strong><span>${esc(t('dest_stat_places'))}</span></div>
             <div><strong>4.8</strong><span>${esc(t('dest_stat_rating'))}</span></div>
-            <div><strong>50+</strong><span>${esc(t('dest_stat_experiences'))}</span></div>
+            <div><strong>${FEATURED_TOURS.length}+</strong><span>${esc(t('dest_stat_experiences'))}</span></div>
             <div><strong>24/7</strong><span>${esc(t('dest_stat_support'))}</span></div>
           </div>
         </div>

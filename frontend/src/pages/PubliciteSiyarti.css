@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&display=swap');
+
+.siyarti-ad {
+  min-height: 100vh;
+  background: #f3f1ec;
+  color: #1a2332;
+  font-family: Montserrat, system-ui, sans-serif;
+}
+
+.siyarti-ad__top {
+  padding: 22px 20px 8px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.siyarti-ad__brand {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+.siyarti-ad__top p:last-child {
+  margin: 4px 0 0;
+  color: #5c6570;
+  font-size: 13px;
+}
+
+.siyarti-ad__layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 18px 48px;
+  display: grid;
+  grid-template-columns: minmax(260px, 390px) 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.siyarti-ad__frame {
+  position: relative;
+  background: #101820;
+  border-radius: 28px;
+  overflow: hidden;
+  aspect-ratio: 9 / 16;
+  box-shadow: 0 18px 40px rgba(16, 24, 32, 0.18);
+}
+
+.siyarti-ad__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.siyarti-ad__captions {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 18px;
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.siyarti-ad__headline,
+.siyarti-ad__dialogue,
+.siyarti-ad__end-line,
+.siyarti-ad__soon {
+  font-family: Tajawal, sans-serif;
+}
+
+.siyarti-ad__headline {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(16, 24, 32, 0.78);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.siyarti-ad__dialogue {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1a2332;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.siyarti-ad__fr {
+  margin: 0;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.siyarti-ad__play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 112px;
+  height: 48px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a2332;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.siyarti-ad__end {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 16px 22px;
+  text-align: center;
+  background: #e8f3fb;
+  color: #1a2332;
+}
+
+.siyarti-ad__app {
+  width: min(78%, 280px);
+  border-radius: 22px;
+  box-shadow: 0 12px 30px rgba(16, 24, 32, 0.18);
+}
+
+.siyarti-ad__shot {
+  width: min(100%, 280px);
+  border-radius: 18px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.siyarti-ad__end-mark {
+  margin: 0;
+  letter-spacing: 0.18em;
+  font-size: 32px;
+}
+
+.siyarti-ad__end-line {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.siyarti-ad__soon {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+}
+
+.siyarti-ad__end-note {
+  margin: 0;
+  max-width: 240px;
+  color: #c5ced6;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.siyarti-ad__end button,
+.siyarti-ad__controls button,
+.siyarti-ad__mock button {
+  border: 0;
+  border-radius: 999px;
+  background: #1a2332;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.siyarti-ad__end button {
+  background: #ff6a00;
+  color: #fff;
+}
+
+.siyarti-ad__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.siyarti-ad__controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.siyarti-ad__check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #3d4652;
+}
+
+.siyarti-ad__now,
+.siyarti-ad__mock p,
+.siyarti-ad__missing li,
+.siyarti-ad__missing p {
+  color: #5c6570;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.siyarti-ad__mock,
+.siyarti-ad__missing {
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(26, 35, 50, 0.06);
+}
+
+.siyarti-ad__missing {
+  margin-top: 16px;
+}
+
+.siyarti-ad__mock h2,
+.siyarti-ad__missing h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.siyarti-ad__mock-flag {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f3e2c4;
+  color: #6a4b16;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.siyarti-ad__mock ul,
+.siyarti-ad__missing ul,
+.siyarti-ad__mock ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.siyarti-ad__mock li,
+.siyarti-ad__missing li {
+  margin: 6px 0;
+}
+
+.siyarti-ad__mock button {
+  background: transparent;
+  color: #1a2332;
+  padding: 0;
+  border-radius: 0;
+  text-align: left;
+}
+
+.siyarti-ad__mock .is-current button {
+  font-weight: 700;
+}
+
+@media (max-width: 800px) {
+  .siyarti-ad__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .siyarti-ad__stage {
+    max-width: 390px;
+  }
+
+  .siyarti-ad__headline {
+    font-size: 18px;
+  }
+}

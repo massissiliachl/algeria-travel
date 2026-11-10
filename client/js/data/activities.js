@@ -335,9 +335,11 @@ const readAdminActivities = () => {
 };
 
 const setAllLangs = (out, field, value, en, ar) => {
+  const prevEn = out[`${field}_en`];
+  const prevAr = out[`${field}_ar`];
   out[field] = value;
-  out[`${field}_en`] = String(en ?? '').trim() || value;
-  out[`${field}_ar`] = String(ar ?? '').trim() || value;
+  out[`${field}_en`] = String(en ?? '').trim() || prevEn || value;
+  out[`${field}_ar`] = String(ar ?? '').trim() || prevAr || value;
 };
 
 /** Lieux et circuits liés, affichés comme « Lieu » sur la fiche activité */
@@ -367,9 +369,9 @@ const fromAdmin = (a) => {
         included_ar: [],
       };
   const name = String(a.name ?? '').trim();
-  if (name && name !== base?.name) setAllLangs(out, 'name', name, a.nameEn, a.nameAr);
+  if (name && (name !== base?.name || a.nameEn || a.nameAr)) setAllLangs(out, 'name', name, a.nameEn, a.nameAr);
   const desc = String(a.description ?? '').trim();
-  if (desc && desc !== base?.desc) {
+  if (desc && (desc !== base?.desc || a.descriptionEn || a.descriptionAr)) {
     setAllLangs(out, 'desc', desc, a.descriptionEn, a.descriptionAr);
     setAllLangs(out, 'fullDesc', desc, a.descriptionEn, a.descriptionAr);
   }
@@ -402,14 +404,23 @@ const fromAdmin = (a) => {
     if (location) setAllLangs(out, 'location', location);
   }
   out.price = Number(out.price) || 0;
+  out.fromAdmin = !base;
   return out;
 };
 
-const adminActivities = readAdminActivities();
+const currentActivities = () => {
+  const adminActivities = readAdminActivities();
+  return adminActivities ? adminActivities.filter((a) => a.id && a.active !== false).map(fromAdmin) : BASE_ACTIVITIES;
+};
 
-export const ACTIVITIES = adminActivities
-  ? adminActivities.filter((a) => a.id && a.active !== false).map(fromAdmin)
-  : BASE_ACTIVITIES;
+export const ACTIVITIES = new Proxy([], {
+  get(_target, prop) {
+    const list = currentActivities();
+    if (prop === Symbol.iterator) return list[Symbol.iterator].bind(list);
+    const value = list[prop];
+    return typeof value === 'function' ? value.bind(list) : value;
+  },
+});
 
 /** Activités liées à une destination, directement ou via un circuit qui y mène */
 export const getActivitiesForPlace = (placeId) => {

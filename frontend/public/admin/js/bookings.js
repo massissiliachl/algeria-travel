@@ -3,6 +3,7 @@
     new: 'Nouvelle',
     contacted: 'Contactée',
     confirmed: 'Confirmée',
+    rejected: 'Refusée',
     cancelled: 'Annulée',
   };
 
@@ -21,14 +22,33 @@
     }
   }
 
+  function purgeDate(archivedAt) {
+    const d = new Date(archivedAt);
+    d.setMonth(d.getMonth() + 6);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function archiveInfo(b) {
+    if (!b.archivedAt) return '';
+    return `Archivée le ${formatDate(b.archivedAt)} — suppression automatique le ${purgeDate(b.archivedAt)}`;
+  }
+
+  function remove(id, toast) {
+    if (!confirm('Supprimer définitivement cette demande de réservation ?')) return false;
+    ATStore.deleteBooking(id);
+    toast('Réservation supprimée');
+    document.dispatchEvent(new CustomEvent('at:refresh'));
+    return true;
+  }
+
   function badge(status) {
     const s = status || 'new';
     return `<span class="badge badge--${s}">${STATUS_LABEL[s] || s}</span>`;
   }
 
-  function renderRows(bookings, { compact } = {}) {
+  function renderRows(bookings, { compact, archived } = {}) {
     if (!bookings.length) {
-      return `<div class="empty">Aucune réservation pour le moment.</div>`;
+      return `<div class="empty">${archived ? 'Aucune réservation archivée.' : 'Aucune réservation pour le moment.'}</div>`;
     }
     const head = compact
       ? `<thead><tr><th>Client</th><th>Destination</th><th>Statut</th><th></th></tr></thead>`
@@ -49,10 +69,11 @@
           <td>${escapeHtml(b.destination || '—')}</td>
           <td>${escapeHtml(b.date || '—')}</td>
           <td>${escapeHtml(String(b.travelers || '—'))}</td>
-          <td>${badge(b.status)}</td>
+          <td>${badge(b.status)}${b.archivedAt ? `<br><small title="${escapeHtml(archiveInfo(b))}">Suppr. le ${purgeDate(b.archivedAt)}</small>` : ''}</td>
           <td>${formatDate(b.createdAt)}</td>
           <td class="actions">
             <button type="button" class="btn btn--sm btn--ghost" data-booking-open="${b.id}">Détail</button>
+            <button type="button" class="btn btn--sm btn--danger" data-booking-delete="${b.id}">Supprimer</button>
           </td>
         </tr>`;
       })
@@ -80,8 +101,13 @@
       <p>Destination : <strong>${escapeHtml(b.destination || '—')}</strong><br>
       Date : ${escapeHtml(b.date || '—')}<br>
       Voyageurs : ${escapeHtml(String(b.travelers || '—'))}<br>
-      Hébergement : ${escapeHtml(b.stay || '—')}</p>
+      Hébergement : ${escapeHtml(b.stay || '—')}
+      ${b.price != null ? `<br>Prix estimé : ${escapeHtml(Number(b.price).toLocaleString('fr-FR'))} DA` : ''}
+      ${b.ref ? `<br>Référence : <strong>${escapeHtml(b.ref)}</strong>` : ''}</p>
+      <p><small>${b.remote === 'db' ? 'Enregistrée dans la base Supabase' : 'Reçue via le serveur IONOS (contact ou demande hors base)'}</small></p>
+      ${b.archivedAt ? `<p><small><strong>${escapeHtml(archiveInfo(b))}</strong></small></p>` : ''}
       <p>${escapeHtml(b.message || '')}</p>
+      <p><small>Une réservation confirmée, refusée ou annulée passe dans les archives, puis est supprimée 6 mois plus tard.</small></p>
       <div class="field" style="margin-top:16px">
         <label for="bkStatus">Statut</label>
         <select id="bkStatus">
@@ -99,7 +125,7 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn--primary" style="width:auto" id="bkSave">Enregistrer</button>
-        <button type="button" class="btn btn--danger" id="bkDelete">Supprimer</button>
+        <button type="button" class="btn btn--danger" style="width:auto" id="bkDelete">Supprimer</button>
       </div>
     `);
 
@@ -112,18 +138,16 @@
       document.dispatchEvent(new CustomEvent('at:refresh'));
       document.getElementById('drawer').classList.remove('is-open');
     };
-    document.getElementById('bkDelete').onclick = () => {
-      if (!confirm('Supprimer cette réservation ?')) return;
-      ATStore.deleteBooking(id);
-      toast('Réservation supprimée');
-      document.dispatchEvent(new CustomEvent('at:refresh'));
-      document.getElementById('drawer').classList.remove('is-open');
+    const del = document.getElementById('bkDelete');
+    if (del) del.onclick = () => {
+      if (remove(id, toast)) document.getElementById('drawer').classList.remove('is-open');
     };
   }
 
   global.ATBookingsUI = {
     renderRows,
     openDetail,
+    remove,
     STATUS_LABEL,
     formatDate,
   };

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { LangProvider } from './hooks/useLangHook';
 import { useRevealOnScroll } from './hooks/useRevealOnScroll';
 import Home from './pages/Home';
@@ -15,6 +15,7 @@ import PlaceDetail from './pages/PlaceDetail';
 import DestinationRedirect from './pages/DestinationRedirect';
 import SearchResults from './pages/SearchResults';
 import Stays from './pages/Stays';
+import PubliciteSiyarti from './pages/PubliciteSiyarti';
 import WhatsAppButton from './components/WhatsAppButton';
 import CookieBanner from './components/CookieBanner';
 
@@ -22,6 +23,8 @@ import './App.css';
 
 function AppRoutes() {
   useRevealOnScroll();
+  const { pathname } = useLocation();
+  const isSiyartiAd = pathname === '/publicite-siyarti';
 
   return (
     <>
@@ -42,9 +45,10 @@ function AppRoutes() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/InfoDestination" element={<Navigate to="/destinations" replace />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/publicite-siyarti" element={<PubliciteSiyarti />} />
       </Routes>
-      <WhatsAppButton />
-      <CookieBanner />
+      {!isSiyartiAd && <WhatsAppButton />}
+      {!isSiyartiAd && <CookieBanner />}
     </>
   );
 }

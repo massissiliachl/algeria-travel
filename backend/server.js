@@ -89,6 +89,7 @@ app.use('/api/reservations', reservationsRoutes);
 app.use('/api/favorites', require('./routes/favorites'));
 app.use('/api/comments', require('./routes/comments'));
 app.use('/api/contact', require('./routes/contact'));
+app.use('/api/inmir', require('./routes/inmir'));
 app.use('/api/inbox', require('./routes/inbox'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/admin/reservations', adminReservationsRoutes);
@@ -222,6 +223,7 @@ const server = app.listen(PORT, async () => {
     try {
       const db = await testConnection();
       console.log(`[DB] Connecté à ${db.database}`);
+      require('./lib/archive').purgeExpiredArchives().catch((err) => console.error('[Archive]', err.message));
       console.log(`[API] Serveur actif — http://localhost:${PORT}/api/health (Ctrl+C pour arrêter)`);
     } catch (err) {
       console.error('[DB]', err.message);

@@ -25,13 +25,13 @@ values (
   'taghit:avion',
   'fixed',
   '[
-    {"start": "2026-11-17", "end": "2026-11-20", "label": "Taghit par avion — 17 au 20 novembre"},
-    {"start": "2026-11-24", "end": "2026-11-27", "label": "Taghit par avion — 24 au 27 novembre"},
+    {"start": "2026-11-16", "end": "2026-11-20", "label": "Taghit par avion — 16 au 20 novembre"},
+    {"start": "2026-11-23", "end": "2026-11-27", "label": "Taghit par avion — 23 au 27 novembre"},
     {"start": "2026-12-01", "end": "2026-12-04", "label": "Taghit par avion — 1er au 4 décembre"},
     {"start": "2026-12-08", "end": "2026-12-11", "label": "Taghit par avion — 8 au 11 décembre"},
     {"start": "2026-12-15", "end": "2026-12-18", "label": "Taghit par avion — 15 au 18 décembre"},
     {"start": "2026-12-22", "end": "2026-12-25", "label": "Taghit par avion — 22 au 25 décembre"},
-    {"start": "2026-12-29", "end": "2027-01-01", "label": "Taghit par avion — 29 décembre au 1er janvier"}
+    {"start": "2026-12-29", "end": "2027-01-03", "label": "Taghit par avion — 29 décembre au 3 janvier 2027"}
   ]'::jsonb,
   'migration'
 )

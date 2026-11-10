@@ -18,6 +18,8 @@ export const HOME_COUP_TAGHIT = {
     {
       id: hotel.id,
       price: hotel.price,
+      priceFrom: hotel.priceFrom,
+      priceTiers: hotel.priceTiers,
       priceOnRequest: false,
       icon: hotel.icon,
       titleKey: 'home_v2_coup_pkg_hotel_title',
@@ -29,11 +31,13 @@ export const HOME_COUP_TAGHIT = {
         'home_v2_coup_pkg_hotel_inc_4',
       ],
       extraKey: 'home_v2_coup_pkg_hotel_extra',
+      priceNoteKey: 'home_v2_coup_pkg_hotel_price_note',
       ctaPath: hotel.path,
     },
     {
       id: avion.id,
       price: avion.price,
+      priceTiers: avion.priceTiers,
       priceOnRequest: false,
       icon: avion.icon,
       titleKey: 'home_v2_coup_pkg_avion_title',

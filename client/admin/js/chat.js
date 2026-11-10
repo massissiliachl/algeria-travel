@@ -76,6 +76,7 @@
       ['IN_PROGRESS', `En cours (${counts.IN_PROGRESS || 0})`],
       ['RESOLVED', `Résolues (${counts.RESOLVED || 0})`],
       ['human', `👤 Conseiller demandé (${human})`],
+      ['archived', 'Archives'],
     ]
       .map(([key, label]) => `<button type="button" class="btn btn--sm ${filter === key ? 'btn--gold' : 'btn--ghost'}" data-chat-filter="${key}">${label}</button>`)
       .join('');
@@ -115,7 +116,8 @@
     try {
       const status = ['NEW', 'IN_PROGRESS', 'RESOLVED'].includes(filter) ? filter : '';
       const qs = new URLSearchParams({ limit: '100' });
-      if (status) qs.set('status', status);
+      if (filter === 'archived') qs.set('archived', '1');
+      else if (status) qs.set('status', status);
       if (search) qs.set('q', search);
       const data = await ATStore.remote.api(`/admin/chat/conversations?${qs}`);
       items = Array.isArray(data?.items) ? data.items : [];
@@ -188,6 +190,9 @@
             ${c.human_requested
               ? '<button type="button" class="btn btn--sm btn--ghost" data-chat-human="false">Retirer « conseiller demandé »</button>'
               : '<button type="button" class="btn btn--sm btn--gold" data-chat-human="true">👤 Demander intervention humaine</button>'}
+            ${c.archived_at
+              ? '<button type="button" class="btn btn--sm btn--ghost" data-chat-archive="false">Restaurer</button>'
+              : '<button type="button" class="btn btn--sm btn--ghost" data-chat-archive="true">Archiver</button>'}
           </div>
         </div>
         <div class="chat-detail__client">
@@ -274,6 +279,13 @@
       if (e.target.closest('[data-chat-back]')) {
         detail = null;
         load();
+        return;
+      }
+      const archive = e.target.closest('[data-chat-archive]');
+      if (archive) {
+        const on = archive.dataset.chatArchive === 'true';
+        if (on && !confirm('Archiver cette conversation ? Elle sera supprimée dans 6 mois.')) return;
+        patchConversation({ archived: on }, on ? 'Conversation archivée' : 'Conversation restaurée');
         return;
       }
       const human = e.target.closest('[data-chat-human]');

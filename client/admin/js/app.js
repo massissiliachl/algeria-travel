@@ -218,6 +218,17 @@
       );
       return;
     }
+    const archiveDest = e.target.closest('[data-dest-archive]');
+    if (archiveDest) {
+      const dest = ATStore.getDestinations().find((d) => d.id === archiveDest.dataset.destArchive);
+      if (!dest) return;
+      const archived = !dest.archived;
+      if (archived && !confirm(`Archiver « ${dest.name} » ? La fiche quitte le site et sera supprimée dans 6 mois.`)) return;
+      ATStore.upsertDestination({ ...dest, archived, archivedAt: archived ? dest.archivedAt || new Date().toISOString() : '', active: archived ? false : dest.active });
+      toast(archived ? `${dest.name} archivée` : `${dest.name} restaurée`);
+      refresh();
+      return;
+    }
     const bookingDest = e.target.closest('[data-dest-booking]');
     if (bookingDest) {
       const dest = ATStore.getDestinations().find((d) => d.id === bookingDest.dataset.destBooking);
@@ -286,6 +297,17 @@
       refresh();
       return;
     }
+    const archiveTour = e.target.closest('[data-tour-archive]');
+    if (archiveTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === archiveTour.dataset.tourArchive);
+      if (!tour) return;
+      const archived = !tour.archived;
+      if (archived && !confirm(`Archiver « ${tour.name} » ? Le circuit quitte le site et sera supprimé dans 6 mois.`)) return;
+      ATStore.upsertTour({ ...tour, archived, active: archived ? false : tour.active });
+      toast(archived ? `${tour.name} archivé` : `${tour.name} restauré`);
+      refresh();
+      return;
+    }
     const editTour = e.target.closest('[data-tour-edit]');
     if (editTour) {
       ATManageUI.openTourForm(
@@ -293,6 +315,17 @@
         openDrawer,
         toast
       );
+      return;
+    }
+    const archiveAct = e.target.closest('[data-act-archive]');
+    if (archiveAct) {
+      const activity = ATStore.getActivities().find((a) => a.id === archiveAct.dataset.actArchive);
+      if (!activity) return;
+      const archived = !activity.archived;
+      if (archived && !confirm(`Archiver « ${activity.name} » ? L’activité quitte le site et sera supprimée dans 6 mois.`)) return;
+      ATStore.upsertActivity({ ...activity, archived, active: archived ? false : activity.active });
+      toast(archived ? `${activity.name} archivée` : `${activity.name} restaurée`);
+      refresh();
       return;
     }
     const editAct = e.target.closest('[data-act-edit]');

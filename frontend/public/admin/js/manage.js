@@ -108,11 +108,11 @@
         <div class="media-card__preview"><img src="${esc(ATStore.src(m.url))}" alt="${esc(m.name)}" loading="lazy" onerror="this.style.opacity=0" /></div>
         <div class="media-card__body">
           <strong>${esc(m.name)}</strong>
-          <small>${esc(MEDIA_CATEGORIES[m.category] || m.category || 'général')}${m.site ? ' · site' : ''}</small>
+          <small>${esc(MEDIA_CATEGORIES[m.category] || m.category || 'général')}${m.site ? ' · site' : ''}${m.destination ? ' · fiche destination' : ''}</small>
           <code class="media-card__url">${esc(m.url).slice(0, 48)}${m.url && m.url.length > 48 ? '…' : ''}</code>
           <div class="actions">
             <button type="button" class="btn btn--sm btn--ghost" data-media-copy="${esc(m.url)}">Copier URL</button>
-            <button type="button" class="btn btn--sm btn--danger" data-media-del="${esc(m.id)}">Suppr.</button>
+            ${m.destination ? '' : `<button type="button" class="btn btn--sm btn--danger" data-media-del="${esc(m.id)}">Suppr.</button>`}
           </div>
         </div>
       </article>`
@@ -407,21 +407,30 @@
         <td>${esc(TOUR_CATEGORIES[t.category] || '—')}</td>
         <td>${tourPrice(t)}</td>
         <td>${t.active === false ? '<span class="badge badge--cancelled">Masqué</span>' : '<span class="badge badge--confirmed">En ligne</span>'}</td>
+        <td>${
+          t.bookingOpen !== false
+            ? '<span class="badge badge--confirmed">Ouvertes</span>'
+            : '<span class="badge badge--cancelled">Fermées</span>'
+        }</td>
         <td class="actions">
+          <button type="button" class="btn btn--sm ${t.bookingOpen !== false ? 'btn--ghost' : 'btn--gold'}" data-tour-booking="${esc(t.id)}">${
+            t.bookingOpen !== false ? 'Fermer les réservations' : 'Ouvrir les réservations'
+          }</button>
+          ${t.placeSlug ? `<button type="button" class="btn btn--sm btn--gold" data-tour-calendar="${esc(t.id)}">Calendrier</button>` : ''}
           <button type="button" class="btn btn--sm btn--ghost" data-tour-edit="${esc(t.id)}">Modifier</button>
           <button type="button" class="btn btn--sm btn--danger" data-tour-del="${esc(t.id)}">Supprimer</button>
         </td>
       </tr>`
       )
       .join('');
-    return `<table><thead><tr><th></th><th>Circuit</th><th>Type</th><th>Prix</th><th>État</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    return `<table><thead><tr><th></th><th>Circuit</th><th>Type</th><th>Prix</th><th>État</th><th>Réservations</th><th></th></tr></thead><tbody>${rows}</tbody></table>
       <p class="gallery-admin__hint" style="margin-top:14px">${list.length} circuit(s). ${reset}</p>`;
   }
 
   function openTourForm(tour, openDrawer, toast) {
     const t = tour || {
       id: '', name: '', subtitle: '', location: '', duration: '', price: 0, priceOnRequest: false,
-      category: 'desert', placeSlug: '', description: '', image: '', active: true,
+      category: 'desert', placeSlug: '', description: '', image: '', active: true, bookingOpen: true,
     };
     const isNew = !tour;
     const slugs = [...new Set(['tadrart', ...ATStore.getDestinations().map((d) => d.id)])];
@@ -438,7 +447,7 @@
         <div class="field full"><label>Sous-titre</label><input name="subtitle" value="${esc(t.subtitle || '')}" placeholder="Ex. 5 jours / 4 nuits · Van Mercedes VIP" /></div>
         <div class="field"><label>Lieu</label><input name="location" value="${esc(t.location || t.destination || '')}" placeholder="Ex. Taghit, Béchar" /></div>
         <div class="field"><label>Durée</label><input name="duration" value="${esc(t.duration || '')}" placeholder="Ex. 5 jours / 4 nuits" /></div>
-        <div class="field"><label>Prix (DA / personne)</label><input name="price" type="number" min="0" value="${Number(t.price || 0)}" /></div>
+        <div class="field"><label>Prix (DA / personne, pour tout le séjour)</label><input name="price" type="number" min="0" value="${Number(t.price || 0)}" /></div>
         <div class="field"><label>Prix sur demande</label>
           <select name="priceOnRequest"><option value="false" ${!t.priceOnRequest ? 'selected' : ''}>Non, afficher le prix</option>
           <option value="true" ${t.priceOnRequest ? 'selected' : ''}>Oui</option></select>
@@ -452,6 +461,10 @@
         <div class="field"><label>Affiché sur le site</label>
           <select name="active"><option value="true" ${t.active !== false ? 'selected' : ''}>Oui</option>
           <option value="false" ${t.active === false ? 'selected' : ''}>Non (masqué)</option></select>
+        </div>
+        <div class="field"><label>Réservations en ligne</label>
+          <select name="bookingOpen"><option value="true" ${t.bookingOpen !== false ? 'selected' : ''}>Ouvertes</option>
+          <option value="false" ${t.bookingOpen === false ? 'selected' : ''}>Fermées</option></select>
         </div>
         <div class="form-actions full">
           <button type="submit" class="btn btn--primary" style="width:auto">Enregistrer</button>
@@ -482,6 +495,7 @@
         image,
         description: String(fd.get('description') || '').trim(),
         active: fd.get('active') === 'true',
+        bookingOpen: fd.get('bookingOpen') === 'true',
       });
       toast('Circuit enregistré');
       document.dispatchEvent(new CustomEvent('at:refresh'));
@@ -500,24 +514,62 @@
   }
 
   /* ── Activités ── */
+  function activityLinks(a) {
+    const places = ATStore.getPlaceChoices().filter((p) => (a.places || []).includes(p.id)).map((p) => p.name);
+    const tours = ATStore.getTours().filter((t) => (a.tours || []).map(String).includes(String(t.id))).map((t) => t.name);
+    return [...places, ...tours];
+  }
+
   function renderActivities() {
     const list = ATStore.getActivities();
     if (!list.length) return `<div class="empty">Aucune activité.</div>`;
     const rows = list
       .map(
-        (a) => `<tr>
+        (a) => {
+          const links = activityLinks(a);
+          return `<tr>
         <td><strong>${esc(a.name)}</strong></td>
+        <td>${links.length ? esc(links.join(', ')) : '<span class="badge badge--cancelled">Non liée</span>'}</td>
         <td>${Number(a.price || 0).toLocaleString('fr-FR')} DA</td>
         <td>${a.active === false ? '<span class="badge badge--cancelled">Inactif</span>' : '<span class="badge badge--confirmed">Actif</span>'}</td>
         <td><button type="button" class="btn btn--sm btn--ghost" data-act-edit="${esc(a.id)}">Modifier</button></td>
-      </tr>`
+      </tr>`;
+        }
       )
       .join('');
-    return `<table><thead><tr><th>Activité</th><th>Prix</th><th>État</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<table><thead><tr><th>Activité</th><th>Destinations / circuits</th><th>Prix</th><th>État</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
+  function checkList(name, items, selected) {
+    const sel = new Set(selected.map(String));
+    return `<div class="check-list">${items
+      .map(
+        (it) => `<label class="check-list__item">
+          <input type="checkbox" name="${name}" value="${esc(it.id)}" ${sel.has(String(it.id)) ? 'checked' : ''} />
+          <span>${esc(it.name)}</span>
+        </label>`
+      )
+      .join('')}</div>`;
+  }
+
+  /** Mêmes clés que ACTIVITY_CATEGORIES / ACTIVITY_FILTERS du site (client/js/data/activities.js) */
+  const ACTIVITY_CATEGORIES = [
+    { id: 'adventure', name: 'Aventure' },
+    { id: 'desert', name: 'Désert' },
+    { id: 'heritage', name: 'Patrimoine' },
+    { id: 'nature', name: 'Nature' },
+  ];
+  const ACTIVITY_GENRES = [
+    { id: 'adventure', name: 'Aventure' },
+    { id: 'nature', name: 'Nature' },
+    { id: 'culture', name: 'Culture' },
+    { id: 'nautical', name: 'Nautique' },
+    { id: 'discovery', name: 'Découverte' },
+    { id: 'extreme', name: 'Extrême' },
+  ];
+
   function openActivityForm(act, openDrawer, toast) {
-    const a = act || { id: '', name: '', price: 0, description: '', image: '', active: true };
+    const a = act || { id: '', name: '', price: 0, description: '', image: '', category: 'adventure', filters: [], places: [], tours: [], active: true };
     const isNew = !act;
     openDrawer(`
       <h3>${isNew ? 'Nouvelle activité' : 'Modifier activité'}</h3>
@@ -528,7 +580,23 @@
         <div class="field full"><label>Image</label>
           ${ATImageInsert.markup({ id: 'actImg', name: 'image', label: 'Insérer une image', value: a.image || '' })}
         </div>
-        <div class="field full"><label>Description</label><textarea name="description">${esc(a.description)}</textarea></div>
+        <div class="field full"><label>Description</label><textarea name="description" placeholder="Vide = texte d’origine du site">${esc(a.description)}</textarea></div>
+        <div class="field"><label>Catégorie (badge sur la photo)</label>
+          <select name="category">${ACTIVITY_CATEGORIES.map(
+            (c) => `<option value="${c.id}" ${(a.category || 'adventure') === c.id ? 'selected' : ''}>${c.name}</option>`
+          ).join('')}</select>
+        </div>
+        <div class="field full"><label>Genre de l’activité *</label>
+          <small class="field-hint">Utilisé par les filtres de la page Activités du site.</small>
+          ${checkList('filters', ACTIVITY_GENRES, a.filters || [])}
+        </div>
+        <div class="field full"><label>Destinations où proposer cette activité</label>
+          <small class="field-hint">Cochez au moins une destination ou un circuit : l’activité s’affichera sur leur page.</small>
+          ${checkList('places', ATStore.getPlaceChoices(), a.places || [])}
+        </div>
+        <div class="field full"><label>Circuits qui incluent cette activité</label>
+          ${checkList('tours', ATStore.getTours().map((t) => ({ id: t.id, name: t.name })), a.tours || [])}
+        </div>
         <div class="field"><label>Actif</label>
           <select name="active"><option value="true" ${a.active !== false ? 'selected' : ''}>Oui</option>
           <option value="false" ${a.active === false ? 'selected' : ''}>Non</option></select>
@@ -544,14 +612,34 @@
     document.getElementById('actForm').onsubmit = (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
-      ATStore.upsertActivity({
-        id: String(fd.get('id') || '').trim(),
-        name: String(fd.get('name') || '').trim(),
-        price: Number(fd.get('price') || 0),
-        image: actImg.getValue(),
-        description: String(fd.get('description') || '').trim(),
-        active: fd.get('active') === 'true',
-      });
+      const places = fd.getAll('places').map(String);
+      const tours = fd.getAll('tours').map(String);
+      const filters = fd.getAll('filters').map(String);
+      if (!filters.length) {
+        toast('Choisissez au moins un genre d’activité');
+        return;
+      }
+      if (!places.length && !tours.length) {
+        toast('Associez l’activité à au moins une destination ou un circuit');
+        return;
+      }
+      try {
+        ATStore.upsertActivity({
+          id: String(fd.get('id') || '').trim(),
+          name: String(fd.get('name') || '').trim(),
+          price: Number(fd.get('price') || 0),
+          image: actImg.getValue(),
+          description: String(fd.get('description') || '').trim(),
+          category: String(fd.get('category') || 'adventure'),
+          filters,
+          places,
+          tours,
+          active: fd.get('active') === 'true',
+        });
+      } catch (err) {
+        toast(err.message === 'quota' ? 'Stockage du navigateur plein : utilisez une image plus légère.' : 'Enregistrement impossible');
+        return;
+      }
       toast('Activité enregistrée');
       document.dispatchEvent(new CustomEvent('at:refresh'));
       document.getElementById('drawer').classList.remove('is-open');

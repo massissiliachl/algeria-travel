@@ -5,6 +5,7 @@ import { href, navigate } from '../core/router.js';
 import { esc, asset } from '../core/dom.js';
 import { FEATURED_TOURS } from '../data/tours.js';
 import { getPlacePathFromTour } from '../data/placeRoutes.js';
+import { formatPriceTiersLabel } from '../data/taghitPackages.js';
 
 const FILTERS = [
   { key: 'all', icon: 'Compass', fr: 'Tous', en: 'All', ar: 'الكل' },
@@ -36,11 +37,16 @@ const filtersHtml = () =>
       </button>`
   ).join('');
 
+const tourPriceLabel = (tour) => {
+  if (tour.priceOnRequest) return t('place_on_request');
+  const dual = formatPriceTiersLabel(tour.priceTiers);
+  if (dual) return `${dual} ${t('per_person')}`;
+  return `${tour.price.toLocaleString()} DA ${t('per_person')}`;
+};
+
 const cardHtml = (tour, i) => {
   const fav = state.favorites.has(String(tour.id));
-  const price = tour.priceOnRequest
-    ? t('place_on_request')
-    : `${tour.price.toLocaleString()} DA ${t('per_person')}`;
+  const price = tourPriceLabel(tour);
   return `
     <article class="acts-card" data-reveal data-delay="${i * 60}" data-href="${esc(getPlacePathFromTour(tour))}" role="link" tabindex="0">
       <img src="${esc(asset(tour.image))}" alt="" loading="lazy" />

@@ -2,7 +2,8 @@
  * Zone d’insertion d’image (fichier obligatoire / prioritaire)
  */
 (function (global) {
-  const MAX_KB = 1500;
+  const MAX_KB = 15000;
+  const COMPRESS_ABOVE_KB = 300;
 
   function escapeHtml(str) {
     return String(str || '')
@@ -24,8 +25,15 @@
         return;
       }
       if (file.size > MAX_KB * 1024) {
-        toast(`Image trop lourde (max ${MAX_KB} Ko). Compressez-la puis réessayez.`);
+        toast(`Image trop lourde (max ${MAX_KB / 1000} Mo).`);
         reject(new Error('size'));
+        return;
+      }
+      if (file.size > COMPRESS_ABOVE_KB * 1024 && !/gif|svg/.test(file.type)) {
+        compressFile(file).then(resolve, () => {
+          toast('Impossible de lire le fichier');
+          reject(new Error('read'));
+        });
         return;
       }
       const reader = new FileReader();
@@ -55,7 +63,7 @@
           <input type="file" id="${escapeHtml(id)}File" accept="image/*" ${multiple} hidden />
           <span class="img-insert__icon" aria-hidden="true">📷</span>
           <strong>${escapeHtml(label)}</strong>
-          <span class="img-insert__hint">Cliquez ou glissez une image ici (JPG, PNG, WEBP — max ${MAX_KB} Ko)</span>
+          <span class="img-insert__hint">Cliquez ou glissez une image ici (JPG, PNG, WEBP — compressée automatiquement)</span>
           <span class="btn btn--sm btn--gold img-insert__btn">Choisir un fichier</span>
         </label>
         <div class="img-insert__preview ${value ? 'is-visible' : ''}" id="${escapeHtml(id)}Preview"
@@ -63,7 +71,7 @@
           <button type="button" class="img-insert__clear" id="${escapeHtml(id)}Clear" title="Retirer">×</button>
         </div>
         <p class="img-insert__or">ou coller une URL</p>
-        <input type="url" class="img-insert__url" id="${escapeHtml(id)}Url" value="${escapeHtml(value && !String(value).startsWith('data:') ? value : '')}" placeholder="https://… ou /images/photo.jpg" />
+        <input type="text" inputmode="url" autocomplete="off" spellcheck="false" class="img-insert__url" id="${escapeHtml(id)}Url" value="${escapeHtml(value && !String(value).startsWith('data:') ? value : '')}" placeholder="https://… ou /images/photo.jpg" />
       </div>
     `;
   }

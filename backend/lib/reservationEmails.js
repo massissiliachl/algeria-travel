@@ -1,4 +1,5 @@
-const { sendMail } = require('./mail');
+const { sendMail, isMailConfigured } = require('./mail');
+const { sendClientPhone } = require('./clientChannel');
 const { paymentMethodLabel } = require('./paymentMethod');
 
 const SITE = process.env.SITE_URL || process.env.FRONTEND_URL || 'https://algeriatravel.com';
@@ -110,4 +111,89 @@ async function sendReservationAdminEmail({
   await sendMail({ to: ADMIN, subject, text });
 }
 
-module.exports = { sendReservationClientEmail, sendReservationAdminEmail };
+function fmtDate(value) {
+  if (!value) return '';
+  const iso = String(value).slice(0, 10);
+  const [year, month, day] = iso.split('-').map(Number);
+  if (!year || !month || !day) return '';
+  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+function decisionText(reservation, status) {
+  const name = String(reservation.clientName || '').trim() || 'Client';
+  const offer = reservation.itemName || 'votre voyage';
+  const facts = [
+    `Voyage : ${offer}`,
+    reservation.referenceCode ? `Référence : ${reservation.referenceCode}` : '',
+    reservation.checkInDate && reservation.checkOutDate
+      ? `Dates : du ${fmtDate(reservation.checkInDate)} au ${fmtDate(reservation.checkOutDate)}`
+      : reservation.travelDate
+        ? `Date : ${fmtDate(reservation.travelDate)}`
+        : '',
+    reservation.travelers ? `Voyageurs : ${reservation.travelers}` : '',
+  ].filter(Boolean);
+  const intro =
+    status === 'confirmed'
+      ? 'Nous avons le plaisir de vous confirmer votre demande de réservation.'
+      : 'Nous sommes au regret de vous informer que votre demande de réservation ne peut pas être acceptée.';
+  const closing =
+    status === 'confirmed'
+      ? 'Notre équipe reste à votre disposition pour la suite de votre voyage.'
+      : 'Nous restons disponibles pour vous proposer une autre date ou une autre formule.';
+
+  return [
+    'Algeria Travel',
+    '',
+    `Monsieur, Madame ${name},`,
+    '',
+    intro,
+    '',
+    ...facts,
+    '',
+    closing,
+    '',
+    'Bien cordialement,',
+    'Algeria Travel',
+    SITE,
+  ].join('\n');
+}
+
+async function notifyReservationDecision(reservation, status) {
+  if (status !== 'confirmed' && status !== 'rejected') {
+    return { email: 'skipped', phone: 'none', phoneStatus: 'skipped', whatsappUrl: null, smsUrl: null };
+  }
+  const text = decisionText(reservation, status);
+  const subject =
+    status === 'confirmed'
+      ? `[Algeria Travel] Réservation confirmée${reservation.referenceCode ? ` — ${reservation.referenceCode}` : ''}`
+      : `[Algeria Travel] Réservation non retenue${reservation.referenceCode ? ` — ${reservation.referenceCode}` : ''}`;
+
+  let email = 'skipped';
+  const to = String(reservation.clientEmail || '').trim();
+  if (to.includes('@')) {
+    if (!isMailConfigured()) email = 'unconfigured';
+    else {
+      try {
+        const info = await sendMail({ to, subject, text });
+        email = info?.simulated ? 'simulated' : 'sent';
+      } catch (err) {
+        email = 'failed';
+        console.warn('[Reservation] E-mail client non envoyé :', err.message);
+      }
+    }
+  }
+
+  const phone = await sendClientPhone(reservation.clientPhone, text);
+  return { email, phone: phone.channel, phoneStatus: phone.status, whatsappAbsent: phone.whatsappAbsent, whatsappUrl: phone.whatsappUrl, smsUrl: phone.smsUrl };
+}
+
+module.exports = {
+  sendReservationClientEmail,
+  sendReservationAdminEmail,
+  notifyReservationDecision,
+  decisionText,
+};

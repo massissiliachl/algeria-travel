@@ -598,11 +598,22 @@ const applyAdminOverride = (place) => {
   return {
     ...place,
     name: override.name || place.name,
+    name_en: override.nameEn || place.name_en || override.name || place.name,
+    name_ar: override.nameAr || place.name_ar || override.name || place.name,
     tagline: override.tagline || place.tagline,
-    price: override.price != null ? Number(override.price) : place.price,
+    tagline_en: override.taglineEn || place.tagline_en || override.tagline || place.tagline,
+    tagline_ar: override.taglineAr || place.tagline_ar || override.tagline || place.tagline,
+    /* Taghit : le prix vient de la formule (hôtel / avion), pas de la fiche destination admin */
+    ...(place.id === 'taghit'
+      ? {}
+      : { price: override.price != null ? Number(override.price) : place.price }),
     bestTime: override.bestTime || place.bestTime,
+    bestTime_en: override.bestTimeEn || place.bestTime_en || override.bestTime || place.bestTime,
+    bestTime_ar: override.bestTimeAr || place.bestTime_ar || override.bestTime || place.bestTime,
     image: override.image || place.image,
     description: override.description || place.description,
+    description_en: override.descriptionEn || place.description_en || override.description || place.description,
+    description_ar: override.descriptionAr || place.description_ar || override.description || place.description,
     gallery: gallery?.length ? gallery : place.image ? [place.image] : place.gallery,
     bookingOpen: override.bookingOpen,
   };
@@ -618,10 +629,60 @@ const withCircuitPrice = (place, pkg) => {
     (t) => getPlaceSlugFromTour(t) === place.id && (t.pkg || '') === want
   );
   if (!tour) return place;
-  if (tour.priceOnRequest) return { ...place, price: 0, priceOnRequest: true };
-  if (!(tour.price > 0)) return place;
-  const out = { ...place, price: tour.price, priceOnRequest: false };
-  if (!(out.oldPrice > out.price)) delete out.oldPrice;
+  const out = { ...place };
+  /* Circuit admin = même fiche : titre formule */
+  if (tour.name) {
+    out.pkgTitle = tour.name;
+    out.pkgTitle_en = tour.name_en || tour.name;
+    out.pkgTitle_ar = tour.name_ar || tour.name;
+  }
+  /* Avion Taghit : tarifs flyer (100 000 / 75 000 / 40 000) — jamais le 99 990 DA hôtel */
+  if (place.id === 'taghit' && want === 'avion' && Array.isArray(place.priceTiers) && place.priceTiers.length >= 2) {
+    const adult = Number(place.priceTiers[0]?.price) || Number(place.price) || 100000;
+    out.price = adult;
+    out.priceOnRequest = false;
+    delete out.priceFrom;
+    delete out.oldPrice;
+    if (place.groupDiscount) out.groupDiscount = place.groupDiscount;
+    if (place.offerPercent) out.offerPercent = place.offerPercent;
+    return out;
+  }
+  if (tour.priceOnRequest) {
+    out.price = 0;
+    out.priceOnRequest = true;
+  } else if (tour.price > 0) {
+    out.price = tour.price;
+    out.priceOnRequest = false;
+    if (tour.oldPrice > tour.price) out.oldPrice = tour.oldPrice;
+    else if (!(out.oldPrice > out.price)) delete out.oldPrice;
+  }
+  if (Array.isArray(tour.priceTiers) && tour.priceTiers.length >= 2) {
+    const tierKind = (tiers) => {
+      if (!Array.isArray(tiers) || tiers.length < 2) return '';
+      const label = `${tiers[0]?.fr || ''} ${tiers[0]?.en || ''}`;
+      if (tiers.length === 3 && /ans|years|سنوات|Over|Under/i.test(label)) return 'age';
+      if (/jours|days|أيام|nuits|nights/i.test(label)) return 'duration';
+      return 'other';
+    };
+    const placeKind = tierKind(place.priceTiers);
+    const tourKind = tierKind(tour.priceTiers);
+    /* Ne pas mélanger paliers âge (avion) et durée (hôtel) via un circuit admin périmé */
+    if (!(placeKind && tourKind && placeKind !== tourKind)) {
+      out.priceTiers = tour.priceTiers.map((tier, i) => ({
+        ...tier,
+        price:
+          tour.priceTiers.length === 3 && i === 0
+            ? Number(tier.price) || Number(out.price) || 0
+            : Number(tier.price) || 0,
+      }));
+      if (tour.priceTiers.length === 3 && out.priceTiers[0]?.price) {
+        out.price = out.priceTiers[0].price;
+      }
+      const lows = out.priceTiers.map((tier) => Number(tier.price) || 0).filter((n) => n > 0);
+      if (lows.length) out.priceFrom = Math.min(...lows);
+    }
+  }
+  if (place.groupDiscount) out.groupDiscount = place.groupDiscount;
   return out;
 };
 
@@ -634,22 +695,22 @@ const placeFromAdmin = (d) => {
   return {
     id: d.id,
     name: d.name,
-    name_en: d.name,
-    name_ar: d.name,
+    name_en: d.nameEn || d.name,
+    name_ar: d.nameAr || d.name,
     tagline: d.tagline || '',
-    tagline_en: d.tagline || '',
-    tagline_ar: d.tagline || '',
+    tagline_en: d.taglineEn || d.tagline || '',
+    tagline_ar: d.taglineAr || d.tagline || '',
     rating: 4.8,
     reviews: 0,
     temp: '—',
     image,
     gallery,
     description: d.description || '',
-    description_en: d.description || '',
-    description_ar: d.description || '',
+    description_en: d.descriptionEn || d.description || '',
+    description_ar: d.descriptionAr || d.description || '',
     bestTime: d.bestTime || '',
-    bestTime_en: d.bestTime || '',
-    bestTime_ar: d.bestTime || '',
+    bestTime_en: d.bestTimeEn || d.bestTime || '',
+    bestTime_ar: d.bestTimeAr || d.bestTime || '',
     duration: 'Sur mesure',
     duration_en: 'Custom',
     duration_ar: 'حسب الطلب',

@@ -204,29 +204,34 @@ async function notifyHumanRequest(conversationId) {
 
 /* ── Admin ── */
 
-async function listConversations({ status, q, limit = 50, offset = 0 } = {}) {
+async function listConversations({ status, q, archived = false, limit = 50, offset = 0 } = {}) {
   const lim = Math.min(Math.max(Number(limit) || 50, 1), 200);
   const off = Math.max(Number(offset) || 0, 0);
   const st = STATUSES.has(status) ? status : null;
   const term = String(q || '').trim().slice(0, 80);
+  const archivedOnly = Boolean(archived);
   const r = await db(
     `select c.id, c.language, c.status, c.human_requested, c.customer_name, c.customer_phone, c.customer_email,
-            c.last_message, c.last_intent, c.message_count, c.page_url, c.created_at, c.last_message_at,
+            c.last_message, c.last_intent, c.message_count, c.page_url, c.created_at, c.last_message_at, c.archived_at,
             (select count(*)::int from public.chat_requests r where r.conversation_id = c.id) as request_count
      from public.chat_conversations c
      where ($1::text is null or c.status = $1)
        and ($2::text = '' or c.customer_name ilike '%' || $2 || '%' or c.customer_phone ilike '%' || $2 || '%'
             or c.customer_email ilike '%' || $2 || '%' or c.last_message ilike '%' || $2 || '%')
        and c.message_count > 0
+       and (($5::boolean and c.archived_at is not null) or (not $5::boolean and c.archived_at is null))
      order by c.human_requested and c.status <> 'RESOLVED' desc, c.last_message_at desc
      limit $3 offset $4`,
-    [st, term, lim, off]
+    [st, term, lim, off, archivedOnly]
   );
-  const counts = await db(`select status, count(*)::int as n from public.chat_conversations where message_count > 0 group by status`, []);
+  const counts = await db(
+    `select status, count(*)::int as n from public.chat_conversations where message_count > 0 and archived_at is null group by status`,
+    []
+  );
   if (r) {
     return { items: r.rows, counts: Object.fromEntries((counts?.rows || []).map((x) => [x.status, x.n])), storage: 'db' };
   }
-  const all = [...mem.conversations.values()].filter((c) => c.message_count > 0);
+  const all = [...mem.conversations.values()].filter((c) => c.message_count > 0 && Boolean(c.archived_at) === archivedOnly);
   const items = all
     .filter((c) => !st || c.status === st)
     .filter((c) => !term || [c.customer_name, c.customer_phone, c.customer_email, c.last_message].some((v) => String(v || '').toLowerCase().includes(term.toLowerCase())))
@@ -247,21 +252,40 @@ async function getConversationDetail(id) {
   return { conversation, messages, requests };
 }
 
-async function updateConversation(id, { status, humanRequested } = {}) {
+async function updateConversation(id, { status, humanRequested, archived } = {}) {
   if (!isUuid(id)) return null;
   const st = STATUSES.has(status) ? status : null;
   const hr = typeof humanRequested === 'boolean' ? humanRequested : null;
+  const ar = typeof archived === 'boolean' ? archived : null;
   const r = await db(
-    `update public.chat_conversations set status = coalesce($2, status), human_requested = coalesce($3, human_requested), updated_at = now()
+    `update public.chat_conversations
+     set status = coalesce($2, status),
+         human_requested = coalesce($3, human_requested),
+         archived_at = case when $4::boolean is null then archived_at when $4 then coalesce(archived_at, now()) else null end,
+         updated_at = now()
      where id = $1 returning *`,
-    [id, st, hr]
+    [id, st, hr, ar]
   );
   if (r) return r.rows[0] || null;
   const conv = mem.conversations.get(id);
   if (!conv) return null;
   if (st) conv.status = st;
   if (hr !== null) conv.human_requested = hr;
+  if (ar === true) conv.archived_at = conv.archived_at || new Date().toISOString();
+  if (ar === false) conv.archived_at = null;
   return conv;
+}
+
+async function deleteConversation(id) {
+  if (!isUuid(id)) return false;
+  await db('delete from public.chat_requests where conversation_id = $1', [id]);
+  const gone = await db('delete from public.chat_conversations where id = $1 returning id', [id]);
+  if (gone) return gone.rowCount > 0;
+  if (!mem.conversations.has(id)) return false;
+  mem.conversations.delete(id);
+  mem.messages = mem.messages.filter((item) => item.conversation_id !== id);
+  mem.requests = mem.requests.filter((item) => item.conversation_id !== id);
+  return true;
 }
 
 async function updateRequest(id, status) {
@@ -302,6 +326,7 @@ module.exports = {
   listConversations,
   getConversationDetail,
   updateConversation,
+  deleteConversation,
   updateRequest,
   addAgentMessage,
 };

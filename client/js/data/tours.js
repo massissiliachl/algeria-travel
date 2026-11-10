@@ -291,29 +291,34 @@ const BASE_TOURS = [
       name: "Taghit — Hôtel 4★",
       name_en: "Taghit — 4★ Hotel",
       name_ar: "تاغيت — فندق 4★",
-      subtitle: "Voyage coup de cœur · vol inclus",
-      subtitle_en: "Must-do escape · flight included",
-      subtitle_ar: "رحلة مفضلة · رحلة مشمولة",
-      description: taghitHotel.includes.map((i) => i.fr).join(', ') + `. ${taghitHotel.extra.fr}. ${taghitHotel.price.toLocaleString()} DA / personne.`,
-      description_en: taghitHotel.includes.map((i) => i.en).join(', ') + `. ${taghitHotel.extra.en}. ${taghitHotel.price.toLocaleString()} DZD / person.`,
+      subtitle: "5 j / 4 n · 130 000 DA · ou 4 j / 3 n · 99 990 DA",
+      subtitle_en: "5 d / 4 n · 130,000 DZD · or 4 d / 3 n · 99,990 DZD",
+      subtitle_ar: "5 أيام / 4 ليالٍ · 130000 دج · أو 4 أيام / 3 ليالٍ · 99990 دج",
+      description: taghitHotel.includes.map((i) => i.fr).join(', ') + `. ${taghitHotel.extra.fr}.`,
+      description_en: taghitHotel.includes.map((i) => i.en).join(', ') + `. ${taghitHotel.extra.en}.`,
       fullDescription:
         `Formule ${taghitHotel.title} Taghit — Voyage coup de cœur.\n` +
         taghitHotel.includes.map((i) => `• ${i.fr}`).join('\n') +
-        `\n• ${taghitHotel.extra.fr}\n${taghitHotel.price.toLocaleString()} DA par personne`,
+        `\n• ${taghitHotel.extra.fr}`,
       fullDescription_en:
         `Taghit ${taghitHotel.title_en} package — must-do escape.\n` +
         taghitHotel.includes.map((i) => `• ${i.en}`).join('\n') +
-        `\n• ${taghitHotel.extra.en}\n${taghitHotel.price.toLocaleString()} DZD per person`,
+        `\n• ${taghitHotel.extra.en}`,
       location: "Taghit, Béchar",
       location_en: "Taghit, Béchar",
       location_ar: "تاغيت، بشار",
-      bestTime: "Octobre – Mars",
-      bestTime_en: "October – March",
-      bestTime_ar: "أكتوبر – مارس",
+      bestTime: taghitHotel.dates,
+      bestTime_en: taghitHotel.dates_en,
+      bestTime_ar: taghitHotel.dates_ar,
+      dates: taghitHotel.dates,
+      dates_en: taghitHotel.dates_en,
+      dates_ar: taghitHotel.dates_ar,
+      departures: taghitHotel.departures,
       duration: taghitHotel.duration,
       duration_en: taghitHotel.duration_en,
       duration_ar: taghitHotel.duration_ar,
       price: taghitHotel.price,
+      priceTiers: taghitHotel.priceTiers,
       rating: 4.9,
       reviews: 142,
       image: "../public/images/taghit.jpeg",
@@ -321,11 +326,12 @@ const BASE_TOURS = [
       placeSlug: "taghit",
       pkg: "hotel",
       badge: { fr: "NEW", en: "NEW", ar: "جديد" },
-      activities: [
-        { icon: "Hotel", label: "Hôtel 4★", label_en: "4★ hotel", label_ar: "فندق 4★" },
-        { icon: "Plane", label: "Vol inclus", label_en: "Flight included", label_ar: "رحلة مشمولة" },
-        { icon: "Car", label: "4×4 & dunes", label_en: "4×4 & dunes", label_ar: "دفع رباعي" },
-      ],
+      activities: taghitHotel.highlights.map((h) => ({
+        icon: h.icon,
+        label: h.fr,
+        label_en: h.en,
+        label_ar: h.ar,
+      })),
       itinerary: [],
     },
     {
@@ -375,9 +381,9 @@ const BASE_TOURS = [
       name: "Séjour Taghit — Départs par avion",
       name_en: "Taghit stay — Departures by plane",
       name_ar: "إقامة تاغيت — رحلات بالطائرة",
-      subtitle: "4 jours / 3 nuits · vol inclus",
-      subtitle_en: "4 days / 3 nights · flight included",
-      subtitle_ar: "4 أيام / 3 ليالٍ · الطيران مشمول",
+      subtitle: "5 j / 4 n · 100 000 DA (+10) · offre −20 %",
+      subtitle_en: "5 d / 4 n · 100,000 DZD (over 10) · −20% offer",
+      subtitle_ar: "5 أيام / 4 ليالٍ · 100000 دج (+10) · عرض −20٪",
       description:
         taghitAvion.includes.map((i) => i.fr).join(', ') +
         `. ${taghitAvion.dates}. ${taghitAvion.extra.fr}.`,
@@ -385,11 +391,11 @@ const BASE_TOURS = [
         taghitAvion.includes.map((i) => i.en).join(', ') +
         `. ${taghitAvion.dates_en}. ${taghitAvion.extra.en}.`,
       fullDescription:
-        `Séjour Taghit 4 jours / 3 nuits — ${taghitAvion.tagline}.\nDéparts : ${avionDates}.\n` +
+        `Séjour Taghit 5 jours / 4 nuits — ${taghitAvion.tagline}.\nDéparts : ${avionDates}.\n` +
         taghitAvion.includes.map((i) => `• ${i.fr}`).join('\n') +
         `\n• ${taghitAvion.extra.fr}`,
       fullDescription_en:
-        `Taghit stay 4 days / 3 nights — ${taghitAvion.tagline_en}.\nDepartures: ${avionDates_en}.\n` +
+        `Taghit stay 5 days / 4 nights — ${taghitAvion.tagline_en}.\nDepartures: ${avionDates_en}.\n` +
         taghitAvion.includes.map((i) => `• ${i.en}`).join('\n') +
         `\n• ${taghitAvion.extra.en}`,
       location: "Taghit, Béchar",
@@ -402,13 +408,15 @@ const BASE_TOURS = [
       duration_en: taghitAvion.duration_en,
       duration_ar: taghitAvion.duration_ar,
       price: taghitAvion.price,
+      priceTiers: taghitAvion.priceTiers,
+      groupDiscount: taghitAvion.groupDiscount,
       rating: 4.9,
       reviews: 0,
       image: taghitAvion.image,
       category: "desert",
       placeSlug: "taghit",
       pkg: "avion",
-      badge: { fr: "NEW", en: "NEW", ar: "جديد" },
+      badge: { fr: "−20 %", en: "−20%", ar: "−20٪" },
       activities: taghitAvion.highlights.map((h) => ({
         icon: h.icon,
         label: h.fr,
@@ -438,12 +446,16 @@ const readAdminCircuits = () => {
 };
 
 /** Un texte modifié dans l’admin (en français) remplace aussi les versions EN / AR */
-const overrideText = (out, base, field, value) => {
+const overrideText = (out, base, field, value, en, ar) => {
   const v = String(value ?? '').trim();
-  if (!v || v === base[field]) return;
-  out[field] = v;
-  out[`${field}_en`] = v;
-  out[`${field}_ar`] = v;
+  const enV = String(en ?? '').trim();
+  const arV = String(ar ?? '').trim();
+  const changed = Boolean(v && v !== String(base?.[field] || ''));
+  if (changed) out[field] = v;
+  if (enV) out[`${field}_en`] = enV;
+  else if (changed && !out[`${field}_en`]) out[`${field}_en`] = v;
+  if (arV) out[`${field}_ar`] = arV;
+  else if (changed && !out[`${field}_ar`]) out[`${field}_ar`] = v;
 };
 
 /** Fiche d’origine du circuit : même id et même destination, ou même formule (pkg) sur la même destination */
@@ -456,16 +468,20 @@ const fromAdmin = (c) => {
   const out = base
     ? { ...base, id: c.id }
     : { id: c.id, rating: 5, reviews: 0, activities: [], itinerary: [], category: 'desert' };
-  overrideText(out, base || {}, 'name', c.name);
-  overrideText(out, base || {}, 'subtitle', c.subtitle);
-  overrideText(out, base || {}, 'location', c.location);
-  overrideText(out, base || {}, 'duration', c.duration);
+  overrideText(out, base || {}, 'name', c.name, c.nameEn, c.nameAr);
+  overrideText(out, base || {}, 'subtitle', c.subtitle, c.subtitleEn, c.subtitleAr);
+  overrideText(out, base || {}, 'location', c.location, c.locationEn, c.locationAr);
+  overrideText(out, base || {}, 'duration', c.duration, c.durationEn, c.durationAr);
   const desc = String(c.description ?? '').trim();
-  if (desc && desc !== base?.description) {
-    out.description = desc;
-    out.description_en = desc;
-    out.fullDescription = desc;
-    out.fullDescription_en = desc;
+  if (desc || c.descriptionEn || c.descriptionAr) {
+    if (desc) {
+      out.description = desc;
+      out.fullDescription = desc;
+    }
+    out.description_en = String(c.descriptionEn || '').trim() || out.description_en || desc;
+    out.description_ar = String(c.descriptionAr || '').trim() || out.description_ar || desc;
+    out.fullDescription_en = out.description_en;
+    out.fullDescription_ar = out.description_ar;
   }
   if (c.image) out.image = c.image;
   if (c.category) out.category = c.category;
@@ -475,14 +491,58 @@ const fromAdmin = (c) => {
   out.priceOnRequest = Boolean(c.priceOnRequest);
   out.price = out.priceOnRequest ? 0 : Number(c.price) || 0;
   if (base && out.price !== base.price) delete out.oldPrice;
+  const baseTiers = Array.isArray(base?.priceTiers) ? base.priceTiers : null;
+  const tiers = Array.isArray(c.priceTiers) && c.priceTiers.length >= 2 ? c.priceTiers : null;
+  if (tiers) {
+    out.priceTiers = tiers.map((tier, i) => {
+      const raw = Number(tier.price);
+      const fallback = Number(baseTiers?.[i]?.price) || 0;
+      const price =
+        tiers.length === 3 && i === 0
+          ? out.price || fallback
+          : raw > 0
+            ? raw
+            : fallback;
+      return {
+        fr: tier.fr || baseTiers?.[i]?.fr || ['+ 10 ans', 'De 2 à 10 ans', '- 2 ans'][i] || '',
+        en: tier.en || baseTiers?.[i]?.en || ['Over 10', '2 to 10 years', 'Under 2'][i] || '',
+        ar: tier.ar || baseTiers?.[i]?.ar || ['أكثر من 10 سنوات', 'من 2 إلى 10 سنوات', 'أقل من سنتين'][i] || '',
+        price,
+      };
+    });
+  } else if (c.priceChild != null || c.priceInfant != null) {
+    const child = Number(c.priceChild) || Number(baseTiers?.[1]?.price) || 0;
+    const infant = Number(c.priceInfant) || Number(baseTiers?.[2]?.price) || 0;
+    if (child > 0 || infant > 0) {
+      out.priceTiers = [
+        { fr: '+ 10 ans', en: 'Over 10', ar: 'أكثر من 10 سنوات', price: out.price },
+        { fr: 'De 2 à 10 ans', en: '2 to 10 years', ar: 'من 2 إلى 10 سنوات', price: child },
+        { fr: '- 2 ans', en: 'Under 2', ar: 'أقل من سنتين', price: infant },
+      ];
+    } else if (baseTiers) {
+      out.priceTiers = baseTiers.map((tier, i) => ({
+        ...tier,
+        price: i === 0 ? out.price || tier.price : tier.price,
+      }));
+    }
+  }
+  out.fromAdmin = !base;
   return out;
 };
 
-const adminCircuits = readAdminCircuits();
+const currentTours = () => {
+  const adminCircuits = readAdminCircuits();
+  return adminCircuits ? adminCircuits.filter((c) => c.active !== false).map(fromAdmin) : BASE_TOURS;
+};
 
-export const FEATURED_TOURS = adminCircuits
-  ? adminCircuits.filter((c) => c.active !== false).map(fromAdmin)
-  : BASE_TOURS;
+export const FEATURED_TOURS = new Proxy([], {
+  get(_target, prop) {
+    const list = currentTours();
+    if (prop === Symbol.iterator) return list[Symbol.iterator].bind(list);
+    const value = list[prop];
+    return typeof value === 'function' ? value.bind(list) : value;
+  },
+});
 
 /** Formules Taghit encore publiées (accueil, fiche, switch) — suit les circuits admin actifs */
 export const liveTaghitPkgs = () => [

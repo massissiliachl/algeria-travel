@@ -443,5 +443,19 @@ export function mountPage({ route = '/', render, bind, afterRender }) {
     if (cookieEl) cookieEl.innerHTML = cookieHtml();
   });
 
+  let seenCatalog = window.__atCatalogVersion || 0;
+  window.addEventListener('at-catalog', () => {
+    seenCatalog = window.__atCatalogVersion || 0;
+    rerender();
+    initReveal();
+  });
+  queueMicrotask(() => {
+    if ((window.__atCatalogVersion || 0) !== seenCatalog) {
+      seenCatalog = window.__atCatalogVersion;
+      rerender();
+      initReveal();
+    }
+  });
+
   return { rerender };
 }

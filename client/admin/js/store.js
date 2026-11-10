@@ -381,9 +381,14 @@
       const body = {};
       if (patch.status) body.status = STATUS_TO_DB[patch.status] || patch.status;
       if (patch.notes !== undefined) body.admin_notes = patch.notes;
-      Remote.api(`/admin/reservations/${encodeURIComponent(id)}`, { method: 'PATCH', body }).catch((err) =>
-        Remote.onStatus(err.message === 'auth' ? 'auth' : 'error')
-      );
+      Remote.api(`/admin/reservations/${encodeURIComponent(id)}`, { method: 'PATCH', body })
+        .then((data) => {
+          const notice = data?.notice;
+          if (!notice || notice.phoneStatus === 'sent') return;
+          const url = notice.whatsappAbsent ? notice.smsUrl : notice.whatsappUrl;
+          if (url) window.open(url, '_blank', 'noopener');
+        })
+        .catch((err) => Remote.onStatus(err.message === 'auth' ? 'auth' : 'error'));
     },
 
     deleteDbBooking(id) {
@@ -456,7 +461,7 @@
   }
 
   const SEED_DESTINATIONS = [
-    { id: 'taghit', name: 'Taghit', tagline: 'Joyau du Grand Erg', price: 99990, bestTime: 'Octobre – Mars', image: '/images/taghit.jpeg', description: 'Oasis ocre au pied des dunes du Grand Erg occidental.', active: true },
+    { id: 'taghit', name: 'Taghit', tagline: 'Joyau du Grand Erg', price: 130000, bestTime: 'Octobre – Mars', image: '/images/taghit.jpeg', description: 'Oasis ocre au pied des dunes du Grand Erg occidental.', active: true },
     { id: 'bejaia', name: 'Béjaïa', tagline: 'Perle de la Kabylie', price: 25000, bestTime: 'Mai – Octobre', image: '/images/bejaia.jpeg', description: 'Mer turquoise, Cap Carbon et montagnes du Djurdjura.', active: true },
     { id: 'djanet', name: 'Djanet', tagline: 'Porte du Tassili', price: 85000, bestTime: 'Novembre – Février', image: '/images/djanet.jpeg', description: 'Art rupestre, dunes et bivouacs sous les étoiles.', active: true },
     { id: 'ghardaia', name: 'Ghardaïa', tagline: 'Vallée du M’Zab', price: 45000, bestTime: 'Octobre – Avril', image: '/images/ghardaia.jpeg', description: 'Architecture mozabite et oasis du M’Zab.', active: true },
@@ -512,9 +517,42 @@
     { id: 4, name: 'Béjaïa', subtitle: 'Mer & Montagne', location: 'Béjaïa, Méditerranée', duration: '3 jours', price: 25000, category: 'nature', image: '/images/bejaia.jpeg', placeSlug: 'bejaia' },
     { id: 5, name: 'Le Hoggar', subtitle: 'Au cœur du désert', location: 'Tamanrasset, Sahara', duration: '9 jours', price: 95000, category: 'desert', image: '/images/hogar.jpeg', placeSlug: 'hoggar' },
     { id: 6, name: 'Constantine', subtitle: 'Ville des ponts', location: 'Constantine, Nord-Est', duration: '3 jours', price: 22000, category: 'culture', image: '/images/alger.jpeg', placeSlug: 'constantine' },
-    { id: 7, name: 'Taghit — Hôtel 4★', subtitle: 'Voyage coup de cœur · vol inclus', location: 'Taghit, Béchar', duration: 'Pension complète', price: 99990, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'hotel' },
+    {
+      id: 7,
+      name: 'Taghit — Hôtel 4★',
+      subtitle: '5 j / 4 n · 130 000 DA · ou 4 j / 3 n · 99 990 DA',
+      location: 'Taghit, Béchar',
+      duration: '4 j / 3 n ou 5 j / 4 n',
+      price: 130000,
+      priceTiers: [
+        { fr: '5 jours / 4 nuits', en: '5 days / 4 nights', ar: '5 أيام / 4 ليالٍ', price: 130000 },
+        { fr: '4 jours / 3 nuits', en: '4 days / 3 nights', ar: '4 أيام / 3 ليالٍ', price: 99990 },
+      ],
+      category: 'desert',
+      image: '/images/taghit.jpeg',
+      placeSlug: 'taghit',
+      pkg: 'hotel',
+    },
     { id: 8, name: 'Taghit — Maison d’hôte', subtitle: 'Voyage coup de cœur · bus Mercedes', location: 'Taghit, Béchar', duration: 'Pension complète', price: 60000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'guesthouse' },
-    { id: 12, name: 'Séjour Taghit — Départs par avion', subtitle: '4 jours / 3 nuits · vol inclus', location: 'Taghit, Béchar', duration: '4 jours / 3 nuits', price: 75000, category: 'desert', image: '/images/taghit.jpeg', placeSlug: 'taghit', pkg: 'avion' },
+    {
+      id: 12,
+      name: 'Séjour Taghit — Départs par avion',
+      subtitle: '5 j / 4 n · 100 000 DA (+10) · offre −20 %',
+      location: 'Taghit, Béchar',
+      duration: '5 jours / 4 nuits',
+      price: 100000,
+      priceChild: 75000,
+      priceInfant: 40000,
+      priceTiers: [
+        { fr: '+ 10 ans', en: 'Over 10', ar: 'أكثر من 10 سنوات', price: 100000 },
+        { fr: 'De 2 à 10 ans', en: '2 to 10 years', ar: 'من 2 إلى 10 سنوات', price: 75000 },
+        { fr: '- 2 ans', en: 'Under 2', ar: 'أقل من سنتين', price: 40000 },
+      ],
+      category: 'desert',
+      image: '/images/taghit.jpeg',
+      placeSlug: 'taghit',
+      pkg: 'avion',
+    },
   ].map((t) => ({ description: '', priceOnRequest: false, active: true, bookingOpen: true, ...t }));
 
   /** Activités du site (client/js/data/activities.js) — description / image vides = contenu d’origine du site */
@@ -578,6 +616,91 @@
     return item;
   }
 
+  /** Même correspondance que client/js/data/placeRoutes.js et backend/lib/priceLink.js */
+  const TOUR_TO_PLACE = {
+    1: 'timimoun', 2: 'djanet', 3: 'ghardaia', 4: 'bejaia', 5: 'hoggar',
+    6: 'constantine', 7: 'taghit', 8: 'taghit', 9: 'taghit', 10: 'tadrart', 12: 'taghit',
+  };
+  const DEFAULT_PKG = { taghit: 'hotel' };
+  let ficheSync = false;
+
+  function placeOfTour(tour) {
+    return String(tour?.placeSlug || TOUR_TO_PLACE[Number(tour?.id)] || '').trim() || '';
+  }
+  function pkgOf(tour) {
+    return String(tour?.pkg || '').trim().toLowerCase();
+  }
+  function defaultPkg(placeId) {
+    return DEFAULT_PKG[placeId] || '';
+  }
+  function isDefaultTourForPlace(tour, placeId) {
+    return placeOfTour(tour) === placeId && pkgOf(tour) === defaultPkg(placeId);
+  }
+  function withFicheSync(fn) {
+    if (ficheSync) return;
+    ficheSync = true;
+    try {
+      fn();
+    } finally {
+      ficheSync = false;
+    }
+  }
+
+  /** Destination → circuit de la formule par défaut (crée le circuit si absent) */
+  function mirrorDestToDefaultTour(dest) {
+    if (!dest?.id) return;
+    const placeId = dest.id;
+    const tours = Store.getTours();
+    const linked = tours.filter((t) => isDefaultTourForPlace(t, placeId));
+    const patch = {
+      name: dest.name || '',
+      subtitle: dest.tagline || '',
+      location: dest.name || '',
+      price: Number(dest.price || 0),
+      image: dest.image || '',
+      description: dest.description || '',
+      placeSlug: placeId,
+      active: dest.active !== false,
+      bookingOpen: dest.bookingOpen !== false,
+    };
+    if (linked.length) {
+      linked.forEach((t) => {
+        const i = tours.findIndex((x) => String(x.id) === String(t.id));
+        if (i >= 0) tours[i] = { ...tours[i], ...patch, pkg: tours[i].pkg || undefined };
+      });
+    } else {
+      tours.unshift({
+        id: uid('tour'),
+        category: 'desert',
+        duration: '',
+        priceOnRequest: false,
+        ...patch,
+      });
+    }
+    Store.saveTours(tours);
+  }
+
+  /** Circuit (formule par défaut) → destination (crée la destination si absente) */
+  function mirrorDefaultTourToDest(tour) {
+    const placeId = placeOfTour(tour);
+    if (!placeId || !isDefaultTourForPlace(tour, placeId)) return;
+    const dests = Store.getDestinations();
+    const i = dests.findIndex((d) => d.id === placeId);
+    const patch = {
+      id: placeId,
+      name: tour.name || placeId,
+      tagline: tour.subtitle || '',
+      price: Number(tour.price || 0),
+      image: tour.image || '',
+      description: tour.description || '',
+      active: tour.active !== false,
+      bookingOpen: tour.bookingOpen !== false,
+    };
+    if (i >= 0) dests[i] = { ...dests[i], ...patch, bestTime: dests[i].bestTime || '', gallery: dests[i].gallery || [] };
+    else dests.push({ bestTime: '', gallery: [], ...patch });
+    Store.saveDestinations(dests);
+  }
+
   const Store = {
     keys: KEYS,
     uid,
@@ -627,10 +750,19 @@
     getDestinations() { return read(KEYS.destinations, SEED_DESTINATIONS); },
     saveDestinations(list) { write(KEYS.destinations, list); },
     upsertDestination(dest) {
-      return upsertList(Store.getDestinations, Store.saveDestinations, dest, 'id');
+      const saved = upsertList(Store.getDestinations, Store.saveDestinations, dest, 'id');
+      /* Destination = circuit (formule par défaut) : une seule fiche côté site */
+      withFicheSync(() => mirrorDestToDefaultTour(saved));
+      return saved;
     },
     deleteDestination(id) {
       Store.saveDestinations(Store.getDestinations().filter((d) => d.id !== id));
+      withFicheSync(() => {
+        const tours = Store.getTours().map((t) =>
+          isDefaultTourForPlace(t, id) ? { ...t, active: false } : t
+        );
+        Store.saveTours(tours);
+      });
     },
 
     getStays() { return read(KEYS.stays, SEED_STAYS); },
@@ -718,13 +850,27 @@
     upsertTour(tour) {
       const list = Store.getTours();
       const i = list.findIndex((x) => String(x.id) === String(tour.id));
-      if (i >= 0) list[i] = { ...list[i], ...tour };
-      else list.unshift(tour);
+      const merged = i >= 0 ? { ...list[i], ...tour } : tour;
+      if (i >= 0) list[i] = merged;
+      else list.unshift(merged);
       Store.saveTours(list);
-      return tour;
+      withFicheSync(() => mirrorDefaultTourToDest(merged));
+      return merged;
     },
     deleteTour(id) {
+      const removed = Store.getTours().find((t) => String(t.id) === String(id));
       Store.saveTours(Store.getTours().filter((t) => String(t.id) !== String(id)));
+      withFicheSync(() => {
+        const placeId = removed && placeOfTour(removed);
+        if (!placeId || !isDefaultTourForPlace(removed, placeId)) return;
+        const still = Store.getTours().some((t) => isDefaultTourForPlace(t, placeId) && t.active !== false);
+        if (still) return;
+        const dests = Store.getDestinations();
+        const di = dests.findIndex((d) => d.id === placeId);
+        if (di < 0) return;
+        dests[di] = { ...dests[di], active: false };
+        Store.saveDestinations(dests);
+      });
     },
     resetTours() { write(KEYS.tours, SEED_TOURS); },
 

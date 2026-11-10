@@ -7,6 +7,13 @@
       .replace(/"/g, '&quot;');
   }
 
+  function purgeDate(iso) {
+    const d = iso ? new Date(iso) : new Date();
+    if (Number.isNaN(d.getTime())) return '';
+    d.setMonth(d.getMonth() + 6);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
   function slugify(text) {
     return String(text || '')
       .normalize('NFD')
@@ -36,7 +43,13 @@
         </td>
         <td>${escapeHtml(d.tagline || '—')}</td>
         <td>${Number(d.price || 0).toLocaleString('fr-FR')} DA</td>
-        <td>${d.active === false ? '<span class="badge badge--cancelled">Archivée</span>' : '<span class="badge badge--confirmed">Active</span>'}</td>
+        <td>${
+          d.archived
+            ? `<span class="badge badge--cancelled">Archivée</span><br><small>Suppr. le ${purgeDate(d.archivedAt)}</small>`
+            : d.active === false
+              ? '<span class="badge badge--cancelled">Hors ligne</span>'
+              : '<span class="badge badge--confirmed">En ligne</span>'
+        }</td>
         <td>${
           d.bookingOpen
             ? '<span class="badge badge--confirmed">Ouvertes</span>'
@@ -46,6 +59,7 @@
           <button type="button" class="btn btn--sm ${d.bookingOpen ? 'btn--ghost' : 'btn--gold'}" data-dest-booking="${escapeHtml(d.id)}">${
             d.bookingOpen ? 'Fermer les réservations' : 'Ouvrir les réservations'
           }</button>
+          <button type="button" class="btn btn--sm btn--ghost" data-dest-archive="${escapeHtml(d.id)}">${d.archived ? 'Restaurer' : 'Archiver'}</button>
           <button type="button" class="btn btn--sm btn--ghost" data-dest-edit="${escapeHtml(d.id)}">Modifier</button>
           <button type="button" class="btn btn--sm btn--gold" data-dest-calendar="${escapeHtml(d.id)}">Calendrier</button>
         </td>

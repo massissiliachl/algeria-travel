@@ -12,6 +12,7 @@ const { ok, list, fail, apiErrorHandler, pagination, v, slugify } = require('../
 const A = require('../lib/accommodation');
 const { audit, actorTag } = require('../lib/audit');
 const { notifyOwner } = require('../lib/ownerNotifications');
+const { notifyReservationDecision } = require('../lib/reservationEmails');
 
 const UNIT_TYPES = new Set(['APARTMENT', 'VILLA']);
 const RESERVATION_STATUSES = ['pending', 'reviewed', 'confirmed', 'rejected', 'cancelled'];
@@ -865,12 +866,30 @@ function makeAccommodationRouter() {
       const params = [id];
       const visible = await query(`select r.id from public.reservations r where r.id = $1 and ${reservationScope(req, params)}`, params);
       if (!visible.rows.length) fail(404, 'Réservation introuvable.');
+      let previousStatus = null;
       const updated = await withTransaction(async (client) => {
         const row = (await client.query('select * from public.reservations where id = $1 for update', [id])).rows[0];
+        previousStatus = row.status;
         if (RELEASED.has(status)) await A.releaseInventory(client, row);
         else if (RELEASED.has(row.status)) await A.rehold(client, row);
         return (await client.query('update public.reservations set status = $2 where id = $1 returning *', [id, status])).rows[0];
       });
+      if (previousStatus !== status && (status === 'confirmed' || status === 'rejected')) {
+        await notifyReservationDecision(
+          {
+            clientName: updated.client_name,
+            clientEmail: updated.client_email,
+            clientPhone: updated.client_phone,
+            referenceCode: updated.reference_code,
+            itemName: updated.item_name,
+            travelDate: updated.travel_date,
+            checkInDate: updated.check_in_date,
+            checkOutDate: updated.check_out_date,
+            travelers: updated.travelers,
+          },
+          status
+        );
+      }
       await audit(req.actor, 'reservation.status', 'reservation', id, { status });
       ok(res, A.mapReservation(updated));
     })

@@ -10,9 +10,11 @@ import {
   HOME_COUP_TAGHIT,
   HOME_HERO,
 } from '../data/homePage.js';
+import { ACTIVITIES } from '../data/activities.js';
 import { FEATURED_TOURS } from '../data/tours.js';
 import { getPlacePathFromTour, getPlaceSlugFromTour } from '../data/placeRoutes.js';
 import { getPlaces } from '../data/places.js';
+import { formatPriceTiersLabel } from '../data/taghitPackages.js';
 import { resolveSearchNavigation, suggestActivities, suggestDestinations } from '../data/search.js';
 import { getAdminPageValue } from '../utils/adminContent.js';
 
@@ -29,16 +31,36 @@ const coupPackages = () => {
       return {
         ...pkg,
         price: tour.priceOnRequest ? null : Number(tour.price) || pkg.price,
+        oldPrice: tour.oldPrice ?? pkg.oldPrice,
+        priceTiers: tour.priceTiers || pkg.priceTiers,
         priceOnRequest: Boolean(tour.priceOnRequest),
       };
     });
 };
 
-/** Destinations actives (admin) pour le carrousel accueil */
+const coupPriceHtml = (pkg) => {
+  if (pkg.priceOnRequest || pkg.price == null) {
+    return `<strong>${esc(t('home_v2_coup_on_request'))}</strong>
+            <em>${pkg.datesKey ? esc(t(pkg.datesKey)) : ''}</em>`;
+  }
+  /* Hôtel : les deux durées. Avion (paliers âge) : un seul prix promo, pas « 75 000 · 0 · 0 ». */
+  const dual = formatPriceTiersLabel(pkg.priceTiers);
+  if (dual) {
+    return `<strong>${esc(dual)}</strong>
+            <em>${esc(t(pkg.priceNoteKey || 'home_v2_coup_per_person'))}</em>`;
+  }
+  return `<strong>${esc(Number(pkg.price).toLocaleString('fr-DZ'))}<span> ${esc(t('home_v2_coup_price_unit'))}</span></strong>
+          <em>${esc(t(pkg.priceNoteKey || 'home_v2_coup_per_person'))}</em>`;
+};
+
+const newestFirst = (list) =>
+  [...list].sort((a, b) => Number(Boolean(b.fromAdmin)) - Number(Boolean(a.fromAdmin)));
+
+const newBadge = (isNew) => (isNew ? `<span class="hv-new">${esc(t('home_new'))}</span>` : '');
+
+/** Destinations actives (admin) pour le carrousel accueil. Les nouvelles sont en tête. */
 const homeDestinations = () =>
-  getPlaces()
-    .filter((p) => p.id !== 'tadrart')
-    .map((p) => ({
+  newestFirst(getPlaces().filter((p) => p.id !== 'tadrart')).map((p) => ({
       id: p.id,
       name: p.name,
       name_en: p.name_en,
@@ -50,7 +72,24 @@ const homeDestinations = () =>
       temp: p.temp || '',
       image: p.image,
       link: `/place/${p.id}`,
+      isNew: Boolean(p.fromAdmin),
     }));
+
+const homeActivities = () =>
+  newestFirst(ACTIVITIES).map((a) => ({
+    id: a.id,
+    name: a.name,
+    name_en: a.name_en,
+    name_ar: a.name_ar,
+    tagline: a.desc,
+    tagline_en: a.desc_en,
+    tagline_ar: a.desc_ar,
+    image: a.image,
+    link: `/activity/${a.id}`,
+    isNew: Boolean(a.fromAdmin),
+  }));
+
+const homeTours = () => newestFirst(FEATURED_TOURS);
 
 const TRUST = [
   { icon: 'Calendar', title: 'home_trust_book', desc: 'home_trust_book_desc' },
@@ -218,6 +257,7 @@ const coupHtml = () => {
             .map(
               (pkg) => `
             <article class="hv-coup__formula hv-coup__formula--${esc(pkg.id)}">
+              <span class="hv-coup__formula-promo">${esc(t('home_v2_coup_promo'))}</span>
               <div class="hv-coup__formula-top">
                 <span class="hv-coup__formula-icon">${icon(pkg.icon, 20, { strokeWidth: 1.6 })}</span>
                 <div>
@@ -237,13 +277,7 @@ const coupHtml = () => {
 
               <div class="hv-coup__formula-foot">
                 <div class="hv-coup__formula-price">
-                  ${
-                    pkg.priceOnRequest || pkg.price == null
-                      ? `<strong>${esc(t('home_v2_coup_on_request'))}</strong>
-                         <em>${pkg.datesKey ? esc(t(pkg.datesKey)) : ''}</em>`
-                      : `<strong>${esc(pkg.price.toLocaleString('fr-DZ'))}<span> ${esc(t('home_v2_coup_price_unit'))}</span></strong>
-                         <em>${esc(t(pkg.priceNoteKey || 'home_v2_coup_per_person'))}</em>`
-                  }
+                  ${coupPriceHtml(pkg)}
                 </div>
                 <a href="${href(pkg.ctaPath || `${HOME_COUP_TAGHIT.link}?pkg=${pkg.id}`)}" class="hv-coup__formula-cta">
                   ${esc(t('home_v2_coup_cta'))}
@@ -304,6 +338,7 @@ const destHtml = () => `
             .map(
               (d, i) => `
             <article class="hv-dest-card" data-reveal data-delay="${i * 60}" data-href="${esc(d.link)}" role="link" tabindex="0">
+              ${newBadge(d.isNew)}
               <img src="${esc(asset(d.image))}" alt="" loading="lazy" />
               <div class="hv-dest-card__body">
                 <h3>${esc(pick(d.name, d.name_en, d.name_ar))}</h3>
@@ -318,6 +353,38 @@ const destHtml = () => `
             .join('')}
         </div>
         ${carouselNext('dest')}
+      </div>
+    </div>
+  </section>`;
+
+const activitiesHtml = () => `
+  <section class="hv-dest" id="activities">
+    <div class="hv-container">
+      <div class="hv-section-head" data-reveal>
+        <div>
+          <span class="hv-eyebrow">${esc(t('home_acts_eyebrow'))}</span>
+          <h2>${esc(t('home_acts_title'))}</h2>
+        </div>
+        <a href="${href('/activities')}" class="hv-link">${esc(t('home_acts_all'))} ${icon('ArrowRight', 16)}</a>
+      </div>
+
+      <div class="hv-carousel">
+        <div class="hv-carousel__track" data-track="acts">
+          ${homeActivities()
+            .map(
+              (a, i) => `
+            <article class="hv-dest-card" data-reveal data-delay="${i * 60}" data-href="${esc(a.link)}" role="link" tabindex="0">
+              ${newBadge(a.isNew)}
+              <img src="${esc(asset(a.image))}" alt="" loading="lazy" />
+              <div class="hv-dest-card__body">
+                <h3>${esc(pick(a.name, a.name_en, a.name_ar))}</h3>
+                <p>${esc(pick(a.tagline, a.tagline_en, a.tagline_ar))}</p>
+              </div>
+            </article>`
+            )
+            .join('')}
+        </div>
+        ${carouselNext('acts')}
       </div>
     </div>
   </section>`;
@@ -350,11 +417,12 @@ const toursHtml = () => `
 
       <div class="hv-carousel">
         <div class="hv-carousel__track" data-track="tours">
-          ${FEATURED_TOURS.map(
+          ${homeTours().map(
             (tour, i) => `
             <article class="hv-dest-card" data-reveal data-delay="${i * 60}" data-href="${esc(
               getPlacePathFromTour(tour)
             )}" role="link" tabindex="0">
+              ${newBadge(tour.fromAdmin)}
               <img src="${esc(asset(tour.image))}" alt="" loading="lazy" />
               <div class="hv-dest-card__body">
                 <h3>${esc(pick(tour.name, tour.name_en, tour.name_ar))}</h3>
@@ -444,6 +512,7 @@ const render = () => `
         ${coupHtml()}
         ${trustHtml()}
         ${destHtml()}
+        ${activitiesHtml()}
         ${circuitsHtml()}
         ${toursHtml()}
         ${statsHtml()}

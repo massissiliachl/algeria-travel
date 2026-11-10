@@ -5,9 +5,12 @@
     clients: 'Clients',
     destinations: 'Destinations',
     stays: 'Hébergements',
+    owners: 'Propriétaires',
     tours: 'Circuits',
     activities: 'Activités',
     media: 'Galerie',
+    comments: 'Commentaires',
+    chat: 'Chat / Messages clients',
     pages: 'Textes du site',
     settings: 'Réglages',
   };
@@ -45,12 +48,45 @@
     if (e.target === drawer) closeDrawer();
   });
 
+  const PUBLISH_LABELS = {
+    local: ['is-local', 'Mode local — non publié (serveur indisponible)'],
+    pending: ['is-pending', 'Synchronisation avec la base…'],
+    published: ['is-ok', 'Publié sur le site ✓'],
+    error: ['is-error', 'Échec de la publication — réessayez'],
+    auth: ['is-error', 'Session expirée — reconnectez-vous pour publier'],
+  };
+
+  function setPublishBadge(status) {
+    const badge = document.getElementById('publishBadge');
+    const [cls, label] = PUBLISH_LABELS[status] || PUBLISH_LABELS.local;
+    badge.hidden = false;
+    badge.className = 'publish-badge ' + cls;
+    badge.textContent = label;
+  }
+
+  ATStore.remote.onStatus = (status) => {
+    setPublishBadge(status);
+    if (status === 'published') toast('Publié sur le site ✓');
+    if (status === 'error') toast('Échec de la publication sur le site');
+    if (status === 'auth') toast('Reconnectez-vous pour publier sur le site');
+  };
+
   function showApp() {
     loginPage.style.display = 'none';
     app.classList.add('is-visible');
     ATStore.ensureSeed();
     refresh();
     ATStore.probeImageBase().then(refresh);
+    setPublishBadge('pending');
+    ATStore.remote.pull().then((online) => {
+      ATStore.ensureSeed();
+      refresh();
+      setPublishBadge(online ? 'published' : 'local');
+      const current = document.querySelector('.section.is-active')?.id.replace('section-', '');
+      if (online && current) showSection(current);
+      ATNotify.start({ toast, showSection, refresh });
+    });
+    document.addEventListener('click', ATNotify.askPermission, { once: true });
   }
 
   function showLogin() {
@@ -69,6 +105,12 @@
     sidebar.classList.remove('is-open');
     if (id === 'settings') ATContentUI.fillSettingsForm();
     if (id === 'pages') ATManageUI.fillPagesForm();
+    if (id === 'comments') ATCommentsUI.load(toast);
+    if (id === 'chat') ATChatUI.load(toast);
+    if (id === 'owners') {
+      ATOwnersUI.load(toast, openDrawer);
+      ATNotify.showPartnerActivity();
+    }
   }
 
   function refresh() {
@@ -82,13 +124,14 @@
       <div class="stat"><div class="stat__label">Hébergements</div><div class="stat__value">${stats.stays}</div></div>
     `;
 
-    const recent = ATStore.getBookings().slice(0, 5);
+    const recent = ATStore.getBookings().filter((b) => !ATStore.isArchived(b)).slice(0, 5);
     document.getElementById('dashBookings').innerHTML = ATBookingsUI.renderRows(recent, { compact: true });
 
+    const archived = document.getElementById('bookingView').value === 'archived';
     const filter = document.getElementById('bookingFilter').value;
-    let bookings = ATStore.getBookings();
+    let bookings = ATStore.getBookings().filter((b) => ATStore.isArchived(b) === archived);
     if (filter !== 'all') bookings = bookings.filter((b) => b.status === filter);
-    document.getElementById('bookingsTable').innerHTML = ATBookingsUI.renderRows(bookings);
+    document.getElementById('bookingsTable').innerHTML = ATBookingsUI.renderRows(bookings, { archived });
 
     document.getElementById('clientsTable').innerHTML = ATManageUI.renderClients();
     document.getElementById('destinationsTable').innerHTML = ATDestinationsUI.renderTable();
@@ -98,10 +141,22 @@
     document.getElementById('galleryGrid').innerHTML = ATManageUI.renderGallery();
   }
 
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const err = document.getElementById('loginError');
-    if (ATAuth.login(document.getElementById('loginUser').value, document.getElementById('loginPass').value)) {
+    ATNotify.askPermission();
+    const submit = e.target.querySelector('[type="submit"]');
+    const label = submit?.textContent;
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = 'Connexion… (réveil du serveur, jusqu’à 1 min)';
+    }
+    const { ok } = await ATAuth.login(document.getElementById('loginUser').value, document.getElementById('loginPass').value);
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = label;
+    }
+    if (ok) {
       err.classList.remove('is-visible');
       showApp();
     } else {
@@ -116,7 +171,7 @@
 
   document.getElementById('menuToggle').addEventListener('click', () => sidebar.classList.toggle('is-open'));
 
-  document.querySelectorAll('.nav-btn').forEach((btn) => {
+  document.querySelectorAll('.nav-btn[data-section]').forEach((btn) => {
     btn.addEventListener('click', () => showSection(btn.dataset.section));
   });
 
@@ -125,6 +180,7 @@
   });
 
   document.getElementById('bookingFilter').addEventListener('change', refresh);
+  document.getElementById('bookingView').addEventListener('change', refresh);
   document.getElementById('destAddBtn').addEventListener('click', () => ATDestinationsUI.openForm(null, openDrawer, toast));
   document.getElementById('clientAddBtn').addEventListener('click', () => ATManageUI.openClientForm(null, openDrawer, toast));
   document.getElementById('clientsRebuild').addEventListener('click', () => {
@@ -135,11 +191,22 @@
   document.getElementById('galleryAddBtn').addEventListener('click', () => ATManageUI.openGalleryAddForm(openDrawer, toast));
   document.getElementById('tourAddBtn').addEventListener('click', () => ATManageUI.openTourForm(null, openDrawer, toast));
   document.getElementById('actAddBtn').addEventListener('click', () => ATManageUI.openActivityForm(null, openDrawer, toast));
+  document.getElementById('commentsReload').addEventListener('click', () => ATCommentsUI.load(toast));
+  ATCommentsUI.bind(toast);
+  document.getElementById('chatReload').addEventListener('click', () => ATChatUI.load(toast));
+  ATChatUI.bind(toast);
+  ATOwnersUI.bind(toast, openDrawer);
+  document.getElementById('partnerActivityReload').addEventListener('click', () => ATNotify.showPartnerActivity());
 
   document.body.addEventListener('click', (e) => {
     const openBk = e.target.closest('[data-booking-open]');
     if (openBk) {
       ATBookingsUI.openDetail(openBk.dataset.bookingOpen, openDrawer, toast);
+      return;
+    }
+    const deleteBk = e.target.closest('[data-booking-delete]');
+    if (deleteBk) {
+      ATBookingsUI.remove(deleteBk.dataset.bookingDelete, toast);
       return;
     }
     const editDest = e.target.closest('[data-dest-edit]');
@@ -149,6 +216,39 @@
         openDrawer,
         toast
       );
+      return;
+    }
+    const bookingDest = e.target.closest('[data-dest-booking]');
+    if (bookingDest) {
+      const dest = ATStore.getDestinations().find((d) => d.id === bookingDest.dataset.destBooking);
+      if (!dest) return;
+      ATStore.upsertDestination({ ...dest, bookingOpen: !dest.bookingOpen });
+      toast(`Réservations ${dest.bookingOpen ? 'fermées' : 'ouvertes'} : ${dest.name}`);
+      refresh();
+      return;
+    }
+    const bookingTour = e.target.closest('[data-tour-booking]');
+    if (bookingTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === bookingTour.dataset.tourBooking);
+      if (!tour) return;
+      const open = tour.bookingOpen !== false;
+      ATStore.upsertTour({ ...tour, bookingOpen: !open });
+      toast(`Réservations ${open ? 'fermées' : 'ouvertes'} : ${tour.name}`);
+      refresh();
+      return;
+    }
+    const calTour = e.target.closest('[data-tour-calendar]');
+    if (calTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === calTour.dataset.tourCalendar);
+      if (!tour?.placeSlug) return;
+      const dest = ATStore.getDestinations().find((d) => d.id === tour.placeSlug) || { id: tour.placeSlug, name: tour.name };
+      ATBookingCalendarUI.open(dest, openDrawer, toast, tour.pkg ? `${tour.placeSlug}:${tour.pkg}` : tour.placeSlug);
+      return;
+    }
+    const calDest = e.target.closest('[data-dest-calendar]');
+    if (calDest) {
+      const dest = ATStore.getDestinations().find((d) => d.id === calDest.dataset.destCalendar);
+      if (dest) ATBookingCalendarUI.open(dest, openDrawer, toast);
       return;
     }
     const editStay = e.target.closest('[data-stay-edit]');

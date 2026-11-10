@@ -406,7 +406,7 @@
         <td><strong>${esc(t.name)}</strong><br><small>${esc(t.location || t.destination || '')}${t.duration ? ' · ' + esc(t.duration) : ''}</small></td>
         <td>${esc(TOUR_CATEGORIES[t.category] || '—')}</td>
         <td>${tourPrice(t)}</td>
-        <td>${t.active === false ? '<span class="badge badge--cancelled">Masqué</span>' : '<span class="badge badge--confirmed">En ligne</span>'}</td>
+        <td>${t.archived ? '<span class="badge badge--cancelled">Archivé</span>' : t.active === false ? '<span class="badge badge--cancelled">Masqué</span>' : '<span class="badge badge--confirmed">En ligne</span>'}</td>
         <td>${
           t.bookingOpen !== false
             ? '<span class="badge badge--confirmed">Ouvertes</span>'
@@ -417,6 +417,7 @@
             t.bookingOpen !== false ? 'Fermer les réservations' : 'Ouvrir les réservations'
           }</button>
           ${t.placeSlug ? `<button type="button" class="btn btn--sm btn--gold" data-tour-calendar="${esc(t.id)}">Calendrier</button>` : ''}
+          <button type="button" class="btn btn--sm btn--ghost" data-tour-archive="${esc(t.id)}">${t.archived ? 'Restaurer' : 'Archiver'}</button>
           <button type="button" class="btn btn--sm btn--ghost" data-tour-edit="${esc(t.id)}">Modifier</button>
           <button type="button" class="btn btn--sm btn--danger" data-tour-del="${esc(t.id)}">Supprimer</button>
         </td>
@@ -430,9 +431,13 @@
   function openTourForm(tour, openDrawer, toast) {
     const t = tour || {
       id: '', name: '', subtitle: '', location: '', duration: '', price: 0, priceOnRequest: false,
-      category: 'desert', placeSlug: '', description: '', image: '', active: true, bookingOpen: true,
+      priceChild: 0, priceInfant: 0, category: 'desert', placeSlug: '', pkg: '', description: '', image: '',
+      active: true, bookingOpen: true,
     };
     const isNew = !tour;
+    const tiers = Array.isArray(t.priceTiers) ? t.priceTiers : null;
+    const priceChild = Number(t.priceChild ?? tiers?.[1]?.price) || 0;
+    const priceInfant = Number(t.priceInfant ?? tiers?.[2]?.price) || 0;
     const slugs = [...new Set(['tadrart', ...ATStore.getDestinations().map((d) => d.id)])];
     const slugOptions = [`<option value="">— Aucune —</option>`]
       .concat(slugs.map((s) => `<option value="${esc(s)}" ${t.placeSlug === s ? 'selected' : ''}>${esc(s)}</option>`))
@@ -440,20 +445,32 @@
     const catOptions = Object.entries(TOUR_CATEGORIES)
       .map(([k, v]) => `<option value="${k}" ${t.category === k ? 'selected' : ''}>${v}</option>`)
       .join('');
+    const pkgOptions = [
+      ['', '— Aucune —'],
+      ['hotel', 'Hôtel 4★'],
+      ['guesthouse', 'Maison d’hôte'],
+      ['avion', 'Séjour par avion'],
+      ['brezina', 'Via Brezina'],
+    ]
+      .map(([k, v]) => `<option value="${esc(k)}" ${String(t.pkg || '') === k ? 'selected' : ''}>${esc(v)}</option>`)
+      .join('');
     openDrawer(`
       <h3>${isNew ? 'Nouveau circuit' : 'Modifier le circuit'}</h3>
       <form id="tourForm" class="form-grid">
-        <div class="field full"><label>Nom du circuit *</label><input name="name" value="${esc(t.name)}" required placeholder="Ex. Taghit via Brezina" /></div>
-        <div class="field full"><label>Sous-titre</label><input name="subtitle" value="${esc(t.subtitle || '')}" placeholder="Ex. 5 jours / 4 nuits · Van Mercedes VIP" /></div>
+        <div class="field full"><label>Nom du circuit *</label><input name="name" value="${esc(t.name)}" required placeholder="Ex. Séjour Taghit par avion" /></div>
+        <div class="field full"><label>Sous-titre</label><input name="subtitle" value="${esc(t.subtitle || '')}" placeholder="Ex. 4 jours / 3 nuits · vol inclus" /></div>
         <div class="field"><label>Lieu</label><input name="location" value="${esc(t.location || t.destination || '')}" placeholder="Ex. Taghit, Béchar" /></div>
-        <div class="field"><label>Durée</label><input name="duration" value="${esc(t.duration || '')}" placeholder="Ex. 5 jours / 4 nuits" /></div>
-        <div class="field"><label>Prix (DA / personne, pour tout le séjour)</label><input name="price" type="number" min="0" value="${Number(t.price || 0)}" /></div>
+        <div class="field"><label>Durée</label><input name="duration" value="${esc(t.duration || '')}" placeholder="Ex. 4 jours / 3 nuits" /></div>
+        <div class="field"><label>Prix adulte / + 10 ans (DA)</label><input name="price" type="number" min="0" value="${Number(t.price || 0)}" /></div>
         <div class="field"><label>Prix sur demande</label>
           <select name="priceOnRequest"><option value="false" ${!t.priceOnRequest ? 'selected' : ''}>Non, afficher le prix</option>
           <option value="true" ${t.priceOnRequest ? 'selected' : ''}>Oui</option></select>
         </div>
+        <div class="field"><label>Prix 2 à 10 ans (DA)</label><input name="priceChild" type="number" min="0" value="${priceChild}" placeholder="0 = pas de palier" /></div>
+        <div class="field"><label>Prix - 2 ans (DA)</label><input name="priceInfant" type="number" min="0" value="${priceInfant}" placeholder="0 = pas de palier" /></div>
         <div class="field"><label>Type</label><select name="category">${catOptions}</select></div>
         <div class="field"><label>Fiche destination liée</label><select name="placeSlug">${slugOptions}</select></div>
+        <div class="field"><label>Formule (Taghit)</label><select name="pkg">${pkgOptions}</select></div>
         <div class="field full"><label>Image</label>
           ${ATImageInsert.markup({ id: 'tourImg', name: 'image', label: 'Insérer une image', value: t.image || '' })}
         </div>
@@ -466,6 +483,7 @@
           <select name="bookingOpen"><option value="true" ${t.bookingOpen !== false ? 'selected' : ''}>Ouvertes</option>
           <option value="false" ${t.bookingOpen === false ? 'selected' : ''}>Fermées</option></select>
         </div>
+        <p class="gallery-admin__hint full">Dates de départ (puces « 17 – 20 nov. »…) : bouton <strong>Calendrier</strong> sur la ligne du circuit → mode « Séjours à dates fixes ».</p>
         <div class="form-actions full">
           <button type="submit" class="btn btn--primary" style="width:auto">Enregistrer</button>
           ${!isNew ? '<button type="button" class="btn btn--danger" id="tourDel">Supprimer</button>' : ''}
@@ -482,16 +500,31 @@
         toast('Ajoutez une image pour le circuit');
         return;
       }
+      const price = Number(fd.get('price') || 0);
+      const child = Number(fd.get('priceChild') || 0);
+      const infant = Number(fd.get('priceInfant') || 0);
+      const priceOnRequest = fd.get('priceOnRequest') === 'true';
       ATStore.upsertTour({
         id: isNew ? ATStore.uid('tour') : t.id,
         name: String(fd.get('name') || '').trim(),
         subtitle: String(fd.get('subtitle') || '').trim(),
         location: String(fd.get('location') || '').trim(),
         duration: String(fd.get('duration') || '').trim(),
-        price: Number(fd.get('price') || 0),
-        priceOnRequest: fd.get('priceOnRequest') === 'true',
+        price,
+        priceOnRequest,
+        priceChild: child,
+        priceInfant: infant,
+        priceTiers:
+          child > 0 || infant > 0
+            ? [
+                { fr: '+ 10 ans', en: 'Over 10', ar: 'أكثر من 10 سنوات', price: priceOnRequest ? 0 : price },
+                { fr: 'De 2 à 10 ans', en: '2 to 10 years', ar: 'من 2 إلى 10 سنوات', price: child },
+                { fr: '- 2 ans', en: 'Under 2', ar: 'أقل من سنتين', price: infant },
+              ]
+            : null,
         category: String(fd.get('category') || 'desert'),
         placeSlug: String(fd.get('placeSlug') || ''),
+        pkg: String(fd.get('pkg') || ''),
         image,
         description: String(fd.get('description') || '').trim(),
         active: fd.get('active') === 'true',
@@ -531,8 +564,11 @@
         <td><strong>${esc(a.name)}</strong></td>
         <td>${links.length ? esc(links.join(', ')) : '<span class="badge badge--cancelled">Non liée</span>'}</td>
         <td>${Number(a.price || 0).toLocaleString('fr-FR')} DA</td>
-        <td>${a.active === false ? '<span class="badge badge--cancelled">Inactif</span>' : '<span class="badge badge--confirmed">Actif</span>'}</td>
-        <td><button type="button" class="btn btn--sm btn--ghost" data-act-edit="${esc(a.id)}">Modifier</button></td>
+        <td>${a.archived ? '<span class="badge badge--cancelled">Archivée</span>' : a.active === false ? '<span class="badge badge--cancelled">Inactive</span>' : '<span class="badge badge--confirmed">En ligne</span>'}</td>
+        <td>
+          <button type="button" class="btn btn--sm btn--ghost" data-act-archive="${esc(a.id)}">${a.archived ? 'Restaurer' : 'Archiver'}</button>
+          <button type="button" class="btn btn--sm btn--ghost" data-act-edit="${esc(a.id)}">Modifier</button>
+        </td>
       </tr>`;
         }
       )
