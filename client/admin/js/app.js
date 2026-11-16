@@ -42,14 +42,24 @@
     drawerPanel.innerHTML =
       html +
       `<div class="form-actions"><button type="button" class="btn btn--ghost" id="drawerClose">Fermer</button></div>`;
+    drawer.hidden = false;
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
+    /* Force reflow — iPad ignore parfois le 1er display:flex */
+    void drawer.offsetHeight;
     document.getElementById('drawerClose').onclick = closeDrawer;
+    try {
+      drawerPanel.scrollTop = 0;
+      drawerPanel.focus?.();
+    } catch {
+      /* ignore */
+    }
   }
 
   function closeDrawer() {
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
+    drawer.hidden = true;
     drawerPanel.innerHTML = '';
   }
 
@@ -234,13 +244,25 @@
   ATOwnersUI.bind(toast, openDrawer);
   document.getElementById('partnerActivityReload').addEventListener('click', () => ATNotify.showPartnerActivity());
 
+  /* pointerup + click : sur tablette le click seul est souvent avalé par le scroll du tableau */
+  const openBookingFromEvent = (e) => {
+    const openBk = e.target.closest?.('[data-booking-open]');
+    if (!openBk) return false;
+    e.preventDefault();
+    e.stopPropagation();
+    ATBookingsUI.openDetail(openBk.getAttribute('data-booking-open'), openDrawer, toast);
+    return true;
+  };
+  document.body.addEventListener(
+    'pointerup',
+    (e) => {
+      if (e.pointerType === 'mouse') return;
+      openBookingFromEvent(e);
+    },
+    { capture: true }
+  );
   document.body.addEventListener('click', (e) => {
-    const openBk = e.target.closest('[data-booking-open]');
-    if (openBk) {
-      e.preventDefault();
-      ATBookingsUI.openDetail(openBk.dataset.bookingOpen, openDrawer, toast);
-      return;
-    }
+    if (openBookingFromEvent(e)) return;
     const deleteBk = e.target.closest('[data-booking-delete]');
     if (deleteBk) {
       e.preventDefault();

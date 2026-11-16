@@ -56,12 +56,13 @@
 
     const body = bookings
       .map((b) => {
+        const id = escapeHtml(String(b.id ?? ''));
         if (compact) {
           return `<tr>
             <td><strong>${escapeHtml(b.name || '—')}</strong><br><small>${escapeHtml(b.email || '')}</small></td>
             <td>${escapeHtml(b.destination || '—')}</td>
             <td>${badge(b.status)}</td>
-            <td><button type="button" class="btn btn--sm btn--ghost" data-booking-open="${b.id}">Voir</button></td>
+            <td class="actions"><button type="button" class="btn btn--sm btn--ghost" data-booking-open="${id}">Voir</button></td>
           </tr>`;
         }
         return `<tr>
@@ -72,14 +73,41 @@
           <td>${badge(b.status)}${b.archivedAt ? `<br><small title="${escapeHtml(archiveInfo(b))}">Suppr. le ${purgeDate(b.archivedAt)}</small>` : ''}</td>
           <td>${formatDate(b.createdAt)}</td>
           <td class="actions">
-            <button type="button" class="btn btn--sm btn--ghost" data-booking-open="${b.id}">Détail</button>
-            <button type="button" class="btn btn--sm btn--danger" data-booking-delete="${b.id}">Supprimer</button>
+            <button type="button" class="btn btn--sm btn--ghost" data-booking-open="${id}">Détail</button>
+            <button type="button" class="btn btn--sm btn--danger" data-booking-delete="${id}">Supprimer</button>
           </td>
         </tr>`;
       })
       .join('');
 
-    return `<table>${head}<tbody>${body}</tbody></table>`;
+    /* Cartes tactiles : sur tablette le tableau sticky + overflow casse souvent les taps iOS/Android */
+    const cards = bookings
+      .map((b) => {
+        const id = escapeHtml(String(b.id ?? ''));
+        return `<article class="bk-card">
+          <div class="bk-card__top">
+            <div>
+              <strong>${escapeHtml(b.name || '—')}</strong>
+              <small>${escapeHtml(b.email || '')}</small>
+            </div>
+            ${badge(b.status)}
+          </div>
+          <p class="bk-card__dest">${escapeHtml(b.destination || '—')}</p>
+          ${
+            compact
+              ? ''
+              : `<p class="bk-card__meta">${escapeHtml(b.date || '—')} · ${escapeHtml(String(b.travelers || '—'))} voy. · ${formatDate(b.createdAt)}</p>`
+          }
+          <div class="bk-card__actions">
+            <button type="button" class="btn btn--primary" data-booking-open="${id}">${compact ? 'Voir' : 'Détail'}</button>
+            ${compact ? '' : `<button type="button" class="btn btn--danger" data-booking-delete="${id}">Supprimer</button>`}
+          </div>
+        </article>`;
+      })
+      .join('');
+
+    return `<div class="bk-desktop table-wrap"><table>${head}<tbody>${body}</tbody></table></div>
+      <div class="bk-mobile">${cards}</div>`;
   }
 
   function escapeHtml(str) {
@@ -91,8 +119,11 @@
   }
 
   function openDetail(id, openDrawer, toast) {
-    const b = ATStore.getBookings().find((x) => x.id === id);
-    if (!b) return;
+    const b = ATStore.getBookings().find((x) => String(x.id) === String(id));
+    if (!b) {
+      if (typeof toast === 'function') toast('Réservation introuvable');
+      return;
+    }
     openDrawer(`
       <h3>Réservation</h3>
       <p><strong>${escapeHtml(b.name)}</strong><br>
