@@ -21,6 +21,15 @@
   const drawerPanel = document.getElementById('drawerPanel');
   const toastEl = document.getElementById('toast');
   const sidebar = document.getElementById('sidebar');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+  const setSidebarOpen = (open) => {
+    sidebar?.classList.toggle('is-open', open);
+    if (sidebarBackdrop) {
+      sidebarBackdrop.hidden = !open;
+      sidebarBackdrop.classList.toggle('is-visible', open);
+    }
+  };
 
   function toast(msg) {
     toastEl.textContent = msg;
@@ -86,7 +95,8 @@
       if (online && current) showSection(current);
       ATNotify.start({ toast, showSection, refresh });
     });
-    document.addEventListener('click', ATNotify.askPermission, { once: true });
+    /* Différé : sinon le 1er tap « Détail » sur iPad peut être mangé par la demande de notification */
+    setTimeout(() => ATNotify.askPermission(), 800);
   }
 
   function showLogin() {
@@ -95,6 +105,7 @@
   }
 
   function showSection(id) {
+    setSidebarOpen(false);
     document.querySelectorAll('.section').forEach((s) => s.classList.remove('is-active'));
     document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('is-active'));
     const section = document.getElementById('section-' + id);
@@ -102,7 +113,6 @@
     if (section) section.classList.add('is-active');
     if (btn) btn.classList.add('is-active');
     document.getElementById('pageTitle').textContent = TITLES[id] || id;
-    sidebar.classList.remove('is-open');
     if (id === 'settings') ATContentUI.fillSettingsForm();
     if (id === 'pages') ATManageUI.fillPagesForm();
     if (id === 'comments') ATCommentsUI.load(toast);
@@ -169,7 +179,33 @@
     showLogin();
   });
 
-  document.getElementById('menuToggle').addEventListener('click', () => sidebar.classList.toggle('is-open'));
+  document.getElementById('menuToggle')?.addEventListener('click', () => {
+    setSidebarOpen(!sidebar.classList.contains('is-open'));
+  });
+  sidebarBackdrop?.addEventListener('click', () => setSidebarOpen(false));
+
+  /* Bouton œil mot de passe — hors <label> + blur iOS pour que le type change sur tablette */
+  document.getElementById('loginPassToggle')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const input = document.getElementById('loginPass');
+    const btn = e.currentTarget;
+    if (!input) return;
+    const show = input.type === 'password';
+    const pos = input.selectionStart;
+    input.blur();
+    input.type = show ? 'text' : 'password';
+    btn.classList.toggle('is-on', show);
+    const label = show ? 'Masquer le mot de passe' : 'Afficher le mot de passe';
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    try {
+      input.focus();
+      if (typeof pos === 'number') input.setSelectionRange(pos, pos);
+    } catch {
+      /* ignore */
+    }
+  });
 
   document.querySelectorAll('.nav-btn[data-section]').forEach((btn) => {
     btn.addEventListener('click', () => showSection(btn.dataset.section));
@@ -201,11 +237,13 @@
   document.body.addEventListener('click', (e) => {
     const openBk = e.target.closest('[data-booking-open]');
     if (openBk) {
+      e.preventDefault();
       ATBookingsUI.openDetail(openBk.dataset.bookingOpen, openDrawer, toast);
       return;
     }
     const deleteBk = e.target.closest('[data-booking-delete]');
     if (deleteBk) {
+      e.preventDefault();
       ATBookingsUI.remove(deleteBk.dataset.bookingDelete, toast);
       return;
     }
@@ -216,6 +254,17 @@
         openDrawer,
         toast
       );
+      return;
+    }
+    const archiveDest = e.target.closest('[data-dest-archive]');
+    if (archiveDest) {
+      const dest = ATStore.getDestinations().find((d) => d.id === archiveDest.dataset.destArchive);
+      if (!dest) return;
+      const archived = !dest.archived;
+      if (archived && !confirm(`Archiver « ${dest.name} » ? La fiche quitte le site et sera supprimée dans 6 mois.`)) return;
+      ATStore.upsertDestination({ ...dest, archived, archivedAt: archived ? dest.archivedAt || new Date().toISOString() : '', active: archived ? false : dest.active });
+      toast(archived ? `${dest.name} archivée` : `${dest.name} restaurée`);
+      refresh();
       return;
     }
     const bookingDest = e.target.closest('[data-dest-booking]');
@@ -286,6 +335,17 @@
       refresh();
       return;
     }
+    const archiveTour = e.target.closest('[data-tour-archive]');
+    if (archiveTour) {
+      const tour = ATStore.getTours().find((t) => String(t.id) === archiveTour.dataset.tourArchive);
+      if (!tour) return;
+      const archived = !tour.archived;
+      if (archived && !confirm(`Archiver « ${tour.name} » ? Le circuit quitte le site et sera supprimé dans 6 mois.`)) return;
+      ATStore.upsertTour({ ...tour, archived, active: archived ? false : tour.active });
+      toast(archived ? `${tour.name} archivé` : `${tour.name} restauré`);
+      refresh();
+      return;
+    }
     const editTour = e.target.closest('[data-tour-edit]');
     if (editTour) {
       ATManageUI.openTourForm(
@@ -293,6 +353,17 @@
         openDrawer,
         toast
       );
+      return;
+    }
+    const archiveAct = e.target.closest('[data-act-archive]');
+    if (archiveAct) {
+      const activity = ATStore.getActivities().find((a) => a.id === archiveAct.dataset.actArchive);
+      if (!activity) return;
+      const archived = !activity.archived;
+      if (archived && !confirm(`Archiver « ${activity.name} » ? L’activité quitte le site et sera supprimée dans 6 mois.`)) return;
+      ATStore.upsertActivity({ ...activity, archived, active: archived ? false : activity.active });
+      toast(archived ? `${activity.name} archivée` : `${activity.name} restaurée`);
+      refresh();
       return;
     }
     const editAct = e.target.closest('[data-act-edit]');

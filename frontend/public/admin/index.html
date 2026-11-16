@@ -8,17 +8,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/admin.css?v=20261012" />
+  <link rel="stylesheet" href="css/admin.css?v=20261116" />
   <style>
     .login-card__pass { position: relative; display: block; }
-    .login-card .login-card__pass input { padding-right: 48px; }
+    .login-card .login-card__pass input { padding-right: 52px; }
     .login-card__eye {
-      position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
-      display: grid; place-items: center; width: 34px; height: 34px; padding: 0;
-      border: 0; border-radius: 8px; background: transparent; color: #8a93a3; cursor: pointer;
+      position: absolute; top: 50%; right: 4px; transform: translateY(-50%);
+      display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+      border: 0; border-radius: 10px; background: transparent; color: #8a93a3; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
       transition: color .15s, background .15s;
     }
-    .login-card__eye:hover { color: #1a2332; background: rgba(26, 35, 50, .06); }
+    .login-card__eye:hover, .login-card__eye:active { color: #1a2332; background: rgba(26, 35, 50, .06); }
     .login-card__eye:focus-visible { outline: 2px solid #c9a24a; outline-offset: 1px; }
     .login-card__eye.is-on .login-card__eye-slash { display: none; }
   </style>
@@ -33,12 +34,11 @@
         Identifiant
         <input type="text" name="user" id="loginUser" required placeholder="admin" autocomplete="username" />
       </label>
-      <label>
-        Mot de passe
+      <div class="login-card__field">
+        <label for="loginPass">Mot de passe</label>
         <span class="login-card__pass">
           <input type="password" name="pass" id="loginPass" required placeholder="••••••••" autocomplete="current-password" />
-          <button type="button" class="login-card__eye" aria-label="Afficher le mot de passe" title="Afficher le mot de passe"
-            onclick="const i = document.getElementById('loginPass'); const show = i.type === 'password'; i.type = show ? 'text' : 'password'; this.classList.toggle('is-on', show); this.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'); this.title = this.getAttribute('aria-label');">
+          <button type="button" class="login-card__eye" id="loginPassToggle" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
               <circle cx="12" cy="12" r="3" />
@@ -46,12 +46,13 @@
             </svg>
           </button>
         </span>
-      </label>
+      </div>
       <button type="submit" class="btn btn--primary">Se connecter</button>
     </form>
   </div>
 
   <div class="app" id="app">
+    <button type="button" class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Fermer le menu" hidden></button>
     <aside class="sidebar" id="sidebar">
 
       <div class="sidebar__brand">
