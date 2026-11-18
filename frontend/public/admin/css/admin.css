@@ -507,9 +507,20 @@ tr.is-muted td { opacity: 0.55; }
 
 .drawer.is-open .drawer__panel { transform: translateX(0); }
 
-/* Desktop = tableau ; tablette/mobile = cartes (taps fiables) */
+/* Desktop souris = tableau ; téléphone + tablette (même iPad paysage) = cartes */
 .bk-mobile { display: none; }
 .bk-desktop { display: block; }
+
+html.is-touch-admin .bk-desktop,
+html.is-touch-admin .bk-desktop.table-wrap {
+  display: none !important;
+}
+
+html.is-touch-admin .bk-mobile {
+  display: grid !important;
+  gap: 12px;
+  padding: 12px;
+}
 
 .bk-card {
   background: #fff;
@@ -1024,7 +1035,17 @@ tr.is-muted td { opacity: 0.55; }
 
   .bk-desktop { display: none !important; }
   .bk-mobile {
-    display: grid;
+    display: grid !important;
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+/* Tablettes larges (iPad paysage ~1024–1366) sans classe JS encore chargée */
+@media (max-width: 1400px) and (pointer: coarse), (max-width: 1400px) and (hover: none) {
+  .bk-desktop { display: none !important; }
+  .bk-mobile {
+    display: grid !important;
     gap: 12px;
     padding: 12px;
   }

@@ -15,6 +15,15 @@
     settings: 'Réglages',
   };
 
+  /* iPad / tablette : largeur > 960px → avant on gardait le tableau desktop (taps morts).
+     On force le mode cartes dès qu’il y a un écran tactile. */
+  const isTouchAdmin =
+    (navigator.maxTouchPoints || 0) > 0 ||
+    'ontouchstart' in window ||
+    window.matchMedia('(pointer: coarse)').matches ||
+    window.matchMedia('(hover: none)').matches;
+  if (isTouchAdmin) document.documentElement.classList.add('is-touch-admin');
+
   const loginPage = document.getElementById('loginPage');
   const app = document.getElementById('app');
   const drawer = document.getElementById('drawer');
